@@ -1,0 +1,118 @@
+---
+title: "HPD 4 — Sistema RAG sobre datos mixtos con evaluación"
+engine: jupyter
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/modulo_10/blob/main/notebooks/hpd4-rag-mixto.ipynb)
+
+
+
+> **Duración:** 6h
+>
+> **Entregable:** Pipeline RAG evaluado con RAGAS (score > 0,6)
+>
+> **Competencias:** [CE-4](index.qmd#competencias-específicas), [CE-5](index.qmd#competencias-específicas)
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q chromadb sentence-transformers langchain ragas datasets
+```
+
+::: {.callout-tip icon=false}
+## 🎯 Objetivos
+- Construir un pipeline RAG que procese datos no estructurados (PDF) y estructurados (SQL)
+- Implementar un re-ranker con cross-encoder
+- Evaluar la calidad del sistema con RAGAS
+- Iterar sobre componentes para mejorar métricas
+
+## 📦 Materiales
+- Librerías: `langchain`, `chromadb`, `sentence-transformers`, `ragas`, `datasets`
+- Modelo embeddings: `intfloat/e5-small-v2`
+- Cross-encoder: `ms-marco-MiniLM`
+- Corpus: PDFs técnicos + tabla SQL (proporcionados)
+- LLM: API Llamus US (`https://llamus.cs.us.es/api/v1`, modelo `qwen3.6:27b`) o local (Ollama)
+
+## 👣 Instrucciones
+1. Cargar e indexar PDFs en base vectorial
+2. Cargar e indexar tabla SQL
+3. Implementar retrievers para cada fuente
+4. Implementar re-ranker con cross-encoder
+5. Construir pipeline RAG fusionado
+6. Crear dataset de preguntas anotadas
+7. Evaluar con RAGAS (faithfulness, answer relevancy, context precision)
+
+## 💻 Código base
+:::
+
+```{python}
+#| echo: true
+#| eval: false
+
+from langchain_community.vectorstores import Chroma
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain.retrievers import ContextualCompressionRetriever
+from langchain.retrievers.document_compressors import CrossEncoderReranker
+from langchain_community.cross_encoders import HuggingFaceCrossEncoder
+from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy, context_precision
+import pandas as pd
+
+# TODO: Configurar embeddings
+# embeddings = HuggingFaceEmbeddings(model_name="intfloat/e5-small-v2")
+
+# TODO: Configurar retrievers
+# vectorstore = Chroma(...)
+# retriever = vectorstore.as_retriever(...)
+
+# TODO: Configurar re-ranker
+# cross_encoder = HuggingFaceCrossEncoder(model_name="ms-marco-MiniLM-L6-v2")
+# compressor = CrossEncoderReranker(model=cross_encoder, top_n=3)
+# compression_retriever = ContextualCompressionRetriever(
+#     base_compressor=compressor,
+#     base_retriever=retriever
+# )
+
+# TODO: Evaluar con RAGAS
+# result = evaluate(...)
+# print(result)
+```
+
+```{mermaid}
+graph TD
+    subgraph "Fuentes de datos"
+        A[PDFs técnicos] --> B[Chunking + Embeddings]
+        C[Tabla SQL] --> D[Text-to-SQL + Embeddings]
+    end
+    B --> E[(Chroma DB<br/>Vector Store)]
+    D --> E
+    F[Query] --> G[Retriever]
+    G --> E
+    E --> H[Resultados iniciales]
+    H --> I[Re-ranker<br/>ms-marco-MiniLM]
+    I --> J[Top-3 relevantes]
+    J --> K[LLM + Contexto]
+    K --> L[Respuesta final]
+    L --> M[Evaluación RAGAS]
+    M --> N{Faithfulness > 0.6?}
+    N -->|Sí| O[✅ Entregable]
+    N -->|No| P[Iterar: chunk size, re-ranker, prompt]
+    P --> G
+```
+
+::: {.callout-tip icon=false}
+## 📤 Entregable
+- Pipeline RAG completo y ejecutable
+- Dataset de preguntas anotadas (mínimo 10)
+- Informe de evaluación RAGAS con scores
+- Iteración documentada: al menos 2 versiones comparadas
+
+## ✅ Criterios de evaluación
+- RAG funcional con datos mixtos (PDF + SQL)
+- Re-ranker implementado y mejora demostrada
+- RAGAS score > 0,6 en faithfulness
+- Análisis de componentes y propuestas de mejora
+
+## ⏱ Tiempo estimado: 6h
+:::

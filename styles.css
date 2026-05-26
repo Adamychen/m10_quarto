@@ -1,0 +1,17 @@
+/* css styles */
+
+.callout-tip .callout-title {
+  font-size: 1.1em;
+}
+
+.mermaid {
+  margin: 2em 0;
+}
+
+table {
+  font-size: 0.9em;
+}
+
+th {
+  background-color: #f0f0f0;
+}

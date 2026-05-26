@@ -1,0 +1,36 @@
+---
+title: "Herramientas y entorno tecnológico recomendado"
+---
+
+El módulo está diseñado para ser completado íntegramente con herramientas gratuitas o de tier libre. El siguiente stack solo muestra algunas opciones; el alumno puede sustituir componentes equivalentes justificando la elección.
+
+| Categoría | Herramienta recomendada | Alternativas / Notas |
+|---|---|---|
+| **LLM API** | Llamus US (`https://llamus.cs.us.es/api/v1`) | OpenAI, Anthropic, Google (API key propia) |
+| **Modelos Llamus** | `qwen3.6:27b`, `gemma4:26b`, `llama3.3:70b` | `qwen3:8b`, `qwen3:1.7b` para demos rápidas |
+| **LLM local** | Ollama + Qwen 3.6 / Llama 3.3 | LM Studio; recomendado para HPD 3 (privacidad) |
+| **Hub de modelos** | [Hugging Face Hub](https://huggingface.co/models) | Descubrimiento, model cards, Spaces |
+| **Embeddings** | Sentence-Transformers (`intfloat/e5-small-v2`) | `qwen3-embedding:0.6b`, `all-MiniLM-L6-v2` |
+| **Vector DB** | Chroma (local) | FAISS (embebible); Qdrant para producción |
+| **Orquestación** | LangChain >= 0.3 (LCEL) | LlamaIndex para indexación documental |
+| **Fine-tuning** | Hugging Face TRL + bitsandbytes (QLoRA) | Google Colab Pro o Kaggle (GPU T4 gratuita) |
+| **Evaluación RAG** | RAGAS >= 0.1 | DeepEval; LangSmith (trazabilidad) |
+| **MCP** | Python MCP SDK (Anthropic) | Servidor stdio local; sin infraestructura cloud |
+| **Entorno** | VS Code + Python 3.11, Jupyter | Google Colab para talleres con GPU |
+
+## Instalación rápida
+
+```bash
+# Entorno base
+python -m venv .venv
+source .venv/bin/activate
+
+# Librerías principales
+pip install langchain langchain-openai chromadb sentence-transformers
+pip install ragas datasets pandas numpy matplotlib requests
+pip install mcp  # Python MCP SDK
+
+# Para fine-tuning (GPU recomendada)
+pip install torch torchvision torchaudio
+pip install transformers accelerate peft bitsandbytes trl
+```

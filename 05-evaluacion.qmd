@@ -1,0 +1,39 @@
+---
+title: "Evaluación"
+---
+
+## Estructura de la evaluación
+
+| Instrumento | Peso | Nota mínima | Vinculación |
+|---|---|---|---|
+| Entregas prácticas parciales (HPD 1-4) | 30 % | 5,0 / 10 | CE-1, CE-2, CE-3, CE-4 |
+| Participación en foros (mínimo 3 de 4) | 10 % | Participado / No participado | CE-6 (pensamiento crítico) |
+| Proyecto integrador final | 60 % | 5,0 / 10 | CE-1 a CE-6 |
+
+## Entregables parciales
+
+| HPD | Título | Duración | Entregable | Enlace |
+|---|---|---|---|---|
+| 1 | Pipeline de embeddings y búsqueda semántica | 4h | Notebook con índice vectorial y métricas recall@k | [HPD 1](hpd1-embeddings.qmd) |
+| 2 | Agente analítico con Tool Calling | 4h | Script del agente con al menos 2 herramientas | [HPD 2](hpd2-agente-tool-calling.qmd) |
+| 3 | Servidor MCP y conexión segura a datos locales | 4h | Servidor MCP funcional + análisis de riesgos | [HPD 3](hpd3-servidor-mcp.qmd) |
+| 4 | Sistema RAG sobre datos mixtos con evaluación | 6h | Pipeline RAG evaluado con RAGAS (score > 0,6) | [HPD 4](hpd4-rag-mixto.qmd) |
+
+## Proyecto integrador final
+
+El proyecto consiste en el diseño e implementación de un sistema de **Inteligencia de Negocio conversacional** orientado a datos corporativos. El alumno debe integrar todos los componentes construidos durante el módulo:
+
+- Pipeline de embeddings sobre un corpus propio (mínimo 50 documentos o 10.000 filas tabulares)
+- Sistema RAG avanzado con al menos una técnica de mejora (re-ranking, query expansion o HyDE)
+- Agente con al menos dos herramientas (búsqueda semántica + ejecución de consultas SQL o código Python)
+- Opcional: conexión segura mediante servidor MCP o fine-tuning ligero
+- Informe de evaluación con métricas RAGAS y análisis de al menos un riesgo ético / de gobernanza
+
+### Rúbrica de evaluación
+
+| Dimensión | Insuficiente (< 5) | Suficiente (5-6,9) | Notable (7-8,9) | Sobresaliente (9-10) |
+|---|---|---|---|---|
+| **Funcionalidad técnica** | El sistema no ejecuta o falla en el flujo principal | Flujo básico RAG + agente funcionando | Integración robusta con manejo de errores | Pipeline óptimo, modular y reproducible |
+| **Calidad del RAG** | Sin evaluación cuantitativa | RAGAS ejecutado, score > 0,5 | Score > 0,65 con análisis de componentes | Score > 0,75, iteración documentada |
+| **Gobernanza y ética** | No se aborda | Se identifica un riesgo | Riesgo identificado y mitigación propuesta | Análisis de múltiples riesgos con evidencias |
+| **Documentación** | Código sin comentarios, sin README | README básico y código legible | Docstrings, diagrama de arquitectura | Documentación completa tipo producción |

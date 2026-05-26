@@ -1,0 +1,111 @@
+---
+title: "HPD 2 — Agente analítico con Tool Calling"
+engine: jupyter
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/modulo_10/blob/main/notebooks/hpd2-agente-tool-calling.ipynb)
+
+
+
+> **Duración:** 4h
+>
+> **Entregable:** Script del agente con al menos 2 herramientas
+>
+> **Competencias:** [CE-2](index.qmd#competencias-específicas)
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q langchain langchain-openai langchain-community
+```
+
+::: {.callout-tip icon=false}
+## 🎯 Objetivos
+- Construir un agente con LangChain y Tool Calling
+- Integrar herramientas de análisis de datos (pandas + visualización)
+- Implementar el patrón ReAct
+- Evaluar la capacidad del agente para responder preguntas en lenguaje natural
+
+## 📦 Materiales
+- Librerías: `langchain`, `openai`, `pandas`, `matplotlib`
+- Dataset a elegir (Kaggle: Titanic, Iris, o similar)
+- API key de Llamus US (`https://llamus.cs.us.es/api/v1`) o LLM local con Ollama
+
+## 👣 Instrucciones
+1. Definir herramientas: ejecutar pandas + generar visualización
+2. Configurar el LLM con bind de herramientas
+3. Implementar el loop ReAct
+4. Probar con preguntas en lenguaje natural
+5. Evaluar precisión y robustez
+
+## 💻 Código base
+:::
+
+```{python}
+#| echo: true
+#| eval: false
+
+from langchain_openai import ChatOpenAI
+from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain.tools import tool
+import pandas as pd
+import matplotlib.pyplot as plt
+import io
+import base64
+
+# TODO: Cargar dataset
+# df = pd.read_csv("data/dataset.csv")
+
+@tool
+def ejecutar_consulta_pandas(query: str) -> str:
+    """Ejecuta una consulta en pandas y devuelve el resultado."""
+    # TODO: implementar sandbox seguro para ejecución
+    pass
+
+@tool
+def generar_visualizacion(codigo: str) -> str:
+    """Genera una gráfica a partir de código matplotlib."""
+    # TODO: implementar generación de gráfico
+    pass
+
+# TODO: Configurar LLM y agente
+# llm = ChatOpenAI(
+#     model="qwen3:8b",
+#     base_url="https://llamus.cs.us.es/api/v1",
+#     api_key="<API_KEY>",
+#     temperature=0
+# )
+# agent = create_tool_calling_agent(llm, [ejecutar_consulta_pandas, generar_visualizacion])
+# agent_executor = AgentExecutor(agent=agent, tools=[...], verbose=True)
+```
+
+```{mermaid}
+graph TD
+    subgraph "Agente ReAct"
+        direction LR
+        A[Pregunta<br/>lenguaje natural] --> B[LLM<br/>Reasoning]
+        B --> C{¿Herramienta<br/>necesaria?}
+        C -->|Sí| D[Tool Calling]
+        D --> E[Ejecutar pandas]
+        D --> F[Generar gráfico]
+        E --> G[Observación]
+        F --> G
+        G --> B
+        C -->|No| H[Respuesta final]
+    end
+```
+
+::: {.callout-tip icon=false}
+## 📤 Entregable
+- Script Python del agente funcional
+- Al menos 2 herramientas implementadas
+- Log de 3 preguntas de prueba con sus respuestas
+
+## ✅ Criterios de evaluación
+- Agente responde correctamente preguntas analíticas
+- Manejo de errores en ejecución de herramientas
+- Código modular y comentado
+
+## ⏱ Tiempo estimado: 4h
+:::

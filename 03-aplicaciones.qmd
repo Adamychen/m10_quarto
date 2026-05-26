@@ -1,0 +1,42 @@
+---
+title: "Bloque 3 — Aplicaciones: RAG, Datos Sintéticos y Fine-tuning"
+---
+
+> **Carga:** HT: 6h | HPD: 4h
+>
+> **Competencias asociadas:** [CE-4](index.qmd#competencias-específicas), [CE-5](index.qmd#competencias-específicas)
+
+## Objetivos
+
+Implementar sistemas RAG de calidad producción, generar datos sintéticos útiles y aplicar técnicas de ajuste fino eficientes.
+
+## Contenidos teóricos
+
+### RAG avanzado
+
+- Arquitectura naive vs. avanzada (re-ranking, query expansion, HyDE, RAG-Fusion)
+- RAG sobre datos estructurados: Text-to-SQL con validación
+- RAG sobre DataFrames
+- Evaluación de pipelines RAG con Ragas (faithfulness, answer relevancy, context precision)
+
+### Generación de datos sintéticos
+
+- Usos en Data Science: oversampling, anonimización, aumento de datasets
+- Técnicas: prompting guiado con esquemas, Evol-Instruct
+- SDV (Synthetic Data Vault) para datos tabulares
+- Validación estadística: fidelidad, utilidad, privacidad
+
+### Fine-tuning eficiente (PEFT)
+
+- LoRA y QLoRA: intuición matemática del rango bajo
+- Hiperparámetros clave: r, alpha, target_modules
+- Cuándo hacer fine-tuning vs. RAG vs. prompting
+- Infraestructura mínima: fine-tuning de modelo 7B en GPU de consumidor con Hugging Face TRL y bitsandbytes
+
+> **Lecturas obligatorias:**
+> - Es et al. (2023) — *RAGAS: Automated Evaluation of Retrieval Augmented Generation*
+> - Hu et al. (2022) — *LoRA: Low-Rank Adaptation of Large Language Models* (secciones 1-4)
+
+## Taller práctico
+
+👉 [HPD 4 — Sistema RAG sobre datos mixtos con evaluación](hpd4-rag-mixto.qmd)

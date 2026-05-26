@@ -1,0 +1,7 @@
+---
+title: "Acerca de"
+---
+
+Módulo 10 del Máster en Data Science & Big Data.
+
+**IA Generativa para Data Science** — 3,0 ECTS | 75 horas | Modalidad a distancia | Nivel técnico.

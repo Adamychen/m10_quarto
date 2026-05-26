@@ -1,0 +1,119 @@
+---
+title: "HPD 3 — Servidor MCP y conexión segura a datos locales"
+engine: jupyter
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/modulo_10/blob/main/notebooks/hpd3-servidor-mcp.ipynb)
+
+
+
+> **Duración:** 4h
+>
+> **Entregable:** Servidor MCP funcional + análisis de riesgos
+>
+> **Competencias:** [CE-3](index.qmd#competencias-específicas)
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q mcp
+```
+
+::: {.callout-tip icon=false}
+## 🎯 Objetivos
+- Implementar un servidor MCP local con Python
+- Exponer acceso a una base de datos SQLite como herramienta MCP
+- Conectar desde un cliente LLM
+- Evaluar riesgos de seguridad: prompt injection, data leakage
+
+## 📦 Materiales
+- Librerías: `mcp` (Python MCP SDK de Anthropic), `sqlite3`
+- Base de datos SQLite corporativa ficticia (proporcionada)
+- LLM local (Ollama + Qwen 3.6 / Llama 3.3) o API Llamus US (`https://llamus.cs.us.es/api/v1`)
+
+## 👣 Instrucciones
+1. Diseñar esquema de la base de datos SQLite
+2. Implementar servidor MCP con herramientas de consulta
+3. Configurar recursos y prompts del servidor
+4. Conectar desde un cliente LLM
+5. Probar consultas y evaluar riesgos de inyección
+
+## 💻 Código base
+:::
+
+```{python}
+#| echo: true
+#| eval: false
+
+from mcp.server import Server, NotificationOptions
+from mcp.server.models import InitializationOptions
+import mcp.server.stdio
+import mcp.types as types
+import sqlite3
+import os
+
+DB_PATH = "data/corporativa.db"
+
+# TODO: Implementar herramientas MCP
+# @server.list_tools()
+# async def handle_list_tools() -> list[types.Tool]:
+#     pass
+
+# @server.call_tool()
+# async def handle_call_tool(name: str, arguments: dict) -> list[types.TextContent]:
+#     pass
+
+# TODO: Implementar validación contra prompt injection
+# def sanitize_query(query: str) -> str:
+#     pass
+```
+
+```{mermaid}
+graph LR
+    subgraph "Cliente"
+        A[LLM Client<br/>Ollama / API]
+    end
+    subgraph "Servidor MCP"
+        B[MCP Server<br/>Python SDK]
+        C[Tool: query_sqlite]
+        D[Resource: schema_info]
+        E[Prompt: analisis_ventas]
+    end
+    subgraph "Datos"
+        F[(SQLite<br/>DB corporativa)]
+    end
+
+    A <-->|stdio| B
+    B --> C --> F
+    B --> D
+    B --> E
+    
+    style A fill:#4B8BBE,color:#fff
+    style B fill:#306998,color:#fff
+    style F fill:#FFD43B,color:#000
+    
+    G[⚠ Riesgos:<br/>Prompt injection<br/>Data leakage] -.-> B
+```
+
+::: {.callout-warning}
+## Análisis de riesgos requerido
+El entregable debe incluir un análisis documentado de:
+- **Prompt injection:** superficies de ataque y mitigaciones
+- **Data leakage:** qué datos quedan expuestos y cómo limitarlo
+- **Control de acceso:** autenticación y autorización en el servidor MCP
+:::
+
+::: {.callout-tip icon=false}
+## 📤 Entregable
+- Código del servidor MCP funcional
+- Documento de análisis de riesgos (mínimo 3 riesgos identificados con mitigación)
+- Log de pruebas de conexión desde un cliente LLM
+
+## ✅ Criterios de evaluación
+- Servidor MCP operativo con al menos 2 herramientas
+- Análisis de riesgos con mitigaciones concretas
+- Uso de LLM local por privacidad (Ollama)
+
+## ⏱ Tiempo estimado: 4h
+:::

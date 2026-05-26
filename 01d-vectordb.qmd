@@ -1,0 +1,278 @@
+---
+title: "01d — Bases de Datos Vectoriales"
+engine: jupyter
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/modulo_10/blob/main/notebooks/01d-vectordb.ipynb)
+
+> 💡 Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto [01c-embeddings.qmd](01c-embeddings.qmd) primero.
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q chromadb faiss-cpu sentence-transformers matplotlib
+```
+
+```{python}
+#| echo: true
+#| eval: false
+
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+import warnings
+warnings.filterwarnings("ignore")
+import numpy as np
+import matplotlib.pyplot as plt
+from sentence_transformers import SentenceTransformer
+plt.rcParams["figure.dpi"] = 100
+print("Librerías cargadas correctamente.")
+```
+
+## Bases de Datos Vectoriales
+
+Una vez que tenemos embeddings, necesitamos almacenarlos y buscarlos eficientemente. Aquí entran las **bases de datos vectoriales**.
+
+### Búsqueda exacta (KNN) vs. aproximada (ANN)
+
+```{mermaid}
+graph TD
+    subgraph "Exact KNN"
+        A[Vector query] --> B["Comparar con todos los vectores"]
+        B --> C["O(n) distancia"]
+        C --> D[Top-k exacto]
+    end
+    subgraph "ANN (HNSW / IVF)"
+        A --> E[Índice jerárquico<br/>o clustering]
+        E --> F["O(log n) aprox."]
+        F --> G[Top-k aproximado<br/>con alta recall]
+    end
+```
+
+| Método | Precisión | Velocidad | Memoria |
+|---|---|---|---|
+| KNN exacto | 100 % | O(n) | — |
+| HNSW | 99 %+ | O(log n) | Alta |
+| IVF | 95-99 % | O(√n) | Media |
+
+### HNSW (Hierarchical Navigable Small World)
+
+El algoritmo más popular en producción (usado por Chroma, Qdrant, Pinecone). Construye un grafo multi-capa donde:
+
+- Las capas superiores tienen pocos nodos (conexiones largas)
+- Las capas inferiores tienen todos los nodos (conexiones cortas)
+- La búsqueda comienza en la capa superior y desciende, recorriendo el grafo greedy
+
+```{mermaid}
+graph TD
+    subgraph "HNSW — Capas"
+        L2(( )) --- L2A(( )) --- L2B(( ))
+        L2 --- L1A(( )) --- L1B(( )) --- L1C(( )) --- L1D(( ))
+        L2A --- L1C
+        L2B --- L1D
+        L1A --- L0A(( )) --- L0B(( )) --- L0C(( ))
+        L1B --- L0D(( )) --- L0E(( )) --- L0F(( ))
+        L1C --- L0E
+        L1D --- L0F
+    end
+    style L2 fill:#E74C3C,color:#fff
+    style L2A fill:#E74C3C,color:#fff
+    style L2B fill:#E74C3C,color:#fff
+    style L1A fill:#3498DB,color:#fff
+    style L1B fill:#3498DB,color:#fff
+    style L1C fill:#3498DB,color:#fff
+    style L1D fill:#3498DB,color:#fff
+    style L0A fill:#2ECC71,color:#fff
+    style L0B fill:#2ECC71,color:#fff
+    style L0C fill:#2ECC71,color:#fff
+    style L0D fill:#2ECC71,color:#fff
+    style L0E fill:#2ECC71,color:#fff
+    style L0F fill:#2ECC71,color:#fff
+```
+
+### Métricas de similitud
+
+| Métrica | Fórmula | Cuándo usarla |
+|---|---|---|
+| **Coseno** | cos(\vec{a}, \vec{b}) = \frac{\vec{a} \cdot \vec{b}}{\|\vec{a}\| \|\vec{b}\|} | Embeddings normalizados (recomendada) |
+| **Producto escalar** | \vec{a} \cdot \vec{b} | Embeddings normalizados (equivalente al coseno) |
+| **L2 (Euclídea)** | \|\vec{a} - \vec{b}\|_2 | Embeddings no normalizados, búsqueda por cercanía absoluta |
+
+::: {.callout-warning}
+## Regla práctica
+
+Siempre **normaliza los embeddings** (||v|| = 1). Con embeddings normalizados, coseno y producto escalar son equivalentes, y la búsqueda es más estable.
+:::
+
+```{python}
+#| echo: true
+#| eval: false
+
+def cosine_sim(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
+
+def euclidean_dist(a, b):
+    return np.linalg.norm(a - b)
+
+a = np.array([1.0, 0.0, 0.0])
+b = np.array([0.8, 0.6, 0.0])
+c = np.array([0.0, 1.0, 0.0])
+
+print(f"coseno(a, b): {cosine_sim(a, b):.3f}")
+print(f"coseno(a, c): {cosine_sim(a, c):.3f}")
+print(f"coseno(b, c): {cosine_sim(b, c):.3f}")
+print()
+print(f"L2(a, b): {euclidean_dist(a, b):.3f}")
+print(f"L2(a, c): {euclidean_dist(a, c):.3f}")
+print(f"L2(b, c): {euclidean_dist(b, c):.3f}")
+```
+
+### Chroma — Base de datos vectorial local
+
+Chroma es una base de datos vectorial embebida que funciona en local sin servidor. Ideal para prototipado y proyectos pequeños/medios.
+
+```{python}
+#| echo: true
+#| eval: false
+
+import chromadb
+from chromadb.config import Settings
+
+# Cliente persistente (los datos se guardan en disco)
+client = chromadb.Client(Settings(
+    persist_directory=".chroma_db",
+    anonymized_telemetry=False
+))
+
+# Crear o recuperar colección
+collection = client.get_or_create_collection(
+    name="ejemplo_embeddings",
+    metadata={"hnsw:space": "cosine"}
+)
+
+print(f"Colección '{collection.name}' lista.")
+print(f"Total de documentos hasta ahora: {collection.count()}")
+```
+
+```{python}
+#| echo: true
+#| eval: false
+
+# Cargar modelo de embeddings
+model = SentenceTransformer("all-MiniLM-L6-v2")
+
+# Añadir documentos con sus embeddings
+documentos = [
+    "La inteligencia artificial está revolucionando la medicina",
+    "Los transformers permiten procesar secuencias en paralelo",
+    "Las bases de datos vectoriales optimizan la búsqueda semántica",
+    "El fine-tuning con LoRA reduce el coste de entrenamiento",
+    "Machine learning supervisado requiere datos etiquetados"
+]
+
+ids = [f"doc_{i}" for i in range(len(documentos))]
+embeddings_docs = model.encode(documentos).tolist()
+
+collection.add(
+    ids=ids,
+    documents=documentos,
+    embeddings=embeddings_docs
+)
+
+print(f"Documentos insertados: {collection.count()}")
+```
+
+```{python}
+#| echo: true
+#| eval: false
+
+# Búsqueda semántica
+query = "¿Cómo procesan secuencias los modelos actuales?"
+query_embedding = model.encode([query]).tolist()
+
+resultados = collection.query(
+    query_embeddings=query_embedding,
+    n_results=3
+)
+
+print(f"Consulta: {query}\n")
+for i, (doc, score) in enumerate(zip(resultados["documents"][0], resultados["distances"][0])):
+    print(f"{i+1}. [{score:.4f}] {doc}")
+```
+
+### FAISS — Indexación en memoria
+
+FAISS (Facebook AI Similarity Search) es una librería de indexación ANN embebible, ideal para integración en pipelines de Python sin necesidad de un servidor de base de datos.
+
+```{python}
+#| echo: true
+#| eval: false
+
+import faiss
+
+# Convertir embeddings a matriz numpy
+emb_matrix = np.array(embeddings_docs).astype("float32")
+dimension = emb_matrix.shape[1]
+
+# Índice plano (exacto) - solo para comparación
+index_exact = faiss.IndexFlatL2(dimension)
+index_exact.add(emb_matrix)
+
+# Índice IVF con cuantización (aproximado)
+nlist = 2  # número de clusters
+quantizer = faiss.IndexFlatL2(dimension)
+index_ivf = faiss.IndexIVFFlat(quantizer, dimension, nlist, faiss.METRIC_L2)
+index_ivf.train(emb_matrix)
+index_ivf.add(emb_matrix)
+index_ivf.nprobe = 2  # número de clusters a explorar
+
+# Búsqueda en ambos índices
+query_vec = np.array(query_embedding).astype("float32")
+dist_exact, idx_exact = index_exact.search(query_vec, 3)
+dist_ivf, idx_ivf = index_ivf.search(query_vec, 3)
+
+print("FAISS — Comparación exacto vs. aproximado:\n")
+print("Índice exacto (FlatL2):")
+for i, idx in enumerate(idx_exact[0]):
+    print(f"  {i+1}. {documentos[idx]} (dist: {dist_exact[0][i]:.4f})")
+
+print("\nÍndice aproximado (IVF):")
+for i, idx in enumerate(idx_ivf[0]):
+    print(f"  {i+1}. {documentos[idx]} (dist: {dist_ivf[0][i]:.4f})")
+
+print(f"\n¿Mismos resultados? {set(idx_exact[0]) == set(idx_ivf[0])}")
+```
+
+### Comparativa operacional
+
+| Característica | Chroma | FAISS | Qdrant | Pinecone |
+|---|---|---|---|---|
+| **Tipo** | Base de datos | Librería | Base de datos | SaaS |
+| **Infraestructura** | Local (sin servidor) | Embebible | Servidor Docker | Cloud |
+| **Persistencia** | Disco (SQLite + vectores) | Memoria / disco | Disco | Cloud |
+| **Privacidad** | Total (local) | Total (local) | Según deploy | Datos en cloud |
+| **Escala** | < 1M vectores | > 1M vectores | 1M+ vectores | Ilimitado |
+| **Coste** | Gratuito | Gratuito | Self-hosted gratis | Por uso |
+| **API** | Python nativa | Python/C++ | REST + gRPC | REST |
+
+### Árbol de decisión para elegir
+
+```{mermaid}
+graph TD
+    A[¿Proyecto pequeño<br/>&lt; 100K vectores?] -->|Sí| B[Chroma<br/>FAISS]
+    A -->|No| C[¿Privacidad total?]
+    C -->|Sí| D[FAISS + gestión propia]
+    C -->|No| E[¿Infraestructura propia?]
+    E -->|Sí| F[Qdrant]
+    E -->|No| G[Pinecone]
+```
+
+::: {.callout-tip}
+## Consejo práctico
+
+Para el **proyecto del módulo** empieza con **Chroma**: es local, no requiere servidor, y escala bien para el alcance del curso. Si luego necesitas más rendimiento, migrar a FAISS o Qdrant es directo porque la API de búsqueda semántica es equivalente.
+:::
+
+---
+
+> Has completado la teoría del **Bloque 1**. Ahora pasa al taller práctico: **[HPD 1 — Pipeline de embeddings y búsqueda semántica](hpd1-embeddings.qmd)**.

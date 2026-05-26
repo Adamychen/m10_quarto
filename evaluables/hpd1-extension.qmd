@@ -1,0 +1,392 @@
+---
+title: "HPD 1 — Extensión (ejercicios evaluables avanzados)"
+engine: jupyter
+---
+
+> **Peso en la nota:** 7.5 % extra (parte del 30 % de entregas prácticas)
+>
+> **Plazo:** 14 días tras la sesión presencial.
+>
+> **Requisito previo:** haber completado `hpd1-evaluables.qmd`.
+>
+> **Entrega:** Notebook `.ipynb` ejecutado. Cada ejercicio especifica qué variable
+>   debe contener el resultado para la corrección automática.
+
+::: {.callout-warning icon=false}
+## Cómo se corrige
+
+Cada ejercicio pide que asignes el resultado a una variable con un nombre concreto.
+El script de corrección ejecutará tu notebook e inspeccionará esas variables.
+**Si la variable no existe o tiene un tipo incorrecto, el ejercicio se puntúa como 0.**
+
+Para autoevaluarte antes de entregar:
+```bash
+python scripts/corregir_hpd1.py --extension tu_notebook.ipynb
+```
+:::
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q chromadb sentence-transformers fpdf2 matplotlib langchain langchain-community langchain-text-splitters pypdf faiss-cpu openai deep-translator rank_bm25
+```
+
+```{python}
+#| echo: true
+
+import os
+import time
+import tempfile
+import shutil
+import faiss
+import numpy as np
+from fpdf import FPDF
+from openai import OpenAI
+from deep_translator import GoogleTranslator
+from sentence_transformers import SentenceTransformer
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import (
+    RecursiveCharacterTextSplitter,
+    CharacterTextSplitter,
+)
+import chromadb
+
+# ------------------------------------------------------------------ Setup compartido
+BASE_DIR = tempfile.mkdtemp()
+CORPUS_DIR = os.path.join(BASE_DIR, "corpus")
+os.makedirs(CORPUS_DIR)
+
+MODEL_NAME = "intfloat/e5-small-v2"
+CHUNK_SIZE = 300
+CHUNK_OVERLAP = 50
+
+model = SentenceTransformer(MODEL_NAME)
+client = chromadb.EphemeralClient()
+DIM = model.get_sentence_embedding_dimension()
+
+print(f"Modelo: {MODEL_NAME} ({DIM} dimensiones)")
+print(f"Directorio temporal: {BASE_DIR}")
+
+# ------------------------------------------------------------------ Corpus sintético
+class PDF(FPDF):
+    pass
+
+def crear_pdf(nombre, titulo, contenido):
+    pdf = PDF()
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.cell(0, 10, titulo, new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(5)
+    pdf.set_font("Helvetica", "", 11)
+    pdf.multi_cell(0, 6, contenido)
+    pdf.output(os.path.join(CORPUS_DIR, nombre))
+
+corpus = {
+    "01_transformers.pdf": (
+        "Transformers y Mecanismos de Atención",
+        "La arquitectura Transformer, introducida por Vaswani et al. en 2017, "
+        "revolucionó el procesamiento del lenguaje natural al eliminar las "
+        "recurrencias y basarse completamente en mecanismos de atención. "
+        "El componente clave es la atención multi-cabeza, que permite al modelo "
+        "atender simultáneamente a diferentes partes de la secuencia de entrada "
+        "desde distintos subespacios de representación. Cada cabeza de atención "
+        "calcula sus propios pesos Query, Key y Value mediante proyecciones "
+        "lineales aprendidas, y las salidas se concatenan y proyectan linealmente. "
+        "Esto permite capturar relaciones tanto locales como globales entre tokens "
+        "sin depender de la distancia secuencial. La codificación posicional se "
+        "suma a los embeddings de entrada para preservar el orden de las palabras, "
+        "ya que la atención por sí misma es invariante a la posición. Existen "
+        "codificaciones sinusoidales fijas y codificaciones posicionales aprendidas. "
+        "Los Transformers admiten tres configuraciones principales: encoder-only "
+        "como BERT, decoder-only como GPT y Llama, y encoder-decoder como T5. "
+        "La versión decoder-only es la base de los grandes modelos de lenguaje "
+        "modernos como GPT-4 y Llama 3."
+    ),
+    "02_embeddings.pdf": (
+        "Embeddings y Representación Vectorial Semántica",
+        "Los embeddings de texto son representaciones vectoriales densas que "
+        "capturan el significado semántico de palabras, frases o documentos "
+        "completos en un espacio vectorial continuo de dimensionalidad fija. "
+        "Modelos como Sentence-BERT, E5 y OpenAI text-embedding-3 proyectan "
+        "textos en un espacio donde la distancia entre vectores refleja la "
+        "similitud semántica, no léxica. La métrica más utilizada es la similitud "
+        "del coseno, que mide el ángulo entre dos vectores normalizados. "
+        "Los embeddings modernos se entrenan con objetivos contrastivos: se "
+        "maximiza la similitud entre textos semánticamente equivalentes mientras "
+        "se minimiza entre textos no relacionados. Los embeddings son la base "
+        "de los sistemas de búsqueda semántica y RAG, ya que permiten encontrar "
+        "información relevante incluso cuando las palabras exactas no coinciden "
+        "entre la consulta y el documento. Modelos como intfloat/e5-small-v2 "
+        "ofrecen un excelente equilibrio entre calidad y eficiencia."
+    ),
+    "03_rag.pdf": (
+        "RAG: Retrieval-Augmented Generation",
+        "RAG es una arquitectura que combina sistemas de recuperación de "
+        "información con modelos generativos para producir respuestas "
+        "fundamentadas en documentos. El pipeline típico consta de tres etapas: "
+        "ingesta, recuperación y generación. En la ingesta, los documentos se "
+        "dividen en chunks, se generan embeddings y se indexan en una base de "
+        "datos vectorial como Chroma o FAISS. La elección del tamaño de chunk "
+        "y el solapamiento es crítica: chunks pequeños mejoran la precisión de "
+        "recuperación pero pierden contexto, mientras que chunks grandes preservan "
+        "contexto pero diluyen la relevancia. En la recuperación, la consulta del "
+        "usuario se convierte en un embedding y se buscan los chunks más similares "
+        "mediante búsqueda por similitud del coseno. En la generación, los chunks "
+        "recuperados se añaden al prompt del LLM. RAG avanzado incorpora técnicas "
+        "como re-ranking con cross-encoders, expansión de consulta con HyDE y "
+        "RAG-Fusion."
+    ),
+}
+
+for nombre, (titulo, contenido) in corpus.items():
+    crear_pdf(nombre, titulo, contenido)
+
+# Cargar documentos con PyPDFLoader
+docs = []
+for filename in sorted(os.listdir(CORPUS_DIR)):
+    if not filename.endswith(".pdf"):
+        continue
+    loader = PyPDFLoader(os.path.join(CORPUS_DIR, filename))
+    docs.extend(loader.load())
+
+print(f"Corpus listo: {len(docs)} páginas cargadas en {CORPUS_DIR}")
+
+# Corpus en español precargado (fallback para E1 si no hay internet)
+CORPUS_ES = {
+    "01_transformers.pdf": (
+        "Transformers y Mecanismos de Atención",
+        "La arquitectura Transformer, introducida por Vaswani et al. en 2017, "
+        "revolucionó el procesamiento del lenguaje natural al eliminar las "
+        "recurrencias y basarse completamente en mecanismos de atención. "
+        "El componente clave es la atención multi-cabeza, que permite al modelo "
+        "atender simultáneamente a diferentes partes de la secuencia de entrada "
+        "desde distintos subespacios de representación."
+    ),
+    "02_embeddings.pdf": (
+        "Embeddings y Representación Vectorial Semántica",
+        "Los embeddings de texto son representaciones vectoriales densas que "
+        "capturan el significado semántico de palabras, frases o documentos "
+        "completos en un espacio vectorial continuo de dimensionalidad fija. "
+        "Modelos como Sentence-BERT, E5 y OpenAI text-embedding-3 proyectan "
+        "textos en un espacio donde la distancia refleja la similitud semántica."
+    ),
+    "03_rag.pdf": (
+        "RAG: Retrieval-Augmented Generation",
+        "RAG es una arquitectura que combina sistemas de recuperación de "
+        "información con modelos generativos para producir respuestas "
+        "fundamentadas en documentos. El pipeline típico consta de tres etapas: "
+        "ingesta, recuperación y generación."
+    ),
+}
+
+# ─── Para E1: usar CORPUS_ES en lugar de traducir (descomenta):
+# corpus = CORPUS_ES
+
+# ------------------------------------------------------------------ Funciones compartidas
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=CHUNK_SIZE,
+    chunk_overlap=CHUNK_OVERLAP,
+)
+
+def recall_at_k(textos_recuperados, palabra_clave, k):
+    """recall@1: 1.0 si palabra_clave aparece en algún texto del top-k."""
+    if not palabra_clave:
+        return 0.0
+    top_k = textos_recuperados[:k]
+    return 1.0 if any(palabra_clave.lower() in t.lower() for t in top_k) else 0.0
+
+def indexar_en_chroma(nombre_coleccion, chunks):
+    col = client.get_or_create_collection(
+        name=nombre_coleccion, metadata={"hnsw:space": "cosine"}
+    )
+    for chunk_idx, chunk in enumerate(chunks):
+        emb = model.encode(chunk.page_content).tolist()
+        fuente = os.path.basename(chunk.metadata["source"])
+        cid = f"{fuente.replace('.pdf', '')}_chunk_{chunk_idx}"
+        col.add(ids=[cid], embeddings=[emb], documents=[chunk.page_content],
+                metadatas=[{"fuente": fuente, "chunk_index": chunk_idx}])
+    return col
+
+def buscar_en_chroma(collection, query, k=3):
+    q_emb = model.encode(query).tolist()
+    res = collection.query(query_embeddings=[q_emb], n_results=k)
+    return res
+```
+
+---
+
+## Ejercicio E1 — Pipeline multilingüe (2.5 puntos)
+
+Carga el modelo `intfloat/multilingual-e5-small`. Traduce los textos de los 3 PDFs
+sintéticos al español usando `GoogleTranslator` de `deep-translator`. Indexa los
+textos en español en Chroma y mide:
+
+- `ext1_recall_cross`: `recall@1` medio con **3 consultas en inglés** buscando sobre
+  los documentos en español.
+- `ext1_recall_mono`: `recall@1` medio con las mismas 3 consultas en inglés buscando
+  sobre los documentos originales en inglés.
+
+```{python}
+#| echo: true
+
+# ─── Carga el modelo multilingüe ───
+# model_multi = SentenceTransformer("intfloat/multilingual-e5-small")
+
+# ─── Traduce los textos al español ───
+# Usa GoogleTranslator(source="en", target="es").translate(texto)
+# Crea nuevos objetos Document con el texto traducido.
+# Pista: traduce solo los chunks, no los documentos enteros.
+
+# ─── Indexa español e inglés en colecciones separadas ───
+# col_es = indexar_en_chroma(...)
+# col_en = indexar_en_chroma(...)
+
+# ─── Evalúa recall@1 con estas 3 consultas ───
+# QRELS_E1 = {
+#     "How does multi-head attention work?":          "atención multi-cabeza",
+#     "What are text embeddings?":                    "representaciones vectoriales densas",
+#     "How does RAG combine retrieval and generation?": "combina sistemas de recuperación",
+# }
+
+ext1_recall_cross = None  # ← float: recall@1 medio inglés → español
+ext1_recall_mono = None   # ← float: recall@1 medio inglés → inglés
+```
+
+---
+
+## Ejercicio E2 — Comparativa de splitters (2.5 puntos)
+
+Compara `RecursiveCharacterTextSplitter` (corta por párrafos → frases → espacios) con
+`CharacterTextSplitter` (corte fijo por caracteres, sin jerarquía semántica). Usa los
+mismos parámetros (`chunk_size=300`, `chunk_overlap=50`) para ambos.
+
+Mide sobre el corpus en inglés:
+
+- `ext2_recall_recursive`: `recall@1` medio con el splitter recursivo.
+- `ext2_recall_character`: `recall@1` medio con el splitter de caracteres.
+- `ext2_chunks`: `{"recursive": N, "character": M}` con el número de chunks de cada uno.
+
+```{python}
+#| echo: true
+
+# ─── Crea ambos splitters ───
+# recursive = RecursiveCharacterTextSplitter(chunk_size=300, chunk_overlap=50)
+# character = CharacterTextSplitter(chunk_size=300, chunk_overlap=50)
+
+# ─── Genera chunks con cada uno ───
+# chunks_rec = recursive.split_documents(docs)
+# chunks_char = character.split_documents(docs)
+
+# ─── Indexa por separado y evalúa ───
+# Usa indexar_en_chroma() y buscar_en_chroma().
+# Ground truth por contenido (invariante al splitter):
+QRELS_E2 = {
+    "How does multi-head attention work?": "atención multi-cabeza",
+    "What are text embeddings?":           "representaciones vectoriales densas",
+    "How does RAG work?":                  "combina sistemas de recuperación",
+}
+
+ext2_recall_recursive = None  # ← float
+ext2_recall_character = None  # ← float
+ext2_chunks = {}              # ← {"recursive": int, "character": int}
+```
+
+---
+
+## Ejercicio E3 — Chroma vs FAISS (2.5 puntos)
+
+Compara Chroma con FAISS (`IndexFlatIP`, búsqueda exacta por producto interno).
+Para que el producto interno equivalga a la similitud del coseno, **normaliza los
+embeddings** (divide cada vector por su norma L2) antes de indexar en FAISS.
+
+Usa los chunks generados con `RecursiveCharacterTextSplitter`. Mide:
+
+- `ext3_tiempo_chroma`: segundos en indexar + buscar 1 query en Chroma.
+- `ext3_tiempo_faiss`: segundos en indexar + buscar 1 query en FAISS.
+- `ext3_recall_chroma`: `recall@1` medio con Chroma (3 queries).
+- `ext3_recall_faiss`: `recall@1` medio con FAISS (3 queries).
+
+Pista para FAISS:
+```python
+index = faiss.IndexFlatIP(dim)        # IP = inner product
+# Normalizar embeddings: emb = emb / np.linalg.norm(emb)
+index.add(embeddings_normalizados)     # (n_chunks, dim)
+distancias, indices = index.search(query_emb_normalizado.reshape(1, -1), k=3)
+```
+
+```{python}
+#| echo: true
+
+# ─── Indexa en Chroma ───
+# Mide tiempo con time.perf_counter()
+
+# ─── Indexa en FAISS ───
+# 1. Normaliza embeddings (L2 norm)
+# 2. Crea faiss.IndexFlatIP(dim), llama a index.add()
+# 3. Normaliza la query antes de index.search()
+# Mide tiempo con time.perf_counter()
+
+# ─── Compara recall@1 (ground truth por contenido) ───
+QRELS_E3 = {
+    "How does multi-head attention work?": "atención multi-cabeza",
+    "What are text embeddings?":           "representaciones vectoriales densas",
+    "How does RAG work?":                  "combina sistemas de recuperación",
+}
+
+ext3_tiempo_chroma = None   # ← float (segundos)
+ext3_tiempo_faiss = None    # ← float (segundos)
+ext3_recall_chroma = None   # ← float
+ext3_recall_faiss = None    # ← float
+```
+
+---
+
+## Ejercicio E4 — Mini-RAG con LLM (2.5 puntos)
+
+Construye un sistema RAG mínimo: recupera los top-3 chunks para una consulta, inyéctalos
+en un prompt y pide al LLM que responda usando solo esa información.
+
+Usa el endpoint de la asignatura (`https://llamus.cs.us.es/api/v1`), que es compatible
+con la API de OpenAI. El modelo es `qwen3.5:35b-a3b`. La API key debes configurarla
+en la variable de entorno `LLM_API_KEY`.
+
+```python
+#| echo: true
+
+# ─── Configura la API key ───
+# import os
+# os.environ["OPENAI_API_KEY"] = os.getenv("LLM_API_KEY", "not-needed")
+
+# ─── Recupera los top-3 chunks para esta consulta ───
+QUERY_E4 = "¿Cómo funciona la atención multi-cabeza en los Transformers?"
+
+# 1. Indexa los documentos en inglés con el pipeline ya construido.
+# 2. Recupera top-3 chunks con buscar_en_chroma().
+# 3. Guarda el texto de los 3 chunks en ext4_chunks.
+
+# ─── Construye el prompt y llama al LLM ───
+# client_llm = OpenAI(
+#     base_url="https://llamus.cs.us.es/api/v1",
+#     api_key=os.getenv("LLM_API_KEY", "not-needed"),
+# )
+# prompt = (
+#     "Responde ÚNICAMENTE con la información proporcionada abajo. "
+#     "Si la información no contiene la respuesta, di 'No lo sé'.\n\n"
+#     "Contexto:\n"
+#     f"{contexto}\n\n"
+#     f"Pregunta: {QUERY_E4}"
+# )
+# respuesta = client_llm.chat.completions.create(
+#     model="qwen3.5:35b-a3b",
+#     messages=[{"role": "user", "content": prompt}],
+# ).choices[0].message.content
+
+# ─── Evalúa manualmente la fidelidad ───
+# Lee la respuesta. Si TODO lo que dice aparece en los chunks, ext4_fiel = True.
+# Si se inventa algo que no está en los chunks, ext4_fiel = False.
+
+ext4_chunks = []     # ← list[str]: texto de los 3 chunks recuperados
+ext4_respuesta = ""  # ← str: respuesta del LLM
+ext4_fiel = False    # ← bool: ¿la respuesta es fiel al contexto?
+```

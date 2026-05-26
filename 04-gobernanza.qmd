@@ -1,0 +1,59 @@
+---
+title: "Bloque 4 — Despliegue y Gobernanza"
+---
+
+> **Carga:** Contenido integrado en proyecto | HPD: 0h — evaluado en proyecto final
+>
+> **Competencias asociadas:** [CE-6](index.qmd#competencias-específicas)
+
+## Objetivos
+
+Evaluar modelos con métricas LLM-as-a-judge, detectar y mitigar alucinaciones y sesgos, y documentar sistemas generativos siguiendo estándares de transparencia algorítmica.
+
+## Contenidos
+
+### Evaluación de LLMs
+
+- Métricas automáticas: ROUGE, BERTScore
+- LLM-as-a-judge: prompt de evaluación, sesgos del juez, calibración
+- Frameworks: DeepEval, RAGAS, LangSmith
+
+### Ética y gobernanza
+
+- Alucinaciones: taxonomía (factual, faithfulness, extrinsic)
+- Técnicas de mitigación: grounding, citation, RLHF
+- Privacidad de datos corporativos: PII detection, data masking
+- On-premise vs. cloud
+- Sesgo en LLMs: tipos, herramientas de auditoría
+- Documentación: Model Card, System Card
+
+### Patrones de despliegue
+
+- API gateway sobre modelos open-source con vLLM / Ollama
+- Control de costes: caching semántico con GPTCache
+- Observabilidad: LangSmith, Langfuse, Prometheus
+
+```{mermaid}
+graph TD
+    subgraph "Alucinaciones"
+        A[Factual] --> D[Mitigaciones]
+        B[Faithfulness] --> D
+        C[Extrinsic] --> D
+        D --> E[Grounding]
+        D --> F[Citation]
+        D --> G[RLHF]
+    end
+    subgraph "Despliegue"
+        H[vLLM / Ollama] --> I[API Gateway]
+        I --> J[Caching<br/>GPTCache]
+        I --> K[Observabilidad<br/>Langfuse / Prometheus]
+    end
+    subgraph "Documentación"
+        L[Model Card] --> N[Transparencia]
+        M[System Card] --> N
+    end
+```
+
+> **Lecturas obligatorias:**
+> - Anthropic Model Card (Claude 3)
+> - Artículo de blog de Langfuse sobre trazabilidad en producción
