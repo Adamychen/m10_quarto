@@ -17,3 +17,11 @@ data/
 .DS_Store
 auth/usuarios.csv
 auth/pins_generated.txt
+
+# Soluciones de prácticas (no públicas)
+solutions/
+guias/
+scripts/
+
+# Documentos internos del módulo
+Modulo10_IA_Generativa_DataScience.docx
