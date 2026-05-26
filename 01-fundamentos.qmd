@@ -62,11 +62,12 @@ Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector
 #| eval: false
 
 !pip install -q chromadb faiss-cpu sentence-transformers
+
+
 ```
 
 ```{python}
 #| echo: true
-#| eval: false
 
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -86,6 +87,8 @@ logging.getLogger("transformers").setLevel(logging.ERROR)
 print("Librerías cargadas correctamente.")
 print(f"NumPy: {np.__version__}")
 print(f"PyTorch: {torch.__version__}")
+
+
 ```
 
 ---

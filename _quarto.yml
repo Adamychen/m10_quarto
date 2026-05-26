@@ -1,5 +1,13 @@
 project:
   type: website
+  render:
+    - "*.qmd"
+    - "*.md"
+    - "!guias/"
+    - "!solutions/"
+    - "!scripts/"
+    - "!Modulo10_IA_Generativa_DataScience.*"
+    - "!README.md"
 
 website:
   title: "Módulo 10 — IA Generativa para Data Science"

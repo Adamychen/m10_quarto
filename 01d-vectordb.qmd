@@ -12,6 +12,8 @@ engine: jupyter
 #| eval: false
 
 !pip install -q chromadb faiss-cpu sentence-transformers matplotlib
+
+
 ```
 
 ```{python}
@@ -27,6 +29,8 @@ import matplotlib.pyplot as plt
 from sentence_transformers import SentenceTransformer
 plt.rcParams["figure.dpi"] = 100
 print("Librerías cargadas correctamente.")
+
+
 ```
 
 ## Bases de Datos Vectoriales
@@ -125,6 +129,8 @@ print()
 print(f"L2(a, b): {euclidean_dist(a, b):.3f}")
 print(f"L2(a, c): {euclidean_dist(a, c):.3f}")
 print(f"L2(b, c): {euclidean_dist(b, c):.3f}")
+
+
 ```
 
 ### Chroma — Base de datos vectorial local
@@ -152,6 +158,8 @@ collection = client.get_or_create_collection(
 
 print(f"Colección '{collection.name}' lista.")
 print(f"Total de documentos hasta ahora: {collection.count()}")
+
+
 ```
 
 ```{python}
@@ -180,6 +188,8 @@ collection.add(
 )
 
 print(f"Documentos insertados: {collection.count()}")
+
+
 ```
 
 ```{python}
@@ -198,6 +208,8 @@ resultados = collection.query(
 print(f"Consulta: {query}\n")
 for i, (doc, score) in enumerate(zip(resultados["documents"][0], resultados["distances"][0])):
     print(f"{i+1}. [{score:.4f}] {doc}")
+
+
 ```
 
 ### FAISS — Indexación en memoria
@@ -241,6 +253,8 @@ for i, idx in enumerate(idx_ivf[0]):
     print(f"  {i+1}. {documentos[idx]} (dist: {dist_ivf[0][i]:.4f})")
 
 print(f"\n¿Mismos resultados? {set(idx_exact[0]) == set(idx_ivf[0])}")
+
+
 ```
 
 ### Comparativa operacional

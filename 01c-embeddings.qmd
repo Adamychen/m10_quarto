@@ -12,11 +12,11 @@ engine: jupyter
 #| eval: false
 
 !pip install -q sentence-transformers matplotlib scikit-learn
+
 ```
 
 ```{python}
 #| echo: true
-#| eval: false
 
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -26,6 +26,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 plt.rcParams["figure.dpi"] = 100
 print("Librerías cargadas correctamente.")
+
 ```
 
 ## Modelos de Embeddings
@@ -53,7 +54,6 @@ El principio fundamental: **"You shall know a word by the company it keeps"** (F
 
 ```{python}
 #| echo: true
-#| eval: false
 
 from sentence_transformers import SentenceTransformer
 
@@ -70,11 +70,11 @@ embeddings = model.encode(frases)
 print(f"Forma de los embeddings: {embeddings.shape}")
 print(f"Dimensión: {embeddings.shape[1]}")
 print(f"Número de frases: {embeddings.shape[0]}")
+
 ```
 
 ```{python}
 #| echo: true
-#| eval: false
 
 from sklearn.metrics.pairwise import cosine_similarity
 
@@ -98,6 +98,7 @@ plt.show()
 
 print("Observa cómo las frases sobre animales (0, 1) tienen alta similitud")
 print("mientras que la frase del clima (3) es diferente al resto.")
+
 ```
 
 ### Sentence-BERT

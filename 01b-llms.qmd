@@ -12,6 +12,9 @@ engine: jupyter
 #| eval: false
 
 !pip install -q transformers langchain-openai requests matplotlib
+
+
+
 ```
 
 ```{python}
@@ -27,6 +30,9 @@ import matplotlib.pyplot as plt
 import torch
 plt.rcParams["figure.dpi"] = 100
 print("Librerías cargadas correctamente.")
+
+
+
 ```
 
 ## Grandes Modelos de Lenguaje (LLMs)
@@ -70,6 +76,9 @@ print(f"Número de tokens: {len(tokens)}")
 print(f"\nTokens: {tokens}")
 print(f"IDs:     {ids}")
 print(f"\nDecodificado: {tokenizer.decode(ids)}")
+
+
+
 ```
 
 ### Ventana de contexto
@@ -119,6 +128,9 @@ for temp in [0.1, 0.7, 1.5]:
     resp = llm.invoke("El futuro de la inteligencia artificial")
     print(f"Temperatura {temp:.1f}: {resp.content[:100]}...")
     print()
+
+
+
 ```
 
 ```{python}
@@ -139,6 +151,9 @@ for i, temp in enumerate([0.1, 1.0, 2.0]):
 
 plt.tight_layout()
 plt.show()
+
+
+
 ```
 
 ::: {.callout-note}
@@ -217,6 +232,9 @@ llm = ChatOpenAI(
 
 resp = llm.invoke("Explica qué es un Transformer en 3 frases")
 print(resp.content)
+
+
+
 ```
 
 ```{python}
@@ -231,6 +249,9 @@ r = requests.get("https://llamus.cs.us.es/api/v1/models",
 models = r.json()
 for m in models["data"]:
     print(f"  • {m['id']}")
+
+
+
 ```
 
 :::{.callout-tip}

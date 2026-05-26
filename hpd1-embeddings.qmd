@@ -39,6 +39,7 @@ jupyter: python3
 
 ```{python}
 #| echo: true
+#| eval: false
 
 import os
 import tempfile
@@ -95,6 +96,7 @@ Usamos `arxiv` para descargar los abstracts de 3 papers clave del módulo. Con `
 
 ```{python}
 #| echo: true
+#| eval: false
 
 class PDF(FPDF):
     pass
@@ -395,6 +397,7 @@ En esta segunda parte repetimos el pipeline sobre un corpus real: **6 papers des
 
 ```{python}
 #| echo: true
+#| eval: false
 
 PAPERS = {
     "1706.03762": "Attention Is All You Need (Vaswani et al., 2017)",
@@ -564,6 +567,7 @@ Usamos dos tareas complementarias: **BIOSSES** (100 pares, dominio biomédico, r
 
 ```{python}
 #| echo: true
+#| eval: false
 
 import mteb
 
