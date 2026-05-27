@@ -14,4 +14,4 @@ Módulo 10 del Máster en Data Science & Big Data.
 Universidad de Sevilla
 
 - **Adam Leiyi Chen Abolacio** — `achen@us.es`
-- **Fernando Sancho Caparrini** — `achen@us.es`
+- **Fernando Sancho Caparrini** — `fsancho@us.es`
