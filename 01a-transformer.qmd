@@ -177,7 +177,7 @@ def multi_head_attention_numpy(Q, K, V, num_heads=2):
 
     outputs, attn_weights = [], []
     for h in range(num_heads):
-        scores = Q_heads[:, h] @ K_heads[:, h].transpose(-2, -1) / np.sqrt(d_k)
+        scores = Q_heads[:, h] @ K_heads[:, h].swapaxes(-2, -1) / np.sqrt(d_k)
         weights = np.exp(scores) / np.sum(np.exp(scores), axis=-1, keepdims=True)
         outputs.append(weights @ V_heads[:, h])
         attn_weights.append(weights)
@@ -208,13 +208,13 @@ embed_dim = 8
 num_heads = 2
 mha = nn.MultiheadAttention(embed_dim=embed_dim, num_heads=num_heads, batch_first=True)
 
-Qt_mh = torch.from_numpy(Q_mh)
-Kt_mh = torch.from_numpy(K_mh)
-Vt_mh = torch.from_numpy(V_mh)
+Qt_mh = torch.from_numpy(Q_mh).float()
+Kt_mh = torch.from_numpy(K_mh).float()
+Vt_mh = torch.from_numpy(V_mh).float()
 
 out_th_mh, attn_th_mh = mha(Qt_mh, Kt_mh, Vt_mh, need_weights=True)
 print(f"Salida nn.MultiheadAttention: {out_th_mh.shape}")
-print(f"Pesos de atención:\n{np.round(attn_th_mh.numpy(), 3)}")
+print(f"Pesos de atención:\n{np.round(attn_th_mh.detach().numpy(), 3)}")
 print(f"\nParámetros entrenables de la capa: {sum(p.numel() for p in mha.parameters())}")
 
 
