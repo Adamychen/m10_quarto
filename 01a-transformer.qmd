@@ -3,7 +3,7 @@ title: "01a — Arquitectura Transformer"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01a-transformer.ipynb)
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01a-transformer.ipynb)
 
 > 💡 Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda seguir el orden: Transformer → LLMs → Embeddings → Vector DB.
 
@@ -19,7 +19,7 @@ engine: jupyter
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
@@ -32,9 +32,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 plt.rcParams["figure.dpi"] = 100
 print("Librerías cargadas correctamente.")
-
-
-
 ```
 
 ## Arquitectura Transformer
@@ -50,20 +47,47 @@ La arquitectura **Transformer** (Vaswani et al., 2017) resolvió estos problemas
 
 ![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)](images/transformer-architecture.png)
 
-```{mermaid}
-graph LR
-    subgraph "RNN"
-        A[t_1] --> B[t_2] --> C[t_3] --> D[t_n]
-    end
-    subgraph "Transformer"
-        E[t_1] --> F[Atención]
-        G[t_2] --> F
-        H[t_3] --> F
-        I[t_n] --> F
-        F --> J[Salida paralela]
-    end
+```{python}
+#| echo: true
+#| eval: true
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 3.5))
+fig.patch.set_facecolor('white')
+
+rnn_nodes = ['$t_1$', '$t_2$', '$t_3$', '$t_n$']
+
+# RNN — procesamiento secuencial
+ax1.set_title("RNN — procesamiento secuencial", fontsize=12, fontweight='bold')
+ax1.axis('off')
+x_positions = [0.05, 0.3, 0.55, 0.8]
+for i, (label, x) in enumerate(zip(rnn_nodes, x_positions)):
+    ax1.text(x, 0.5, label, fontsize=13, ha='center', va='center',
+             bbox=dict(boxstyle='round,pad=0.3', facecolor='#e3f2fd', edgecolor='#1565c0'))
+    if i < len(rnn_nodes) - 1:
+        ax1.annotate('', xy=(x_positions[i+1] - 0.05, 0.5),
+                     xytext=(x + 0.05, 0.5),
+                     arrowprops=dict(arrowstyle='->', color='#1565c0', lw=2))
+
+# Transformer — atención paralela
+ax2.set_title("Transformer — atención paralela", fontsize=12, fontweight='bold')
+ax2.axis('off')
+y_positions = [0.75, 0.55, 0.35, 0.15]
+for label, y in zip(rnn_nodes, y_positions):
+    ax2.text(0.05, y, label, fontsize=13, ha='center', va='center',
+             bbox=dict(boxstyle='round,pad=0.3', facecolor='#e8f5e9', edgecolor='#2e7d32'))
+    ax2.annotate('', xy=(0.38, 0.45), xytext=(0.13, y),
+                 arrowprops=dict(arrowstyle='->', color='#2e7d32', lw=1.5))
+
+ax2.text(0.42, 0.45, 'Atención\nMulti-Cabeza', fontsize=11, ha='center', va='center',
+         bbox=dict(boxstyle='round,pad=0.4', facecolor='#fff3e0', edgecolor='#e65100'))
+ax2.annotate('', xy=(0.78, 0.45), xytext=(0.58, 0.45),
+             arrowprops=dict(arrowstyle='->', color='#e65100', lw=2))
+ax2.text(0.88, 0.45, 'Salida\nparalela', fontsize=11, ha='center', va='center',
+         bbox=dict(boxstyle='round,pad=0.3', facecolor='#fce4ec', edgecolor='#c62828'))
+
+plt.tight_layout()
+plt.show()
 ```
-### ESTO ES UNA PRUEBA
 ### Atención multi-cabeza (Multi-Head Attention)
 
 El núcleo del Transformer es el mecanismo de **scaled dot-product attention**. Para cada token, se calculan tres vectores:
@@ -84,7 +108,7 @@ El producto Q·K^T mide la similitud entre cada par de tokens. El factor √d_k 
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 def scaled_dot_product_attention_numpy(Q, K, V):
     """Atención paso a paso con numpy. Muestra la matemática subyacente."""
@@ -114,7 +138,7 @@ print("\nCada fila suma 1:", np.round(attn_np[0].sum(axis=1), 3))
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 def scaled_dot_product_attention_torch(Q, K, V):
     """Atención nativa de PyTorch con Flash Attention (GPU)."""
@@ -138,7 +162,7 @@ print(f"\n¿Resultados idénticos? {np.allclose(out_np, out_th.numpy(), atol=1e-
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 def multi_head_attention_numpy(Q, K, V, num_heads=2):
     """Multi-head atención desde cero: divide en cabezas, atiende, concatena, proyecta."""
@@ -176,7 +200,7 @@ print(f"\nCada cabeza atiende de forma distinta (diferentes pesos).")
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 embed_dim = 8
 num_heads = 2
@@ -199,7 +223,7 @@ print(f"\nParámetros entrenables de la capa: {sum(p.numel() for p in mha.parame
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 fig, axes = plt.subplots(1, 3, figsize=(14, 4))
 
@@ -238,7 +262,7 @@ $$PE_{(pos, 2i+1)} = \cos(pos / 10000^{2i/d_{model}})$$
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 def positional_encoding_numpy(seq_len, d_model):
     """Codificación posicional sinusoidal desde cero."""
@@ -269,7 +293,7 @@ plt.close(fig)
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 vocab_size = 50
 d_model = 32
