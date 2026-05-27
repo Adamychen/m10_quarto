@@ -3,7 +3,7 @@ title: "HPD 4 — Sistema RAG sobre datos mixtos con evaluación"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/modulo_10/blob/main/notebooks/hpd4-rag-mixto.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/hpd4-rag-mixto.ipynb)
 
 
 

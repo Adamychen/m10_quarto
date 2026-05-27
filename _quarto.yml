@@ -20,6 +20,8 @@ website:
         contents:
           - href: index.qmd
             text: Presentación
+          - href: about.qmd
+            text: Acerca de
       - section: "Bloque 1 — Fundamentos"
         contents:
           - href: 01-fundamentos.qmd
@@ -34,6 +36,10 @@ website:
             text: Bases de datos vectoriales
           - href: hpd1-embeddings.qmd
             text: "🔧 HPD 1 — Embeddings"
+          - href: evaluables/hpd1-evaluables.qmd
+            text: "📝 Ejercicios evaluables HPD 1"
+          - href: evaluables/hpd1-extension.qmd
+            text: "⭐ Extensión HPD 1"
       - section: "Bloque 2 — Orquestación"
         contents:
           - href: 02-orquestacion.qmd
@@ -68,6 +74,11 @@ format:
     theme:
       - cosmo
       - brand
+    grid:
+      sidebar-width: 260px
+      body-width: 850px
+      margin-width: 0px
+      gutter-width: 1.5rem
     css: styles.css
     toc: true
     code-fold: false

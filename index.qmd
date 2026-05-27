@@ -2,16 +2,16 @@
 title: "Módulo 10 — IA Generativa para Data Science"
 ---
 
-[![Open in GitHub](https://img.shields.io/badge/GitHub-Repositorio-181717?logo=github)](https://github.com/Adamychen/modulo_10)
+[![Open in GitHub](https://img.shields.io/badge/GitHub-Repositorio-181717?logo=github)](https://github.com/Adamychen/m10_quarto)
 
 ::: {.callout-note}
 ## Cómo abrir los notebooks en Colab (repo privado)
 
 1. **Primera vez:** abre [colab.research.google.com](https://colab.research.google.com), ve a ⚙️ Settings → GitHub → **Connect to GitHub** y autoriza la app.
 2. Haz clic en el badge 🟢 "Open in Colab" de cualquier página.
-3. Si no funciona, usa **File → Open Notebook → GitHub** en Colab, busca `Adamychen/modulo_10` y selecciona el notebook de la carpeta `notebooks/`.
+3. Si no funciona, usa **File → Open Notebook → GitHub** en Colab, busca `Adamychen/m10_quarto` y selecciona el notebook de la carpeta `notebooks/`.
 
-Si prefieres descargar el `.ipynb` y subirlo manualmente: [Ver archivos en GitHub](https://github.com/Adamychen/modulo_10/tree/main/notebooks/).
+Si prefieres descargar el `.ipynb` y subirlo manualmente: [Ver archivos en GitHub](https://github.com/Adamychen/m10_quarto/tree/main/notebooks/).
 :::
 
 ## Distribución de la carga docente

@@ -3,7 +3,7 @@ title: "01c — Modelos de Embeddings"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/modulo_10/blob/main/notebooks/01c-embeddings.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01c-embeddings.ipynb)
 
 > 💡 Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto [01b-llms.qmd](01b-llms.qmd) primero.
 
