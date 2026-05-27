@@ -4,7 +4,7 @@ Sitio web del módulo 10 del **Máster en Data Science & Big Data** de la Univer
 
 **IA Generativa para Data Science** — 3,0 ECTS | 75 horas
 
-## 👨‍🎓 Para alumnos
+## Para alumnos
 
 ### Ver el sitio online
 
@@ -12,9 +12,9 @@ El sitio está publicado en GitHub Pages. Accede desde la URL que se muestra en 
 
 ### Abrir notebooks en Colab
 
-Cada página tiene un badge 🟢 **Open in Colab** en la parte superior. Si es la primera vez:
+Cada página tiene un badge **Open in Colab** en la parte superior. Si es la primera vez:
 1. Abre [colab.research.google.com](https://colab.research.google.com)
-2. Ve a ⚙️ Settings → GitHub → **Connect to GitHub** y autoriza la app
+2. Ve a **Settings → GitHub → Connect to GitHub** y autoriza la app
 3. Vuelve a la página y haz clic en el badge
 
 Como alternativa: **File → Open Notebook → GitHub**, busca `Adamychen/m10_quarto` y selecciona el notebook de la carpeta `notebooks/`.
@@ -25,7 +25,7 @@ Los ejercicios evaluables están en `evaluables/hpd1-evaluables.qmd` y la extens
 
 ---
 
-## 👨‍🏫 Para profesores
+## Para profesores
 
 ### Requisitos
 

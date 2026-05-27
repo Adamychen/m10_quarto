@@ -39,4 +39,4 @@ Implementar sistemas RAG de calidad producción, generar datos sintéticos útil
 
 ## Taller práctico
 
-👉 [HPD 4 — Sistema RAG sobre datos mixtos con evaluación](hpd4-rag-mixto.qmd)
+- [HPD 4 — Sistema RAG sobre datos mixtos con evaluación](hpd4-rag-mixto.qmd)

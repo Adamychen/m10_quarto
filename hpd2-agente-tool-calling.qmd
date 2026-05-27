@@ -21,25 +21,25 @@ engine: jupyter
 ```
 
 ::: {.callout-tip icon=false}
-## 🎯 Objetivos
+## Objetivos
 - Construir un agente con LangChain y Tool Calling
 - Integrar herramientas de análisis de datos (pandas + visualización)
 - Implementar el patrón ReAct
 - Evaluar la capacidad del agente para responder preguntas en lenguaje natural
 
-## 📦 Materiales
+## Materiales
 - Librerías: `langchain`, `openai`, `pandas`, `matplotlib`
 - Dataset a elegir (Kaggle: Titanic, Iris, o similar)
 - API key de Llamus US (`https://llamus.cs.us.es/api/v1`) o LLM local con Ollama
 
-## 👣 Instrucciones
+## Instrucciones
 1. Definir herramientas: ejecutar pandas + generar visualización
 2. Configurar el LLM con bind de herramientas
 3. Implementar el loop ReAct
 4. Probar con preguntas en lenguaje natural
 5. Evaluar precisión y robustez
 
-## 💻 Código base
+## Código base
 :::
 
 ```{python}
@@ -97,15 +97,15 @@ graph TD
 ```
 
 ::: {.callout-tip icon=false}
-## 📤 Entregable
+## Entregable
 - Script Python del agente funcional
 - Al menos 2 herramientas implementadas
 - Log de 3 preguntas de prueba con sus respuestas
 
-## ✅ Criterios de evaluación
+## Criterios de evaluación
 - Agente responde correctamente preguntas analíticas
 - Manejo de errores en ejecución de herramientas
 - Código modular y comentado
 
-## ⏱ Tiempo estimado: 4h
+## Tiempo estimado: 4h
 :::

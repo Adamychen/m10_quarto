@@ -50,5 +50,5 @@ Diseñar pipelines de prompting robustos, usar frameworks de orquestación y con
 
 ## Talleres prácticos
 
-👉 [HPD 2 — Agente analítico con Tool Calling](hpd2-agente-tool-calling.qmd)
-👉 [HPD 3 — Servidor MCP y conexión segura a datos locales](hpd3-servidor-mcp.qmd)
+- [HPD 2 — Agente analítico con Tool Calling](hpd2-agente-tool-calling.qmd)
+- [HPD 3 — Servidor MCP y conexión segura a datos locales](hpd3-servidor-mcp.qmd)

@@ -5,7 +5,7 @@ engine: jupyter
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01a-transformer.ipynb)
 
-> 💡 Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda seguir el orden: Transformer → LLMs → Embeddings → Vector DB.
+> Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda seguir el orden: Transformer → LLMs → Embeddings → Vector DB.
 
 ```{python}
 #| echo: true
@@ -86,6 +86,7 @@ ax2.text(0.88, 0.45, 'Salida\nparalela', fontsize=11, ha='center', va='center',
 plt.tight_layout()
 plt.show()
 ```
+
 ### Atención multi-cabeza (Multi-Head Attention)
 
 El núcleo del Transformer es el mecanismo de **scaled dot-product attention**. Para cada token, se calculan tres vectores:

@@ -12,11 +12,11 @@ engine: jupyter
 > **Dependencias:** `torch`, `transformers`, `sentence-transformers`, `chromadb`, `faiss-cpu`, `matplotlib`, `scikit-learn`, `numpy`
 
 ::: {.callout-tip}
-## 💻 Ejecución en Colab
+## Ejecución en Colab
 Todas las celdas de código están diseñadas para ejecutarse en **Google Colab** con GPU T4 gratuita (12 GB RAM).
 
-1. Haz clic en el badge 🟢 "Open in Colab" de arriba
-2. Si es la primera vez, autoriza Colab en GitHub: ⚙️ Settings → GitHub → **Connect to GitHub**
+1. Haz clic en el badge "Open in Colab" de arriba
+2. Si es la primera vez, autoriza Colab en GitHub: **Settings → GitHub → Connect to GitHub**
 3. En Colab: `Runtime → Run all`
 
 Si el badge no funciona, abre [colab.research.google.com](https://colab.research.google.com), ve a **File → Open Notebook → GitHub**, busca `Adamychen/m10_quarto` y selecciona el notebook correspondiente.
@@ -49,13 +49,13 @@ Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector
 
 | Tema | Archivo | Duración estimada |
 |---|---|---|
-| 🔷 **Transformers** — Atención, codificación posicional, variantes | [01a-transformer.qmd](01a-transformer.qmd) | 2h |
-| 🔷 **LLMs e inferencia** — Preentrenamiento, tokenización, parámetros, HF Hub, API Llamus | [01b-llms.qmd](01b-llms.qmd) | 2h |
-| 🔷 **Embeddings** — word2vec, SBERT, modelos, comparativa | [01c-embeddings.qmd](01c-embeddings.qmd) | 1h |
-| 🔷 **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica | [01d-vectordb.qmd](01d-vectordb.qmd) | 1h |
-| 🔧 **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](hpd1-embeddings.qmd) | 4h |
+| **Transformers** — Atención, codificación posicional, variantes | [01a-transformer.qmd](01a-transformer.qmd) | 2h |
+| **LLMs e inferencia** — Preentrenamiento, tokenización, parámetros, HF Hub, API Llamus | [01b-llms.qmd](01b-llms.qmd) | 2h |
+| **Embeddings** — word2vec, SBERT, modelos, comparativa | [01c-embeddings.qmd](01c-embeddings.qmd) | 1h |
+| **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica | [01d-vectordb.qmd](01d-vectordb.qmd) | 1h |
+| **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](hpd1-embeddings.qmd) | 4h |
 
-> 💡 Los temas marcados con 🔷 son teoría obligatoria. Puedes profundizar en cada uno según tu interés.
+> Los temas marcados con 🔷 son teoría obligatoria. Puedes profundizar en cada uno según tu interés.
 
 ```{python}
 #| echo: true

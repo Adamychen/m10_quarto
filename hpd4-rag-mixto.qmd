@@ -21,20 +21,20 @@ engine: jupyter
 ```
 
 ::: {.callout-tip icon=false}
-## 🎯 Objetivos
+## Objetivos
 - Construir un pipeline RAG que procese datos no estructurados (PDF) y estructurados (SQL)
 - Implementar un re-ranker con cross-encoder
 - Evaluar la calidad del sistema con RAGAS
 - Iterar sobre componentes para mejorar métricas
 
-## 📦 Materiales
+## Materiales
 - Librerías: `langchain`, `chromadb`, `sentence-transformers`, `ragas`, `datasets`
 - Modelo embeddings: `intfloat/e5-small-v2`
 - Cross-encoder: `ms-marco-MiniLM`
 - Corpus: PDFs técnicos + tabla SQL (proporcionados)
 - LLM: API Llamus US (`https://llamus.cs.us.es/api/v1`, modelo `qwen3.6:27b`) o local (Ollama)
 
-## 👣 Instrucciones
+## Instrucciones
 1. Cargar e indexar PDFs en base vectorial
 2. Cargar e indexar tabla SQL
 3. Implementar retrievers para cada fuente
@@ -43,7 +43,7 @@ engine: jupyter
 6. Crear dataset de preguntas anotadas
 7. Evaluar con RAGAS (faithfulness, answer relevancy, context precision)
 
-## 💻 Código base
+## Código base
 :::
 
 ```{python}
@@ -102,17 +102,17 @@ graph TD
 ```
 
 ::: {.callout-tip icon=false}
-## 📤 Entregable
+## Entregable
 - Pipeline RAG completo y ejecutable
 - Dataset de preguntas anotadas (mínimo 10)
 - Informe de evaluación RAGAS con scores
 - Iteración documentada: al menos 2 versiones comparadas
 
-## ✅ Criterios de evaluación
+## Criterios de evaluación
 - RAG funcional con datos mixtos (PDF + SQL)
 - Re-ranker implementado y mejora demostrada
 - RAGAS score > 0,6 en faithfulness
 - Análisis de componentes y propuestas de mejora
 
-## ⏱ Tiempo estimado: 6h
+## Tiempo estimado: 6h
 :::
