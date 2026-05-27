@@ -98,9 +98,9 @@ La atención se calcula como:
 
 $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
 
-El producto Q·K^T mide la similitud entre cada par de tokens. El factor √d_k escala para evitar que los valores crezcan demasiado. La **multi-cabeza** ejecuta este proceso en paralelo con pesos distintos, permitiendo al modelo atender a diferentes relaciones simultáneamente (sintaxis, semántica, coreferencias...).
+El producto $Q·K^T$ mide la similitud entre cada par de tokens. El factor √d_k escala para evitar que los valores crezcan demasiado. La **multi-cabeza** ejecuta este proceso en paralelo con pesos distintos, permitiendo al modelo atender a diferentes relaciones simultáneamente (sintaxis, semántica, coreferencias...).
 
-![Atención multi-cabeza (izquierda) y Scaled Dot-Product Attention (derecha) (Vaswani et al., 2017, Figure 2)](images/multi-head-attention.png)
+![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (Vaswani et al., 2017, Figure 2)](images/multi-head-attention.png)
 
 #### Scaled Dot-Product Attention — Low Level (numpy)
 
