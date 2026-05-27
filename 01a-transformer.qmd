@@ -43,7 +43,7 @@ Antes de Transformer, los modelos secuenciales dominaban el procesamiento de len
 
 La arquitectura **Transformer** (Vaswani et al., 2017) resolvió estos problemas introduciendo el **mecanismo de atención** como reemplazo de la recurrencia, permitiendo procesar todos los tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones.
 
-![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)](images/transformer-architecture.png)
+![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)](images/diagrama_transformer_original.webp)
 
 ```{python}
 #| echo: true
@@ -101,7 +101,7 @@ $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)
 
 El producto $Q·K^T$ mide la similitud entre cada par de tokens. El factor √d_k escala para evitar que los valores crezcan demasiado. La **multi-cabeza** ejecuta este proceso en paralelo con pesos distintos, permitiendo al modelo atender a diferentes relaciones simultáneamente (sintaxis, semántica, coreferencias...).
 
-![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (Vaswani et al., 2017, Figure 2)](images/multi-head-attention.png)
+![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (Vaswani et al., 2017, Figure 2)](images/multi-head-attention.webp)
 
 #### Scaled Dot-Product Attention — Low Level (numpy)
 
