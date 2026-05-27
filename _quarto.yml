@@ -85,5 +85,4 @@ format:
     code-tools: true
     mermaid:
       theme: neutral
-    footer:
-      center: "© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science & Big Data · Universidad de Sevilla"
+    include-after-body: includes/footer.html

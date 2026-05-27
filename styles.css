@@ -15,3 +15,16 @@ table {
 th {
   background-color: #f0f0f0;
 }
+
+.footer-custom {
+  text-align: center;
+  padding: 1.5em 0;
+  border-top: 1px solid #ddd;
+  font-size: 0.85em;
+  color: #666;
+}
+
+.footer-custom img {
+  height: 60px;
+  margin-bottom: 0.5em;
+}
