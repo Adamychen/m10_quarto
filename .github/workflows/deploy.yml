@@ -30,6 +30,8 @@ jobs:
       - uses: quarto-dev/quarto-actions/setup@v2
 
       - run: quarto render
+        env:
+          LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
 
       - uses: actions/upload-pages-artifact@v3
         with:
