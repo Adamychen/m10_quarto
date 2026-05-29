@@ -24,6 +24,12 @@ Evaluar modelos con métricas LLM-as-a-judge, detectar y mitigar alucinaciones y
 - Técnicas de mitigación: grounding, citation, RLHF
 - Privacidad de datos corporativos: PII detection, data masking
 - On-premise vs. cloud
+- Datos sintéticos y privacidad:
+  - ¿Son realmente anónimos? Riesgo de re-identificación por proximidad
+  - Privacidad diferencial ($\varepsilon$-differential privacy) en SDV
+  - Distancia al registro real más cercano (DCR) como métrica de exposición
+  - Caso real: ataques de inferencia de pertenencia (membership inference) sobre datos sintéticos
+  - Buenas prácticas: nunca compartir datos sintéticos sin validación de privacidad
 - Sesgo en LLMs: tipos, herramientas de auditoría
 - Documentación: Model Card, System Card
 

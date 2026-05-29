@@ -1,0 +1,78 @@
+---
+title: "Bloque 2 — Orquestación: Prompt Engineering, Frameworks y Agentes"
+---
+
+> **Carga:** HT: 6h | HPD: 4h
+>
+> **Competencias asociadas:** [CE-2](../index.qmd#competencias-específicas), [CE-3](../index.qmd#competencias-específicas)
+
+## Objetivos del bloque
+
+Diseñar pipelines de prompting robustos, usar frameworks de orquestación (LangChain, LlamaIndex), implementar servidores MCP y construir agentes inteligentes con herramientas externas.
+
+## Mapa conceptual del bloque
+
+```{mermaid}
+graph TD
+    subgraph "Orquestación"
+        A[Prompt Engineering<br/>técnicas avanzadas] --> B[LangChain<br/>cadenas + memoria]
+        A --> C[LlamaIndex<br/>indexación + RAG]
+        B --> E[Agentes<br/>ReAct + Tool Calling]
+        C --> E
+        D[MCP<br/>protocolo estandarizado] --> E
+        E --> F["RAG + Agentes (Bloque 3)"]
+    end
+    style A fill:#4B8BBE,color:#fff
+    style B fill:#306998,color:#fff
+    style C fill:#FFD43B,color:#000
+    style D fill:#e65100,color:#fff
+    style E fill:#2e7d32,color:#fff
+```
+
+Este bloque te lleva de la interacción básica con un LLM hasta la construcción de sistemas autónomos capaces de razonar, usar herramientas y ejecutar tareas multi-paso. Empezamos refinando el arte del prompt, luego aprendemos a orquestar con frameworks, estandarizamos la conexión a datos con MCP y finalmente construimos agentes inteligentes.
+
+## Contenido del bloque
+
+| Tema | Archivo | Duración estimada |
+|---|---|---|
+| **Prompt Engineering** — Few-shot, CoT/ToT, JSON Schema, role prompting | [02a-prompt-engineering.qmd](02a-prompt-engineering.qmd) | 1.5h |
+| **LangChain** — LCEL, memoria conversacional, retrievers, parsers, callbacks | [02b-langchain.qmd](02b-langchain.qmd) | 1.5h |
+| **LlamaIndex** — Índices, query engines, pipelines de ingesta, chunking | [02c-llamaindex.qmd](02c-llamaindex.qmd) | 1h |
+| **MCP** — Protocolo, servidores stdio, recursos/tools/prompts, seguridad | [02d-mcp.qmd](02d-mcp.qmd) | 1h |
+| **Agentes Inteligentes** — ReAct, Tool Calling, multi-step, multi-agente | [02e-agentes.qmd](02e-agentes.qmd) | 1h |
+
+## Talleres prácticos
+
+| HPD | Título | Enlace | Duración |
+|---|---|---|---|
+| **HPD 2** | Agente analítico con Tool Calling | [hpd2-agente-tool-calling.qmd](hpd2-agente-tool-calling.qmd) | 4h |
+| **HPD 3** | Servidor MCP y conexión segura a datos locales | [hpd3-servidor-mcp.qmd](hpd3-servidor-mcp.qmd) | 4h |
+
+> **Lecturas obligatorias:**
+> - [Documentación oficial de LangChain LCEL](https://python.langchain.com/docs/concepts/lcel/)
+> - [Especificación MCP v1.0](https://spec.modelcontextprotocol.io/) (secciones Resources y Tools)
+> - [Prompt Engineering Guide (DAIR.AI)](https://www.promptingguide.ai/)
+
+## Ruta de aprendizaje recomendada
+
+```{mermaid}
+graph LR
+    A["1. Prompt<br/>Engineering"] --> B["2. LangChain"]
+    A --> C["3. LlamaIndex"]
+    C --> D["4. MCP"]
+    B --> E["5. Agentes<br/>Inteligentes"]
+    D --> E
+    E --> F["🔧 HPD 2<br/>Tool Calling"]
+    D --> G["🔧 HPD 3<br/>Servidor MCP"]
+    
+    style A fill:#4B8BBE,color:#fff
+    style E fill:#2e7d32,color:#fff
+    style F fill:#e65100,color:#fff
+    style G fill:#e65100,color:#fff
+```
+
+1. Comienza con **Prompt Engineering** para dominar cómo comunicarte con el LLM
+2. Aprende **LangChain** o **LlamaIndex** (o ambos, son complementarios) para orquestar
+3. Entiende **MCP** para estandarizar la conexión a datos
+4. Construye **agentes** uniendo todos los conceptos
+5. Ponlo en práctica con los HPDs: un **agente con herramientas** (HPD 2) y un **servidor MCP** (HPD 3)

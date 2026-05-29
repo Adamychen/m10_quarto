@@ -33,17 +33,22 @@ m10_quarto/
 | **Evaluación** | `05-evaluacion.qmd` |
 | **Recursos** | `06-herramientas.qmd`, `07-bibliografia.qmd` |
 
+## Requisitos
+
+- Python 3.11+
+- [Quarto](https://quarto.org/docs/get-started/) 1.6+
+
 ## Cómo renderizar
 
 ```bash
 # Instalar dependencias
 pip install -r requirements.txt
 
-# Renderizar sitio
-quarto render
+# Renderizar sitio (usa QUARTO_PYTHON para usar el venv)
+QUARTO_PYTHON=.venv/bin/python3 quarto render
 
 # Ver en local
-quarto preview
+QUARTO_PYTHON=.venv/bin/python3 quarto preview
 ```
 
 ## Despliegue (CI/CD)

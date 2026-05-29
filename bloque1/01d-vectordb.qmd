@@ -3,7 +3,7 @@ title: "01d — Bases de Datos Vectoriales"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01d-vectordb.ipynb)
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01d-vectordb.ipynb)
 
 > Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto [01c-embeddings.qmd](01c-embeddings.qmd) primero.
 
@@ -36,6 +36,12 @@ print("Librerías cargadas correctamente.")
 ## Bases de Datos Vectoriales
 
 Una vez que tenemos embeddings, necesitamos almacenarlos y buscarlos eficientemente. Aquí entran las **bases de datos vectoriales**.
+
+::: {.callout-note}
+## Idioma de los ejemplos
+
+Los modelos de embeddings que usamos (`all-MiniLM-L6-v2`) están entrenados en inglés, por lo que los ejemplos usan texto en inglés. Usar un tokenizador inglés sobre texto español produce más subtokens por palabra y embeddings de menor calidad. Para trabajar con español, cambia a un modelo multilingüe como `intfloat/multilingual-e5-small`.
+:::
 
 ### Búsqueda exacta (KNN) vs. aproximada (ANN)
 
@@ -171,11 +177,11 @@ model = SentenceTransformer("all-MiniLM-L6-v2")
 
 # Añadir documentos con sus embeddings
 documentos = [
-    "La inteligencia artificial está revolucionando la medicina",
-    "Los transformers permiten procesar secuencias en paralelo",
-    "Las bases de datos vectoriales optimizan la búsqueda semántica",
-    "El fine-tuning con LoRA reduce el coste de entrenamiento",
-    "Machine learning supervisado requiere datos etiquetados"
+    "Artificial intelligence is revolutionizing medicine",
+    "Transformers can process sequences in parallel",
+    "Vector databases optimize semantic search",
+    "Fine-tuning with LoRA reduces training cost",
+    "Supervised machine learning requires labeled data"
 ]
 
 ids = [f"doc_{i}" for i in range(len(documentos))]
@@ -197,7 +203,7 @@ print(f"Documentos insertados: {collection.count()}")
 #| eval: false
 
 # Búsqueda semántica
-query = "¿Cómo procesan secuencias los modelos actuales?"
+query = "How do current models process sequences?"
 query_embedding = model.encode([query]).tolist()
 
 resultados = collection.query(
@@ -289,4 +295,4 @@ Para el **proyecto del módulo** empieza con **Chroma**: es local, no requiere s
 
 ---
 
-> Has completado la teoría del **Bloque 1**. Ahora pasa al taller práctico: **[HPD 1 — Pipeline de embeddings y búsqueda semántica](hpd1-embeddings.qmd)**.
+> Has completado la teoría del **Bloque 1**. Ahora pasa al taller práctico: **[HPD 1 — Pipeline de embeddings y búsqueda semántica](../hpd1-embeddings.qmd)**.

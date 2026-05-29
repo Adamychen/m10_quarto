@@ -29,7 +29,7 @@ Los ejercicios evaluables están en `evaluables/hpd1-evaluables.qmd` y la extens
 
 ### Requisitos
 
-- Python 3.10+
+- Python 3.11+
 - [Quarto](https://quarto.org/docs/get-started/) 1.6+
 
 ### Clonar y preparar
@@ -37,7 +37,7 @@ Los ejercicios evaluables están en `evaluables/hpd1-evaluables.qmd` y la extens
 ```bash
 git clone https://github.com/Adamychen/m10_quarto.git
 cd m10_quarto
-python3 -m venv .venv
+python3.11 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
@@ -45,13 +45,13 @@ pip install -r requirements.txt
 ### Renderizar en local
 
 ```bash
-quarto render
+QUARTO_PYTHON=.venv/bin/python3 quarto render
 ```
 
 Para verlo en el navegador con recarga automática:
 
 ```bash
-quarto preview
+QUARTO_PYTHON=.venv/bin/python3 quarto preview
 ```
 
 ### Estructura del proyecto

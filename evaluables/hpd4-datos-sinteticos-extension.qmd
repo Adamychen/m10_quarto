@@ -1,0 +1,202 @@
+---
+title: "Extensión — Datos Sintéticos (ejercicios avanzados)"
+engine: jupyter
+---
+
+> **Peso en la nota:** 7.5 % extra (parte del 30 % de entregas prácticas)
+>
+> **Plazo:** 14 días tras la sesión presencial del Bloque 3.
+>
+> **Requisito previo:** haber completado `hpd4-datos-sinteticos.qmd`.
+>
+> **Entrega:** Notebook `.ipynb` ejecutado. Cada ejercicio especifica qué variable
+>   debe contener el resultado para la corrección automática.
+
+::: {.callout-warning icon=false}
+## Cómo se corrige
+
+Cada ejercicio pide que asignes el resultado a una variable con un nombre concreto.
+El script de corrección ejecutará tu notebook e inspeccionará esas variables.
+**Si la variable no existe o tiene un tipo incorrecto, el ejercicio se puntúa como 0.**
+
+Para autoevaluarte antes de entregar:
+```bash
+python scripts/corregir_hpd4_ds.py --extension tu_notebook.ipynb
+```
+:::
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q sdv scipy pandas scikit-learn matplotlib seaborn
+```
+
+```{python}
+#| echo: true
+
+import warnings
+warnings.filterwarnings("ignore")
+import numpy as np
+import pandas as pd
+from scipy.stats import ks_2samp
+from scipy.spatial.distance import cdist
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import f1_score
+from sdv.single_table import CTGANSynthesizer
+from sdv.metadata import SingleTableMetadata
+
+print("Librerías cargadas correctamente.")
+```
+
+---
+
+## Dataset de trabajo
+
+Igual que en `hpd4-datos-sinteticos.qmd`: Adult Census Income.
+
+```{python}
+#| echo: true
+
+df_real = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
+                       header=None,
+                       names=["age", "workclass", "fnlwgt", "education", "education_num",
+                              "marital_status", "occupation", "relationship", "race", "sex",
+                              "capital_gain", "capital_loss", "hours_per_week", "native_country", "income"])
+
+df_real = df_real.replace(" ?", np.nan).dropna()
+df_real["income"] = (df_real["income"].str.strip() == ">50K").astype(int)
+
+print(f"Dataset real: {df_real.shape[0]} filas, {df_real.shape[1]} columnas")
+```
+
+---
+
+## Ejercicio 1 — Privacidad diferencial con CTGAN
+
+Entrena **dos** CTGAN con SDV sobre las columnas `["age", "education_num", "hours_per_week", "sex", "income"]` (100 epochs):
+
+- **Sin privacidad:** CTGAN por defecto
+- **Con privacidad:** CTGAN con `epsilon=10`
+
+Genera 1000 filas con cada uno. Para cada modelo, calcula la **Distancia al Registro Real más Cercano (DCR)** sobre las columnas numéricas normalizadas: para cada fila sintética, encuentra la distancia euclidiana mínima a cualquier fila real. Un DCR bajo o con ceros indica riesgo de re-identificación.
+
+El resultado debe ser un **diccionario** `eval1_dcr` con estructura:
+
+```python
+{
+    "sin_privacidad": {"dcr_mean": float, "dcr_min": float},
+    "con_privacidad": {"dcr_mean": float, "dcr_min": float}
+}
+```
+
+```{python}
+#| echo: true
+
+from sklearn.preprocessing import StandardScaler
+
+eval1_dcr = None  # Sustituir con tu código
+
+# Validación automática
+if eval1_dcr is not None:
+    assert isinstance(eval1_dcr, dict), "eval1_dcr debe ser un diccionario"
+    for key in ["sin_privacidad", "con_privacidad"]:
+        assert key in eval1_dcr, f"Falta clave '{key}'"
+        for metric in ["dcr_mean", "dcr_min"]:
+            assert metric in eval1_dcr[key], f"Falta '{metric}' en eval1_dcr['{key}']"
+            assert isinstance(eval1_dcr[key][metric], float)
+    print(f"✅ Ejercicio 1 OK")
+    print(f"   Sin privacidad:  DCR mean={eval1_dcr['sin_privacidad']['dcr_mean']:.4f}, min={eval1_dcr['sin_privacidad']['dcr_min']:.4f}")
+    print(f"   Con privacidad:  DCR mean={eval1_dcr['con_privacidad']['dcr_mean']:.4f}, min={eval1_dcr['con_privacidad']['dcr_min']:.4f}")
+else:
+    print("⚠️  Ejercicio 1 pendiente")
+```
+
+---
+
+## Ejercicio 2 — Oversampling sintético para clase minoritaria
+
+Vas a simular un escenario de dataset desbalanceado y usar datos sintéticos para corregirlo.
+
+1. Filtra `df_real` para quedarte solo con la clase minoritaria (`income == 1`) y una muestra aleatoria de 200 registros de la clase mayoritaria (`income == 0`). Así creas un dataset muy desbalanceado artificialmente.
+2. Entrena un `RandomForestClassifier(n_estimators=50, random_state=42)` y mide **macro F1** con 70/30 split. Guarda en `f1_antes`.
+3. Entrena un CTGAN (50 epochs) sobre los registros de la clase minoritaria y genera 300 filas sintéticas con `income == 1`.
+4. Añade esas filas al dataset de entrenamiento, reentrena el clasificador y mide **macro F1** de nuevo. Guarda en `f1_despues`.
+
+El resultado debe ser un **diccionario** `eval2_oversampling`:
+
+```python
+{"f1_antes": float, "f1_despues": float, "mejora": float}
+```
+
+donde `mejora = f1_despues - f1_antes`.
+
+```{python}
+#| echo: true
+
+eval2_oversampling = None  # Sustituir con tu código
+
+# Validación automática
+if eval2_oversampling is not None:
+    assert isinstance(eval2_oversampling, dict), "eval2_oversampling debe ser un diccionario"
+    for key in ["f1_antes", "f1_despues", "mejora"]:
+        assert key in eval2_oversampling, f"Falta clave '{key}'"
+        assert isinstance(eval2_oversampling[key], float)
+    print(f"✅ Ejercicio 2 OK")
+    print(f"   F1 antes del oversampling:    {eval2_oversampling['f1_antes']:.4f}")
+    print(f"   F1 después del oversampling:  {eval2_oversampling['f1_despues']:.4f}")
+    print(f"   Mejora:                       {eval2_oversampling['mejora']:+.4f}")
+else:
+    print("⚠️  Ejercicio 2 pendiente")
+```
+
+---
+
+## Ejercicio 3 — Evaluación con múltiples métricas de fidelidad
+
+Entrena un CTGAN (100 epochs) sobre `df_real` con columnas `["age", "education_num", "hours_per_week", "sex", "income"]`.
+Genera 2000 filas sintéticas.
+Calcula las **5 métricas** siguientes comparando real vs. sintético:
+
+1. `ks_age`: p-value del KS test para `age`
+2. `ks_hours`: p-value del KS test para `hours_per_week`
+3. `chi2_sex`: p-value del chi-cuadrado para `sex`
+4. `chi2_income`: p-value del chi-cuadrado para `income`
+5. `corr_diff`: diferencia absoluta media entre las matrices de correlación numérica
+
+El resultado debe ser un **diccionario** `eval3_metrics`:
+
+```python
+{
+    "ks_age": float,
+    "ks_hours": float,
+    "chi2_sex": float,
+    "chi2_income": float,
+    "corr_diff": float
+}
+```
+
+```{python}
+#| echo: true
+
+eval3_metrics = None  # Sustituir con tu código
+
+# Validación automática
+expected_keys = ["ks_age", "ks_hours", "chi2_sex", "chi2_income", "corr_diff"]
+
+if eval3_metrics is not None:
+    assert isinstance(eval3_metrics, dict), "eval3_metrics debe ser un diccionario"
+    for key in expected_keys:
+        assert key in eval3_metrics, f"Falta clave '{key}'"
+        assert isinstance(eval3_metrics[key], float), f"'{key}' debe ser float"
+        if "ks" in key or "chi2" in key:
+            assert 0 <= eval3_metrics[key] <= 1, f"'{key}' fuera de rango: {eval3_metrics[key]}"
+    pvals = [eval3_metrics[k] for k in expected_keys[:4]]
+    passing = sum(1 for p in pvals if p > 0.05)
+    print(f"✅ Ejercicio 3 OK — {passing}/4 tests pasan (p > 0.05)")
+    for k in expected_keys:
+        print(f"   {k}: {eval3_metrics[k]:.4f}")
+else:
+    print("⚠️  Ejercicio 3 pendiente")
+```

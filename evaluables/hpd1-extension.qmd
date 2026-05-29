@@ -84,58 +84,58 @@ def crear_pdf(nombre, titulo, contenido):
 
 corpus = {
     "01_transformers.pdf": (
-        "Transformers y Mecanismos de Atención",
-        "La arquitectura Transformer, introducida por Vaswani et al. en 2017, "
-        "revolucionó el procesamiento del lenguaje natural al eliminar las "
-        "recurrencias y basarse completamente en mecanismos de atención. "
-        "El componente clave es la atención multi-cabeza, que permite al modelo "
-        "atender simultáneamente a diferentes partes de la secuencia de entrada "
-        "desde distintos subespacios de representación. Cada cabeza de atención "
-        "calcula sus propios pesos Query, Key y Value mediante proyecciones "
-        "lineales aprendidas, y las salidas se concatenan y proyectan linealmente. "
-        "Esto permite capturar relaciones tanto locales como globales entre tokens "
-        "sin depender de la distancia secuencial. La codificación posicional se "
-        "suma a los embeddings de entrada para preservar el orden de las palabras, "
-        "ya que la atención por sí misma es invariante a la posición. Existen "
-        "codificaciones sinusoidales fijas y codificaciones posicionales aprendidas. "
-        "Los Transformers admiten tres configuraciones principales: encoder-only "
-        "como BERT, decoder-only como GPT y Llama, y encoder-decoder como T5. "
-        "La versión decoder-only es la base de los grandes modelos de lenguaje "
-        "modernos como GPT-4 y Llama 3."
+        "Transformers and Attention Mechanisms",
+        "The Transformer architecture, introduced by Vaswani et al. in 2017, "
+        "revolutionized natural language processing by eliminating recurrences "
+        "and relying entirely on attention mechanisms. "
+        "The key component is multi-head attention, which allows the model "
+        "to simultaneously attend to different parts of the input sequence "
+        "from different representation subspaces. Each attention head "
+        "computes its own Query, Key, and Value weights through learned "
+        "linear projections, and the outputs are concatenated and linearly "
+        "projected. This enables capturing both local and global relationships "
+        "between tokens without depending on sequential distance. Positional "
+        "encoding is added to the input embeddings to preserve word order, "
+        "since attention by itself is position-invariant. There are fixed "
+        "sinusoidal encodings and learned positional encodings. Transformers "
+        "support three main configurations: encoder-only like BERT, decoder-only "
+        "like GPT and Llama, and encoder-decoder like T5. The decoder-only "
+        "version is the foundation of modern large language models such as "
+        "GPT-4 and Llama 3."
     ),
     "02_embeddings.pdf": (
-        "Embeddings y Representación Vectorial Semántica",
-        "Los embeddings de texto son representaciones vectoriales densas que "
-        "capturan el significado semántico de palabras, frases o documentos "
-        "completos en un espacio vectorial continuo de dimensionalidad fija. "
-        "Modelos como Sentence-BERT, E5 y OpenAI text-embedding-3 proyectan "
-        "textos en un espacio donde la distancia entre vectores refleja la "
-        "similitud semántica, no léxica. La métrica más utilizada es la similitud "
-        "del coseno, que mide el ángulo entre dos vectores normalizados. "
-        "Los embeddings modernos se entrenan con objetivos contrastivos: se "
-        "maximiza la similitud entre textos semánticamente equivalentes mientras "
-        "se minimiza entre textos no relacionados. Los embeddings son la base "
-        "de los sistemas de búsqueda semántica y RAG, ya que permiten encontrar "
-        "información relevante incluso cuando las palabras exactas no coinciden "
-        "entre la consulta y el documento. Modelos como intfloat/e5-small-v2 "
-        "ofrecen un excelente equilibrio entre calidad y eficiencia."
+        "Embeddings and Semantic Vector Representation",
+        "Text embeddings are dense vector representations that capture the "
+        "semantic meaning of words, phrases, or entire documents in a "
+        "continuous vector space of fixed dimensionality. Models such as "
+        "Sentence-BERT, E5, and OpenAI text-embedding-3 project texts into "
+        "a space where the distance between vectors reflects semantic "
+        "similarity, not lexical overlap. The most widely used metric is "
+        "cosine similarity, which measures the angle between two normalized "
+        "vectors independently of their magnitude. Modern embeddings are "
+        "trained with contrastive objectives: maximizing similarity between "
+        "semantically equivalent texts while minimizing it between unrelated "
+        "ones. Embeddings are the foundation of semantic search and RAG "
+        "systems, as they allow finding relevant information even when the "
+        "exact words do not match between the query and the document. "
+        "Models like intfloat/e5-small-v2 offer an excellent balance between "
+        "quality and efficiency."
     ),
     "03_rag.pdf": (
         "RAG: Retrieval-Augmented Generation",
-        "RAG es una arquitectura que combina sistemas de recuperación de "
-        "información con modelos generativos para producir respuestas "
-        "fundamentadas en documentos. El pipeline típico consta de tres etapas: "
-        "ingesta, recuperación y generación. En la ingesta, los documentos se "
-        "dividen en chunks, se generan embeddings y se indexan en una base de "
-        "datos vectorial como Chroma o FAISS. La elección del tamaño de chunk "
-        "y el solapamiento es crítica: chunks pequeños mejoran la precisión de "
-        "recuperación pero pierden contexto, mientras que chunks grandes preservan "
-        "contexto pero diluyen la relevancia. En la recuperación, la consulta del "
-        "usuario se convierte en un embedding y se buscan los chunks más similares "
-        "mediante búsqueda por similitud del coseno. En la generación, los chunks "
-        "recuperados se añaden al prompt del LLM. RAG avanzado incorpora técnicas "
-        "como re-ranking con cross-encoders, expansión de consulta con HyDE y "
-        "RAG-Fusion."
+        "RAG is an architecture that combines information retrieval systems "
+        "with generative models to produce answers grounded in documents. "
+        "The typical pipeline consists of three stages: ingestion, retrieval, "
+        "and generation. During ingestion, documents are split into chunks, "
+        "embeddings are generated, and they are indexed in a vector database "
+        "such as Chroma or FAISS. The choice of chunk size and overlap is "
+        "critical: small chunks improve retrieval precision but lose context, "
+        "while large chunks preserve context but dilute relevance. During "
+        "retrieval, the user query is converted into an embedding and the "
+        "most similar chunks are retrieved using cosine similarity search. "
+        "During generation, the retrieved chunks are added to the LLM prompt. "
+        "Advanced RAG incorporates techniques such as re-ranking with "
+        "cross-encoders, query expansion with HyDE, and RAG-Fusion."
     ),
 }
 
@@ -151,6 +151,16 @@ for filename in sorted(os.listdir(CORPUS_DIR)):
     docs.extend(loader.load())
 
 print(f"Corpus listo: {len(docs)} páginas cargadas en {CORPUS_DIR}")
+```
+
+::: {.callout-warning icon=false}
+## Idioma del corpus
+
+El corpus sintético está en **inglés** porque el modelo `intfloat/e5-small-v2` está entrenado principalmente en inglés. El corpus en español (`CORPUS_ES`) se usa solo como fallback para el **Ejercicio E1** (pipeline multilingüe con `intfloat/multilingual-e5-small`). En los demás ejercicios, usa el corpus en inglés para obtener embeddings de calidad.
+:::
+
+```{python}
+#| echo: true
 
 # Corpus en español precargado (fallback para E1 si no hay internet)
 CORPUS_ES = {
@@ -348,7 +358,7 @@ Construye un sistema RAG mínimo: recupera los top-3 chunks para una consulta, i
 en un prompt y pide al LLM que responda usando solo esa información.
 
 Usa el endpoint de la asignatura (`https://llamus.cs.us.es/api/v1`), que es compatible
-con la API de OpenAI. El modelo es `qwen3.5:35b-a3b`. La API key debes configurarla
+con la API de OpenAI. El modelo es `gemma4:e2b-mlx`. La API key debes configurarla
 en la variable de entorno `LLM_API_KEY`.
 
 ```python
@@ -359,7 +369,7 @@ en la variable de entorno `LLM_API_KEY`.
 # os.environ["OPENAI_API_KEY"] = os.getenv("LLM_API_KEY", "not-needed")
 
 # ─── Recupera los top-3 chunks para esta consulta ───
-QUERY_E4 = "¿Cómo funciona la atención multi-cabeza en los Transformers?"
+QUERY_E4 = "How does multi-head attention work in Transformers?"
 
 # 1. Indexa los documentos en inglés con el pipeline ya construido.
 # 2. Recupera top-3 chunks con buscar_en_chroma().
@@ -378,7 +388,7 @@ QUERY_E4 = "¿Cómo funciona la atención multi-cabeza en los Transformers?"
 #     f"Pregunta: {QUERY_E4}"
 # )
 # respuesta = client_llm.chat.completions.create(
-#     model="qwen3.5:35b-a3b",
+#     model="gemma4:e2b-mlx",
 #     messages=[{"role": "user", "content": prompt}],
 # ).choices[0].message.content
 

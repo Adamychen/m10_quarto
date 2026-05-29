@@ -24,15 +24,15 @@ website:
             text: Acerca de
       - section: "Bloque 1 — Fundamentos"
         contents:
-          - href: 01-fundamentos.qmd
+          - href: bloque1/01-fundamentos.qmd
             text: Visión general
-          - href: 01a-transformer.qmd
+          - href: bloque1/01a-transformer.qmd
             text: Transformers
-          - href: 01b-llms.qmd
+          - href: bloque1/01b-llms.qmd
             text: LLMs e inferencia
-          - href: 01c-embeddings.qmd
+          - href: bloque1/01c-embeddings.qmd
             text: Embeddings
-          - href: 01d-vectordb.qmd
+          - href: bloque1/01d-vectordb.qmd
             text: Bases de datos vectoriales
           - href: hpd1-embeddings.qmd
             text: "🔧 HPD 1 — Embeddings"
@@ -42,18 +42,42 @@ website:
             text: "⭐ Extensión HPD 1"
       - section: "Bloque 2 — Orquestación"
         contents:
-          - href: 02-orquestacion.qmd
-            text: Teoría
-          - href: hpd2-agente-tool-calling.qmd
+          - href: bloque2/02-orquestacion.qmd
+            text: Visión general
+          - href: bloque2/02a-prompt-engineering.qmd
+            text: Prompt Engineering
+          - href: bloque2/02b-langchain.qmd
+            text: LangChain
+          - href: bloque2/02c-llamaindex.qmd
+            text: LlamaIndex
+          - href: bloque2/02d-mcp.qmd
+            text: MCP
+          - href: bloque2/02e-agentes.qmd
+            text: Agentes Inteligentes
+          - href: bloque2/hpd2-agente-tool-calling.qmd
             text: "🔧 HPD 2 — Agente Tool Calling"
-          - href: hpd3-servidor-mcp.qmd
+          - href: evaluables/hpd2-evaluables.qmd
+            text: "📝 Ejercicios evaluables HPD 2"
+          - href: evaluables/hpd2-extension.qmd
+            text: "⭐ Extensión HPD 2"
+          - href: bloque2/hpd3-servidor-mcp.qmd
             text: "🔧 HPD 3 — Servidor MCP"
+          - href: evaluables/hpd3-evaluables.qmd
+            text: "📝 Ejercicios evaluables HPD 3"
+          - href: evaluables/hpd3-extension.qmd
+            text: "⭐ Extensión HPD 3"
       - section: "Bloque 3 — Aplicaciones"
         contents:
           - href: 03-aplicaciones.qmd
             text: Teoría
+          - href: bloque3/03a-datos-sinteticos.qmd
+            text: Datos Sintéticos
           - href: hpd4-rag-mixto.qmd
             text: "🔧 HPD 4 — RAG Mixto"
+          - href: evaluables/hpd4-datos-sinteticos.qmd
+            text: "📝 Ejercicios — Datos Sintéticos"
+          - href: evaluables/hpd4-datos-sinteticos-extension.qmd
+            text: "⭐ Extensión — Datos Sintéticos"
       - section: "Bloque 4 — Gobernanza"
         contents:
           - href: 04-gobernanza.qmd

@@ -7,7 +7,7 @@ engine: jupyter
 
 > **Carga:** HT: 6h | HPD: 4h
 >
-> **Competencias asociadas:** [CE-1](index.qmd#competencias-específicas)
+> **Competencias asociadas:** [CE-1](../index.qmd#competencias-específicas)
 >
 > **Dependencias:** `torch`, `transformers`, `sentence-transformers`, `chromadb`, `faiss-cpu`, `matplotlib`, `scikit-learn`, `numpy`
 
@@ -53,7 +53,7 @@ Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector
 | **LLMs e inferencia** — Preentrenamiento, tokenización, parámetros, HF Hub, API Llamus | [01b-llms.qmd](01b-llms.qmd) | 2h |
 | **Embeddings** — word2vec, SBERT, modelos, comparativa | [01c-embeddings.qmd](01c-embeddings.qmd) | 1h |
 | **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica | [01d-vectordb.qmd](01d-vectordb.qmd) | 1h |
-| **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](hpd1-embeddings.qmd) | 4h |
+| **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](../hpd1-embeddings.qmd) | 4h |
 
 > Los temas marcados con 🔷 son teoría obligatoria. Puedes profundizar en cada uno según tu interés.
 
@@ -131,7 +131,7 @@ Este bloque sienta las bases para todo lo que viene:
 - **Bloque 3:** con embeddings + vector DB construirás sistemas RAG
 - **Bloque 4:** evaluarás y desplegarás estos sistemas en producción
 
-Ahora pasa al [taller práctico: HPD 1 — Pipeline de embeddings y búsqueda semántica](hpd1-embeddings.qmd).
+Ahora pasa al [taller práctico: HPD 1 — Pipeline de embeddings y búsqueda semántica](../hpd1-embeddings.qmd).
 
 ::: {.callout-note}
 ## Antes de continuar

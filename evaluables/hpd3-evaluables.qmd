@@ -1,0 +1,343 @@
+---
+title: "HPD 3 — Ejercicios evaluables: Servidor MCP"
+engine: jupyter
+---
+
+> **Peso en la nota:** 7.5 % (parte del 30 % de entregas prácticas)
+>
+> **Plazo:** 7 días tras la sesión presencial.
+>
+> **Requisito previo:** haber completado el notebook de la sesión presencial (`bloque2/hpd3-servidor-mcp.qmd`).
+>
+> **Entrega:** Notebook `.ipynb` ejecutado con todas las celdas completas.
+>   Cada ejercicio especifica qué variable debe contener el resultado para la corrección automática.
+
+::: {.callout-warning icon=false}
+## Cómo se corrige
+
+Cada ejercicio pide que asignes el resultado a una variable con un nombre concreto
+(`eval1_server`, `eval2_respuesta`, `eval3_ataques`, `eval4_riesgos`). El script de
+corrección ejecutará tu notebook e inspeccionará esas variables. **Si la variable
+no existe o tiene un tipo incorrecto, el ejercicio se puntúa como 0.**
+
+Para autoevaluarte antes de entregar:
+```bash
+python scripts/corregir_hpd3.py tu_notebook.ipynb
+```
+:::
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q fastmcp openai python-dotenv
+```
+
+```{python}
+#| echo: true
+
+import os, sqlite3, tempfile, json
+from dotenv import load_dotenv
+load_dotenv()
+import warnings
+warnings.filterwarnings("ignore")
+import numpy as np
+np.random.seed(42)
+
+from fastmcp import FastMCP
+from openai import OpenAI
+
+LLM_KEY = os.getenv("LLM_API_KEY")
+LLM_URL = "https://llamus.cs.us.es/api/v1"
+
+if not LLM_KEY:
+    print("⚠️  Crea .env con LLM_API_KEY=tu_key.")
+else:
+    client = OpenAI(base_url=LLM_URL, api_key=LLM_KEY)
+    print("✅ LLM configurado.")
+
+# ─── Dataset compartido ───
+db = sqlite3.connect(":memory:")
+db.execute("CREATE TABLE empleados (id INTEGER PRIMARY KEY, nombre TEXT, departamento TEXT, salario REAL, antiguedad_años INTEGER)")
+db.execute("CREATE TABLE proyectos (id INTEGER PRIMARY KEY, nombre TEXT, departamento TEXT, presupuesto REAL, estado TEXT)")
+db.execute("CREATE TABLE horas (id INTEGER PRIMARY KEY, empleado_id INTEGER, proyecto_id INTEGER, fecha TEXT, horas REAL)")
+
+empleados = [
+    (1, "Ana García", "I+D", 55000, 7), (2, "Carlos Ruiz", "I+D", 62000, 10),
+    (3, "Beatriz López", "I+D", 48000, 3), (4, "David Martín", "I+D", 51000, 5),
+    (5, "Gloria Sanz", "Ventas", 52000, 6), (6, "Héctor Mora", "Ventas", 47000, 4),
+    (7, "Isabel Cruz", "Ventas", 50000, 5), (8, "Luis Paz", "RRHH", 44000, 3),
+    (9, "Marina Rey", "RRHH", 46000, 6), (10, "Pablo Ortiz", "Operaciones", 50000, 7),
+    (11, "Rosa Ibáñez", "Operaciones", 53000, 8), (12, "Violeta Ríos", "Finanzas", 56000, 9),
+    (13, "Walter Pinto", "Finanzas", 59000, 11), (14, "Ximena Rojas", "Finanzas", 51000, 4),
+    (15, "Yago Fuentes", "Finanzas", 48000, 3),
+]
+db.executemany("INSERT INTO empleados VALUES (?,?,?,?,?)", empleados)
+
+proyectos = [
+    (1, "Alpha", "I+D", 200000, "activo"), (2, "Beta", "I+D", 150000, "activo"),
+    (3, "CRM Upgrade", "Ventas", 120000, "activo"), (4, "Onboarding 2.0", "RRHH", 45000, "activo"),
+    (5, "Logística Smart", "Operaciones", 180000, "activo"), (6, "ERP Modernización", "Finanzas", 250000, "activo"),
+    (7, "Auditoría 2026", "Finanzas", 75000, "activo"), (8, "Forecast Tool", "Finanzas", 95000, "finalizado"),
+]
+db.executemany("INSERT INTO proyectos VALUES (?,?,?,?,?)", proyectos)
+
+horas = [
+    (1, 1, 1, "2026-01-15", 6), (2, 2, 1, "2026-01-16", 8), (3, 3, 1, "2026-01-17", 5),
+    (4, 4, 2, "2026-02-10", 7), (5, 1, 2, "2026-02-11", 4), (6, 5, 3, "2026-03-01", 6),
+    (7, 6, 3, "2026-03-02", 8), (8, 8, 4, "2026-04-05", 5), (9, 9, 4, "2026-04-06", 7),
+    (10, 10, 5, "2026-05-10", 8), (11, 11, 5, "2026-05-11", 6), (12, 12, 6, "2026-06-01", 7),
+    (13, 13, 6, "2026-06-02", 5), (14, 12, 7, "2026-06-15", 6), (15, 14, 7, "2026-06-16", 8),
+]
+db.executemany("INSERT INTO horas VALUES (?,?,?,?,?)", horas)
+db.commit()
+
+print(f"Dataset listo: {len(empleados)} empleados, {len(proyectos)} proyectos, {len(horas)} registros de horas")
+```
+
+---
+
+## Ejercicio 1 — Servidor MCP funcional (2.5 puntos)
+
+Implementa un servidor con FastMCP que exponga **al menos 3 tools** y **1 resource**. Guarda el código del servidor en la variable `eval1_server` como string (el contenido completo del archivo `.py` que ejecutarías).
+
+| Criterio | Puntos |
+|---|---|
+| Servidor creado con FastMCP | 0.5 |
+| `consultar_sql(query)` implementada y funcional | 0.5 |
+| `empleado_por_id(id_empleado)` implementada y funcional | 0.5 |
+| `resumen_proyecto(id_proyecto)` implementada y funcional | 0.5 |
+| Al menos 1 resource (schema:// o stats://) implementado | 0.5 |
+
+```{python}
+#| echo: true
+
+# ─── Implementa aquí tu servidor MCP completo ───
+# Define todas las tools y resources dentro de este bloque
+
+mcp = FastMCP("Servidor HPD3")
+
+# TODO: implementar @mcp.tool() consultar_sql
+# TODO: implementar @mcp.tool() empleado_por_id
+# TODO: implementar @mcp.tool() resumen_proyecto
+# TODO: implementar @mcp.resource() esquema_bd
+
+# ─── Resultado esperado por el corrector ───
+# eval1_server debe ser un string multilínea con el código del servidor completo
+# (incluyendo imports, la conexión db, y todas las tools/resources)
+
+eval1_server = None  # ← asigna aquí el código del servidor (str)
+```
+
+```{python}
+#| eval: false
+# ─── Auto-verificación ───
+assert isinstance(eval1_server, str), "❌ eval1_server debe ser un string"
+assert "FastMCP" in eval1_server, "❌ No se encuentra FastMCP"
+assert "consultar_sql" in eval1_server, "❌ Falta consultar_sql"
+assert "empleado_por_id" in eval1_server, "❌ Falta empleado_por_id"
+assert "resumen_proyecto" in eval1_server, "❌ Falta resumen_proyecto"
+assert "@mcp.resource" in eval1_server or "@mcp.tool" in eval1_server, "❌ Faltan tools o resources"
+print("✅ Ejercicio 1: formato correcto")
+```
+
+---
+
+## Ejercicio 2 — Cliente LLM con Tool Calling (2.5 puntos)
+
+Implementa la función `preguntar_al_llm(pregunta: str)` que conecte el LLM a las tools MCP. El LLM debe decidir qué tool usar sin que tú le digas cuál. Ejecútala con la pregunta *"¿Cuántos empleados de Finanzas hay y cuál es su salario medio?"* y guarda la respuesta en `eval2_respuesta`.
+
+| Criterio | Puntos |
+|---|---|
+| Función `preguntar_al_llm` definida correctamente | 1.0 |
+| El LLM elige la tool correcta sin indicárselo manualmente | 1.0 |
+| La respuesta es coherente con los datos | 0.5 |
+
+```{python}
+#| echo: true
+
+# ─── Define las tools en formato OpenAI function calling ───
+tools_definition = [
+    {
+        "type": "function",
+        "function": {
+            "name": "consultar_sql",
+            "description": "Ejecuta una consulta SQL SELECT en la BD corporativa. Tablas: empleados(id, nombre, departamento, salario, antiguedad_años), proyectos(id, nombre, departamento, presupuesto, estado), horas(id, empleado_id, proyecto_id, fecha, horas).",
+            "parameters": {
+                "type": "object",
+                "properties": {"query": {"type": "string", "description": "Consulta SQL SELECT"}},
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "empleado_por_id",
+            "description": "Busca un empleado por su ID. Devuelve nombre, departamento, salario y antigüedad.",
+            "parameters": {
+                "type": "object",
+                "properties": {"id_empleado": {"type": "integer", "description": "ID del empleado"}},
+                "required": ["id_empleado"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "resumen_proyecto",
+            "description": "Devuelve resumen del proyecto: nombre, departamento, presupuesto, estado y horas imputadas.",
+            "parameters": {
+                "type": "object",
+                "properties": {"id_proyecto": {"type": "integer", "description": "ID del proyecto"}},
+                "required": ["id_proyecto"]
+            }
+        }
+    },
+]
+
+def ejecutar_tool(nombre, args):
+    """Simula la ejecución de una tool MCP usando la conexión global db."""
+    try:
+        if nombre == "consultar_sql":
+            query = args["query"].upper()
+            for prohibida in ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE"]:
+                if prohibida in query:
+                    return f"Error: comando {prohibida} bloqueado por seguridad."
+            cursor = db.execute(args["query"])
+            cols = [d[0] for d in cursor.description]
+            rows = cursor.fetchall()[:20]
+            return " | ".join(cols) + "\n" + "\n".join(" | ".join(str(v) for v in r) for r in rows)
+        elif nombre == "empleado_por_id":
+            cursor = db.execute("SELECT * FROM empleados WHERE id = ?", (args["id_empleado"],))
+            row = cursor.fetchone()
+            return f"{row[1]} | {row[2]} | {row[3]}€ | {row[4]} años" if row else "Empleado no encontrado."
+        elif nombre == "resumen_proyecto":
+            cursor = db.execute("SELECT * FROM proyectos WHERE id = ?", (args["id_proyecto"],))
+            proj = cursor.fetchone()
+            if not proj:
+                return "Proyecto no encontrado."
+            cursor = db.execute("SELECT COUNT(DISTINCT empleado_id), SUM(horas) FROM horas WHERE proyecto_id = ?", (args["id_proyecto"],))
+            emp_count, total_h = cursor.fetchone()
+            return f"{proj[1]} | {proj[2]} | {proj[3]}€ | {proj[4]} | {emp_count or 0} empleados | {total_h or 0}h"
+        return "Tool desconocida."
+    except Exception as e:
+        return f"Error: {e}"
+
+# ─── Implementa preguntar_al_llm ───
+def preguntar_al_llm(pregunta: str) -> str:
+    # TODO: Bucle de tool calling
+    # 1. Llamar a client.chat.completions.create con tools=tools_definition
+    # 2. Si hay tool_calls, ejecutar cada una con ejecutar_tool()
+    # 3. Añadir el resultado al historial y volver a llamar al LLM
+    # 4. Devolver la respuesta final
+    pass  # ← completar
+
+# ─── Ejecutar y guardar ───
+eval2_respuesta = None  # ← asigna aquí la respuesta del LLM (str)
+```
+
+```{python}
+#| eval: false
+# ─── Auto-verificación ───
+assert isinstance(eval2_respuesta, str), "❌ eval2_respuesta debe ser un string"
+assert len(eval2_respuesta) > 10, f"❌ Respuesta demasiado corta ({len(eval2_respuesta)} chars)"
+assert any(p in eval2_respuesta.lower() for p in ["finanzas", "empleado", "salario"]), \
+    "❌ La respuesta no parece referirse a Finanzas"
+print("✅ Ejercicio 2: formato correcto")
+```
+
+---
+
+## Ejercicio 3 — Sanitización probada (2.5 puntos)
+
+Modifica `consultar_sql` para que bloquee comandos peligrosos. Luego prueba **al menos 5 intentos de ataque** distintos y documenta cuáles fueron bloqueados y cuáles no. Guarda los resultados en `eval3_ataques`.
+
+| Criterio | Puntos |
+|---|---|
+| Sanitización implementada (SELECT obligatorio, sin DROP/DELETE/UPDATE/INSERT/ALTER) | 1.0 |
+| 5 ataques probados y documentados | 1.0 |
+| Todos los ataques peligrosos fueron bloqueados | 0.5 |
+
+```{python}
+#| echo: true
+
+# ─── Implementa la sanitización ───
+def sanitizar_query(query: str) -> str:
+    # TODO: Bloquear comandos peligrosos
+    # TODO: Verificar que empieza por SELECT
+    # TODO: Lanzar ValueError si no pasa la validación
+    pass  # ← completar
+
+# ─── Prueba tus ataques ───
+# Para cada ataque, guarda: {"ataque": str, "bloqueado": bool, "mensaje": str}
+
+ataques_probados = [
+    "DROP TABLE empleados",
+    "DELETE FROM proyectos WHERE estado = 'activo'",
+    "INSERT INTO empleados VALUES (99, 'Hacker', 'IT', 999999, 0)",
+    "UPDATE empleados SET salario = 0",
+    "SELECT * FROM empleados; DROP TABLE horas; --",
+]
+
+# ─── Resultado esperado por el corrector ───
+# eval3_ataques debe ser una lista de dicts:
+# [{"ataque": str, "bloqueado": bool, "mensaje": str}, ...] (mínimo 5)
+
+eval3_ataques = []  # ← lista de 5 dicts
+```
+
+```{python}
+#| eval: false
+# ─── Auto-verificación ───
+assert isinstance(eval3_ataques, list), "❌ eval3_ataques debe ser una lista"
+assert len(eval3_ataques) >= 5, f"❌ Se esperaban al menos 5 ataques, tienes {len(eval3_ataques)}"
+for i, a in enumerate(eval3_ataques):
+    for k in ("ataque", "bloqueado", "mensaje"):
+        assert k in a, f"❌ Falta clave '{k}' en ataque {i}"
+    assert isinstance(a["bloqueado"], bool), f"❌ 'bloqueado' debe ser bool en ataque {i}"
+# Al menos 4 de 5 deben estar bloqueados
+bloqueados = sum(1 for a in eval3_ataques if a["bloqueado"])
+assert bloqueados >= 4, f"❌ Solo {bloqueados}/5 ataques bloqueados"
+print("✅ Ejercicio 3: formato correcto")
+```
+
+---
+
+## Ejercicio 4 — Análisis de riesgos (2.5 puntos)
+
+Documenta **2 riesgos de seguridad** de tu servidor MCP. Para cada uno: describe el vector de ataque, la mitigación que implementaste y una prueba concreta de que la mitigación funciona.
+
+| Criterio | Puntos |
+|---|---|
+| Riesgo 1 documentado con vector de ataque, mitigación y prueba | 1.25 |
+| Riesgo 2 documentado con vector de ataque, mitigación y prueba | 1.25 |
+
+```{python}
+#| echo: true
+
+# ─── Documenta tus riesgos ───
+# Para cada riesgo, describe:
+#   - riesgo: nombre del riesgo
+#   - ataque: cómo un atacante lo explotaría (descripción concreta)
+#   - mitigacion: qué implementaste para evitarlo
+#   - prueba: cómo verificaste que la mitigación funciona (código o descripción del test)
+
+# ─── Resultado esperado por el corrector ───
+# eval4_riesgos debe ser una lista de 2 dicts:
+# [{"riesgo": str, "ataque": str, "mitigacion": str, "prueba": str}, ...]
+
+eval4_riesgos = []  # ← lista de 2 dicts
+```
+
+```{python}
+#| eval: false
+# ─── Auto-verificación ───
+assert isinstance(eval4_riesgos, list), "❌ eval4_riesgos debe ser una lista"
+assert len(eval4_riesgos) == 2, f"❌ Se esperaban 2 riesgos, tienes {len(eval4_riesgos)}"
+for i, r in enumerate(eval4_riesgos):
+    for k in ("riesgo", "ataque", "mitigacion", "prueba"):
+        assert k in r, f"❌ Falta clave '{k}' en riesgo {i}"
+        assert isinstance(r[k], str) and len(r[k]) > 10, f"❌ '{k}' demasiado corto en riesgo {i}"
+print("✅ Ejercicio 4: formato correcto")
+```

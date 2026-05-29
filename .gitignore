@@ -5,6 +5,7 @@ _site/
 *.ipynb
 !notebooks/*.ipynb
 .DS_Store
+.venv
 
 /.quarto/
 **/*.quarto_ipynb

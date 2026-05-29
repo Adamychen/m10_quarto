@@ -1,0 +1,420 @@
+---
+title: "02d — Model Context Protocol (MCP)"
+engine: jupyter
+---
+
+> Este tema forma parte del **Bloque 2 — Orquestación**. Aquí se aprende a exponer datos y herramientas a LLMs de forma estandarizada con MCP.
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q fastmcp
+```
+
+```{python}
+#| echo: true
+
+import os
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+import warnings
+warnings.filterwarnings("ignore")
+print("Librerías cargadas correctamente.")
+```
+
+## Model Context Protocol (MCP)
+
+### El problema que resuelve
+
+Imagina que tienes 5 fuentes de datos distintas (una base de datos SQLite, una API REST de CRM, archivos CSV locales, Google Drive, un servicio meteorológico). Conectar todas a un LLM implica escribir un adaptador personalizado para cada una. Cada framework (LangChain, LlamaIndex, OpenAI...) tiene su propia forma de definir herramientas. Resultado: **un lío de integraciones ad hoc que no escalan**.
+
+**MCP** es un protocolo abierto (liderado por Anthropic) que estandariza cómo los LLMs se conectan a herramientas y fuentes de datos externas. Funciona como un "USB-C para LLMs": una interfaz única para todo.
+
+```{mermaid}
+graph TD
+    subgraph "Sin MCP — M×N integraciones"
+        L1[Claude] --> T1[(BD)]
+        L1 --> T2[API REST]
+        L2[Qwen] --> T1
+        L2 --> T2
+        L3[GPT] --> T1
+        L3 --> T2
+    end
+
+    subgraph "Con MCP — N+M integraciones"
+        LC[Claude] --> MC[MCP Server BD]
+        LC --> MR[MCP Server API]
+        LQ[Qwen] --> MC
+        LQ --> MR
+        LG[GPT] --> MC
+        LG --> MR
+    end
+
+    style L1 fill:#4B8BBE,color:#fff
+    style LC fill:#2e7d32,color:#fff
+    style MC fill:#e65100,color:#fff
+    style MR fill:#e65100,color:#fff
+```
+
+### Arquitectura de MCP
+
+MCP sigue el modelo **cliente-servidor**. Cada servidor expone capacidades en 3 categorías:
+
+| Primitiva | ¿Qué es? | Ejemplo |
+|---|---|---|
+| **Tools** | Funciones que el LLM puede invocar | `ejecutar_sql(query)`, `buscar_cliente(id)` |
+| **Resources** | Datos expuestos como recursos de solo lectura | `schema://tablas`, `datos://ventas_2025` |
+| **Prompts** | Plantillas de prompt predefinidas | `analisis_ventas(mes)`, `resumen_ejecutivo()` |
+
+```{mermaid}
+graph LR
+    subgraph "Cliente LLM"
+        A[LLM<br/>Claude / Qwen / GPT]
+    end
+
+    subgraph "Servidor MCP"
+        B[Resources<br/>datos expuestos]
+        C[Tools<br/>funciones invocables]
+        D[Prompts<br/>plantillas]
+    end
+
+    subgraph "Backend"
+        E[(Base de datos)]
+        F[API REST]
+        G[Archivos locales]
+    end
+
+    A <-->|stdio / HTTP| B
+    A <-->|stdio / HTTP| C
+    A <-->|stdio / HTTP| D
+    B --> E
+    C --> F
+    D --> G
+
+    style A fill:#4B8BBE,color:#fff
+    style B fill:#FFD43B,color:#000
+    style C fill:#e65100,color:#fff
+    style D fill:#306998,color:#fff
+```
+
+### Transporte: stdio vs HTTP
+
+| Transporte | Cómo funciona | Cuándo usarlo |
+|---|---|---|
+| **stdio** | El cliente lanza el servidor como subproceso, comunicación por stdin/stdout | Local, sin red, máxima seguridad |
+| **HTTP (SSE)** | El servidor escucha en un puerto, el cliente se conecta por HTTP | Remoto, multi-cliente, cloud |
+
+En este curso usamos **stdio** porque es el más simple y seguro para entornos locales.
+
+### FastMCP: el SDK simplificado
+
+FastMCP es una capa por encima del SDK oficial que simplifica mucho crear servidores. Basta con decorar funciones Python normales:
+
+```{python}
+#| echo: true
+
+from fastmcp import FastMCP
+
+mcp = FastMCP("Mi Primer Servidor")
+
+@mcp.tool()
+def sumar(a: float, b: float) -> float:
+    """Suma dos números. Ejemplo: sumar(3, 5) → 8"""
+    return a + b
+
+@mcp.tool()
+def multiplicar(a: float, b: float) -> float:
+    """Multiplica dos números. Ejemplo: multiplicar(4, 7) → 28"""
+    return a * b
+
+@mcp.tool()
+def contar_palabras(texto: str) -> int:
+    """Cuenta el número de palabras en un texto."""
+    return len(texto.split())
+
+# Las herramientas son funciones Python normales: se pueden probar directamente
+print("=== Probando herramientas directamente ===")
+print(f"sumar(3, 5) = {sumar(3, 5)}")
+print(f"multiplicar(4, 7) = {multiplicar(4, 7)}")
+print(f"contar_palabras('Hola mundo MCP') = {contar_palabras('Hola mundo MCP')}")
+```
+
+::: {.callout-tip}
+FastMCP **infiere automáticamente el JSON Schema** a partir de los type hints de Python. `a: float` se convierte en `{"type": "number"}`, `texto: str` en `{"type": "string"}`, etc. No necesitas escribir el schema manualmente.
+:::
+
+### Recursos MCP
+
+Los **Resources** exponen datos de solo lectura que el LLM puede consultar:
+
+```{python}
+#| echo: true
+
+@mcp.resource("config://version")
+def get_version() -> str:
+    """Versión del servidor."""
+    return "1.0.0"
+
+@mcp.resource("stats://herramientas")
+async def get_stats() -> str:
+    """Estadísticas del servidor."""
+    tools = await mcp.list_tools()
+    return f"Tools registradas: {len(tools)}"
+
+# Los recursos también son funciones normales
+print(f"Versión del servidor: {get_version()}")
+print(f"Estadísticas: {await get_stats()}")
+```
+
+### MCP + SQLite: herramienta de consulta
+
+El caso de uso más común: permitir que un LLM consulte una base de datos SQLite de forma segura:
+
+```{python}
+#| echo: true
+
+import sqlite3
+
+# Creamos una BD de ejemplo con datos corporativos
+db = sqlite3.connect(":memory:")
+db.execute("CREATE TABLE ventas (id INTEGER, fecha TEXT, producto TEXT, importe REAL, cliente_id INTEGER)")
+db.execute("CREATE TABLE clientes (id INTEGER, nombre TEXT, sector TEXT, facturacion REAL)")
+db.execute("INSERT INTO clientes VALUES (1, 'ACME Corp', 'Tecnología', 500000)")
+db.execute("INSERT INTO clientes VALUES (2, 'IberTech SA', 'Industrial', 1200000)")
+db.execute("INSERT INTO clientes VALUES (3, 'Datafy Analytics', 'Consultoría', 300000)")
+db.execute("INSERT INTO ventas VALUES (1, '2025-01-15', 'CloudSync', 45000, 1)")
+db.execute("INSERT INTO ventas VALUES (2, '2025-02-20', 'DataViz', 32000, 2)")
+db.execute("INSERT INTO ventas VALUES (3, '2025-03-10', 'CloudSync', 51000, 1)")
+db.execute("INSERT INTO ventas VALUES (4, '2025-04-05', 'AI Toolkit', 28000, 3)")
+db.execute("INSERT INTO ventas VALUES (5, '2025-05-18', 'DataViz', 19000, 2)")
+db.commit()
+
+print("=== Base de datos corporativa ===")
+for row in db.execute("SELECT v.id, v.fecha, v.producto, v.importe, c.nombre FROM ventas v JOIN clientes c ON v.cliente_id = c.id"):
+    print(f"  Venta {row[0]}: {row[1]} | {row[2]:12s} | {row[3]:6.0f}€ | {row[4]}")
+
+# NOTA: db sigue abierta en memoria; las tools la usarán directamente
+# No necesita backup a disco porque las tools comparten el mismo kernel
+```
+
+```{python}
+#| echo: true
+
+# Herramienta MCP con validación de seguridad
+
+def sanitizar_query(query: str) -> str:
+    """Bloquea comandos peligrosos. Solo permite SELECT."""
+    peligrosos = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE"]
+    query_upper = query.upper()
+    for cmd in peligrosos:
+        if cmd in query_upper:
+            raise ValueError(f"Operación no permitida: {cmd}. Solo se admiten consultas SELECT.")
+    if not query_upper.strip().startswith("SELECT"):
+        raise ValueError("Solo se permiten consultas SELECT.")
+    return query
+
+@mcp.tool()
+def consultar_sql(query: str) -> str:
+    """
+    Ejecuta una consulta SELECT en la base de datos corporativa.
+
+    Schema disponible:
+    - ventas(id, fecha, producto, importe, cliente_id)
+    - clientes(id, nombre, sector, facturacion)
+
+    Args:
+        query: consulta SQL SELECT. Ejemplo: 'SELECT * FROM ventas WHERE importe > 30000'
+
+    Returns:
+        Resultados de la consulta en formato tabla.
+    """
+    try:
+        query = sanitizar_query(query)
+        cursor = db.execute(query)
+
+        columnas = [d[0] for d in cursor.description]
+        filas = cursor.fetchall()
+
+        if not filas:
+            return "La consulta no devolvió resultados."
+
+        resultado = " | ".join(columnas) + "\n" + "-" * 40 + "\n"
+        for fila in filas[:20]:
+            resultado += " | ".join(str(v) for v in fila) + "\n"
+        resultado += f"\nTotal filas: {len(filas)}"
+        return resultado
+    except Exception as e:
+        return f"Error: {e}"
+
+# Probar directamente (sin servidor MCP)
+print("=== Probando herramienta SQL ===")
+print(consultar_sql("SELECT * FROM ventas WHERE producto = 'CloudSync'"))
+print()
+print(consultar_sql("SELECT c.nombre, SUM(v.importe) as total_ventas FROM ventas v JOIN clientes c ON v.cliente_id = c.id GROUP BY c.nombre"))
+print()
+print("--- Test de seguridad ---")
+print(consultar_sql("DROP TABLE ventas"))
+```
+
+### Seguridad en MCP: el checklist imprescindible
+
+Cada servidor MCP es una **superficie de ataque**. El LLM escribe el input de las herramientas, y un atacante puede manipular el prompt para inyectar comandos maliciosos (**prompt injection**):
+
+```{mermaid}
+graph TD
+    A[Usuario malicioso<br/>inyecta comandos en el prompt] --> B[LLM<br/>genera query alterada]
+    B --> C[Servidor MCP<br/>¿valida?]
+    C -->|Sin validación| D[💀 Ejecuta<br/>DROP TABLE]
+    C -->|Con validación| E[✅ Bloquea<br/>y notifica]
+
+    style A fill:#c62828,color:#fff
+    style D fill:#c62828,color:#fff
+    style E fill:#2e7d32,color:#fff
+```
+
+::: {.callout-warning}
+## Checklist de seguridad MCP
+
+| Riesgo | Mitigación |
+|---|---|
+| **SQL Injection vía prompt** | Solo permitir SELECT, sanitizar query |
+| **Data leakage** | Limitar filas devueltas (TOP 100), no exponer columnas sensibles |
+| **Path traversal** | Validar rutas con `os.path.abspath`, restringir a un directorio base |
+| **Denegación de servicio** | Timeout en queries (máx. 5s), límite de memoria |
+| **Acceso no autorizado** | Autenticación en el transporte (API keys), logs de auditoría |
+| **Escalada de privilegios** | Principio de mínimo privilegio: cada tool accede solo a lo que necesita |
+:::
+
+### Servidor MCP completo para ejecutar como script
+
+Guarda el siguiente código en `servidor_mcp.py` y ejecútalo con `python servidor_mcp.py`. Los clientes LLM pueden conectarse vía stdio:
+
+```{python}
+#| echo: true
+#| eval: false
+
+# servidor_mcp.py — Servidor listo para producción
+# Para ejecutar: python servidor_mcp.py
+# El servidor queda escuchando por stdio
+
+from fastmcp import FastMCP
+import sqlite3
+import os
+
+mcp = FastMCP("Servidor Corporativo")
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "datos", "corporativa.db")
+
+def _sanitizar(query: str) -> str:
+    prohibidos = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE"]
+    for cmd in prohibidos:
+        if cmd in query.upper():
+            raise ValueError(f"Operación bloqueada: {cmd}")
+    if not query.upper().strip().startswith("SELECT"):
+        raise ValueError("Solo SELECT permitido")
+    return query
+
+@mcp.tool()
+def consultar_ventas(query: str) -> str:
+    """
+    Ejecuta una consulta SELECT en la BD corporativa.
+    Tablas: ventas(id, fecha, producto, importe, cliente_id), clientes(id, nombre, sector)
+    """
+    try:
+        query = _sanitizar(query)
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute(query)
+        cols = [d[0] for d in cursor.description]
+        rows = cursor.fetchall()
+        conn.close()
+        header = " | ".join(cols) + "\n" + "-" * 50 + "\n"
+        body = "\n".join(" | ".join(str(v) for v in r) for r in rows[:100])
+        return header + body + f"\n\n{len(rows)} filas."
+    except Exception as e:
+        return f"Error: {e}"
+
+@mcp.resource("schema://tablas")
+def esquema_bd() -> str:
+    """Devuelve el esquema SQL de todas las tablas."""
+    conn = sqlite3.connect(DB_PATH)
+    cursor = conn.cursor()
+    cursor.execute("SELECT sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")
+    schemas = [r[0] for r in cursor.fetchall() if r[0]]
+    conn.close()
+    return "\n\n".join(schemas) if schemas else "Sin tablas definidas."
+
+if __name__ == "__main__":
+    mcp.run()
+```
+
+### Conexión desde un cliente LLM
+
+Un cliente (LLM o aplicación) se conecta al servidor MCP lanzándolo como subproceso:
+
+```{python}
+#| echo: true
+#| eval: false
+
+# cliente_mcp.py — Cómo conectar un LLM al servidor MCP
+import asyncio
+from fastmcp import Client
+
+async def main():
+    async with Client("python", "servidor_mcp.py") as client:
+        # Listar herramientas disponibles
+        tools = await client.list_tools()
+        print("Herramientas disponibles:")
+        for t in tools:
+            print(f"  - {t.name}: {t.description}")
+
+        # Ejecutar una consulta
+        result = await client.call_tool(
+            "consultar_ventas",
+            {"query": "SELECT * FROM ventas WHERE importe > 30000"}
+        )
+        print(f"\nResultado:\n{result}")
+
+asyncio.run(main())
+```
+
+### Resumen visual
+
+```{mermaid}
+graph TD
+    subgraph "Tu aplicación"
+        A[Usuario<br/>pregunta en NL]
+    end
+
+    subgraph "Cliente MCP"
+        B[LLM<br/>interpreta pregunta]
+        C[Decision<br/>¿qué tool usar?]
+    end
+
+    subgraph "Servidor MCP (stdio)"
+        D[Tool: consultar_ventas]
+        E[Tool: contar_palabras]
+        F[Resource: schema]
+    end
+
+    subgraph "Datos"
+        G[(SQLite)]
+    end
+
+    A --> B
+    B --> C
+    C --> D
+    C --> E
+    D --> G
+    F --> G
+
+    H[🛡️ Sanitización<br/>+ límites + logs] -.-> D
+
+    style A fill:#4B8BBE,color:#fff
+    style B fill:#306998,color:#fff
+    style D fill:#e65100,color:#fff
+    style G fill:#FFD43B,color:#000
+    style H fill:#c62828,color:#fff
+```
+
+> **Lectura recomendada:** [Model Context Protocol Specification](https://spec.modelcontextprotocol.io/) | [FastMCP Documentation](https://gofastmcp.com/)

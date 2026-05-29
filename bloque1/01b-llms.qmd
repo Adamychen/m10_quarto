@@ -3,7 +3,7 @@ title: "01b — Grandes Modelos de Lenguaje e Inferencia"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01b-llms.ipynb)
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01b-llms.ipynb)
 
 > Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto primero [01a-transformer.qmd](01a-transformer.qmd).
 
@@ -118,7 +118,7 @@ from langchain_openai import ChatOpenAI
 # Usamos la API unificada de la Universidad de Sevilla (Llamus)
 # No necesita GPU — solo una API key que obtendrás en la asignatura
 llm = ChatOpenAI(
-    model="qwen3:1.7b",  # Modelo ligero para demos rápidas
+    model="gemma4:e2b-mlx",
     base_url="https://llamus.cs.us.es/api/v1",
     api_key="<API_KEY>"
 )
@@ -164,6 +164,25 @@ plt.show()
 - **Top-k:** limita la selección a los k tokens más probables. típico: 40-50.
 - Combinación común: temp=0.7, top-p=0.9, top-k=40.
 :::
+
+### Más allá del texto: el LLM como modelo generativo
+
+Un LLM no es más que un modelo que aprende una distribución de probabilidad $P(\text{token} \mid \text{contexto})$ y muestrea de ella. Esta misma idea —aprender la distribución subyacente de los datos y generar nuevas muestras— es el **principio unificador de todos los modelos generativos**:
+
+| Modelo | ¿Qué aprende? | ¿Qué genera? |
+|---|---|---|
+| **LLM** (GPT, Qwen, Llama) | $P(\text{token} \mid \text{contexto})$ | Texto, código, JSON, datos tabulares |
+| **GAN** (CTGAN, CopulaGAN) | Distribución implícita vía juego adversarial | Datos tabulares |
+| **VAE** (TVAE) | Espacio latente comprimido de los datos | Datos tabulares |
+| **Difusión** (TabDDPM) | Proceso inverso de eliminación de ruido | Datos tabulares, imágenes |
+
+Lo que acabas de entender sobre la temperatura es el equivalente conceptual a:
+
+- La varianza del ruido en una VAE (controla diversidad)
+- El muestreo del espacio latente en una GAN (controla realismo vs. variedad)
+- El nivel de ruido en un modelo de difusión (controla fidelidad)
+
+En el **Bloque 2** verás cómo usar LLMs para generar datos sintéticos de forma intuitiva (sin entrenar nada), y en el **Bloque 3** explorarás modelos especializados (GANs, VAEs, difusión) para cuando necesites rigor estadístico y garantías de privacidad.
 
 ## El ecosistema Hugging Face
 
@@ -213,7 +232,7 @@ La Universidad de Sevilla proporciona un endpoint **OpenAI-compatible** para usa
 
 ```
 Endpoint: https://llamus.cs.us.es/api/v1
-Modelos disponibles: qwen3.6:27b, gemma4:26b, llama3.3:70b, qwen3:8b, qwen3:1.7b, ...
+Modelos disponibles: gemma4:e2b-mlx, gemma4:26b, llama3.3:70b, ...
 ```
 
 Funciona con `ChatOpenAI` de LangChain, el cliente OpenAI de Python, o cualquier herramienta compatible con OpenAI. Solo necesitas tu **API key de la US** (se proporciona en la asignatura).
@@ -225,7 +244,7 @@ Funciona con `ChatOpenAI` de LangChain, el cliente OpenAI de Python, o cualquier
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
-    model="qwen3.6:27b",   # Modelo principal del curso
+    model="gemma4:e2b-mlx",   # Modelo principal del curso
     base_url="https://llamus.cs.us.es/api/v1",
     api_key="<API_KEY>"
 )

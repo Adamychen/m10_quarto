@@ -30,6 +30,20 @@ jupyter: python3
 2. **Parte 2 — Escenario realista:** corpus real de ArXiv, indexación a escala, evaluación MTEB
 :::
 
+::: {.callout-note icon=false}
+## ¿Por qué necesitas esto?
+
+Imagina que trabajas en un despacho de abogados buscando cláusulas de confidencialidad
+en 500 contratos. O en una multinacional filtrando currículums por habilidades, no
+por palabras clave exactas. O en un hospital recuperando historiales clínicos con
+síntomas parecidos. Los tres problemas se resuelven con **la misma arquitectura**:
+convertir documentos en vectores y buscar por similitud semántica.
+
+Al final de este taller sabrás construir ese pipeline de principio a fin. Y lo mejor:
+cambiar de dominio (legal, médico, financiero) solo requiere cambiar los documentos
+de entrada — el código es el mismo.
+:::
+
 ```{python}
 #| echo: true
 #| eval: false
@@ -240,6 +254,22 @@ for chunk_idx, chunk in enumerate(chunks):
 print(f"Indexación completada: {collection.count()} vectores en Chroma")
 ```
 
+::: {.callout-tip}
+## ¿Chroma, FAISS o Qdrant? ¿Cuál elijo?
+
+| | Chroma | FAISS | Qdrant |
+|---|---|---|---|
+| **Instalación** | `pip install chromadb` | `pip install faiss-cpu` | Docker o cloud |
+| **Escala máxima** | ~500k vectores | Miles de millones | Miles de millones |
+| **Privacidad** | Total (local, sin servidor) | Total (librería embebible) | Depende del despliegue |
+| **Ideal para...** | Prototipos, HPDs, proyectos pequeños | Producción on-premise, búsqueda a gran escala | Cloud multi-tenant, API REST nativa |
+| **Lo usamos en...** | HPD 1, HPD 4 (RAG) | — | — |
+
+**Regla práctica:** empieza con Chroma (es lo que usamos aquí). Si tu proyecto crece
+a >100k documentos o necesitas servir consultas por API, migra a Qdrant. Si necesitas
+máxima velocidad en local con millones de vectores, FAISS.
+:::
+
 ## 1.5 Búsqueda semántica
 
 La consulta se codifica y se recuperan los `k` chunks más similares por distancia coseno.
@@ -297,7 +327,98 @@ Con embeddings normalizados (lo habitual), la similitud coseno equivale al produ
 
 :::
 
-## 1.6 Evaluación con recall@k
+## 1.6 Más allá del texto: embeddings de datos tabulares
+
+Hasta ahora hemos hecho embeddings de PDFs. Pero, ¿y si tus datos están en un Excel?
+La buena noticia: **el pipeline no cambia**. Solo cambia cómo conviertes cada fila en texto.
+
+```{python}
+#| echo: true
+#| eval: false
+
+# Dataset tabular de ejemplo: empleados
+df_empleados = pd.DataFrame({
+    "nombre":       ["Ana García", "Carlos Ruiz", "Beatriz López", "David Martín"],
+    "departamento": ["I+D",        "Ventas",       "I+D",           "Operaciones"],
+    "salario":      [55000,        47000,          48000,           51000],
+    "antiguedad":   [7,            4,              3,               5],
+})
+
+# Convertir cada fila en un "documento" textual
+df_empleados["documento"] = df_empleados.apply(
+    lambda r: f"Empleado {r['nombre']}. Departamento {r['departamento']}. "
+              f"Salario {r['salario']} euros. Antigüedad {r['antiguedad']} años.",
+    axis=1
+)
+
+print("Filas convertidas a texto:")
+for doc in df_empleados["documento"]:
+    print(f"  → {doc}")
+
+# Mismo modelo, mismo encode(), mismo pipeline
+embeddings_tab = model.encode(df_empleados["documento"].tolist())
+print(f"\nEmbeddings tabulares: {embeddings_tab.shape}")
+```
+
+```{python}
+#| echo: true
+#| eval: false
+
+# Indexar en Chroma — idéntico a como hiciste con PDFs
+collection_tab = client.get_or_create_collection(
+    name="hpd1_tabular",
+    metadata={"hnsw:space": "cosine"}
+)
+
+for i, (_, row) in enumerate(df_empleados.iterrows()):
+    collection_tab.add(
+        ids=[f"emp_{i}"],
+        embeddings=[embeddings_tab[i].tolist()],
+        documents=[row["documento"]],
+        metadatas=[{"nombre": row["nombre"], "departamento": row["departamento"]}]
+    )
+
+print(f"Indexación completada: {collection_tab.count()} vectores en Chroma")
+
+# Buscar: "empleados senior de I+D"
+res = collection_tab.query(
+    query_embeddings=[model.encode("empleados senior de I+D").tolist()],
+    n_results=2
+)
+print("\n🔎 Búsqueda: 'empleados senior de I+D'")
+for doc, dist in zip(res["documents"][0], res["distances"][0]):
+    print(f"  {doc[:80]}... (dist: {dist:.4f})")
+```
+
+::: {.callout-tip}
+## ¿Qué modelo de embeddings uso según mi tipo de dato?
+
+| Tipo de dato | Modelo recomendado | ¿Requiere entrenamiento? |
+|---|---|---|
+| **Texto** (PDFs, webs, emails) | `e5-small-v2`, `text-embedding-3-small` | No, vienen pre-entrenados |
+| **Tabular (rápido)** | Texto concatenado + `e5-small-v2` | No, usas el mismo modelo |
+| **Tabular (riguroso)** | TabNet, SCARF | **Sí**, requieren GPU y target supervisado |
+| **Código fuente** | CodeBERT, UnixCoder | No, vienen pre-entrenados |
+| **Imágenes + texto** | CLIP | No, pre-entrenado multimodal |
+
+La clave: el pipeline (`encode → index → search`) es el mismo. Solo cambia el modelo
+de embeddings. Si cambias de dominio, cambias los documentos de entrada, no el código.
+:::
+
+::: {.callout-warning}
+## Limitación honesta del texto concatenado
+
+Este enfoque no sabe que 55000 está numéricamente más cerca de 52000 que de 12000.
+Para eso existen modelos especializados como **TabNet** (atención sobre columnas
+tabulares) y **SCARF** (contrastive learning tabular), que se mencionan en la
+teoría del Bloque 1. Ambos requieren entrenamiento supervisado con GPU.
+
+Para el 80% de los casos reales de búsqueda semántica sobre datos corporativos
+(buscar empleados por perfil, filtrar productos por características, recuperar
+registros por descripción), el texto concatenado es suficiente.
+:::
+
+## 1.7 Evaluación con recall@k
 
 ::: {.callout-note icon=false}
 
@@ -383,8 +504,9 @@ for k in [1, 3, 5]:
 #| eval: false
 
 client.delete_collection("hpd1_sintetico")
+client.delete_collection("hpd1_tabular")
 shutil.rmtree(CORPUS_SINTETICO)
-print("✓ Parte 1 limpiada (colección + corpus temporal eliminados)")
+print("✓ Parte 1 limpiada (colecciones + corpus temporal eliminados)")
 ```
 
 ---
@@ -429,10 +551,23 @@ for arxiv_id, descripcion in PAPERS.items():
         size_kb = os.path.getsize(ruta) / 1024
         print(f"  ✓ {arxiv_id}: {descripcion[:60]}... ({size_kb:.0f} KB)")
     except Exception as e:
-        print(f"  ✗ {arxiv_id}: {e}")
+        print(f"  ⚠️ {arxiv_id}: descarga fallida ({e}) — continuando con abstracts pre-guardados")
+        # Si no se pueden descargar los PDFs, usamos abstracts inline
+        abstracts_fallback = {
+            "1706.03762": "Attention Is All You Need — The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show that these models are superior in quality while being more parallelizable and requiring significantly less time to train.",
+            "1810.04805": "BERT: Pre-training of Deep Bidirectional Transformers — We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks.",
+            "1908.10084": "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks — BERT and RoBERTa set new state-of-the-art performance on semantic textual similarity tasks. However, they require both sentences to be fed into the network, causing a massive computational overhead. We present Sentence-BERT, a modification of the pretrained BERT network that uses siamese and triplet network structures to derive semantically meaningful sentence embeddings that can be compared using cosine similarity.",
+            "2005.11401": "RAG: Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks — We explore a general-purpose fine-tuning recipe for retrieval-augmented generation (RAG). RAG models combine pre-trained parametric memory (a sequence-to-sequence model) with non-parametric memory (a dense vector index of Wikipedia). We fine-tune and evaluate RAG on a range of knowledge-intensive NLP tasks and set the state of the art on three open-domain QA tasks.",
+            "2106.09685": "LoRA: Low-Rank Adaptation of Large Language Models — We propose Low-Rank Adaptation (LoRA), which freezes the pre-trained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks. Compared to GPT-3 175B fine-tuned with Adam, LoRA reduces trainable parameters by 10,000x and GPU memory requirement by 3x.",
+            "2309.15217": "RAGAS: Automated Evaluation of Retrieval Augmented Generation — We introduce RAGAS (Retrieval Augmented Generation Assessment), a framework for reference-free evaluation of RAG pipelines. RAGAS provides a suite of metrics to evaluate different dimensions of RAG systems without requiring ground-truth human annotations: faithfulness, answer relevancy, and context precision among others.",
+        }
+        if arxiv_id in abstracts_fallback:
+            with open(os.path.join(CORPUS_REAL, f"{arxiv_id}.txt"), "w", encoding="utf-8") as fallback_f:
+                fallback_f.write(abstracts_fallback[arxiv_id])
+            print(f"     → abstract pre-guardado de {arxiv_id} guardado como .txt")
 
-pdfs_descargados = [f for f in os.listdir(CORPUS_REAL) if f.endswith(".pdf")]
-print(f"\nTotal PDFs en {CORPUS_REAL}: {len(pdfs_descargados)}")
+pdfs_descargados = [f for f in os.listdir(CORPUS_REAL) if f.endswith((".pdf", ".txt"))]
+print(f"\nTotal documentos en {CORPUS_REAL}: {len(pdfs_descargados)}")
 if len(pdfs_descargados) == 0:
     print("⚠️  No se descargó ningún PDF. ¿Hay conexión a internet?")
 ```
@@ -545,6 +680,14 @@ for k in [1, 3, 5]:
 ```
 
 ## 2.5 Evaluación MTEB — Validación profesional del modelo
+
+::: {.callout-note icon=false}
+## ⏱️ Tiempo estimado: 20-30 minutos
+
+Esta sección descarga benchmarks públicos y evalúa el modelo. No es necesaria
+para completar el entregable del HPD 1, pero te da criterio profesional para
+comparar modelos de embeddings en tu proyecto final.
+:::
 
 ::: {.callout-note icon=false}
 
@@ -673,6 +816,26 @@ Indexa los mismos embeddings en FAISS (`IndexFlatIP` para búsqueda exacta + `In
 **E4 — Mini-RAG con LLM local**
 
 Usa los top-3 chunks de una query como contexto para hacer una pregunta a un LLM local con Ollama (`llama3.2:1b`). El LLM debe responder basándose solo en los chunks. Evalúa a ojo si la respuesta es fiel a las fuentes. Esto es un RAG naïve — la base sobre la que construirás en HPD 4.
+
+**E5 — Pipeline sobre datos de tu sector**
+
+Elige un dominio cercano a tu ámbito profesional y construye un mini-corpus de 3
+"documentos" (párrafos de ~200 palabras cada uno) sobre ese tema. Por ejemplo:
+- **Legal:** extractos de GDPR, LOPD, y una sentencia de protección de datos
+- **Salud:** abstracts de PubMed sobre epidemiología o ensayos clínicos
+- **Finanzas:** informes anuales resumidos de 3 empresas del IBEX 35
+- **Marketing:** descripciones de campañas, segmentos de clientes y métricas
+- **Ingeniería:** especificaciones técnicas de 3 productos o componentes
+
+Ejecuta el pipeline completo sobre tu corpus (carga → chunking → embeddings →
+indexación → búsqueda). Evalúa con 3 queries en español sobre tu dominio y calcula
+recall@k sobre tu propio ground truth.
+
+¿Qué observas? ¿El recall es similar al de los papers de ML? ¿El dominio afecta
+a la calidad de la búsqueda semántica? ¿Por qué?
+
+> 🎯 *Objetivo: comprobar que el pipeline es independiente del dominio. Lo que
+> aprendes aquí se aplica a tu sector profesional.*
 
 :::
 

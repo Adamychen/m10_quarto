@@ -21,10 +21,17 @@ Implementar sistemas RAG de calidad producción, generar datos sintéticos útil
 
 ### Generación de datos sintéticos
 
-- Usos en Data Science: oversampling, anonimización, aumento de datasets
-- Técnicas: prompting guiado con esquemas, Evol-Instruct
-- SDV (Synthetic Data Vault) para datos tabulares
-- Validación estadística: fidelidad, utilidad, privacidad
+Este tema tiene página propia por su extensión:
+
+→ **[03a — Generación de Datos Sintéticos para Data Science](bloque3/03a-datos-sinteticos.qmd)**
+
+Resumen:
+- **Enfoque intuitivo** con LLMs + JSON Schema (ya lo manejas del Bloque 2)
+- **Modelos especializados:** CTGAN, TVAE (GANs y VAEs para datos tabulares), TabDDPM (difusión)
+- **SDV (Synthetic Data Vault)** como framework unificado: entrena, genera y valida con una API común
+- **Validación estadística:** KS test, chi-cuadrado, comparación de correlaciones, PCA, utilidad downstream
+
+→ **[📝 Ejercicios de datos sintéticos](evaluables/hpd4-datos-sinteticos.qmd)** (trabajo autónomo)
 
 ### Fine-tuning eficiente (PEFT)
 

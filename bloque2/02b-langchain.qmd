@@ -1,0 +1,385 @@
+---
+title: "02b — LangChain: Cadenas, Memoria y Recuperación"
+engine: jupyter
+---
+
+> Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber visto [Prompt Engineering](02a-prompt-engineering.qmd) primero.
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q langchain langchain-openai langchain-community python-dotenv
+```
+
+```{python}
+#| echo: true
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+import warnings
+warnings.filterwarnings("ignore")
+print("Librerías cargadas correctamente.")
+```
+
+```{python}
+#| echo: true
+
+from langchain_openai import ChatOpenAI
+
+LLM_KEY = os.getenv("LLM_API_KEY")
+LLM_URL = "https://llamus.cs.us.es/api/v1"
+
+if not LLM_KEY:
+    print("⚠️  Crea un archivo .env en la raíz del proyecto con:\n    LLM_API_KEY=tu_api_key\n    Las celdas siguientes mostrarán este mensaje hasta que configures la clave.")
+else:
+    llm = ChatOpenAI(model="gemma4:e2b-mlx", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
+    print("✅ ChatOpenAI configurado. Las celdas de ejemplo funcionarán correctamente.")
+```
+
+## LangChain
+
+### ¿Qué es y para qué sirve?
+
+LangChain es un **framework de orquestación** para aplicaciones con LLMs. Si usar la API de OpenAI directamente es como cocinar con un solo fuego, LangChain te da una cocina completa: fogones, temporizador, nevera con ingredientes y libro de recetas.
+
+```{mermaid}
+graph TD
+    subgraph "Aplicación con LangChain"
+        A[Prompt<br/>Template] --> B[LLM]
+        B --> C[Output<br/>Parser]
+        D[Retriever<br/>Vector DB] -.-> A
+        E[Memory] -.-> A
+        F[Tools/APIs] -.-> B
+    end
+
+    A --> G[Usuario]
+    C --> G
+
+    style A fill:#4B8BBE,color:#fff
+    style B fill:#306998,color:#fff
+    style C fill:#2e7d32,color:#fff
+```
+
+**Componentes clave que veremos:**
+
+| Componente | ¿Qué hace? |
+|---|---|
+| **Prompt Templates** | Plantillas reutilizables con variables |
+| **LCEL** | Encadenar componentes con `\|` |
+| **Memory** | Mantener historial de conversación |
+| **Retrievers** | Buscar documentos relevantes |
+| **Output Parsers** | Estructurar la salida del modelo |
+| **Callbacks** | Monitorizar y loguear la ejecución |
+
+### LCEL — LangChain Expression Language
+
+LCEL usa el operador `|` (pipe) para encadenar componentes, como en las tuberías de Unix:
+
+```{python}
+#| echo: true
+
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+
+prompt = ChatPromptTemplate.from_template(
+    "Eres un analista de datos. Explica {concepto} en {num_palabras} palabras."
+)
+
+if not LLM_KEY:
+    print("⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.")
+else:
+    cadena = prompt | llm | StrOutputParser()
+    resultado = cadena.invoke({
+        "concepto": "desviación estándar",
+        "num_palabras": "50"
+    })
+    print(resultado)
+```
+
+```{mermaid}
+graph LR
+    A["prompt<br/>{concepto}"] -->|"|"| B["llm<br/>Qwen3"]
+    B -->|"|"| C["StrOutputParser<br/>texto limpio"]
+
+    style A fill:#4B8BBE,color:#fff
+    style B fill:#306998,color:#fff
+    style C fill:#2e7d32,color:#fff
+```
+
+**¿Por qué LCEL?** Esta sintaxis de tubería permite:
+- Componer cadenas complejas de forma legible
+- Ejecución asíncrona, streaming y paralela sin código extra
+- Trazabilidad automática con LangSmith
+
+```{python}
+#| echo: true
+
+from langchain_core.runnables import RunnableLambda
+
+def procesar_intermedio(texto):
+    return texto.upper()
+
+cadena_compleja = prompt | llm | StrOutputParser() | RunnableLambda(procesar_intermedio)
+
+if not LLM_KEY:
+    print("⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.")
+else:
+    print(cadena_compleja.invoke({"concepto": "p-valor", "num_palabras": "30"}))
+```
+
+### Prompt Templates
+
+Las plantillas permiten separar la lógica del prompt del código. Soporta variables, few-shot examples y carga desde archivo:
+
+```{python}
+#| echo: true
+
+from langchain_core.prompts import PromptTemplate, FewShotPromptTemplate
+
+plantilla_simple = PromptTemplate.from_template(
+    "Genera un resumen de {tipo_documento} sobre {tema} con tono {tono}."
+)
+
+print(plantilla_simple.format(
+    tipo_documento="informe ejecutivo",
+    tema="ventas Q1 2026",
+    tono="formal"
+))
+
+ejemplos = [
+    {"pregunta": "¿Qué es una media?", "respuesta": "La media es la suma dividida por el número de elementos."},
+    {"pregunta": "¿Qué es una mediana?", "respuesta": "La mediana es el valor central al ordenar los datos."},
+]
+
+plantilla_few_shot = FewShotPromptTemplate(
+    examples=ejemplos,
+    example_prompt=PromptTemplate.from_template("P: {pregunta}\nR: {respuesta}"),
+    prefix="Eres un profesor de estadística. Responde de forma similar a los ejemplos:",
+    suffix="P: {pregunta}\nR:",
+    input_variables=["pregunta"]
+)
+
+print("\n--- Prompt generado con few-shot ---")
+print(plantilla_few_shot.format(pregunta="¿Qué es una moda?"))
+```
+
+### Memoria conversacional
+
+Sin memoria, cada llamada al LLM es independiente: el modelo no recuerda lo que dijiste antes. La memoria almacena el historial y lo inyecta en cada nuevo prompt:
+
+```{python}
+#| echo: true
+
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.runnables.history import RunnableWithMessageHistory
+
+llm_chat = ChatOpenAI(model="gemma4:e2b-mlx", base_url=LLM_URL, api_key=LLM_KEY, temperature=0.7)
+
+prompt_con_memoria = ChatPromptTemplate.from_messages([
+    ("system", "Eres un profesor de estadística amable. Responde en 2 frases máximo."),
+    MessagesPlaceholder(variable_name="history"),
+    ("human", "{input}")
+])
+
+cadena_con_historial = RunnableWithMessageHistory(
+    prompt_con_memoria | llm_chat,
+    lambda session_id: ChatMessageHistory(),
+    input_messages_key="input",
+    history_messages_key="history"
+)
+
+if not LLM_KEY:
+    print("⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.")
+else:
+    r1 = cadena_con_historial.invoke(
+        {"input": "¿Qué es la desviación estándar?"},
+        config={"configurable": {"session_id": "alumno_01"}}
+    )
+    print("R1:", r1.content)
+
+    r2 = cadena_con_historial.invoke(
+        {"input": "¿Y cómo se relaciona con la varianza?"},
+        config={"configurable": {"session_id": "alumno_01"}}
+    )
+    print("R2:", r2.content)
+```
+
+::: {.callout-tip}
+## Tipos de memoria en LangChain
+
+| Tipo | Estrategia | Ideal para |
+|---|---|---|
+| `ConversationBufferMemory` | Guarda todo el historial | Conversaciones cortas |
+| `ConversationBufferWindowMemory` | Solo las últimas K interacciones | Ventana deslizante |
+| `ConversationSummaryMemory` | Resume historial con otro LLM | Conversaciones largas |
+| `ConversationTokenBufferMemory` | Limita por número de tokens | Control de costes |
+:::
+
+### Retrievers
+
+Un **retriever** busca documentos relevantes en una base de conocimiento (vectorial o clásica) y los inyecta en el prompt. Es el corazón del patrón RAG (Retrieval-Augmented Generation):
+
+```{python}
+#| echo: true
+
+from langchain_community.document_loaders import TextLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+from langchain_community.vectorstores import Chroma
+from langchain_openai import OpenAIEmbeddings
+
+# Crear un documento de ejemplo para la demo
+import tempfile
+with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False, encoding="utf-8") as f:
+    f.write("""
+Informe Anual de Ventas 2025
+
+Q1: Los ingresos del primer trimestre alcanzaron 1.2 millones de euros, un 15% más que el año anterior.
+El producto estrella fue CloudSync Pro con 450k€ en ventas. La región de Madrid lideró con el 40% del total.
+
+Q2: Los ingresos del segundo trimestre fueron de 1.5 millones de euros. Se lanzó el nuevo producto DataViz Analytics
+que facturó 200k€ en su primer mes. La región de Barcelona creció un 25% respecto al Q1.
+
+Q3: Tercer trimestre con 1.1 millones de euros. Hubo una caída estacional del 10% en agosto.
+La región Norte incorporó 15 nuevos clientes corporativos.
+
+Q4: Cierre de año récord con 1.8 millones de euros. La campaña de Black Friday generó 300k€ adicionales.
+El total anual fue de 5.6 millones de euros, superando el objetivo de 5 millones.
+""")
+    doc_path = f.name
+
+loader = TextLoader(doc_path)
+documentos = loader.load()
+
+splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+chunks = splitter.split_documents(documentos)
+print(f"Documento troceado en {len(chunks)} fragmentos")
+
+if not LLM_KEY:
+    print("⚠️  Configura LLM_API_KEY en .env para indexar y buscar.")
+else:
+    embeddings = OpenAIEmbeddings(
+        model="embeddinggemma:latest",
+        base_url=LLM_URL,
+        api_key=LLM_KEY,
+        tiktoken_enabled=False,
+        check_embedding_ctx_length=False,
+    )
+    vectorstore = Chroma.from_documents(chunks, embeddings)
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
+
+    pregunta = "¿Cuáles fueron los ingresos del Q2?"
+    docs_relevantes = retriever.invoke(pregunta)
+
+    for i, doc in enumerate(docs_relevantes):
+        print(f"\n--- Documento {i+1} ---")
+        print(doc.page_content[:200])
+
+import os as _os; _os.unlink(doc_path)
+```
+
+```{mermaid}
+graph LR
+    A[Pregunta<br/>usuario] --> B[Retriever<br/>búsqueda semántica]
+    B --> C[Vector DB<br/>top-K chunks]
+    C --> D[Prompt<br/>pregunta + contexto]
+    D --> E[LLM]
+    E --> F[Respuesta<br/>fundamentada]
+
+    style A fill:#4B8BBE,color:#fff
+    style B fill:#e65100,color:#fff
+    style C fill:#FFD43B,color:#000
+    style F fill:#2e7d32,color:#fff
+```
+
+### Output Parsers
+
+Los parsers convierten la salida textual del LLM en objetos Python utilizables:
+
+```{python}
+#| echo: true
+
+from langchain_core.output_parsers import JsonOutputParser
+from pydantic import BaseModel, Field
+
+class AnalisisDatos(BaseModel):
+    metrica_principal: str = Field(description="Nombre de la métrica más relevante")
+    valor: float = Field(description="Valor numérico de la métrica")
+    tendencia: str = Field(description="'sube', 'baja' o 'estable'")
+    recomendacion: str = Field(description="Recomendación de 1 frase")
+
+parser = JsonOutputParser(pydantic_object=AnalisisDatos)
+
+prompt_con_parser = ChatPromptTemplate.from_messages([
+    ("system", "Analizas datos empresariales. {formato}"),
+    ("user", "Ventas enero: 100, febrero: 120, marzo: 115. ¿Qué ves?")
+])
+
+cadena_con_parser = prompt_con_parser | llm | parser
+
+if not LLM_KEY:
+    print("⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.")
+else:
+    resultado = cadena_con_parser.invoke({
+        "formato": parser.get_format_instructions()
+    })
+    print(f"Métrica: {resultado['metrica_principal']}")
+    print(f"Valor: {resultado['valor']}")
+    print(f"Tendencia: {resultado['tendencia']}")
+    print(f"Recomendación: {resultado['recomendacion']}")
+```
+
+### Callbacks
+
+Los callbacks permiten ejecutar código en puntos clave del pipeline:
+
+```{python}
+#| echo: true
+
+from langchain_core.callbacks import BaseCallbackHandler
+
+class MiCallback(BaseCallbackHandler):
+    def on_llm_start(self, serialized, prompts, **kwargs):
+        print(f"[CALLBACK] Llamando al LLM con {len(prompts)} prompt(s)")
+
+    def on_llm_end(self, response, **kwargs):
+        tokens = response.llm_output.get("token_usage", {}).get("total_tokens", "?") if response.llm_output else "?"
+        print(f"[CALLBACK] Respuesta recibida. Tokens usados: {tokens}")
+
+cadena = prompt | llm | StrOutputParser()
+
+if not LLM_KEY:
+    print("⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.")
+else:
+    resultado = cadena.invoke(
+        {"concepto": "regresión lineal", "num_palabras": "30"},
+        config={"callbacks": [MiCallback()]}
+    )
+    print(f"\nResultado: {resultado}")
+```
+
+::: {.callout-note}
+Los callbacks son la base del **tracing** (LangSmith), el **logging** y la **monitorización** en producción. Te permiten saber exactamente qué está pasando dentro de tus cadenas y cuánto te está costando.
+:::
+
+### Resumen del flujo completo
+
+```{mermaid}
+graph TD
+    A[Usuario pregunta] --> B[Memory<br/>carga historial]
+    B --> C[Retriever<br/>busca docs relevantes]
+    C --> D[Prompt Template<br/>construye prompt final]
+    D --> E[LLM<br/>genera respuesta]
+    E --> F[Output Parser<br/>estructura salida]
+    F --> G[Memory<br/>guarda interacción]
+    F --> H[Usuario recibe<br/>respuesta]
+
+    style A fill:#4B8BBE,color:#fff
+    style H fill:#2e7d32,color:#fff
+```
+
+> **Lectura recomendada:** [LangChain Expression Language (LCEL)](https://python.langchain.com/docs/concepts/lcel/)

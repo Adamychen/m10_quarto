@@ -3,7 +3,7 @@ title: "01c — Modelos de Embeddings"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01c-embeddings.ipynb)
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01c-embeddings.ipynb)
 
 > Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto [01b-llms.qmd](01b-llms.qmd) primero.
 
@@ -45,8 +45,16 @@ timeline
     2022 : text-embedding-3 (OpenAI) : Embeddings comerciales
     2023 : E5 (Microsoft) : Embeddings open-source
     2024 : BGE-M3 (BAAI) : Multilingüe + multimodal
-    2025 : Qwen3-Embedding : Embeddings nativos Qwen
+     2025 : Qwen3-Embedding : Embeddings nativos Qwen
 ```
+
+::: {.callout-note}
+## Idioma de los textos de ejemplo
+
+Los modelos de embeddings que usamos en este bloque (`all-MiniLM-L6-v2`) están entrenados principalmente en **inglés**. Por eso los ejemplos de código utilizan texto en inglés. Cada modelo lleva asociado un **tokenizador** entrenado en su idioma: usar un tokenizador inglés sobre texto español produce más subtokens por palabra y embeddings de menor calidad, porque el espacio semántico aprendido está calibrado para relaciones del inglés.
+
+Si necesitas trabajar con español, usa modelos multilingües como `intfloat/multilingual-e5-small` o `BAAI/bge-m3`. La API es la misma; solo cambia el nombre del modelo.
+:::
 
 ### Semántica distribucional
 
@@ -60,10 +68,10 @@ from sentence_transformers import SentenceTransformer
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 frases = [
-    "El gato juega en el jardín",
-    "Un felino corre tras una mariposa",
-    "El perro duerme en la alfombra",
-    "Mañana será un día soleado"
+    "A cat plays in the garden",
+    "A feline chases a butterfly",
+    "The dog sleeps on the rug",
+    "Tomorrow will be a sunny day"
 ]
 
 embeddings = model.encode(frases)
@@ -96,8 +104,8 @@ plt.colorbar(im, ax=ax)
 plt.tight_layout()
 plt.show()
 
-print("Observa cómo las frases sobre animales (0, 1) tienen alta similitud")
-print("mientras que la frase del clima (3) es diferente al resto.")
+print("Notice how animal-related phrases (0, 1) have high similarity")
+print("while the weather phrase (3) is different from the rest.")
 
 ```
 

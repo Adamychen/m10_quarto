@@ -1,0 +1,213 @@
+---
+title: "Ejercicios evaluables — Generación y validación de datos sintéticos"
+engine: jupyter
+---
+
+> **Peso en la nota:** 7.5 % (parte del 30 % de entregas prácticas)
+>
+> **Plazo:** 7 días tras la sesión presencial del Bloque 3.
+>
+> **Requisito previo:** haber leído `bloque3/03a-datos-sinteticos.qmd`.
+>
+> **Entrega:** Notebook `.ipynb` ejecutado con todas las celdas completas.
+>   Cada ejercicio especifica qué variable debe contener el resultado para la corrección automática.
+
+::: {.callout-warning icon=false}
+## Cómo se corrige
+
+Cada ejercicio pide que asignes el resultado a una variable con un nombre concreto
+(`eval1_df`, `eval2_ks`, `eval3_f1`, `eval4_dict`). El script de
+corrección ejecutará tu notebook e inspeccionará esas variables. **Si la variable
+no existe o tiene un tipo incorrecto, el ejercicio se puntúa como 0.**
+
+Para autoevaluarte antes de entregar:
+```bash
+python scripts/corregir_hpd4_ds.py tu_notebook.ipynb
+```
+:::
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q sdv scipy pandas matplotlib seaborn openai python-dotenv
+```
+
+```{python}
+#| echo: true
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+
+import warnings
+warnings.filterwarnings("ignore")
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from scipy.stats import ks_2samp, chi2_contingency
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+
+LLM_KEY = os.getenv("LLM_API_KEY")
+LLM_URL = "https://llamus.cs.us.es/api/v1"
+
+print("Librerías cargadas correctamente.")
+```
+
+---
+
+## Dataset de trabajo
+
+Para todos los ejercicios usarás el dataset `Adult Census Income` (UCI), cargado directamente. Contiene ~32k filas con datos demográficos y laborales.
+
+```{python}
+#| echo: true
+
+df_real = pd.read_csv("https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data",
+                       header=None,
+                       names=["age", "workclass", "fnlwgt", "education", "education_num",
+                              "marital_status", "occupation", "relationship", "race", "sex",
+                              "capital_gain", "capital_loss", "hours_per_week", "native_country", "income"])
+
+df_real = df_real.replace(" ?", np.nan).dropna()
+df_real["income"] = (df_real["income"].str.strip() == ">50K").astype(int)
+
+print(f"Dataset real: {df_real.shape[0]} filas, {df_real.shape[1]} columnas")
+print(f"Balance de clases: {df_real['income'].value_counts().to_dict()}")
+print(f"\nColumnas numéricas: {df_real.select_dtypes(include=[np.number]).columns.tolist()}")
+print(f"Columnas categóricas: {df_real.select_dtypes(include=['object']).columns.tolist()}")
+```
+
+---
+
+## Ejercicio 1 — Generar datos sintéticos con LLM (enfoque intuitivo)
+
+Genera 20 filas sintéticas usando la API de Llamus.
+Pide el JSON en el prompt (como en `02a-prompt-engineering.qmd`) y extrae la respuesta
+con el helper `parse_json_response()`.
+Usa como columnas: `age`, `hours_per_week`, `education`, `income`.
+Incluye 2 ejemplos few-shot en el prompt. Usa temperatura 0.8.
+
+El resultado debe ser un **DataFrame** asignado a `eval1_df` con exactamente 4 columnas en este orden: `age`, `hours_per_week`, `education`, `income`.
+
+```{python}
+#| echo: true
+
+import json, re
+from openai import OpenAI
+
+def parse_json_response(content: str) -> dict:
+    """Extrae JSON de una respuesta que puede venir envuelta en ```json ... ```."""
+    match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", content, re.DOTALL)
+    if match:
+        content = match.group(1)
+    return json.loads(content)
+
+eval1_df = None  # Sustituir con tu código
+
+# Validación automática
+if eval1_df is not None:
+    assert isinstance(eval1_df, pd.DataFrame), "eval1_df debe ser un DataFrame"
+    assert list(eval1_df.columns) == ["age", "hours_per_week", "education", "income"], \
+        f"Columnas incorrectas: {list(eval1_df.columns)}"
+    assert len(eval1_df) >= 15, f"Se esperaban al menos 15 filas, hay {len(eval1_df)}"
+    print(f"✅ Ejercicio 1 OK — {len(eval1_df)} filas generadas")
+else:
+    print("⚠️  Ejercicio 1 pendiente")
+```
+
+---
+
+## Ejercicio 2 — KS test: datos reales vs. sintéticos
+
+Entrena un CTGAN con SDV sobre `df_real` (usa solo las columnas `["age", "education_num", "hours_per_week", "sex", "income"]` para que entrene más rápido, 50 epochs bastan).
+Genera 1000 filas sintéticas.
+Calcula el **KS test** comparando la distribución de `age` entre datos reales y sintéticos.
+
+El resultado debe ser un **diccionario** `eval2_ks` con claves `"statistic"` (float) y `"p_value"` (float).
+
+```{python}
+#| echo: true
+
+from sdv.single_table import CTGANSynthesizer
+from sdv.metadata import SingleTableMetadata
+
+eval2_ks = None  # Sustituir con tu código
+eval2_df_synth = None  # DataFrame sintético generado (para usar en ejercicios siguientes)
+
+# Validación automática
+if eval2_ks is not None:
+    assert isinstance(eval2_ks, dict), "eval2_ks debe ser un diccionario"
+    assert "statistic" in eval2_ks and "p_value" in eval2_ks, "Faltan claves"
+    assert 0 <= eval2_ks["statistic"] <= 1, f"Statistic fuera de rango: {eval2_ks['statistic']}"
+    assert 0 <= eval2_ks["p_value"] <= 1, f"P-value fuera de rango: {eval2_ks['p_value']}"
+    print(f"✅ Ejercicio 2 OK — KS statistic={eval2_ks['statistic']:.4f}, p_value={eval2_ks['p_value']:.4f}")
+else:
+    print("⚠️  Ejercicio 2 pendiente")
+```
+
+---
+
+## Ejercicio 3 — Utilidad downstream: clasificador con datos sintéticos
+
+Entrena un `RandomForestClassifier(n_estimators=50, random_state=42)` con los datos sintéticos generados en el Ejercicio 2 (usa `eval2_df_synth`).
+Evalúa sobre el 30 % de `df_real` como test set.
+Usa `get_dummies` para codificar las categóricas y `reindex` para alinear columnas entre train y test.
+
+El resultado debe ser un **float** `eval3_f1` con el macro F1-score sobre el test set real.
+
+```{python}
+#| echo: true
+
+eval3_f1 = None  # Sustituir con tu código
+
+# Validación automática
+if eval3_f1 is not None:
+    assert isinstance(eval3_f1, float), "eval3_f1 debe ser un float"
+    assert 0 <= eval3_f1 <= 1, f"F1 fuera de rango: {eval3_f1}"
+    print(f"✅ Ejercicio 3 OK — Macro F1 sobre test real = {eval3_f1:.4f}")
+else:
+    print("⚠️  Ejercicio 3 pendiente")
+```
+
+---
+
+## Ejercicio 4 — Comparación CTGAN vs. TVAE
+
+Entrena un TVAE sobre las mismas 5 columnas y con los mismos 50 epochs que en el Ejercicio 2.
+Calcula para ambos modelos (CTGAN y TVAE):
+
+- `ks_age`: p-value del KS test para `age`
+- `chi2_sex`: p-value del chi-cuadrado para `sex`
+
+El resultado debe ser un **diccionario** `eval4_dict` con esta estructura exacta:
+
+```python
+{
+    "ctgan": {"ks_age_pvalue": float, "chi2_sex_pvalue": float},
+    "tvae":  {"ks_age_pvalue": float, "chi2_sex_pvalue": float}
+}
+```
+
+```{python}
+#| echo: true
+
+eval4_dict = None  # Sustituir con tu código
+
+# Validación automática
+if eval4_dict is not None:
+    assert isinstance(eval4_dict, dict), "eval4_dict debe ser un diccionario"
+    for model in ["ctgan", "tvae"]:
+        assert model in eval4_dict, f"Falta clave '{model}'"
+        for metric in ["ks_age_pvalue", "chi2_sex_pvalue"]:
+            assert metric in eval4_dict[model], f"Falta '{metric}' en eval4_dict['{model}']"
+            assert isinstance(eval4_dict[model][metric], float), f"'{metric}' debe ser float"
+            assert 0 <= eval4_dict[model][metric] <= 1, f"'{metric}' fuera de rango: {eval4_dict[model][metric]}"
+    print(f"✅ Ejercicio 4 OK")
+    print(f"   CTGAN: ks_age_p={eval4_dict['ctgan']['ks_age_pvalue']:.4f}, chi2_sex_p={eval4_dict['ctgan']['chi2_sex_pvalue']:.4f}")
+    print(f"   TVAE:  ks_age_p={eval4_dict['tvae']['ks_age_pvalue']:.4f}, chi2_sex_p={eval4_dict['tvae']['chi2_sex_pvalue']:.4f}")
+else:
+    print("⚠️  Ejercicio 4 pendiente")
+```
