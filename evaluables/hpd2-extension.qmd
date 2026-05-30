@@ -46,9 +46,8 @@ import seaborn as sns
 import io, base64
 
 from langchain_openai import ChatOpenAI
-from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain.agents import create_agent
 from langchain.tools import tool
-from langchain_core.prompts import ChatPromptTemplate
 
 plt.rcParams["figure.dpi"] = 100
 
@@ -122,12 +121,7 @@ def codigo_libre(codigo: str) -> str:
         plt.close()
         return f"Error: {e}. Reintenta con plt.<funcion>() en vez de df.plot()"
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "Eres un analista de datos del Titanic. Usa las herramientas disponibles. Responde en español."),
-    ("placeholder", "{chat_history}"),
-    ("human", "{input}"),
-    ("placeholder", "{agent_scratchpad}")
-])
+SYSTEM_PROMPT = "Eres un analista de datos del Titanic. Usa las herramientas disponibles. Responde en español."
 
 print("Setup listo.")
 ```
@@ -224,7 +218,7 @@ from langchain_core.documents import Document as LCDoc
 
 # ─── Añade memoria conversacional ───
 # Usa una lista de mensajes: historial.append({"role": msg.role, "content": msg.content})
-# El agente con create_tool_calling_agent recibe el historial en el prompt con {chat_history}
+# En create_agent, el historial se pasa como mensajes adicionales en la lista "messages"
 
 # ─── Preguntas de prueba ───
 # Datos: "¿Cuál era la edad media de los pasajeros?", "¿Cuántos pasajeros de 1ª clase sobrevivieron?"

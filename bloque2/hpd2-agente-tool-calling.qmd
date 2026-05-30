@@ -307,8 +307,6 @@ Definimos el system prompt que le dice al modelo su rol y cómo usar las herrami
 ```{python}
 #| echo: true
 
-from langchain_core.prompts import ChatPromptTemplate
-
 # ─── COMPLETAR: escribe el system prompt del agente ───
 # Debe indicar:
 #   - Rol: analista de datos del Titanic
@@ -321,14 +319,7 @@ SYSTEM_PROMPT = """Eres un analista de datos experto en el dataset del Titanic.
 # TODO: completar el resto del prompt
 """
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", SYSTEM_PROMPT),
-    ("placeholder", "{chat_history}"),
-    ("human", "{input}"),
-    ("placeholder", "{agent_scratchpad}")
-])
-
-print("Prompt configurado.")
+print("System prompt configurado.")
 print(f"System prompt actual ({len(SYSTEM_PROMPT)} caracteres):")
 print(SYSTEM_PROMPT[:200] + "..." if len(SYSTEM_PROMPT) > 200 else SYSTEM_PROMPT)
 ```
@@ -338,8 +329,7 @@ print(SYSTEM_PROMPT[:200] + "..." if len(SYSTEM_PROMPT) > 200 else SYSTEM_PROMPT
 ```{python}
 #| echo: true
 
-from langchain.agents import create_tool_calling_agent, AgentExecutor
-from langchain_core.prompts import ChatPromptTemplate
+from langchain.agents import create_agent
 
 if not LLM_KEY:
     print("⚠️  Configura LLM_API_KEY en .env para crear el agente.")
@@ -347,17 +337,10 @@ else:
     # ─── COMPLETAR: crear el agente ───
     tools = [consulta_pandas, histograma, barras, boxplot, codigo_libre]
     
-    # TODO: Crea el agente:
-    #   prompt = ChatPromptTemplate.from_messages([
-    #       ("system", "Eres un analista del Titanic..."),
-    #       ("placeholder", "{chat_history}"),
-    #       ("human", "{input}"),
-    #       ("placeholder", "{agent_scratchpad}")
-    #   ])
-    #   agente = create_tool_calling_agent(llm, tools, prompt)
-    #   executor = AgentExecutor(agent=agente, tools=tools, ...)
-    #   result = executor.invoke({"input": pregunta})
-    #   print(result["output"])
+    # TODO: Crea el agente con create_agent:
+    #   agente = create_agent(model=llm, tools=tools, system_prompt=SYSTEM_PROMPT)
+    #   result = agente.invoke({"messages": [{"role": "user", "content": pregunta}]})
+    #   print(result["messages"][-1].content)
     agente = None  # ← completar
     
     if agente:
@@ -400,8 +383,8 @@ else:
         print(f"PREGUNTA {i}: {pregunta}")
         print('='*70)
         try:
-            result = executor.invoke({"input": pregunta})
-            print(f"\nRESPUESTA FINAL: {result['output']}")
+            result = agente.invoke({"messages": [{"role": "user", "content": pregunta}]})
+            print(f"\nRESPUESTA FINAL: {result['messages'][-1].content}")
         except Exception as e:
             print(f"ERROR: {e}")
 ```

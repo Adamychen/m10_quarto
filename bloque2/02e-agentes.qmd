@@ -99,14 +99,13 @@ graph TD
 
 ### Tool Calling (Function Calling nativo)
 
-LangChain abstrae el bucle ReAct con `create_tool_calling_agent`:
+LangChain abstrae el bucle ReAct con `create_agent`:
 
 ```{python}
 #| echo: true
 
-from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain.agents import create_agent
 from langchain.tools import tool
-from langchain_core.prompts import ChatPromptTemplate
 
 @tool
 def calculadora(expresion: str) -> str:
@@ -150,14 +149,11 @@ if not LLM_KEY:
     print("\n⚠️  Configura LLM_API_KEY en .env para ver el agente en acción.")
 else:
     tools = [calculadora, buscar_cliente, convertir_moneda]
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "Eres un asistente corporativo con acceso a herramientas. Responde de forma concisa."),
-        ("placeholder", "{chat_history}"),
-        ("human", "{input}"),
-        ("placeholder", "{agent_scratchpad}")
-    ])
-    agente = create_tool_calling_agent(llm, tools, prompt)
-    executor = AgentExecutor(agent=agente, tools=tools, verbose=False, max_iterations=5, handle_parsing_errors=True)
+    agente = create_agent(
+        model=llm,
+        tools=tools,
+        system_prompt="Eres un asistente corporativo con acceso a herramientas. Responde de forma concisa.",
+    )
 
     preguntas = [
         "¿Cuánto factura ACME Corp en dólares?",
@@ -169,8 +165,8 @@ else:
         print(f"\n{'='*60}")
         print(f"PREGUNTA: {pregunta}")
         try:
-            result = executor.invoke({"input": pregunta})
-            print(f"RESPUESTA: {result['output']}")
+            result = agente.invoke({"messages": [{"role": "user", "content": pregunta}]})
+            print(f"RESPUESTA: {result['messages'][-1].content}")
         except Exception as e:
             print(f"ERROR: {e}")
 ```
@@ -477,20 +473,14 @@ print("\nProducto más vendido (unidades):")
 print(consulta_pandas.invoke({"expresion": "df.groupby('producto')['cantidad'].sum().idxmax()"}))
 
 if LLM_KEY:
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "Eres un analista de datos. Usa la herramienta consulta_pandas para responder preguntas sobre el DataFrame de ventas. Responde en español."),
-        ("placeholder", "{chat_history}"),
-        ("human", "{input}"),
-        ("placeholder", "{agent_scratchpad}")
-    ])
-    agente = create_tool_calling_agent(llm, [consulta_pandas], prompt)
-    executor = AgentExecutor(agent=agente, tools=[consulta_pandas], verbose=False, max_iterations=5, handle_parsing_errors=True)
+    SYSTEM_PROMPT = "Eres un analista de datos. Usa la herramienta consulta_pandas para responder preguntas sobre el DataFrame de ventas. Responde en español."
+    agente = create_agent(model=llm, tools=[consulta_pandas], system_prompt=SYSTEM_PROMPT)
 
     print("\n" + "=" * 60)
     pregunta = "¿Cuál es la región con mayor facturación total y a cuánto asciende?"
     print(f"PREGUNTA: {pregunta}")
-    result = executor.invoke({"input": pregunta})
-    print(f"RESPUESTA: {result['output']}")
+    result = agente.invoke({"messages": [{"role": "user", "content": pregunta}]})
+    print(f"RESPUESTA: {result['messages'][-1].content}")
 ```
 
 ### Cuándo usar un agente

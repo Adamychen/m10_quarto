@@ -504,7 +504,7 @@ En producción, el cliente LLM lanza el servidor MCP como subproceso y se comuni
 ::: {.callout-note icon=false}
 ## De LangChain (HPD 2) a la API de OpenAI
 
-En HPD 2 usaste `create_tool_calling_agent` de LangChain para crear el agente.
+En HPD 2 usaste `create_agent` de LangChain para crear el agente.
 Aquí implementas el mismo bucle ReAct manualmente con la API de OpenAI. La
 diferencia es que las tools no son funciones Python decoradas con `@tool` — están
 en un servidor MCP independiente. El patrón de razonamiento (LLM decide → ejecuta

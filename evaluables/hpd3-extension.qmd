@@ -191,7 +191,7 @@ print("✅ Ejercicio 2: formato correcto")
 
 ## Ejercicio 3 — Agente LangChain que consume tools MCP (3 puntos)
 
-Crea un agente con LangChain (`create_tool_calling_agent`) donde las tools no sean funciones Python decoradas con `@tool`, sino wrappers que invoquen las tools de tu servidor MCP. El agente debe responder preguntas sobre la base de datos corporativa usando exclusivamente las tools MCP.
+Crea un agente con LangChain (`create_agent`) donde las tools no sean funciones Python decoradas con `@tool`, sino wrappers que invoquen las tools de tu servidor MCP. El agente debe responder preguntas sobre la base de datos corporativa usando exclusivamente las tools MCP.
 
 | Criterio | Puntos |
 |---|---|
@@ -203,9 +203,8 @@ Crea un agente con LangChain (`create_tool_calling_agent`) donde las tools no se
 #| echo: true
 
 from langchain_openai import ChatOpenAI
-from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain.agents import create_agent
 from langchain.tools import tool
-from langchain_core.prompts import ChatPromptTemplate
 
 if not LLM_KEY:
     print("⚠️  Configura LLM_API_KEY en .env")
@@ -235,19 +234,13 @@ else:
 
     # ─── Crea el agente con las tools MCP ───
     tools = [consultar_bd, info_empleado]
-    prompt = ChatPromptTemplate.from_messages([
-        ("system", "Eres un asistente corporativo. Usa las tools para responder. Responde en español."),
-        ("placeholder", "{chat_history}"),
-        ("human", "{input}"),
-        ("placeholder", "{agent_scratchpad}")
-    ])
-    agente = create_tool_calling_agent(llm, tools, prompt)
-    executor = AgentExecutor(agent=agente, tools=tools, verbose=False, max_iterations=5, handle_parsing_errors=True)
+    SYSTEM_PROMPT = "Eres un asistente corporativo. Usa las tools para responder. Responde en español."
+    agente = create_agent(model=llm, tools=tools, system_prompt=SYSTEM_PROMPT)
 
     # ─── Ejecutar pregunta de prueba ───
     pregunta = "¿Cuántos empleados hay en I+D y cuál es el presupuesto total de sus proyectos activos?"
-    result = executor.invoke({"input": pregunta})
-    eval3_integracion = result['output']
+    result = agente.invoke({"messages": [{"role": "user", "content": pregunta}]})
+    eval3_integracion = result["messages"][-1].content
 ```
 
 ```{python}

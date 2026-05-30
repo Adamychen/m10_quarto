@@ -47,9 +47,8 @@ import seaborn as sns
 import io, base64
 
 from langchain_openai import ChatOpenAI
-from langchain.agents import create_tool_calling_agent, AgentExecutor
+from langchain.agents import create_agent
 from langchain.tools import tool
-from langchain_core.prompts import ChatPromptTemplate
 
 plt.rcParams["figure.dpi"] = 100
 
@@ -141,14 +140,7 @@ def codigo_libre(codigo: str) -> str:
 
 SYSTEM_PROMPT = "Eres un analista de datos del Titanic. Usa las herramientas SIEMPRE que la pregunta requiera datos del Titanic. Responde en español, de forma concisa."
 
-prompt = ChatPromptTemplate.from_messages([
-    ("system", SYSTEM_PROMPT),
-    ("placeholder", "{chat_history}"),
-    ("human", "{input}"),
-    ("placeholder", "{agent_scratchpad}")
-])
-
-print("Herramientas y prompt base listos.")
+print("Herramientas y system prompt base listos.")
 ```
 
 ---
@@ -189,10 +181,8 @@ def correlacion(col1: str, col2: str) -> str:
 
 # ─── Crea y ejecuta el agente con 3 herramientas ───
 # tools = [consulta_pandas, histograma, barras, boxplot, codigo_libre, correlacion]
-# prompt = ChatPromptTemplate.from_messages([("system", "Eres un analista del Titanic..."), ("placeholder", "{chat_history}"), ("human", "{input}"), ("placeholder", "{agent_scratchpad}")])
-# agente = create_tool_calling_agent(llm, tools, prompt)
-# executor = AgentExecutor(agent=agente, tools=tools, max_iterations=5, handle_parsing_errors=True)
-# result = executor.invoke({"input": pregunta})
+# agente = create_agent(model=llm, tools=tools, system_prompt=SYSTEM_PROMPT)
+# result = agente.invoke({"messages": [{"role": "user", "content": pregunta}]})
 
 # ─── Pregunta que active la tool correlacion ───
 # pregunta_1 = "¿Existe correlación entre la edad y la tarifa pagada?"
@@ -237,10 +227,8 @@ preguntas_eval = [
 
 # ─── Crea el agente base ───
 # tools = [consulta_pandas, histograma, barras, boxplot, codigo_libre]
-# prompt = ChatPromptTemplate.from_messages([("system", "Eres un analista del Titanic..."), ("placeholder", "{chat_history}"), ("human", "{input}"), ("placeholder", "{agent_scratchpad}")])
-# agente = create_tool_calling_agent(llm, tools, prompt)
-# executor = AgentExecutor(agent=agente, tools=tools, max_iterations=5, handle_parsing_errors=True)
-# result = executor.invoke({"input": pregunta})
+# agente = create_agent(model=llm, tools=tools, system_prompt=SYSTEM_PROMPT)
+# result = agente.invoke({"messages": [{"role": "user", "content": pregunta}]})
 
 # Para cada pregunta, ejecuta executor.invoke({"input": pregunta})
 # Evalúa la respuesta y completa eval2_tabla
