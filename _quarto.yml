@@ -69,9 +69,13 @@ website:
       - section: "Bloque 3 — Aplicaciones"
         contents:
           - href: 03-aplicaciones.qmd
-            text: Teoría
+            text: Visión general
+          - href: bloque3/03b-rag-avanzado.qmd
+            text: RAG Avanzado
           - href: bloque3/03a-datos-sinteticos.qmd
             text: Datos Sintéticos
+          - href: bloque3/03c-fine-tuning.qmd
+            text: Fine-tuning eficiente
           - href: hpd4-rag-mixto.qmd
             text: "🔧 HPD 4 — RAG Mixto"
           - href: evaluables/hpd4-datos-sinteticos.qmd

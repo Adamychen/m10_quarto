@@ -28,7 +28,7 @@ m10_quarto/
 | **Inicio** | `index.qmd` (Presentación), `about.qmd` (Acerca de) |
 | **Bloque 1 — Fundamentos** | `01-fundamentos.qmd`, `01a-transformer.qmd`, `01b-llms.qmd`, `01c-embeddings.qmd`, `01d-vectordb.qmd`, `hpd1-embeddings.qmd`, `evaluables/hpd1-evaluables.qmd`, `evaluables/hpd1-extension.qmd` |
 | **Bloque 2 — Orquestación** | `02-orquestacion.qmd`, `hpd2-agente-tool-calling.qmd`, `hpd3-servidor-mcp.qmd` |
-| **Bloque 3 — Aplicaciones** | `03-aplicaciones.qmd`, `hpd4-rag-mixto.qmd` |
+| **Bloque 3 — Aplicaciones** | `03-aplicaciones.qmd`, `bloque3/03b-rag-avanzado.qmd`, `bloque3/03a-datos-sinteticos.qmd`, `bloque3/03c-fine-tuning.qmd`, `hpd4-rag-mixto.qmd`, `evaluables/hpd4-datos-sinteticos.qmd`, `evaluables/hpd4-datos-sinteticos-extension.qmd` |
 | **Bloque 4 — Gobernanza** | `04-gobernanza.qmd` |
 | **Evaluación** | `05-evaluacion.qmd` |
 | **Recursos** | `06-herramientas.qmd`, `07-bibliografia.qmd` |

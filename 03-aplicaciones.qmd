@@ -1,49 +1,101 @@
 ---
-title: "Bloque 3 — Aplicaciones: RAG, Datos Sintéticos y Fine-tuning"
+title: "Bloque 3 — Aplicaciones: RAG Avanzado, Datos Sintéticos y Fine-tuning"
 ---
 
 > **Carga:** HT: 6h | HPD: 4h
 >
 > **Competencias asociadas:** [CE-4](index.qmd#competencias-específicas), [CE-5](index.qmd#competencias-específicas)
 
-## Objetivos
+## Objetivos del bloque
 
-Implementar sistemas RAG de calidad producción, generar datos sintéticos útiles y aplicar técnicas de ajuste fino eficientes.
+Implementar sistemas RAG de calidad producción con evaluación objetiva, generar datos sintéticos validados estadísticamente, y aplicar técnicas de ajuste fino eficientes (LoRA/QLoRA) para adaptar modelos a dominios específicos.
 
-## Contenidos teóricos
+## Mapa conceptual del bloque
 
-### RAG avanzado
+```{mermaid}
+graph TD
+    subgraph "Aplicaciones"
+        A["RAG Avanzado<br/>re-ranking, evaluación, multi-fuente"] --> B["Sistemas RAG<br/>de producción"]
+        C["Datos Sintéticos<br/>CTGAN, TVAE, SDV"] --> D["Datasets aumentados<br/>y anonimizados"]
+        E["Fine-tuning<br/>LoRA, QLoRA, PEFT"] --> F["Modelos adaptados<br/>a tu dominio"]
 
-- Arquitectura naive vs. avanzada (re-ranking, query expansion, HyDE, RAG-Fusion)
-- RAG sobre datos estructurados: Text-to-SQL con validación
-- RAG sobre DataFrames
-- Evaluación de pipelines RAG con Ragas (faithfulness, answer relevancy, context precision)
+        B --> G["Proyecto integrador"]
+        D --> G
+        F --> G
+    end
+    style A fill:#4B8BBE,color:#fff
+    style C fill:#FFD43B,color:#000
+    style E fill:#e65100,color:#fff
+    style G fill:#2e7d32,color:#fff
+```
 
-### Generación de datos sintéticos
+Los tres pilares de este bloque son **complementarios y se refuerzan mutuamente**:
 
-Este tema tiene página propia por su extensión:
+- **RAG Avanzado** te enseña a construir sistemas de pregunta-respuesta robustos, con evaluación objetiva (RAGAS) y técnicas avanzadas (re-ranking, query expansion, multi-fuente).
+- **Datos Sintéticos** te permite generar datos de entrenamiento, testing o anonimización cuando los datos reales son insuficientes o sensibles.
+- **Fine-tuning** te permite adaptar modelos open-source a tu dominio específico cuando RAG y prompting no bastan.
 
-→ **[03a — Generación de Datos Sintéticos para Data Science](bloque3/03a-datos-sinteticos.qmd)**
+## Contenido del bloque
 
-Resumen:
-- **Enfoque intuitivo** con LLMs + JSON Schema (ya lo manejas del Bloque 2)
-- **Modelos especializados:** CTGAN, TVAE (GANs y VAEs para datos tabulares), TabDDPM (difusión)
-- **SDV (Synthetic Data Vault)** como framework unificado: entrena, genera y valida con una API común
-- **Validación estadística:** KS test, chi-cuadrado, comparación de correlaciones, PCA, utilidad downstream
+| Tema | Archivo | Duración estimada |
+|---|---|---|
+| **RAG Avanzado** — Re-ranking, HyDE, RAG-Fusion, RAGAS, multi-fuente | [bloque3/03b-rag-avanzado.qmd](bloque3/03b-rag-avanzado.qmd) | 3h |
+| **Datos Sintéticos** — CTGAN, TVAE, TabDDPM, SDV, validación estadística | [bloque3/03a-datos-sinteticos.qmd](bloque3/03a-datos-sinteticos.qmd) | 1.5h |
+| **Fine-tuning eficiente** — LoRA, QLoRA, PEFT, cuándo adaptar modelos | [bloque3/03c-fine-tuning.qmd](bloque3/03c-fine-tuning.qmd) | 1.5h |
+| **HPD 4 — Sistema RAG sobre datos mixtos** | [hpd4-rag-mixto.qmd](hpd4-rag-mixto.qmd) | 4h |
 
-→ **[📝 Ejercicios de datos sintéticos](evaluables/hpd4-datos-sinteticos.qmd)** (trabajo autónomo)
+## Ruta de aprendizaje recomendada
 
-### Fine-tuning eficiente (PEFT)
+```{mermaid}
+graph LR
+    A["1. RAG Avanzado"] --> B["2. Datos Sintéticos"]
+    A --> C["3. Fine-tuning"]
+    B --> D["🔧 HPD 4<br/>RAG Mixto"]
+    C --> D
+    D --> E["Proyecto integrador"]
 
-- LoRA y QLoRA: intuición matemática del rango bajo
-- Hiperparámetros clave: r, alpha, target_modules
-- Cuándo hacer fine-tuning vs. RAG vs. prompting
-- Infraestructura mínima: fine-tuning de modelo 7B en GPU de consumidor con Hugging Face TRL y bitsandbytes
+    style A fill:#4B8BBE,color:#fff
+    style B fill:#FFD43B,color:#000
+    style C fill:#e65100,color:#fff
+    style D fill:#306998,color:#fff
+    style E fill:#2e7d32,color:#fff
+```
 
-> **Lecturas obligatorias:**
-> - Es et al. (2023) — *RAGAS: Automated Evaluation of Retrieval Augmented Generation*
-> - Hu et al. (2022) — *LoRA: Low-Rank Adaptation of Large Language Models* (secciones 1-4)
+1. Empieza con **RAG Avanzado**: es el tema central del bloque y la base del HPD 4. Aprenderás a mejorar la calidad de tus sistemas RAG con re-ranking, query expansion y evaluación objetiva con RAGAS.
+2. Continúa con **Datos Sintéticos**: aprenderás a generar datos verosímiles con LLMs (enfoque intuitivo) y con modelos especializados (CTGAN, TVAE).
+3. Cierra con **Fine-tuning**: entenderás cuándo y cómo adaptar modelos open-source a tu dominio con LoRA/QLoRA.
+4. Ponlo todo en práctica con el **HPD 4**: construirás un sistema RAG completo sobre datos mixtos (PDFs + SQL) con evaluación RAGAS.
 
-## Taller práctico
+## Talleres prácticos
 
-- [HPD 4 — Sistema RAG sobre datos mixtos con evaluación](hpd4-rag-mixto.qmd)
+| HPD | Título | Enlace | Duración |
+|---|---|---|---|
+| **HPD 4** | Sistema RAG sobre datos mixtos con evaluación | [hpd4-rag-mixto.qmd](hpd4-rag-mixto.qmd) | 4h |
+
+## Lecturas obligatorias
+
+- Es, S. et al. (2023). **RAGAS: Automated Evaluation of Retrieval Augmented Generation**. [arXiv:2309.15217](https://arxiv.org/abs/2309.15217)
+- Hu, E. et al. (2022). **LoRA: Low-Rank Adaptation of Large Language Models**. ICLR. [arXiv:2106.09685](https://arxiv.org/abs/2106.09685) — secciones 1-4
+- Lewis, P. et al. (2020). **Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks**. NeurIPS. [arXiv:2005.11401](https://arxiv.org/abs/2005.11401)
+
+## Resumen del bloque
+
+```{mermaid}
+graph TD
+    subgraph "Bloque 3 — Lo que has aprendido"
+        A[RAG Avanzado] -->|Re-ranking + RAGAS| B[Sistemas RAG evaluados]
+        C[Datos Sintéticos] -->|CTGAN + validación| D[Datasets aumentados]
+        E[Fine-tuning] -->|LoRA + QLoRA| F[Modelos adaptados]
+    end
+    B --> G[Proyecto integrador]
+    D --> G
+    F --> G
+    G --> H["Bloque 4: Gobernanza y despliegue"]
+```
+
+Este bloque te da las herramientas para llevar tus sistemas IA a **calidad de producción**:
+
+- **Bloque 4:** evaluarás y desplegarás estos sistemas con gobernanza, detectando alucinaciones, sesgos y documentando con Model Cards.
+- **Proyecto integrador:** combinarás RAG + datos sintéticos + fine-tuning en un sistema completo de tu dominio.
+
+Ahora pasa al primer tema: **[RAG Avanzado](bloque3/03b-rag-avanzado.qmd)**.
