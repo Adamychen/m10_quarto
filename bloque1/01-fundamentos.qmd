@@ -24,7 +24,7 @@ Si el badge no funciona, abre [colab.research.google.com](https://colab.research
 
 ## Objetivos del bloque
 
-Comprender la arquitectura que subyace a los LLMs modernos y dominar la representación vectorial de texto y datos tabulares, así como las bases de datos vectoriales para búsqueda semántica.
+Comprender la arquitectura que subyace a los LLMs modernos y dominar la representación vectorial de texto y datos tabulares, así como las bases de datos vectoriales para búsqueda semántica y recuperación de información.
 
 ## Mapa conceptual del bloque
 
@@ -43,9 +43,11 @@ graph TD
     style E fill:#FFD43B,color:#000
 ```
 
-Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) son la base sobre la que se construye todo el módulo. El orden sigue una progresión lógica: primero entendemos cómo funciona la arquitectura Transformer, luego cómo escala a LLMs, después cómo representar significado mediante embeddings y finalmente cómo almacenar y buscar esos vectores de forma eficiente.
+Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos los fundamentos de la arquitectura Transformer, pasamos a exponer cómo esta arquitectura escala para construir los LLMs (en su forma más general), continuaremos con la representación de la información haciendo uso de vectores numéricos por medio de los embeddings y, finalmente, explicaremos algunos métodos para almacenar y recuperar esos vectores de representación de forma eficiente.
 
 ## Contenido del bloque
+
+La siguiente tabla muestra el itinerario que sigue este bloque en su exposición de objetivos, así como los ficheros interactivos asociados y el tiempo estimado necesario para la exposición de los mismos:
 
 | Tema | Archivo | Duración estimada |
 |---|---|---|
@@ -113,7 +115,7 @@ print(f"PyTorch: {torch.__version__}")
 
 ```{mermaid}
 graph TD
-    subgraph "Bloque 1 — Lo que has aprendido"
+    subgraph "Bloque 1"
         A[Transformer] -->|Arquitectura base| B[LLMs]
         A -->|Representación| C[Embeddings]
         B -->|Tokens + parámetros| D[Inferencia]
@@ -125,13 +127,13 @@ graph TD
     G --> H[Proyecto integrador]
 ```
 
-Este bloque sienta las bases para todo lo que viene:
+Este primer bloque sienta las bases para el resto de bloques que componen el curso. Concretamente:
 
-- **Bloque 2:** usarás LLMs para construir agentes y prompts estructurados
-- **Bloque 3:** con embeddings + vector DB construirás sistemas RAG
-- **Bloque 4:** evaluarás y desplegarás estos sistemas en producción
+- **Bloque 2:** uso de LLMs para construir agentes y prompts estructurados
+- **Bloque 3:** uso de embeddings + vector DB para construir sistemas RAG (recuperación de información)
+- **Bloque 4:** evaluación y despliegue de sistemas en producción
 
-Ahora pasa al [taller práctico: HPD 1 — Pipeline de embeddings y búsqueda semántica](../hpd1-embeddings.qmd).
+Tras haber asimilado los conceptos de las secciones anteriores, puedes pasar al [taller práctico: HPD 1 — Pipeline de embeddings y búsqueda semántica](../hpd1-embeddings.qmd).
 
 ::: {.callout-note}
 ## Antes de continuar
