@@ -5,7 +5,8 @@ engine: jupyter
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01a-transformer.ipynb)
 
-> Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda seguir el orden: Transformer → LLMs → Embeddings → Vector DB.
+> Este tema forma parte del **Bloque 1 — Fundamentos**. 
+> Se recomienda seguir el orden propuesto: Transformer → LLMs → Embeddings → Vector DB.
 
 ```{python}
 #| echo: true
@@ -36,14 +37,14 @@ print("Librerías cargadas correctamente.")
 
 ### El problema que resuelve
 
-Antes de Transformer, los modelos secuenciales dominaban el procesamiento de lenguaje: RNN, LSTM, GRU. Estos modelos procesan tokens uno tras otro, lo que:
-- Impide la paralelización (cada token depende del anterior)
-- Sufre desvanecimiento de gradiente en secuencias largas
-- Dificulta capturar dependencias de largo alcance
+Antes de la aparición del modelo Transformer, los modelos secuenciales dominaban el procesamiento de lenguaje (RNN, LSTM, GRU, etc.). Estos modelos se catalogan bajo el paraguas de **modelos secuenciales** por su forma de procesar los tokens, uno tras otro, de forma secuencial, lo que imponía ciertas restricciones:
+- Impide la paralelización (cada token depende del anterior).
+- Sufre desvanecimiento de gradiente en secuencias largas.
+- Dificulta capturar dependencias de largo alcance.
 
-La arquitectura **Transformer** (Vaswani et al., 2017) resolvió estos problemas introduciendo el **mecanismo de atención** como reemplazo de la recurrencia, permitiendo procesar todos los tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones.
+La arquitectura **Transformer** (Vaswani et al., 2017) resolvió estos problemas introduciendo el **mecanismo de atención** para reemplazar el **mecanisno de recurrencia** (limitada) usado hasta el momento, algo que permitió procesar un conjunto de tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones de ese conjunto de tokens.
 
-![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)](images/diagrama_transformer_original.webp)
+![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)](../images/diagrama_transformer_original.webp)
 
 ```{python}
 #| echo: true
@@ -89,19 +90,19 @@ plt.show()
 
 ### Atención multi-cabeza (Multi-Head Attention)
 
-El núcleo del Transformer es el mecanismo de **scaled dot-product attention**. Para cada token, se calculan tres vectores:
+El núcleo del Transformer se encuentra en el mecanismo de **scaled dot-product attention** (atención basada en el producto escalar). En este proceso, para cada token se calculan tres vectores numéricos, que *presuponen* el siguiente contenido semántico:
 
-- **Q (Query):** qué información busca este token
-- **K (Key):** qué información ofrece cada token
-- **V (Value):** el contenido real de cada token
+- **Q (Query):** qué información busca este token.
+- **K (Key):** qué información ofrece cada token.
+- **V (Value):** el contenido real de cada token.
 
-La atención se calcula como:
+A partir de estos, la atención se calcula como:
 
 $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
 
-El producto $Q·K^T$ mide la similitud entre cada par de tokens. El factor √d_k escala para evitar que los valores crezcan demasiado. La **multi-cabeza** ejecuta este proceso en paralelo con pesos distintos, permitiendo al modelo atender a diferentes relaciones simultáneamente (sintaxis, semántica, coreferencias...).
+donde el producto $Q·K^T$ mide la similitud entre cada par de tokens; el factor $\sqrt{d_k}$ sirve como escala normalizadora para evitar que los valores crezcan demasiado en módulo; la **multi-cabeza** ejecuta este proceso en paralelo con pesos distintos, permitiendo al modelo *atender* a diferentes relaciones simultáneamente (sintaxis, semántica, coreferencias, etc.).
 
-![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (Vaswani et al., 2017, Figure 2)](images/multi-head-attention.webp)
+![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (Vaswani et al., 2017, Figure 2)](../images/multi-head-attention.webp)
 
 #### Scaled Dot-Product Attention — Low Level (numpy)
 
