@@ -3,7 +3,7 @@ title: "03a — Generación de Datos Sintéticos para Data Science"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/03a-datos-sinteticos.ipynb)
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/03a-datos-sinteticos.ipynb)
 
 > Este tema forma parte del **Bloque 3 — Aplicaciones**. Se recomienda haber completado los [Bloques 1](../bloque1/01-fundamentos.qmd) y [2](../bloque2/02-orquestacion.qmd) primero, especialmente [Prompt Engineering](../bloque2/02a-prompt-engineering.qmd).
 
@@ -168,7 +168,7 @@ from sdv.metadata import SingleTableMetadata
 metadata = SingleTableMetadata()
 metadata.detect_from_dataframe(df_real)
 
-synthesizer = CTGANSynthesizer(metadata, epochs=100, batch_size=500, verbose=True)
+synthesizer = CTGANSynthesizer(metadata, epochs=600, batch_size=100, verbose=False)
 synthesizer.fit(df_real)
 
 df_sintetico_gan = synthesizer.sample(num_rows=2000)
@@ -193,15 +193,15 @@ Un **Variational Autoencoder (VAE)** aprende a comprimir cada fila de datos en u
 ```{mermaid}
 graph LR
     subgraph "Entrenamiento"
-        A[Dato real x] --> B[Encoder<br/>comprime a μ, σ]
-        B --> C[z ~ N(μ, σ²)]
-        C --> D[Decoder<br/>reconstruye x̂]
+        A[Dato real x] --> B["\text{Encoder<br/>comprime a } $$\mu, \sigma$$"]
+        B --> C["$$z \sim N(\mu, \sigma^2)$$"]
+        C --> D["\text{Decoder<br/>reconstruye } $$\hat{x}$$"]
         A --> E{Pérdida}
         D --> E
     end
 
     subgraph "Generación"
-        F[z ~ N(0, I)] --> G[Decoder<br/>entrenado]
+        F["$$z ~ N(0, I)$$"] --> G["Decoder<br/>entrenado"]
         G --> H[Dato sintético]
     end
 
@@ -212,8 +212,8 @@ graph LR
 
 - **Encoder:** comprime `x` (fila de 10 columnas) a `z` (vector de 2-3 dimensiones) + una varianza
 - **Decoder:** reconstruye `x̂` a partir de `z`
-- **Pérdida:** error de reconstrucción + KL divergence (para que `z` sea ~N(0,I))
-- **Generar:** muestrea `z ~ N(0,I)` y pásalo por el decoder
+- **Pérdida:** error de reconstrucción + KL divergence (para que `z` sea $~N(0,I)$)
+- **Generar:** muestrea $z \sim N(0,I)$ y pásalo por el decoder
 
 ### TVAE (Tabular VAE)
 
@@ -226,7 +226,7 @@ TVAE aplica la misma lógica que CTGAN al preprocesamiento de datos tabulares (m
 
 from sdv.single_table import TVAESynthesizer
 
-synthesizer_tvae = TVAESynthesizer(metadata, epochs=100, batch_size=500, verbose=True)
+synthesizer_tvae = TVAESynthesizer(metadata, epochs=600, batch_size=100, verbose=False)
 synthesizer_tvae.fit(df_real)
 
 df_sintetico_vae = synthesizer_tvae.sample(num_rows=2000)
@@ -241,19 +241,19 @@ print(f"Datos sintéticos TVAE: {df_sintetico_vae.shape[0]} filas")
 
 Los modelos de difusión funcionan en dos fases:
 
-1. **Forward (difusión):** tomas un dato real `x₀` y le añades ruido gaussiano progresivamente hasta convertirlo en ruido puro `x_T`.
-2. **Reverse (denoising):** entrenas una red neuronal para que aprenda a invertir el proceso: dado `x_t` (parcialmente ruidoso), predecir `x_{t-1}` (menos ruidoso).
+1. **Forward (difusión):** tomas un dato real $x_\theta$ y le añades ruido gaussiano progresivamente hasta convertirlo en ruido puro $x_T$.
+2. **Reverse (denoising):** entrenas una red neuronal para que aprenda a invertir el proceso: dado $x_t$ (parcialmente ruidoso), predecir $x_{t-1}$ (menos ruidoso).
 
 Para generar datos sintéticos: partes de ruido puro y aplicas el proceso inverso aprendido.
 
 ```{mermaid}
 graph LR
     subgraph "Forward: añadir ruido (fijo)"
-        X0["x₀ (dato real)"] --> X1["x₁ (+ ruido)"] --> X2["x₂ (+ más ruido)"] --> XT["x_T (ruido puro)"]
+        X0["$$x_0$$ \text{ (dato real)}"] --> X1["$$x_1$$ \text{ (+ ruido)}"] --> X2["$$x_2$$ \text{ (+ más ruido)}"] --> XT["$$x_T$$ \text{ (ruido puro)}"]
     end
 
-    subgraph "Reverse: eliminar ruido (aprendido por red neuronal)"
-        YT["x_T (ruido puro)"] --> Y2["x_{T-1}"] --> Y1["x₁"] --> Y0["x₀ (dato sintético)"]
+    subgraph "Reverse: eliminar ruido (aprendido)"
+        YT["$$x_T$$ \text{ (ruido puro)}"] --> Y2["$$x_{T-1}$$"] --> Y1["$$x_1$$"] --> Y0["$$x_0$$ (dato sintético)"]
     end
 
     style X0 fill:#2e7d32,color:#fff
@@ -280,14 +280,14 @@ SDV unifica todo bajo una API común. El flujo es siempre el mismo:
 
 ```{mermaid}
 graph LR
-    A[1. Dataset real] --> B[2. Metadata<br/>detecta tipos]
-    B --> C[3. Elegir modelo<br/>CTGAN / TVAE / CopulaGAN]
-    C --> D[4. Entrenar<br/>synthesizer.fit()]
-    D --> E[5. Generar<br/>synthesizer.sample()]
-    E --> F[6. Validar<br/>evaluate() + KS test]
-    F --> G{¿Métricas ok?}
-    G -->|Sí| H[✅ Usar datos sintéticos]
-    G -->|No| I[Ajustar epochs, batch_size, probar otro modelo]
+    A["1. Dataset real"] --> B["2. Metadata<br/>detecta tipos"]
+    B --> C["3. Elegir modelo<br/>CTGAN / TVAE / CopulaGAN"]
+    C --> D["4. Entrenar<br/>synthesizer.fit()"]
+    D --> E["5. Generar<br/>synthesizer.sample()"]
+    E --> F["6. Validar<br/>evaluate() + KS test"]
+    F --> G{"¿Métricas ok?"}
+    G -->|Sí| H["✅ Usar datos sintéticos"]
+    G -->|No| I["Ajustar epochs, batch_size, probar otro modelo"]
     I --> C
 
     style A fill:#4B8BBE,color:#fff
