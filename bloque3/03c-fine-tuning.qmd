@@ -129,19 +129,19 @@ graph TD
 ```{mermaid}
 graph TD
     subgraph "Modelo original (congelado)"
-        X["Entrada x"] --> W["Matriz W<br/>(d × d, congelada)"]
-        W --> WX["Wx"]
+        X["Entrada $$x$$"] --> W["Matriz $$W$$<br/>($$d \times d$$, congelada)"]
+        W --> WX["$$Wx$$"]
     end
 
     subgraph "Adaptadores LoRA (entrenables)"
-        X --> A["Matriz A<br/>(d × r, r << d)"]
-        A --> B["Matriz B<br/>(r × d)"]
-        B --> BAX["BAx"]
+        X --> A["Matriz $$A$$<br/>($$d \times r$$, $$r \ll d$$)"]
+        A --> B["Matriz $$B$$<br/>($$r \times d$$)"]
+        B --> BAX["$$BAx$$"]
     end
 
-    WX --> SUM["+"]
+    WX --> SUM["$$+$$"]
     BAX --> SUM
-    SUM --> OUT["Salida: Wx + BAx"]
+    SUM --> OUT["Salida: $$Wx + BAx$$"]
 
     style W fill:#306998,color:#fff
     style A fill:#e65100,color:#fff
