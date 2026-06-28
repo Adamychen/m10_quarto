@@ -3,6 +3,8 @@ title: "HPD 3 — Ejercicios evaluables: Servidor MCP"
 engine: jupyter
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/hpd3-evaluables.ipynb)
+
 > **Peso en la nota:** 7.5 % (parte del 30 % de entregas prácticas)
 >
 > **Plazo:** 7 días tras la sesión presencial.

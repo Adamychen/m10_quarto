@@ -57,7 +57,9 @@ La siguiente tabla muestra el itinerario que sigue este bloque en su exposición
 | **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica | [01d-vectordb.qmd](01d-vectordb.qmd) | 1h |
 | **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](../evaluables/hpd1-embeddings.qmd) | 4h |
 
-> Los temas marcados con 🔷 son teoría obligatoria. Puedes profundizar en cada uno según tu interés.
+::: {.callout-note}
+**Teoría obligatoria.** Los temas listados arriba son obligatorios. Puedes profundizar en cada uno según tu interés.
+:::
 
 ```{python}
 #| echo: true

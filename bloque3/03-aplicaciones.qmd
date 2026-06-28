@@ -50,7 +50,7 @@ Los tres pilares de este bloque son **complementarios y se refuerzan mutuamente*
 graph LR
     A["1. RAG Avanzado"] --> B["2. Datos Sintéticos"]
     A --> C["3. Fine-tuning"]
-    B --> D["🔧 HPD 4<br/>RAG Mixto"]
+    B --> D["HPD 4<br/>RAG Mixto"]
     C --> D
     D --> E["Proyecto integrador"]
 

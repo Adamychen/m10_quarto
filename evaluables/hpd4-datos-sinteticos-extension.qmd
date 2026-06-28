@@ -3,6 +3,8 @@ title: "Extensión — Datos Sintéticos (ejercicios avanzados)"
 engine: jupyter
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/hpd4-datos-sinteticos-extension.ipynb)
+
 > **Peso en la nota:** 7.5 % extra (parte del 30 % de entregas prácticas)
 >
 > **Plazo:** 14 días tras la sesión presencial del Bloque 3.

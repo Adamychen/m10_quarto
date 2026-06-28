@@ -62,8 +62,8 @@ graph LR
     C --> D["4. MCP"]
     B --> E["5. Agentes<br/>Inteligentes"]
     D --> E
-    E --> F["🔧 HPD 2<br/>Tool Calling"]
-    D --> G["🔧 HPD 3<br/>Servidor MCP"]
+    E --> F["HPD 2<br/>Tool Calling"]
+    D --> G["HPD 3<br/>Servidor MCP"]
     
     style A fill:#4B8BBE,color:#fff
     style E fill:#2e7d32,color:#fff

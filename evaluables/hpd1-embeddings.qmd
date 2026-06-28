@@ -124,7 +124,7 @@ def crear_pdf(nombre: str, titulo: str, contenido: str) -> None:
     pdf.set_font("Helvetica", "", 11)
     pdf.multi_cell(0, 6, contenido)
     pdf.output(os.path.join(CORPUS_SINTETICO, nombre))
-    print(f"  ✓ {nombre}")
+    print(f"  ✅ {nombre}")
 
 # Descargar abstracts de ArXiv
 arxiv_client = arxiv.Client()
@@ -135,7 +135,7 @@ abstracts = {}
 for paper in arxiv_client.results(search):
     aid = paper.get_short_id().split("v")[0]
     abstracts[aid] = (paper.title, paper.summary.replace("\n", " ").strip())
-    print(f"  ✓ {aid}: {paper.title[:70]}...")
+    print(f"  ✅ {aid}: {paper.title[:70]}...")
 
 # Construir el corpus con los abstracts
 corpus = {
@@ -385,7 +385,7 @@ res = collection_tab.query(
     query_embeddings=[model.encode("empleados senior de I+D").tolist()],
     n_results=2
 )
-print("\n🔎 Búsqueda: 'empleados senior de I+D'")
+print("\nBúsqueda: 'empleados senior de I+D'")
 for doc, dist in zip(res["documents"][0], res["distances"][0]):
     print(f"  {doc[:80]}... (dist: {dist:.4f})")
 ```
@@ -506,7 +506,7 @@ for k in [1, 3, 5]:
 client.delete_collection("hpd1_sintetico")
 client.delete_collection("hpd1_tabular")
 shutil.rmtree(CORPUS_SINTETICO)
-print("✓ Parte 1 limpiada (colecciones + corpus temporal eliminados)")
+print("✅ Parte 1 limpiada (colecciones + corpus temporal eliminados)")
 ```
 
 ---
@@ -549,7 +549,7 @@ for arxiv_id, descripcion in PAPERS.items():
     try:
         ruta = descargar_paper(arxiv_id, CORPUS_REAL)
         size_kb = os.path.getsize(ruta) / 1024
-        print(f"  ✓ {arxiv_id}: {descripcion[:60]}... ({size_kb:.0f} KB)")
+        print(f"  ✅ {arxiv_id}: {descripcion[:60]}... ({size_kb:.0f} KB)")
     except Exception as e:
         print(f"  ⚠️ {arxiv_id}: descarga fallida ({e}) — continuando con abstracts pre-guardados")
         # Si no se pueden descargar los PDFs, usamos abstracts inline
@@ -628,12 +628,12 @@ consultas = [
 for query in consultas:
     res = buscar(collection_real, query, k=3)
     if not res["ids"][0]:
-        print(f"\n🔎 {query}\n   → sin resultados")
+        print(f"\n{query}\n   → sin resultados")
         continue
     top_id = res["ids"][0][0]
     top_dist = res["distances"][0][0]
     top_text = res["documents"][0][0][:120]
-    print(f"\n🔎 {query}")
+    print(f"\n{query}")
     print(f"   → {top_id}  (distancia: {top_dist:.4f})")
     print(f"   {top_text}...")
 ```
@@ -682,7 +682,7 @@ for k in [1, 3, 5]:
 ## 2.5 Evaluación MTEB — Validación profesional del modelo
 
 ::: {.callout-note icon=false}
-## ⏱️ Tiempo estimado: 20-30 minutos
+## Tiempo estimado: 20-30 minutos
 
 Esta sección descarga benchmarks públicos y evalúa el modelo. No es necesaria
 para completar el entregable del HPD 1, pero te da criterio profesional para
@@ -750,7 +750,7 @@ for task_result in results:
 print("Limpiando recursos temporales...")
 client.delete_collection("hpd1_real")
 shutil.rmtree(BASE_DIR)
-print("✓ Limpieza completada (colecciones efímeras + corpus temporal eliminados)")
+print("✅ Limpieza completada (colecciones efímeras + corpus temporal eliminados)")
 ```
 
 ---
@@ -769,7 +769,9 @@ Estos ejercicios no se entregan, pero te preparan para las entregas HPD y para e
 
 Escribe un texto de ~300 palabras sobre *fine-tuning con LoRA* y añádelo al diccionario `corpus` de la Parte 1 como `"04_lora.pdf"`. Re-ejecuta el pipeline y comprueba que una query como *"¿Cómo se reduce el número de parámetros?"* recupera chunks de tu nuevo documento.
 
-> 🎯 *Objetivo: entender que el pipeline es genérico — si el corpus cambia, el sistema se adapta solo.*
+::: {.callout-note}
+**Objetivo:** entender que el pipeline es genérico — si el corpus cambia, el sistema se adapta solo.
+:::
 
 ---
 
@@ -779,7 +781,9 @@ Modifica `CHUNK_SIZE` y `CHUNK_OVERLAP` en 3 combinaciones (por ejemplo: `200/30
 
 ¿Qué combinación funciona mejor? ¿Por qué crees que ocurre?
 
-> 🎯 *Objetivo: desarrollar criterio sobre cómo elegir el tamaño de chunk según el caso de uso.*
+::: {.callout-note}
+**Objetivo:** desarrollar criterio sobre cómo elegir el tamaño de chunk según el caso de uso.
+:::
 
 ---
 
@@ -787,7 +791,9 @@ Modifica `CHUNK_SIZE` y `CHUNK_OVERLAP` en 3 combinaciones (por ejemplo: `200/30
 
 Sustituye `intfloat/e5-small-v2` por `all-MiniLM-L6-v2` (22M parámetros, disponible en Sentence-Transformers). Repite el recall@k en la Parte 1. ¿Mejora o empeora? ¿Merece la pena usar un modelo más pequeño?
 
-> 🎯 *Objetivo: comparar modelos y desarrollar criterio de selección.*
+::: {.callout-note}
+**Objetivo:** comparar modelos y desarrollar criterio de selección.
+:::
 
 ---
 
@@ -795,7 +801,9 @@ Sustituye `intfloat/e5-small-v2` por `all-MiniLM-L6-v2` (22M parámetros, dispon
 
 Para el corpus real (ArXiv), lee el abstract de 2 papers de la lista y escribe 3 queries nuevas con sus chunks relevantes esperados. Ejecuta recall@k sobre tus queries y compara los resultados con el ground truth del profesor.
 
-> 🎯 *Objetivo: entender que el ground truth no es automático — requiere juicio humano.*
+::: {.callout-note}
+**Objetivo:** entender que el ground truth no es automático — requiere juicio humano.
+:::
 
 ---
 
@@ -834,8 +842,9 @@ recall@k sobre tu propio ground truth.
 ¿Qué observas? ¿El recall es similar al de los papers de ML? ¿El dominio afecta
 a la calidad de la búsqueda semántica? ¿Por qué?
 
-> 🎯 *Objetivo: comprobar que el pipeline es independiente del dominio. Lo que
-> aprendes aquí se aplica a tu sector profesional.*
+::: {.callout-note}
+**Objetivo:** comprobar que el pipeline es independiente del dominio. Lo que aprendes aquí se aplica a tu sector profesional.
+:::
 
 :::
 

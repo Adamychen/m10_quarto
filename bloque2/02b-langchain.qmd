@@ -3,6 +3,8 @@ title: "02b — LangChain: Cadenas, Memoria y Recuperación"
 engine: jupyter
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/02b-langchain.ipynb)
+
 > Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber visto [Prompt Engineering](02a-prompt-engineering.qmd) primero.
 
 ```{python}

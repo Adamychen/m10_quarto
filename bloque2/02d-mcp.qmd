@@ -3,6 +3,8 @@ title: "02d — Model Context Protocol (MCP)"
 engine: jupyter
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/02d-mcp.ipynb)
+
 > Este tema forma parte del **Bloque 2 — Orquestación**. Aquí se aprende a exponer datos y herramientas a LLMs de forma estandarizada con MCP.
 
 ```{python}
@@ -26,34 +28,54 @@ print("Librerías cargadas correctamente.")
 
 ### El problema que resuelve
 
-Imagina que tienes 5 fuentes de datos distintas (una base de datos SQLite, una API REST de CRM, archivos CSV locales, Google Drive, un servicio meteorológico). Conectar todas a un LLM implica escribir un adaptador personalizado para cada una. Cada framework (LangChain, LlamaIndex, OpenAI...) tiene su propia forma de definir herramientas. Resultado: **un lío de integraciones ad hoc que no escalan**.
 
-**MCP** es un protocolo abierto (liderado por Anthropic) que estandariza cómo los LLMs se conectan a herramientas y fuentes de datos externas. Funciona como un "USB-C para LLMs": una interfaz única para todo.
+Conectar un LLM a múltiples fuentes de datos (SQLite, APIs REST, CSV, Google Drive, un servicio meteorológico) requiere un adaptador por cada combinación de fuente y framework. Con 5 fuentes y 5 frameworks distintos, eso son 5 × 5 = 25 adaptadores. En la práctica, cada fuente expone varios métodos, por lo que el número crece todavía más. Es el problema $n \times m$.
+
+Para resolverlo, Anthropic impulsó el Model Context Protocol (MCP), un protocolo abierto que estandariza la conexión entre LLMs y fuentes externas. Funciona como un "USB-C para LLMs": una interfaz única para todo. Con MCP, el número de adaptadores se reduce a $n + m$, ya que las fuentes se conectan a través de un servidor MCP común y solo hace falta un adaptador por modelo.
+
 
 ```{mermaid}
-graph TD
-    subgraph "Sin MCP — M×N integraciones"
-        L1[Claude] --> T1[(BD)]
-        L1 --> T2[API REST]
-        L2[Qwen] --> T1
-        L2 --> T2
-        L3[GPT] --> T1
-        L3 --> T2
+graph TB
+    subgraph "Sin MCP — M×N integraciones ad hoc (9 conexiones)"
+        direction LR
+        L1[Claude] --- D1[(BD)]
+        L1 --- D2[API REST]
+        L1 --- D3[CSV]
+        L2[Qwen] --- D1
+        L2 --- D2
+        L2 --- D3
+        L3[GPT] --- D1
+        L3 --- D2
+        L3 --- D3
     end
 
-    subgraph "Con MCP — N+M integraciones"
-        LC[Claude] --> MC[MCP Server BD]
-        LC --> MR[MCP Server API]
-        LQ[Qwen] --> MC
-        LQ --> MR
-        LG[GPT] --> MC
-        LG --> MR
+    subgraph "Con MCP — M+N integraciones estandarizadas (6 implementaciones)"
+        direction TB
+        LC[Claude<br/>+ MCP Client]
+        LQ[Qwen<br/>+ MCP Client]
+        LG[GPT<br/>+ MCP Client]
+        PROTO{{"Protocolo MCP<br/>Tools · Resources · Prompts"}}
+        S1[MCP Server · BD]
+        S2[MCP Server · API]
+        S3[MCP Server · CSV]
+        LC <--> PROTO
+        LQ <--> PROTO
+        LG <--> PROTO
+        PROTO <--> S1
+        PROTO <--> S2
+        PROTO <--> S3
     end
 
     style L1 fill:#4B8BBE,color:#fff
+    style L2 fill:#4B8BBE,color:#fff
+    style L3 fill:#4B8BBE,color:#fff
     style LC fill:#2e7d32,color:#fff
-    style MC fill:#e65100,color:#fff
-    style MR fill:#e65100,color:#fff
+    style LQ fill:#2e7d32,color:#fff
+    style LG fill:#2e7d32,color:#fff
+    style S1 fill:#e65100,color:#fff
+    style S2 fill:#e65100,color:#fff
+    style S3 fill:#e65100,color:#fff
+    style PROTO fill:#FFD43B,color:#000,stroke:#000,stroke-width:2px
 ```
 
 ### Arquitectura de MCP
@@ -264,7 +286,7 @@ Cada servidor MCP es una **superficie de ataque**. El LLM escribe el input de la
 graph TD
     A[Usuario malicioso<br/>inyecta comandos en el prompt] --> B[LLM<br/>genera query alterada]
     B --> C[Servidor MCP<br/>¿valida?]
-    C -->|Sin validación| D[💀 Ejecuta<br/>DROP TABLE]
+    C -->|Sin validación| D["Ejecuta<br/>DROP TABLE"]
     C -->|Con validación| E[✅ Bloquea<br/>y notifica]
 
     style A fill:#c62828,color:#fff
@@ -408,7 +430,7 @@ graph TD
     D --> G
     F --> G
 
-    H[🛡️ Sanitización<br/>+ límites + logs] -.-> D
+    H[Sanitización<br/>+ límites + logs] -.-> D
 
     style A fill:#4B8BBE,color:#fff
     style B fill:#306998,color:#fff

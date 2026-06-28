@@ -541,7 +541,7 @@ if not LLM_KEY:
     print("⚠️  Configura LLM_API_KEY en .env.")
 else:
     pregunta = "¿Qué productos de Hogar y Oficina tienen problemas de stock?"
-    print(f"🔹 PREGUNTA: {pregunta}\n")
+    print(f"PREGUNTA: {pregunta}\n")
     # resultado = rag(pregunta)
     # print(f"RESPUESTA: {resultado['respuesta']}")
     # print(f"\nFuentes usadas ({len(resultado['fuentes'])}):")
@@ -762,7 +762,9 @@ Estos ejercicios no se entregan, pero te preparan para las entregas HPD y el pro
 
 Ejecuta el pipeline con `CHUNK_SIZE = 200, 600` (mantén overlap al 15%). Para cada uno, mide las 3 métricas de RAGAS. ¿Qué tamaño funciona mejor para este corpus? ¿Por qué?
 
-> 🎯 *Objetivo: interiorizar que el chunk size es el hiperparámetro más impactante en RAG.*
+::: {.callout-note}
+**Objetivo:** interiorizar que el chunk size es el hiperparámetro más impactante en RAG.
+:::
 
 ---
 
@@ -770,7 +772,9 @@ Ejecuta el pipeline con `CHUNK_SIZE = 200, 600` (mantén overlap al 15%). Para c
 
 Ejecuta el RAG con `usar_reranker=True` y `usar_reranker=False` sobre las mismas 5 preguntas de la batería. Compara las métricas RAGAS. ¿En qué tipo de preguntas marca más diferencia el re-ranker?
 
-> 🎯 *Objetivo: decidir con datos si el coste extra del re-ranker merece la pena.*
+::: {.callout-note}
+**Objetivo:** decidir con datos si el coste extra del re-ranker merece la pena.
+:::
 
 ---
 
@@ -778,7 +782,9 @@ Ejecuta el RAG con `usar_reranker=True` y `usar_reranker=False` sobre las mismas
 
 Escribe 3 preguntas originales que no estén en la lista `preguntas_eval`. Para cada una, define manualmente la respuesta esperada (`ground_truth`). Evalúa con RAGAS. ¿Tus preguntas obtienen mejor o peor score que las del profesor? ¿Por qué?
 
-> 🎯 *Objetivo: entender que la calidad del ground truth condiciona la evaluación.*
+::: {.callout-note}
+**Objetivo:** entender que la calidad del ground truth condiciona la evaluación.
+:::
 
 ---
 

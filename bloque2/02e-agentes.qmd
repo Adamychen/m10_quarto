@@ -3,6 +3,8 @@ title: "02e — Diseño de Agentes Inteligentes"
 engine: jupyter
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/02e-agentes.ipynb)
+
 > Este tema forma parte del **Bloque 2 — Orquestación**. Aquí unimos todos los conceptos anteriores: prompts, herramientas, memoria y orquestación para construir agentes autónomos.
 
 ```{python}

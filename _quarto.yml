@@ -35,11 +35,11 @@ website:
           - href: bloque1/01d-vectordb.qmd
             text: Bases de datos vectoriales
           - href: evaluables/hpd1-embeddings.qmd
-            text: "🔧 HPD 1 — Embeddings"
+            text: "HPD 1 — Embeddings"
           - href: evaluables/hpd1-evaluables.qmd
-            text: "📝 Ejercicios evaluables HPD 1"
+            text: "Ejercicios evaluables HPD 1"
           - href: evaluables/hpd1-extension.qmd
-            text: "⭐ Extensión HPD 1"
+            text: "Extensión HPD 1"
       - section: "Bloque 2 — Orquestación"
         contents:
           - href: bloque2/02-orquestacion.qmd
@@ -55,17 +55,17 @@ website:
           - href: bloque2/02e-agentes.qmd
             text: Agentes Inteligentes
           - href: bloque2/hpd2-agente-tool-calling.qmd
-            text: "🔧 HPD 2 — Agente Tool Calling"
+            text: "HPD 2 — Agente Tool Calling"
           - href: evaluables/hpd2-evaluables.qmd
-            text: "📝 Ejercicios evaluables HPD 2"
+            text: "Ejercicios evaluables HPD 2"
           - href: evaluables/hpd2-extension.qmd
-            text: "⭐ Extensión HPD 2"
+            text: "Extensión HPD 2"
           - href: bloque2/hpd3-servidor-mcp.qmd
-            text: "🔧 HPD 3 — Servidor MCP"
+            text: "HPD 3 — Servidor MCP"
           - href: evaluables/hpd3-evaluables.qmd
-            text: "📝 Ejercicios evaluables HPD 3"
+            text: "Ejercicios evaluables HPD 3"
           - href: evaluables/hpd3-extension.qmd
-            text: "⭐ Extensión HPD 3"
+            text: "Extensión HPD 3"
       - section: "Bloque 3 — Aplicaciones"
         contents:
           - href: bloque3/03-aplicaciones.qmd
@@ -77,11 +77,11 @@ website:
           - href: bloque3/03c-fine-tuning.qmd
             text: Fine-tuning eficiente
           - href: evaluables/hpd4-rag-mixto.qmd
-            text: "🔧 HPD 4 — RAG Mixto"
+            text: "HPD 4 — RAG Mixto"
           - href: evaluables/hpd4-datos-sinteticos.qmd
-            text: "📝 Ejercicios — Datos Sintéticos"
+            text: "Ejercicios — Datos Sintéticos"
           - href: evaluables/hpd4-datos-sinteticos-extension.qmd
-            text: "⭐ Extensión — Datos Sintéticos"
+            text: "Extensión — Datos Sintéticos"
       - section: "Bloque 4 — Gobernanza"
         contents:
           - href: bloque4/04-gobernanza.qmd

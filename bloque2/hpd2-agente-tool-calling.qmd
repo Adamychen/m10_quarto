@@ -457,7 +457,9 @@ Crea `@tool resumen_estadistico(columna: str)` que devuelva media, mediana, desv
 
 Prueba que tu agente la usa correctamente con preguntas como *"¿Cuál es el resumen estadístico de la columna fare?"*
 
-> 🎯 *Objetivo: entender que añadir herramientas es trivial si están bien documentadas — el agente aprende a usarlas solo.*
+::: {.callout-note}
+**Objetivo:** entender que añadir herramientas es trivial si están bien documentadas — el agente aprende a usarlas solo.
+:::
 
 ---
 
@@ -467,7 +469,9 @@ Modifica el `SYSTEM_PROMPT` para que el agente actúe como **guía turístico de
 
 Ejecuta las mismas 5 preguntas. ¿Cómo cambian las respuestas?
 
-> 🎯 *Objetivo: comprobar que el system prompt controla el comportamiento del agente.*
+::: {.callout-note}
+**Objetivo:** comprobar que el system prompt controla el comportamiento del agente.
+:::
 
 ---
 

@@ -3,6 +3,8 @@ title: "02a — Prompt Engineering Avanzado"
 engine: jupyter
 ---
 
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/02a-prompt-engineering.ipynb)
+
 > Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber completado el [Bloque 1](../bloque1/01-fundamentos.qmd) primero.
 
 ```{python}
@@ -372,7 +374,7 @@ Reglas:
         datos = parse_json_response(respuesta.choices[0].message.content)
         df = pd.DataFrame(datos["clientes"])
         print(df.to_string(index=False))
-        print(f"\n📊 {len(df)} registros generados")
+        print(f"\n{len(df)} registros generados")
         print(f"   Edad: {df['edad'].min()}-{df['edad'].max()} (media {df['edad'].mean():.0f})")
         print(f"   Ingresos: {df['ingresos_anuales'].min():.0f}-{df['ingresos_anuales'].max():.0f} (media {df['ingresos_anuales'].mean():.0f})")
     except (json.JSONDecodeError, KeyError) as e:

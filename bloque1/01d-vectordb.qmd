@@ -18,10 +18,17 @@ engine: jupyter
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 import os
+
+# Workaround para conflicto de OpenMP en macOS ARM64 (PyTorch + sklearn + FAISS
+# cargan múltiples libomp.dylib que entran en conflicto durante clustering,
+# causando SIGSEGV). Ver ~/Library/Logs/DiagnosticReports/Python-*.ips
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
+os.environ["OMP_NUM_THREADS"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
+
 import warnings
 warnings.filterwarnings("ignore")
 import numpy as np
@@ -116,7 +123,7 @@ Siempre **normaliza los embeddings** (||v|| = 1). Con embeddings normalizados, c
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 def cosine_sim(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
@@ -145,7 +152,7 @@ Chroma es una base de datos vectorial embebida que funciona en local sin servido
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 import chromadb
 from chromadb.config import Settings
@@ -170,7 +177,7 @@ print(f"Total de documentos hasta ahora: {collection.count()}")
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Cargar modelo de embeddings
 model = SentenceTransformer("all-MiniLM-L6-v2")
@@ -200,7 +207,7 @@ print(f"Documentos insertados: {collection.count()}")
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 # Búsqueda semántica
 query = "How do current models process sequences?"
@@ -212,8 +219,9 @@ resultados = collection.query(
 )
 
 print(f"Consulta: {query}\n")
-for i, (doc, score) in enumerate(zip(resultados["documents"][0], resultados["distances"][0])):
-    print(f"{i+1}. [{score:.4f}] {doc}")
+for i, (doc, dist) in enumerate(zip(resultados["documents"][0], resultados["distances"][0])):
+    sim = 1 - dist
+    print(f"{i+1}. [sim={sim:.4f}] {doc}")
 
 
 ```
@@ -224,7 +232,7 @@ FAISS (Facebook AI Similarity Search) es una librería de indexación ANN embebi
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
 
 import faiss
 

@@ -232,7 +232,7 @@ print(f"   Proyectos con horas: {len(set(h[2] for h in horas_data))}")
 ```{python}
 #| echo: true
 
-# 📊 Explorar el schema
+# Explorar el schema
 print("=" * 60)
 print("SCHEMA — Base de datos corporativa")
 print("=" * 60)
@@ -591,7 +591,7 @@ print("✅ Función preguntar_al_llm definida.")
 ```
 
 ::: {.callout-warning}
-## ⏱️ Esta es la celda más compleja del taller
+## Esta es la celda más compleja del taller
 
 Implementar el bucle de tool calling a mano requiere gestionar `tool_calls`, ejecutar
 las tools y reinyectar los resultados en el historial. El patrón es idéntico al que
@@ -608,7 +608,7 @@ else:
     print("=== Probando cliente LLM + MCP ===\n")
 
     pregunta = "¿Cuántos empleados hay en el departamento de I+D?"
-    print(f"🔹 PREGUNTA: {pregunta}")
+    print(f"PREGUNTA: {pregunta}")
     # respuesta = preguntar_al_llm(pregunta)
     # print(f"   RESPUESTA: {respuesta}")
     print("   ⚠️  Descomenta cuando hayas implementado preguntar_al_llm().")
@@ -624,7 +624,7 @@ Cada tool MCP es una **superficie de ataque**. El LLM recibe input del usuario, 
 graph TD
     A[Usuario malicioso<br/>inyecta comandos en el prompt] --> B[LLM<br/>genera query alterada]
     B --> C[Servidor MCP<br/>¿valida?]
-    C -->|"Sin validación"| D["💀 Ejecuta<br/>DROP TABLE"]
+    C -->|"Sin validación"| D["Ejecuta<br/>DROP TABLE"]
     C -->|"Con validación"| E["✅ Bloquea<br/>y notifica"]
 
     style A fill:#c62828,color:#fff
@@ -715,16 +715,23 @@ print("⚠️  Implementa el límite de filas en consultar_sql.")
 ::: {.callout-warning}
 ## Rellena este checklist
 
-Marca con ✅ lo que has implementado y ✏️ lo que añadirías en producción:
+Marca con ✅ lo que has implementado (los que queden vacíos son mitigaciones que añadirías en producción):
 
-| Riesgo | Implementado | Mitigación |
-|---|---|---|
-| SQL Injection vía prompt | ✏️ | Solo permitir SELECT, sanitizar query |
-| Data leakage (demasiadas filas) | ✏️ | Limitar a 30 filas, 2000 caracteres |
-| Path traversal (si expusieras archivos) | ✏️ | Validar rutas con `os.path.abspath` |
-| Denegación de servicio | ✏️ | Timeout en queries (máx. 5s) |
-| Acceso no autorizado | ✏️ | API keys en transporte, logs de auditoría |
-| Escalada de privilegios | ✏️ | Cada tool accede solo a lo que necesita |
+| Riesgo | Mitigación |
+|---|---|
+| SQL Injection vía prompt | Solo permitir SELECT, sanitizar query |
+| Data leakage (demasiadas filas) | Limitar a 30 filas, 2000 caracteres |
+| Path traversal (si expusieras archivos) | Validar rutas con `os.path.abspath` |
+| Denegación de servicio | Timeout en queries (máx. 5s) |
+| Acceso no autorizado | API keys en transporte, logs de auditoría |
+| Escalada de privilegios | Cada tool accede solo a lo que necesita |
+
+- [ ] SQL Injection vía prompt
+- [ ] Data leakage (demasiadas filas)
+- [ ] Path traversal (si expusieras archivos)
+- [ ] Denegación de servicio
+- [ ] Acceso no autorizado
+- [ ] Escalada de privilegios
 :::
 
 ::: {.callout-tip}
@@ -825,7 +832,7 @@ graph TD
     E --> I
     F --> I
 
-    J[🛡️ Sanitización<br/>+ límite filas<br/>+ logs] -.-> D
+    J[Sanitización<br/>+ límite filas<br/>+ logs] -.-> D
 
     style A fill:#4B8BBE,color:#fff
     style B fill:#306998,color:#fff
@@ -854,7 +861,9 @@ Estos ejercicios no se entregan, pero te preparan para el HPD 3 evaluable y el p
 
 Crea `@mcp.tool() empleados_por_departamento(departamento: str)` que devuelva la lista de empleados de un departamento con formato: `nombre | salario | antiguedad_años`. Si el departamento no existe, devuelve un mensaje con los departamentos disponibles.
 
-> 🎯 *Objetivo: entender que añadir tools especializadas reduce la carga del LLM (no necesita escribir SQL para consultas simples).*
+::: {.callout-note}
+**Objetivo:** entender que añadir tools especializadas reduce la carga del LLM (no necesita escribir SQL para consultas simples).
+:::
 
 ---
 
@@ -862,7 +871,9 @@ Crea `@mcp.tool() empleados_por_departamento(departamento: str)` que devuelva la
 
 Crea `@mcp.resource("presupuesto://total")` que devuelva el presupuesto total de todos los proyectos + desglose por departamento.
 
-> 🎯 *Objetivo: distinguir tools (acciones que modifican o consultan con parámetros) de resources (datos estáticos de solo lectura).*
+::: {.callout-note}
+**Objetivo:** distinguir tools (acciones que modifican o consultan con parámetros) de resources (datos estáticos de solo lectura).
+:::
 
 ---
 
@@ -875,7 +886,9 @@ Cambia el mensaje `system` de `preguntar_al_llm()` para que el asistente:
 
 Prueba con 3 preguntas y compara el comportamiento con el prompt original.
 
-> 🎯 *Objetivo: comprobar que el system prompt es tu primera línea de defensa.*
+::: {.callout-note}
+**Objetivo:** comprobar que el system prompt es tu primera línea de defensa.
+:::
 
 ---
 
