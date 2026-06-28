@@ -49,7 +49,7 @@ else:
 
 ### De RAG naive a RAG avanzado
 
-En el [HPD 1](../hpd1-embeddings.qmd) construiste un pipeline RAG básico: cargar PDFs, trocearlos en chunks, generar embeddings, indexar en Chroma y buscar por similitud coseno. Funciona, pero tiene limitaciones:
+En el [HPD 1](../evaluables/hpd1-embeddings.qmd) construiste un pipeline RAG básico: cargar PDFs, trocearlos en chunks, generar embeddings, indexar en Chroma y buscar por similitud coseno. Funciona, pero tiene limitaciones:
 
 - El retriever semántico (bi-encoder) es **rápido pero impreciso**: confunde frases con palabras similares pero significado distinto
 - No hay forma de **medir la calidad** del sistema más allá de "a ojo"
@@ -606,7 +606,7 @@ graph TD
 | **Datos numéricos** | No distingue 55000 de 52000 | Sabe que 55000 > 52000 |
 | **Agregaciones** | No puede hacer SUM, AVG, GROUP BY | Sí |
 | **Riesgo** | Baja precisión en datos numéricos | SQL incorrecto o inyección |
-| **Ya lo viste en** | [HPD 1](../hpd1-embeddings.qmd) sección 1.6 | [02c-llamaindex.qmd](../bloque2/02c-llamaindex.qmd) sección SQL |
+| **Ya lo viste en** | [HPD 1](../evaluables/hpd1-embeddings.qmd) sección 1.6 | [02c-llamaindex.qmd](../bloque2/02c-llamaindex.qmd) sección SQL |
 
 ::: {.callout-warning}
 ## Text-to-SQL: potente pero peligroso
@@ -619,7 +619,7 @@ El LLM puede generar SQL incorrecto (columnas que no existen, JOINs mal formados
 4. **Usa** una base de datos de solo lectura
 :::
 
-En el [HPD 4](../hpd4-rag-mixto.qmd) combinarás ambos caminos: búsqueda semántica en PDFs de informes + datos estructurados de una tabla de productos.
+En el [HPD 4](../evaluables/hpd4-rag-mixto.qmd) combinarás ambos caminos: búsqueda semántica en PDFs de informes + datos estructurados de una tabla de productos.
 
 ---
 
@@ -686,4 +686,4 @@ graph TD
 
 > Continúa con **[03a — Datos Sintéticos](03a-datos-sinteticos.qmd)** o con **[03c — Fine-tuning Eficiente](03c-fine-tuning.qmd)**.
 >
-> Cuando estés listo, pasa al taller práctico: **[HPD 4 — Sistema RAG sobre datos mixtos](../hpd4-rag-mixto.qmd)**.
+> Cuando estés listo, pasa al taller práctico: **[HPD 4 — Sistema RAG sobre datos mixtos](../evaluables/hpd4-rag-mixto.qmd)**.

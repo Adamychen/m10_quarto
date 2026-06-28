@@ -55,7 +55,7 @@ La siguiente tabla muestra el itinerario que sigue este bloque en su exposición
 | **LLMs e inferencia** — Preentrenamiento, tokenización, parámetros, HF Hub, API Llamus | [01b-llms.qmd](01b-llms.qmd) | 2h |
 | **Embeddings** — word2vec, SBERT, modelos, comparativa | [01c-embeddings.qmd](01c-embeddings.qmd) | 1h |
 | **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica | [01d-vectordb.qmd](01d-vectordb.qmd) | 1h |
-| **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](../hpd1-embeddings.qmd) | 4h |
+| **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](../evaluables/hpd1-embeddings.qmd) | 4h |
 
 > Los temas marcados con 🔷 son teoría obligatoria. Puedes profundizar en cada uno según tu interés.
 
@@ -133,7 +133,7 @@ Este primer bloque sienta las bases para el resto de bloques que componen el cur
 - **Bloque 3:** uso de embeddings + vector DB para construir sistemas RAG (recuperación de información)
 - **Bloque 4:** evaluación y despliegue de sistemas en producción
 
-Tras haber asimilado los conceptos de las secciones anteriores, puedes pasar al [taller práctico: HPD 1 — Pipeline de embeddings y búsqueda semántica](../hpd1-embeddings.qmd).
+Tras haber asimilado los conceptos de las secciones anteriores, puedes pasar al [taller práctico: HPD 1 — Pipeline de embeddings y búsqueda semántica](../evaluables/hpd1-embeddings.qmd).
 
 ::: {.callout-note}
 ## Antes de continuar

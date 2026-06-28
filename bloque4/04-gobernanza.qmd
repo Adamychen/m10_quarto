@@ -4,7 +4,7 @@ title: "Bloque 4 — Despliegue y Gobernanza"
 
 > **Carga:** Contenido integrado en proyecto | HPD: 0h — evaluado en proyecto final
 >
-> **Competencias asociadas:** [CE-6](index.qmd#competencias-específicas)
+> **Competencias asociadas:** [CE-6](../index.qmd#competencias-específicas)
 
 ## Objetivos
 

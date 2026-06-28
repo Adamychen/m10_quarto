@@ -8,7 +8,7 @@ jupyter: python3
 
 > **Duración:** 4h
 >
-> **Competencias:** [CE-1](index.qmd#competencias-específicas)
+> **Competencias:** [CE-1](../index.qmd#competencias-específicas)
 
 ::: {.callout-tip icon=false}
 ## Objetivos

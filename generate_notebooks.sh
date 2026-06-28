@@ -1,26 +1,18 @@
 #!/bin/bash
 # generate_notebooks.sh
-# Genera notebooks .ipynb para Colab desde los .qmd
-# Ejecutar tras modificar cualquier .qmd que tenga badge Colab
+# Genera notebooks .ipynb para Colab desde los .qmd con engine: jupyter
+# Descubrimiento automático: escanea bloque1/..4, evaluables/
 
 set -e
-
-FILES=(
-  01-fundamentos.qmd
-  01a-transformer.qmd
-  01b-llms.qmd
-  01c-embeddings.qmd
-  01d-vectordb.qmd
-  hpd1-embeddings.qmd
-  hpd2-agente-tool-calling.qmd
-  hpd3-servidor-mcp.qmd
-  hpd4-rag-mixto.qmd
-)
 
 echo "==> Generando notebooks para Colab..."
 mkdir -p notebooks
 
-for f in "${FILES[@]}"; do
+grep -rl "engine: jupyter" \
+  bloque1/ bloque2/ bloque3/ bloque4/ evaluables/ \
+  --include="*.qmd" \
+| sort \
+| while read -r f; do
   name=$(basename "${f%.qmd}")
   echo "  → $name.ipynb ..."
   quarto render "$f" --to ipynb --output-dir notebooks/

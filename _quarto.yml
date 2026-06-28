@@ -34,7 +34,7 @@ website:
             text: Embeddings
           - href: bloque1/01d-vectordb.qmd
             text: Bases de datos vectoriales
-          - href: hpd1-embeddings.qmd
+          - href: evaluables/hpd1-embeddings.qmd
             text: "🔧 HPD 1 — Embeddings"
           - href: evaluables/hpd1-evaluables.qmd
             text: "📝 Ejercicios evaluables HPD 1"
@@ -68,7 +68,7 @@ website:
             text: "⭐ Extensión HPD 3"
       - section: "Bloque 3 — Aplicaciones"
         contents:
-          - href: 03-aplicaciones.qmd
+          - href: bloque3/03-aplicaciones.qmd
             text: Visión general
           - href: bloque3/03b-rag-avanzado.qmd
             text: RAG Avanzado
@@ -76,7 +76,7 @@ website:
             text: Datos Sintéticos
           - href: bloque3/03c-fine-tuning.qmd
             text: Fine-tuning eficiente
-          - href: hpd4-rag-mixto.qmd
+          - href: evaluables/hpd4-rag-mixto.qmd
             text: "🔧 HPD 4 — RAG Mixto"
           - href: evaluables/hpd4-datos-sinteticos.qmd
             text: "📝 Ejercicios — Datos Sintéticos"
@@ -84,7 +84,7 @@ website:
             text: "⭐ Extensión — Datos Sintéticos"
       - section: "Bloque 4 — Gobernanza"
         contents:
-          - href: 04-gobernanza.qmd
+          - href: bloque4/04-gobernanza.qmd
             text: Teoría y Despliegue
       - section: "Evaluación"
         contents:

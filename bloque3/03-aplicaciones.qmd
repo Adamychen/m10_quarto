@@ -4,7 +4,7 @@ title: "Bloque 3 — Aplicaciones: RAG Avanzado, Datos Sintéticos y Fine-tuning
 
 > **Carga:** HT: 6h | HPD: 4h
 >
-> **Competencias asociadas:** [CE-4](index.qmd#competencias-específicas), [CE-5](index.qmd#competencias-específicas)
+> **Competencias asociadas:** [CE-4](../index.qmd#competencias-específicas), [CE-5](../index.qmd#competencias-específicas)
 
 ## Objetivos del bloque
 
@@ -39,10 +39,10 @@ Los tres pilares de este bloque son **complementarios y se refuerzan mutuamente*
 
 | Tema | Archivo | Duración estimada |
 |---|---|---|
-| **RAG Avanzado** — Re-ranking, HyDE, RAG-Fusion, RAGAS, multi-fuente | [bloque3/03b-rag-avanzado.qmd](bloque3/03b-rag-avanzado.qmd) | 3h |
-| **Datos Sintéticos** — CTGAN, TVAE, TabDDPM, SDV, validación estadística | [bloque3/03a-datos-sinteticos.qmd](bloque3/03a-datos-sinteticos.qmd) | 1.5h |
-| **Fine-tuning eficiente** — LoRA, QLoRA, PEFT, cuándo adaptar modelos | [bloque3/03c-fine-tuning.qmd](bloque3/03c-fine-tuning.qmd) | 1.5h |
-| **HPD 4 — Sistema RAG sobre datos mixtos** | [hpd4-rag-mixto.qmd](hpd4-rag-mixto.qmd) | 4h |
+| **RAG Avanzado** — Re-ranking, HyDE, RAG-Fusion, RAGAS, multi-fuente | [03b-rag-avanzado.qmd](03b-rag-avanzado.qmd) | 3h |
+| **Datos Sintéticos** — CTGAN, TVAE, TabDDPM, SDV, validación estadística | [03a-datos-sinteticos.qmd](03a-datos-sinteticos.qmd) | 1.5h |
+| **Fine-tuning eficiente** — LoRA, QLoRA, PEFT, cuándo adaptar modelos | [03c-fine-tuning.qmd](03c-fine-tuning.qmd) | 1.5h |
+| **HPD 4 — Sistema RAG sobre datos mixtos** | [hpd4-rag-mixto.qmd](../evaluables/hpd4-rag-mixto.qmd) | 4h |
 
 ## Ruta de aprendizaje recomendada
 
@@ -70,7 +70,7 @@ graph LR
 
 | HPD | Título | Enlace | Duración |
 |---|---|---|---|
-| **HPD 4** | Sistema RAG sobre datos mixtos con evaluación | [hpd4-rag-mixto.qmd](hpd4-rag-mixto.qmd) | 4h |
+| **HPD 4** | Sistema RAG sobre datos mixtos con evaluación | [hpd4-rag-mixto.qmd](../evaluables/hpd4-rag-mixto.qmd) | 4h |
 
 ## Lecturas obligatorias
 
@@ -98,4 +98,4 @@ Este bloque te da las herramientas para llevar tus sistemas IA a **calidad de pr
 - **Bloque 4:** evaluarás y desplegarás estos sistemas con gobernanza, detectando alucinaciones, sesgos y documentando con Model Cards.
 - **Proyecto integrador:** combinarás RAG + datos sintéticos + fine-tuning en un sistema completo de tu dominio.
 
-Ahora pasa al primer tema: **[RAG Avanzado](bloque3/03b-rag-avanzado.qmd)**.
+Ahora pasa al primer tema: **[RAG Avanzado](03b-rag-avanzado.qmd)**.

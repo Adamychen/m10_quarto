@@ -14,10 +14,10 @@ title: "Evaluación"
 
 | HPD | Título | Duración | Entregable | Enlace |
 |---|---|---|---|---|
-| 1 | Pipeline de embeddings y búsqueda semántica | 4h | Notebook con índice vectorial y métricas recall@k | [HPD 1](hpd1-embeddings.qmd) |
+| 1 | Pipeline de embeddings y búsqueda semántica | 4h | Notebook con índice vectorial y métricas recall@k | [HPD 1](evaluables/hpd1-embeddings.qmd) |
 | 2 | Agente analítico con Tool Calling | 4h | Script del agente con al menos 2 herramientas | [HPD 2](bloque2/hpd2-agente-tool-calling.qmd) |
 | 3 | Servidor MCP y conexión segura a datos locales | 4h | Servidor MCP funcional + análisis de riesgos | [HPD 3](bloque2/hpd3-servidor-mcp.qmd) |
-| 4 | Sistema RAG sobre datos mixtos con evaluación | 4h | Pipeline RAG evaluado con RAGAS (score > 0,6) | [HPD 4](hpd4-rag-mixto.qmd) |
+| 4 | Sistema RAG sobre datos mixtos con evaluación | 4h | Pipeline RAG evaluado con RAGAS (score > 0,6) | [HPD 4](evaluables/hpd4-rag-mixto.qmd) |
 | — | Generación y validación de datos sintéticos (HA) | — | Notebook con ejercicios de SDV, KS test y F1 | [Ejercicios](evaluables/hpd4-datos-sinteticos.qmd) |
 
 ## Proyecto integrador final

@@ -421,4 +421,4 @@ El fine-tuning con datos de baja calidad produce un modelo **peor** que el base.
 
 ---
 
-> Has completado la teoría del **Bloque 3**. Ahora pasa al taller práctico: **[HPD 4 — Sistema RAG sobre datos mixtos](../hpd4-rag-mixto.qmd)**.
+> Has completado la teoría del **Bloque 3**. Ahora pasa al taller práctico: **[HPD 4 — Sistema RAG sobre datos mixtos](../evaluables/hpd4-rag-mixto.qmd)**.
