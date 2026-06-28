@@ -3,7 +3,7 @@ title: "02d — Model Context Protocol (MCP)"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/02d-mcp.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02d-mcp.ipynb)
 
 > Este tema forma parte del **Bloque 2 — Orquestación**. Aquí se aprende a exponer datos y herramientas a LLMs de forma estandarizada con MCP.
 

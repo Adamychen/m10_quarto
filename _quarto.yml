@@ -114,3 +114,5 @@ format:
     mermaid:
       theme: neutral
     include-after-body: includes/footer.html
+  ipynb:
+    embed-resources: true

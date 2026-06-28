@@ -3,7 +3,7 @@ title: "Bloque 1 — Fundamentos: Transformers, LLMs y Representación Vectorial
 engine: jupyter
 ---
 
-[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01-fundamentos.ipynb)
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01-fundamentos.ipynb)
 
 > **Carga:** HT: 6h | HPD: 4h
 >

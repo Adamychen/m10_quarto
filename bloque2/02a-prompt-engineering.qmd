@@ -3,7 +3,7 @@ title: "02a — Prompt Engineering Avanzado"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/02a-prompt-engineering.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02a-prompt-engineering.ipynb)
 
 > Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber completado el [Bloque 1](../bloque1/01-fundamentos.qmd) primero.
 

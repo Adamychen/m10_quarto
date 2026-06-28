@@ -4,7 +4,7 @@ _site/
 .site/
 *_files/
 *.ipynb
-!notebooks/*.ipynb
+!notebooks/**/*.ipynb
 .DS_Store
 .venv
 

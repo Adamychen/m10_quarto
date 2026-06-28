@@ -3,7 +3,7 @@ title: "02c — LlamaIndex: Indexación y Consulta de Documentos"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/02c-llamaindex.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02c-llamaindex.ipynb)
 
 > Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber visto [LangChain](02b-langchain.qmd) primero.
 

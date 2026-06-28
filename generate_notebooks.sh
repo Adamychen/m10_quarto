@@ -23,3 +23,5 @@ echo "✅ Notebooks generados en notebooks/:"
 ls -lh notebooks/
 echo ""
 echo "==> No olvides commitear: git add notebooks/ && git commit -m 'Update notebooks' && git push"
+echo ""
+echo "==> No olvides commitear: git add notebooks/ && git commit -m 'Update notebooks' && git push"

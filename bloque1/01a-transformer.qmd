@@ -3,7 +3,7 @@ title: "01a — Arquitectura Transformer"
 engine: jupyter
 ---
 
-[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01a-transformer.ipynb)
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01a-transformer.ipynb)
 
 > Este tema forma parte del **Bloque 1 — Fundamentos**. 
 > Se recomienda seguir el orden propuesto: Transformer → LLMs → Embeddings → Vector DB.

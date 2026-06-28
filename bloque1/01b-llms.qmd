@@ -3,7 +3,7 @@ title: "01b — Grandes Modelos de Lenguaje e Inferencia"
 engine: jupyter
 ---
 
-[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/01b-llms.ipynb)
+[![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01b-llms.ipynb)
 
 > Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto primero [01a-transformer.qmd](01a-transformer.qmd).
 

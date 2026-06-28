@@ -3,7 +3,7 @@ title: "HPD 2 — Agente analítico con Tool Calling"
 engine: jupyter
 ---
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/hpd2-agente-tool-calling.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/hpd2-agente-tool-calling.ipynb)
 
 > **Duración:** 4h
 >
