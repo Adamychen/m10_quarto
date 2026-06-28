@@ -253,10 +253,11 @@ textos en español en Chroma y mide:
 # col_en = indexar_en_chroma(...)
 
 # ─── Evalúa recall@1 con estas 3 consultas ───
+# QRELS_E1: tupla (kw_es para buscar en español, kw_en para buscar en inglés)
 # QRELS_E1 = {
-#     "How does multi-head attention work?":          "atención multi-cabeza",
-#     "What are text embeddings?":                    "representaciones vectoriales densas",
-#     "How does RAG combine retrieval and generation?": "combina sistemas de recuperación",
+#     "How does multi-head attention work?":            ("atención multi-cabeza", "multi-head attention"),
+#     "What are text embeddings?":                      ("representaciones vectoriales densas", "dense vector representations"),
+#     "How does RAG combine retrieval and generation?": ("combina sistemas de recuperación", "information retrieval systems"),
 # }
 
 ext1_recall_cross = None  # ← float: recall@1 medio inglés → español
@@ -292,9 +293,9 @@ Mide sobre el corpus en inglés:
 # Usa indexar_en_chroma() y buscar_en_chroma().
 # Ground truth por contenido (invariante al splitter):
 QRELS_E2 = {
-    "How does multi-head attention work?": "atención multi-cabeza",
-    "What are text embeddings?":           "representaciones vectoriales densas",
-    "How does RAG work?":                  "combina sistemas de recuperación",
+    "How does multi-head attention work?": "multi-head attention",
+    "What are text embeddings?":           "dense vector representations",
+    "How does RAG work?":                  "information retrieval systems",
 }
 
 ext2_recall_recursive = None  # ← float
@@ -339,9 +340,9 @@ distancias, indices = index.search(query_emb_normalizado.reshape(1, -1), k=3)
 
 # ─── Compara recall@1 (ground truth por contenido) ───
 QRELS_E3 = {
-    "How does multi-head attention work?": "atención multi-cabeza",
-    "What are text embeddings?":           "representaciones vectoriales densas",
-    "How does RAG work?":                  "combina sistemas de recuperación",
+    "How does multi-head attention work?": "multi-head attention",
+    "What are text embeddings?":           "dense vector representations",
+    "How does RAG work?":                  "information retrieval systems",
 }
 
 ext3_tiempo_chroma = None   # ← float (segundos)
@@ -361,7 +362,7 @@ Usa el endpoint de la asignatura (`https://llamus.cs.us.es/api/v1`), que es comp
 con la API de OpenAI. El modelo es `gemma4:e2b-mlx`. La API key debes configurarla
 en la variable de entorno `LLM_API_KEY`.
 
-```python
+```{python}
 #| echo: true
 
 # ─── Configura la API key ───
