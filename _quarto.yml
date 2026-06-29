@@ -97,6 +97,9 @@ website:
           - href: 07-bibliografia.qmd
             text: Bibliografía
 
+execute:
+  freeze: false
+
 format:
   html:
     theme:

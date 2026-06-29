@@ -21,7 +21,16 @@ Como alternativa: **File → Open Notebook → GitHub**, busca `Adamychen/m10_qu
 
 ### Ejercicios evaluables
 
-Los ejercicios evaluables están en `evaluables/hpd1-evaluables.qmd` y la extensión avanzada en `evaluables/hpd1-extension.qmd`. Se entregan como notebook `.ipynb` ejecutado con todas las celdas completas.
+Hay 4 HPDs con sus ejercicios evaluables (entrega básica) y una extensión avanzada por cada uno. Todos se entregan como notebook `.ipynb` ejecutado con todas las celdas completas.
+
+| HPD | Ejercicios evaluables | Extensión avanzada |
+|---|---|---|
+| HPD 1 — Embeddings | `evaluables/hpd1-evaluables.qmd` | `evaluables/hpd1-extension.qmd` |
+| HPD 2 — Agente Tool Calling | `evaluables/hpd2-evaluables.qmd` | `evaluables/hpd2-extension.qmd` |
+| HPD 3 — Servidor MCP | `evaluables/hpd3-evaluables.qmd` | `evaluables/hpd3-extension.qmd` |
+| HPD 4 — RAG mixto + Datos sintéticos | `evaluables/hpd4-rag-mixto.qmd` y `evaluables/hpd4-datos-sinteticos.qmd` | `evaluables/hpd4-datos-sinteticos-extension.qmd` |
+
+Los talleres presenciales (con código parcialmente completado por el alumno) están en `bloque1/`, `bloque2/`, `bloque3/` y `bloque4/`.
 
 ---
 
@@ -59,13 +68,49 @@ QUARTO_PYTHON=.venv/bin/python3 quarto preview
 ```
 m10_quarto/
 ├── _quarto.yml                  # Configuración del sitio (sidebar, grid, tema)
-├── *.qmd                        # Páginas con engine jupyter (Python)
-├── evaluables/                  # Ejercicios evaluables
+├── index.qmd                    # Presentación
+├── about.qmd                    # Acerca de
+├── mod10.md                     # Guía docente pública
+├── bloque1/                     # Fundamentos: Transformers, LLMs, embeddings, vector DB
+│   ├── 01-fundamentos.qmd
+│   ├── 01a-transformer.qmd
+│   ├── 01b-llms.qmd
+│   ├── 01c-embeddings.qmd
+│   └── 01d-vectordb.qmd
+├── bloque2/                     # Orquestación: prompt, frameworks, MCP, agentes
+│   ├── 02-orquestacion.qmd
+│   ├── 02a-prompt-engineering.qmd
+│   ├── 02b-langchain.qmd
+│   ├── 02c-llamaindex.qmd
+│   ├── 02d-mcp.qmd
+│   ├── 02e-agentes.qmd
+│   ├── hpd2-agente-tool-calling.qmd
+│   └── hpd3-servidor-mcp.qmd
+├── bloque3/                     # Aplicaciones: RAG avanzado, datos sintéticos, fine-tuning
+│   ├── 03-aplicaciones.qmd
+│   ├── 03a-datos-sinteticos.qmd
+│   ├── 03b-rag-avanzado.qmd
+│   └── 03c-fine-tuning.qmd
+├── bloque4/                     # Despliegue y gobernanza
+│   └── 04-gobernanza.qmd
+├── evaluables/                  # Ejercicios evaluables (10 ficheros)
+│   ├── hpd1-embeddings.qmd
 │   ├── hpd1-evaluables.qmd
-│   └── hpd1-extension.qmd
+│   ├── hpd1-extension.qmd
+│   ├── hpd2-evaluables.qmd
+│   ├── hpd2-extension.qmd
+│   ├── hpd3-evaluables.qmd
+│   ├── hpd3-extension.qmd
+│   ├── hpd4-rag-mixto.qmd
+│   ├── hpd4-datos-sinteticos.qmd
+│   └── hpd4-datos-sinteticos-extension.qmd
+├── 05-evaluacion.qmd            # Evaluación y proyecto
+├── 06-herramientas.qmd          # Herramientas y stack recomendado
+├── 07-bibliografia.qmd          # Bibliografía y recursos
 ├── images/                      # Imágenes del sitio
+├── includes/footer.html         # Pie de página
 ├── styles.css                   # Estilos CSS personalizados
-├── requirements.txt             # Dependencias Python
+├── requirements.txt             # Dependencias Python fijadas
 ├── generate_notebooks.sh        # Genera .ipynb desde .qmd
 ├── .github/workflows/
 │   └── deploy.yml               # CI/CD a GitHub Pages

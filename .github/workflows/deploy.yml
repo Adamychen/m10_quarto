@@ -29,7 +29,10 @@ jobs:
 
       - uses: quarto-dev/quarto-actions/setup@v2
 
+      - run: rm -rf .quarto _site
+
       - run: quarto render
+        timeout-minutes: 120
         env:
           LLM_API_KEY: ${{ secrets.LLM_API_KEY }}
 

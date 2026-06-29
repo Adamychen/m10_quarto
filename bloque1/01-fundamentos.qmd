@@ -81,16 +81,10 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
 import numpy as np
 import matplotlib.pyplot as plt
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
 plt.rcParams["figure.dpi"] = 100
 import math
-import logging
-logging.getLogger("transformers").setLevel(logging.ERROR)
 print("Librerías cargadas correctamente.")
 print(f"NumPy: {np.__version__}")
-print(f"PyTorch: {torch.__version__}")
 
 
 ```
