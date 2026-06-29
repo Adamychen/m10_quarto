@@ -1,0 +1,2086 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>03c — Fine-tuning Eficiente: LoRA, QLoRA y Cuándo Adaptar Modelos – Módulo 10 — IA Generativa para Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-f97a59afa23c78b76dca51217b896fc0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="mermaid-theme" content="neutral">
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque3/03-aplicaciones.html">Bloque 3 — Aplicaciones</a></li><li class="breadcrumb-item"><a href="../bloque3/03c-fine-tuning.html">Fine-tuning eficiente</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Módulo 10 — IA Generativa para Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inicio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acerca de</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 1 — Fundamentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01a-transformer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01b-llms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs e inferencia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01c-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01d-vectordb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bases de datos vectoriales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-evaluables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ejercicios evaluables HPD 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-extension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extensión HPD 1</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 2 — Orquestación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02-orquestacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02a-prompt-engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prompt Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02b-langchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LangChain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02c-llamaindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LlamaIndex</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02d-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02e-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentes Inteligentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd2-evaluables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ejercicios evaluables HPD 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd2-extension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extensión HPD 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd3-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Servidor MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd3-evaluables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ejercicios evaluables HPD 3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd3-extension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extensión HPD 3</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 3 — Aplicaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03-aplicaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03b-rag-avanzado.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAG Avanzado</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03a-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Fine-tuning eficiente</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — RAG Mixto</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ejercicios — Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-datos-sinteticos-extension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extensión — Datos Sintéticos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 4 — Gobernanza</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría y Despliegue</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Evaluación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación y Proyecto</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../06-herramientas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Herramientas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../07-bibliografia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliografía</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#fine-tuning-eficiente" id="toc-fine-tuning-eficiente" class="nav-link active" data-scroll-target="#fine-tuning-eficiente">Fine-tuning Eficiente</a>
+  <ul class="collapse">
+  <li><a href="#qué-es-fine-tuning-y-por-qué-es-difícil" id="toc-qué-es-fine-tuning-y-por-qué-es-difícil" class="nav-link" data-scroll-target="#qué-es-fine-tuning-y-por-qué-es-difícil">¿Qué es fine-tuning y por qué es difícil?</a></li>
+  <li><a href="#la-decisión-clave-fine-tuning-rag-o-prompting" id="toc-la-decisión-clave-fine-tuning-rag-o-prompting" class="nav-link" data-scroll-target="#la-decisión-clave-fine-tuning-rag-o-prompting">La decisión clave: ¿Fine-tuning, RAG o Prompting?</a></li>
+  <li><a href="#lora-low-rank-adaptation" id="toc-lora-low-rank-adaptation" class="nav-link" data-scroll-target="#lora-low-rank-adaptation">LoRA: Low-Rank Adaptation</a></li>
+  <li><a href="#qlora-fine-tuning-en-gpu-de-consumidor" id="toc-qlora-fine-tuning-en-gpu-de-consumidor" class="nav-link" data-scroll-target="#qlora-fine-tuning-en-gpu-de-consumidor">QLoRA: fine-tuning en GPU de consumidor</a></li>
+  <li><a href="#otras-técnicas-peft" id="toc-otras-técnicas-peft" class="nav-link" data-scroll-target="#otras-técnicas-peft">Otras técnicas PEFT</a></li>
+  <li><a href="#infraestructura-y-ejemplo-en-colab" id="toc-infraestructura-y-ejemplo-en-colab" class="nav-link" data-scroll-target="#infraestructura-y-ejemplo-en-colab">Infraestructura y ejemplo en Colab</a></li>
+  <li><a href="#resumen" id="toc-resumen" class="nav-link" data-scroll-target="#resumen">Resumen</a></li>
+  </ul></li>
+  <li><a href="#referencias" id="toc-referencias" class="nav-link" data-scroll-target="#referencias">Referencias</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="03c-fine-tuning.ipynb" download="03c-fine-tuning.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque3/03-aplicaciones.html">Bloque 3 — Aplicaciones</a></li><li class="breadcrumb-item"><a href="../bloque3/03c-fine-tuning.html">Fine-tuning eficiente</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">03c — Fine-tuning Eficiente: LoRA, QLoRA y Cuándo Adaptar Modelos</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque3/03c-fine-tuning.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img"></a></p>
+<figcaption>Open In Colab</figcaption>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p>Este tema forma parte del <strong>Bloque 3 — Aplicaciones</strong>. Se recomienda haber completado los <a href="../bloque1/01-fundamentos.html">Bloques 1</a> y <a href="../bloque2/02-orquestacion.html">2</a> primero.</p>
+</blockquote>
+<div id="c0665326" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q transformers peft bitsandbytes trl datasets torch accelerate python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="bbe2fb21" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Librerías cargadas correctamente.</code></pre>
+</div>
+</div>
+<section id="fine-tuning-eficiente" class="level2">
+<h2 class="anchored" data-anchor-id="fine-tuning-eficiente">Fine-tuning Eficiente</h2>
+<section id="qué-es-fine-tuning-y-por-qué-es-difícil" class="level3">
+<h3 class="anchored" data-anchor-id="qué-es-fine-tuning-y-por-qué-es-difícil">¿Qué es fine-tuning y por qué es difícil?</h3>
+<p>Un LLM preentrenado es como un <strong>médico generalista</strong>: sabe de todo un poco. Hacer fine-tuning es como enviarlo a una <strong>especialización de 6 meses</strong>: sale sabiendo mucho de un tema concreto sin olvidar lo general.</p>
+<p>El fine-tuning consiste en tomar un modelo base preentrenado y <strong>entrenarlo adicionalmente</strong> con datos de tu dominio para que adapte su comportamiento: nuevo tono, nuevo formato de salida, nuevo vocabulario técnico, o nuevo conocimiento específico.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph LR
+    subgraph "Preentrenamiento"
+        A["Datos generales&lt;br/&gt;(internet, libros, código)"] --&gt; B["Modelo base&lt;br/&gt;(GPT, Llama, Qwen)"]
+    end
+
+    subgraph "Fine-tuning"
+        B --&gt; C["Modelo base&lt;br/&gt;(congelado o no)"]
+        D["Datos específicos&lt;br/&gt;(tu dominio)"] --&gt; C
+        C --&gt; E["Modelo adaptado&lt;br/&gt;a tu dominio"]
+    end
+
+    style A fill:#4B8BBE,color:#fff
+    style B fill:#306998,color:#fff
+    style D fill:#FFD43B,color:#000
+    style E fill:#2e7d32,color:#fff
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>El problema es la <strong>escala</strong>. Los modelos modernos tienen miles de millones de parámetros, y entrenarlos completamente requiere una cantidad de memoria GPU prohibitiva:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Modelo</th>
+<th>Parámetros</th>
+<th>RAM para fine-tuning completo</th>
+<th>Coste GPU/hora</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Llama 3.3 70B</td>
+<td>70 mil millones</td>
+<td>~560 GB</td>
+<td>~$50/h (A100 80GB)</td>
+</tr>
+<tr class="even">
+<td>Qwen 3 7B</td>
+<td>7 mil millones</td>
+<td>~56 GB</td>
+<td>~$5/h (A100 80GB)</td>
+</tr>
+<tr class="odd">
+<td>Gemma 2B</td>
+<td>2 mil millones</td>
+<td>~16 GB</td>
+<td>~$1/h (T4 16GB)</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>El problema de memoria
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Fine-tuning completo de un modelo 7B requiere ~56 GB de RAM: 14 GB para los pesos + 28 GB para los gradientes + 14 GB para los estados del optimizador Adam. Una GPU de consumidor (RTX 4090: 24 GB) no basta. Aquí entran las técnicas <strong>PEFT</strong> (Parameter-Efficient Fine-Tuning).</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="la-decisión-clave-fine-tuning-rag-o-prompting" class="level3">
+<h3 class="anchored" data-anchor-id="la-decisión-clave-fine-tuning-rag-o-prompting">La decisión clave: ¿Fine-tuning, RAG o Prompting?</h3>
+<p>Antes de hacer fine-tuning, pregúntate si realmente lo necesitas. La mayoría de las veces, <strong>RAG o prompting son suficientes</strong>.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    Q["¿Qué necesitas cambiar?"] --&gt; A{¿Nuevo conocimiento?}
+
+    A --&gt;|Sí| B{¿Los datos cambian&lt;br/&gt;frecuentemente?}
+    A --&gt;|No| C{¿Nuevo comportamiento&lt;br/&gt;o formato?}
+
+    B --&gt;|Sí| RAG["RAG&lt;br/&gt;(re-indexar es barato)"]
+    B --&gt;|No| D{¿Mucho conocimiento&lt;br/&gt;nuevo?}
+
+    D --&gt;|Sí| RAG
+    D --&gt;|No| FT["Fine-tuning&lt;br/&gt;(conocimiento estable)"]
+
+    C --&gt;|Sí| FT2["Fine-tuning&lt;br/&gt;(tono, formato, dominio)"]
+    C --&gt;|No| P["Prompting&lt;br/&gt;(instrucciones bastan)"]
+
+    style Q fill:#4B8BBE,color:#fff
+    style RAG fill:#FFD43B,color:#000
+    style FT fill:#e65100,color:#fff
+    style FT2 fill:#e65100,color:#fff
+    style P fill:#2e7d32,color:#fff
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Criterio</th>
+<th>Prompting</th>
+<th>RAG</th>
+<th>Fine-tuning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Nuevo conocimiento</strong></td>
+<td>No</td>
+<td>Sí</td>
+<td>Sí (limitado)</td>
+</tr>
+<tr class="even">
+<td><strong>Nuevo formato/comportamiento</strong></td>
+<td>Limitado</td>
+<td>No</td>
+<td>Sí</td>
+</tr>
+<tr class="odd">
+<td><strong>Latencia añadida</strong></td>
+<td>Ninguna</td>
+<td>Retrieval (ms)</td>
+<td>Ninguna</td>
+</tr>
+<tr class="even">
+<td><strong>Coste de setup</strong></td>
+<td>Minutos</td>
+<td>Horas</td>
+<td>Horas + GPU</td>
+</tr>
+<tr class="odd">
+<td><strong>Mantenimiento</strong></td>
+<td>Editar prompt</td>
+<td>Pipeline + Vector DB</td>
+<td>Re-entrenar</td>
+</tr>
+<tr class="even">
+<td><strong>Actualización de datos</strong></td>
+<td>Editar prompt</td>
+<td>Re-indexar</td>
+<td>Re-entrenar</td>
+</tr>
+<tr class="odd">
+<td><strong>Ejemplo de uso</strong></td>
+<td>Extraer JSON</td>
+<td>Buscar en documentos corporativos</td>
+<td>Adaptar tono médico/legal</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Regla práctica
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><strong>Empieza con prompting.</strong> Si no basta, añade RAG.</li>
+<li><strong>Si necesitas un comportamiento muy específico</strong> (tono, formato, vocabulario de dominio), considera fine-tuning.</li>
+<li><strong>Si necesitas conocimiento actualizable</strong>, usa RAG. El fine-tuning no se actualiza sin re-entrenar.</li>
+<li><strong>Si necesitas ambos</strong> (conocimiento + comportamiento), combina RAG + fine-tuning.</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+<section id="lora-low-rank-adaptation" class="level3">
+<h3 class="anchored" data-anchor-id="lora-low-rank-adaptation">LoRA: Low-Rank Adaptation</h3>
+<p><strong>LoRA</strong> es la técnica PEFT más popular. En vez de reescribir todos los pesos del modelo, añade pequeñas “notas adhesivas” (matrices de bajo rango) que modifican el comportamiento sin tocar el modelo original.</p>
+<p><strong>En vez de reescribir todo el libro (fine-tuning completo), LoRA añade notas adhesivas en las páginas clave. El libro original no cambia, pero las notas modifican cómo se lee.</strong></p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    subgraph "Modelo original (congelado)"
+        X["Entrada $$x$$"] --&gt; W["Matriz $$W$$&lt;br/&gt;($$d \times d$$, congelada)"]
+        W --&gt; WX["$$Wx$$"]
+    end
+
+    subgraph "Adaptadores LoRA (entrenables)"
+        X --&gt; A["Matriz $$A$$&lt;br/&gt;($$d \times r$$, $$r \ll d$$)"]
+        A --&gt; B["Matriz $$B$$&lt;br/&gt;($$r \times d$$)"]
+        B --&gt; BAX["$$BAx$$"]
+    end
+
+    WX --&gt; SUM["$$+$$"]
+    BAX --&gt; SUM
+    SUM --&gt; OUT["Salida: $$Wx + BAx$$"]
+
+    style W fill:#306998,color:#fff
+    style A fill:#e65100,color:#fff
+    style B fill:#e65100,color:#fff
+    style SUM fill:#2e7d32,color:#fff
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>La idea es que los <strong>cambios necesarios</strong> para adaptar el modelo son de “bajo rango”: no necesitas modificar los millones de pesos de W, solo unas pocas direcciones principales. Las matrices A y B capturan esas direcciones con una fracción de los parámetros.</p>
+<section id="intuición-del-rango-bajo" class="level4">
+<h4 class="anchored" data-anchor-id="intuición-del-rango-bajo">Intuición del rango bajo</h4>
+<p>Imagina una imagen de 1000×1000 píxeles (1 millón de valores). Si la describes con 10 factores principales (rango 10), solo necesitas 1000×10 + 10×1000 = 20.000 valores. Has comprimido <strong>50×</strong> sin perder la esencia.</p>
+<p>Lo mismo aplica a las matrices de pesos del Transformer: los cambios necesarios para adaptar el modelo a un nuevo dominio ocupan pocas direcciones principales.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Parámetro</th>
+<th>Qué controla</th>
+<th>Valor típico</th>
+<th>Impacto</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>r</strong> (rank)</td>
+<td>Tamaño de las matrices A y B</td>
+<td>8-64</td>
+<td>Más alto = más capacidad, más VRAM</td>
+</tr>
+<tr class="even">
+<td><strong>alpha</strong></td>
+<td>Factor de escala (alpha/r)</td>
+<td>16-128</td>
+<td>Controla cuánto influye LoRA vs el modelo base</td>
+</tr>
+<tr class="odd">
+<td><strong>target_modules</strong></td>
+<td>Qué capas del Transformer se adaptan</td>
+<td><code>q_proj, v_proj</code></td>
+<td>Más módulos = más parámetros</td>
+</tr>
+<tr class="even">
+<td><strong>dropout</strong></td>
+<td>Regularización</td>
+<td>0.05-0.1</td>
+<td>Evita overfitting en datasets pequeños</td>
+</tr>
+</tbody>
+</table>
+<div id="1c58a5cd" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> LoraConfig(</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    r<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    lora_alpha<span class="op">=</span><span class="dv">32</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    target_modules<span class="op">=</span>[<span class="st">"q_proj"</span>, <span class="st">"v_proj"</span>],</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    lora_dropout<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    bias<span class="op">=</span><span class="st">"none"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    task_type<span class="op">=</span><span class="st">"CAUSAL_LM"</span>,</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Configuración LoRA:"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Rank (r): </span><span class="sc">{</span>config<span class="sc">.</span>r<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Alpha: </span><span class="sc">{</span>config<span class="sc">.</span>lora_alpha<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Escala efectiva: alpha/r = </span><span class="sc">{</span>config<span class="sc">.</span>lora_alpha <span class="op">/</span> config<span class="sc">.</span>r<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Módulos objetivo: </span><span class="sc">{</span>config<span class="sc">.</span>target_modules<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Dropout: </span><span class="sc">{</span>config<span class="sc">.</span>lora_dropout<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Configuración LoRA:
+  Rank (r): 16
+  Alpha: 32
+  Escala efectiva: alpha/r = 2.0
+  Módulos objetivo: {'q_proj', 'v_proj'}
+  Dropout: 0.05</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Configuración recomendada para empezar
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><strong>r=8, alpha=16, target_modules=[‘q_proj’, ‘v_proj’]</strong> — mínima, funciona bien para la mayoría de casos</li>
+<li><strong>r=16, alpha=32, target_modules=[‘q_proj’, ‘k_proj’, ‘v_proj’, ‘o_proj’]</strong> — más capacidad, más VRAM</li>
+<li><strong>r=64, alpha=128</strong> — solo si tienes muchos datos (&gt;10k ejemplos) y VRAM suficiente</li>
+</ul>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="qlora-fine-tuning-en-gpu-de-consumidor" class="level3">
+<h3 class="anchored" data-anchor-id="qlora-fine-tuning-en-gpu-de-consumidor">QLoRA: fine-tuning en GPU de consumidor</h3>
+<p><strong>QLoRA</strong> combina LoRA con <strong>cuantización a 4 bits</strong>: el modelo base se comprime para que ocupe menos memoria, y solo los adaptadores LoRA se entrenan en precisión completa.</p>
+<p><strong>QLoRA es como hacer la mudanza en una furgoneta en vez de un camión: el modelo base viaja comprimido (4 bits) y solo las notas adhesivas (LoRA) ocupan espacio real.</strong></p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    subgraph "QLoRA"
+        A["Modelo base 7B"] --&gt; B["Cuantizar a 4-bit (NF4)"]
+        B --&gt; C["~4 GB en GPU"]
+        C --&gt; D["+ Adaptadores LoRA (16-bit)"]
+        D --&gt; E["Entrenar solo LoRA"]
+        E --&gt; F["Modelo base 4-bit&lt;br/&gt;+ LoRA 16-bit"]
+    end
+
+    style A fill:#306998,color:#fff
+    style B fill:#e65100,color:#fff
+    style E fill:#2e7d32,color:#fff
+    style F fill:#2e7d32,color:#fff
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Enfoque</th>
+<th>Modelo 7B en GPU</th>
+<th>VRAM necesaria</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Fine-tuning completo (16-bit)</td>
+<td>14 GB pesos + 42 GB optimizador</td>
+<td>~56 GB</td>
+</tr>
+<tr class="even">
+<td>LoRA (16-bit)</td>
+<td>14 GB pesos (congelados) + 0.1 GB LoRA</td>
+<td>~16 GB</td>
+</tr>
+<tr class="odd">
+<td><strong>QLoRA (4-bit)</strong></td>
+<td><strong>4 GB pesos (congelados) + 0.1 GB LoRA</strong></td>
+<td><strong>~6 GB</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Con QLoRA puedes hacer fine-tuning de un modelo 7B en una <strong>GPU de Colab gratuita</strong> (T4, 16 GB VRAM).</p>
+<div id="0d9d3b12" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModelForCausalLM, BitsAndBytesConfig</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>bnb_config <span class="op">=</span> BitsAndBytesConfig(</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    load_in_4bit<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    bnb_4bit_quant_type<span class="op">=</span><span class="st">"nf4"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    bnb_4bit_compute_dtype<span class="op">=</span><span class="st">"float16"</span>,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    bnb_4bit_use_double_quant<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForCausalLM.from_pretrained(</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Qwen/Qwen3-0.6B"</span>,</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>    quantization_config<span class="op">=</span>bnb_config,</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>    device_map<span class="op">=</span><span class="st">"auto"</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Modelo cargado en 4-bit"</span>)</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Parámetros totales: </span><span class="sc">{</span>model<span class="sc">.</span>num_parameters()<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  VRAM usada: ~</span><span class="sc">{</span><span class="bu">sum</span>(p.numel() <span class="op">*</span> p.element_size() <span class="cf">for</span> p <span class="kw">in</span> model.parameters()) <span class="op">/</span> <span class="fl">1e6</span><span class="sc">:.0f}</span><span class="ss"> MB (solo pesos)"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>QLoRA vs LoRA: ¿pierdes calidad?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>QLoRA reduce la calidad ligeramente vs LoRA 16-bit. Para la mayoría de casos la diferencia es despreciable (&lt;2% en benchmarks), pero si necesitas máxima precisión y tienes VRAM suficiente, usa LoRA sin cuantizar.</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="otras-técnicas-peft" class="level3">
+<h3 class="anchored" data-anchor-id="otras-técnicas-peft">Otras técnicas PEFT</h3>
+<p>LoRA y QLoRA cubren el 95% de los casos prácticos. Las demás técnicas son relevantes si lees papers o trabajas en investigación:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Técnica</th>
+<th>Idea</th>
+<th>Parámetros añadidos</th>
+<th>Cuándo usarla</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>LoRA</strong></td>
+<td>Matrices de bajo rango en capas lineales</td>
+<td>~0.1-1%</td>
+<td>La más versátil, recomendada por defecto</td>
+</tr>
+<tr class="even">
+<td><strong>QLoRA</strong></td>
+<td>LoRA + cuantización 4-bit</td>
+<td>~0.1-1%</td>
+<td>Cuando la VRAM es limitada</td>
+</tr>
+<tr class="odd">
+<td><strong>Adapters</strong></td>
+<td>Capas bottleneck entre capas del Transformer</td>
+<td>~1-3%</td>
+<td>Investigación, menos soporte en herramientas</td>
+</tr>
+<tr class="even">
+<td><strong>Prefix-tuning</strong></td>
+<td>Prefijos aprendidos en cada capa</td>
+<td>~0.1%</td>
+<td>Generación de texto, menos popular</td>
+</tr>
+<tr class="odd">
+<td><strong>Prompt-tuning</strong></td>
+<td>Soft prompts aprendidos</td>
+<td>~0.01%</td>
+<td>Modelos muy grandes (&gt;10B), pocos datos</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>En la práctica
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Si estás empezando, usa <strong>LoRA</strong> (o <strong>QLoRA</strong> si tienes poca VRAM). Las demás técnicas tienen casos de uso muy específicos y menos soporte en las herramientas habituales (Hugging Face, TRL, etc.).</p>
+</div>
+</div>
+<hr>
+</section>
+<section id="infraestructura-y-ejemplo-en-colab" class="level3">
+<h3 class="anchored" data-anchor-id="infraestructura-y-ejemplo-en-colab">Infraestructura y ejemplo en Colab</h3>
+<p>El stack tecnológico para fine-tuning eficiente es:</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    subgraph "Stack de fine-tuning"
+        A["Hugging Face TRL&lt;br/&gt;(entrenamiento SFT/RLHF)"] --&gt; B["PEFT&lt;br/&gt;(LoRA/QLoRA)"]
+        B --&gt; C["bitsandbytes&lt;br/&gt;(cuantización 4-bit)"]
+        C --&gt; D["Transformers&lt;br/&gt;(modelo base)"]
+        D --&gt; E["GPU Colab T4&lt;br/&gt;(16 GB VRAM, gratuita)"]
+    end
+
+    style A fill:#4B8BBE,color:#fff
+    style B fill:#306998,color:#fff
+    style C fill:#e65100,color:#fff
+    style E fill:#2e7d32,color:#fff
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p>El siguiente ejemplo muestra un fine-tuning mínimo con TRL (Supervised Fine-Tuning) sobre un modelo pequeño. Está diseñado para ejecutarse en <strong>Colab con GPU T4 gratuita</strong>.</p>
+<div id="f61aca2e" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig, get_peft_model</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> trl <span class="im">import</span> SFTConfig, SFTTrainer</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> Dataset</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"Qwen/Qwen3-0.6B"</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>bnb_config <span class="op">=</span> BitsAndBytesConfig(</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    load_in_4bit<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    bnb_4bit_quant_type<span class="op">=</span><span class="st">"nf4"</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    bnb_4bit_compute_dtype<span class="op">=</span><span class="st">"float16"</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForCausalLM.from_pretrained(</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    model_name,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    quantization_config<span class="op">=</span>bnb_config,</span>
+<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    device_map<span class="op">=</span><span class="st">"auto"</span>,</span>
+<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>lora_config <span class="op">=</span> LoraConfig(</span>
+<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a>    r<span class="op">=</span><span class="dv">8</span>,</span>
+<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    lora_alpha<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    target_modules<span class="op">=</span>[<span class="st">"q_proj"</span>, <span class="st">"v_proj"</span>],</span>
+<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>    lora_dropout<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>    task_type<span class="op">=</span><span class="st">"CAUSAL_LM"</span>,</span>
+<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> get_peft_model(model, lora_config)</span>
+<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>model.print_trainable_parameters()</span>
+<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>train_data <span class="op">=</span> {</span>
+<span id="cb7-33"><a href="#cb7-33" aria-hidden="true" tabindex="-1"></a>    <span class="st">"text"</span>: [</span>
+<span id="cb7-34"><a href="#cb7-34" aria-hidden="true" tabindex="-1"></a>        <span class="st">"### Instrucción:</span><span class="ch">\n</span><span class="st">Clasifica el sentimiento de esta reseña.</span><span class="ch">\n\n</span><span class="st">### Entrada:</span><span class="ch">\n</span><span class="st">El producto llegó roto y la atención fue pésima.</span><span class="ch">\n\n</span><span class="st">### Respuesta:</span><span class="ch">\n</span><span class="st">Sentimiento: NEGATIVO. El cliente expresa insatisfacción con el estado del producto y el servicio recibido."</span>,</span>
+<span id="cb7-35"><a href="#cb7-35" aria-hidden="true" tabindex="-1"></a>        <span class="st">"### Instrucción:</span><span class="ch">\n</span><span class="st">Clasifica el sentimiento de esta reseña.</span><span class="ch">\n\n</span><span class="st">### Entrada:</span><span class="ch">\n</span><span class="st">Todo perfecto, entrega rápida y bien embalado.</span><span class="ch">\n\n</span><span class="st">### Respuesta:</span><span class="ch">\n</span><span class="st">Sentimiento: POSITIVO. El cliente destaca la calidad del envío y el embalaje."</span>,</span>
+<span id="cb7-36"><a href="#cb7-36" aria-hidden="true" tabindex="-1"></a>        <span class="st">"### Instrucción:</span><span class="ch">\n</span><span class="st">Clasifica el sentimiento de esta reseña.</span><span class="ch">\n\n</span><span class="st">### Entrada:</span><span class="ch">\n</span><span class="st">El paquete llegó ayer por la tarde.</span><span class="ch">\n\n</span><span class="st">### Respuesta:</span><span class="ch">\n</span><span class="st">Sentimiento: NEUTRAL. El cliente solo informa de la recepción sin expresar valoración."</span>,</span>
+<span id="cb7-37"><a href="#cb7-37" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb7-38"><a href="#cb7-38" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb7-39"><a href="#cb7-39" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> Dataset.from_dict(train_data)</span>
+<span id="cb7-40"><a href="#cb7-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-41"><a href="#cb7-41" aria-hidden="true" tabindex="-1"></a>training_args <span class="op">=</span> SFTConfig(</span>
+<span id="cb7-42"><a href="#cb7-42" aria-hidden="true" tabindex="-1"></a>    output_dir<span class="op">=</span><span class="st">"./lora-output"</span>,</span>
+<span id="cb7-43"><a href="#cb7-43" aria-hidden="true" tabindex="-1"></a>    num_train_epochs<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb7-44"><a href="#cb7-44" aria-hidden="true" tabindex="-1"></a>    per_device_train_batch_size<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb7-45"><a href="#cb7-45" aria-hidden="true" tabindex="-1"></a>    gradient_accumulation_steps<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb7-46"><a href="#cb7-46" aria-hidden="true" tabindex="-1"></a>    learning_rate<span class="op">=</span><span class="fl">2e-4</span>,</span>
+<span id="cb7-47"><a href="#cb7-47" aria-hidden="true" tabindex="-1"></a>    fp16<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb7-48"><a href="#cb7-48" aria-hidden="true" tabindex="-1"></a>    logging_steps<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb7-49"><a href="#cb7-49" aria-hidden="true" tabindex="-1"></a>    save_strategy<span class="op">=</span><span class="st">"no"</span>,</span>
+<span id="cb7-50"><a href="#cb7-50" aria-hidden="true" tabindex="-1"></a>    report_to<span class="op">=</span><span class="st">"none"</span>,</span>
+<span id="cb7-51"><a href="#cb7-51" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-52"><a href="#cb7-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-53"><a href="#cb7-53" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> SFTTrainer(</span>
+<span id="cb7-54"><a href="#cb7-54" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>model,</span>
+<span id="cb7-55"><a href="#cb7-55" aria-hidden="true" tabindex="-1"></a>    args<span class="op">=</span>training_args,</span>
+<span id="cb7-56"><a href="#cb7-56" aria-hidden="true" tabindex="-1"></a>    train_dataset<span class="op">=</span>dataset,</span>
+<span id="cb7-57"><a href="#cb7-57" aria-hidden="true" tabindex="-1"></a>    processing_class<span class="op">=</span>tokenizer,</span>
+<span id="cb7-58"><a href="#cb7-58" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb7-59"><a href="#cb7-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-60"><a href="#cb7-60" aria-hidden="true" tabindex="-1"></a>trainer.train()</span>
+<span id="cb7-61"><a href="#cb7-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-62"><a href="#cb7-62" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> <span class="st">"### Instrucción:</span><span class="ch">\n</span><span class="st">Clasifica el sentimiento de esta reseña.</span><span class="ch">\n\n</span><span class="st">### Entrada:</span><span class="ch">\n</span><span class="st">El diseño es bonito pero la batería no dura nada.</span><span class="ch">\n\n</span><span class="st">### Respuesta:</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb7-63"><a href="#cb7-63" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> tokenizer(prompt, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(model.device)</span>
+<span id="cb7-64"><a href="#cb7-64" aria-hidden="true" tabindex="-1"></a>outputs <span class="op">=</span> model.generate(<span class="op">**</span>inputs, max_new_tokens<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb7-65"><a href="#cb7-65" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tokenizer.decode(outputs[<span class="dv">0</span>], skip_special_tokens<span class="op">=</span><span class="va">True</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Sobre este ejemplo
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>El modelo <code>Qwen3-0.6B</code> es pequeño (600M parámetros) para que el ejemplo sea rápido. En tu proyecto puedes usar modelos mayores (7B) con QLoRA.</li>
+<li>El dataset tiene solo 3 ejemplos para ilustrar el formato. En la práctica necesitas <strong>cientos o miles</strong> de ejemplos para un fine-tuning efectivo.</li>
+<li>El formato <code>### Instrucción / ### Entrada / ### Respuesta</code> es el estándar para SFT (Supervised Fine-Tuning).</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>La calidad del dataset es lo más importante
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>El fine-tuning con datos de baja calidad produce un modelo <strong>peor</strong> que el base. Antes de hacer fine-tuning:</p>
+<ol type="1">
+<li><strong>Revisa</strong> cada ejemplo manualmente</li>
+<li><strong>Asegura</strong> consistencia en el formato</li>
+<li><strong>Incluye</strong> casos edge (respuestas negativas, neutrales, ambiguas)</li>
+<li><strong>Empieza</strong> con 100-500 ejemplos de alta calidad antes de escalar</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+<section id="resumen" class="level3">
+<h3 class="anchored" data-anchor-id="resumen">Resumen</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Técnica</th>
+<th>VRAM (modelo 7B)</th>
+<th>Calidad</th>
+<th>Caso de uso</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Fine-tuning completo</td>
+<td>~56 GB</td>
+<td>Máxima</td>
+<td>Investigación, recursos ilimitados</td>
+</tr>
+<tr class="even">
+<td>LoRA</td>
+<td>~16 GB</td>
+<td>Alta</td>
+<td>Uso general, GPU A100/4090</td>
+</tr>
+<tr class="odd">
+<td>QLoRA</td>
+<td>~6 GB</td>
+<td>Alta (ligeramente menor)</td>
+<td>GPU de consumidor, Colab gratuito</td>
+</tr>
+<tr class="even">
+<td>Prompting / RAG</td>
+<td>0 GB extra</td>
+<td>Depende del modelo base</td>
+<td>La mayoría de casos prácticos</td>
+</tr>
+</tbody>
+</table>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Árbol de decisión final
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>¿Tu problema se resuelve con <strong>prompting</strong>? → No hagas fine-tuning.</li>
+<li>¿Necesitas <strong>conocimiento actualizable</strong>? → Usa <strong>RAG</strong>.</li>
+<li>¿Necesitas <strong>comportamiento/formato específico</strong> y tienes datos de calidad? → <strong>LoRA</strong> (o <strong>QLoRA</strong> si tienes poca VRAM).</li>
+<li>¿Necesitas <strong>ambos</strong> (conocimiento + comportamiento)? → <strong>RAG + LoRA</strong>.</li>
+</ol>
+</div>
+</div>
+<hr>
+</section>
+</section>
+<section id="referencias" class="level2">
+<h2 class="anchored" data-anchor-id="referencias">Referencias</h2>
+<ul>
+<li>Hu, E. et al.&nbsp;(2022). <strong>LoRA: Low-Rank Adaptation of Large Language Models</strong>. ICLR. <a href="https://arxiv.org/abs/2106.09685">arXiv:2106.09685</a></li>
+<li>Dettmers, T. et al.&nbsp;(2023). <strong>QLoRA: Efficient Finetuning of Quantized Language Models</strong>. NeurIPS. <a href="https://arxiv.org/abs/2305.14314">arXiv:2305.14314</a></li>
+<li>He, J. et al.&nbsp;(2022). <strong>Towards a Unified View of Parameter-Efficient Transfer Learning</strong>. ICLR. <a href="https://arxiv.org/abs/2110.04366">arXiv:2110.04366</a></li>
+<li>Lester, B. et al.&nbsp;(2021). <strong>The Power of Scale for Parameter-Efficient Prompt Tuning</strong>. EMNLP. <a href="https://arxiv.org/abs/2104.08691">arXiv:2104.08691</a></li>
+</ul>
+<hr>
+<blockquote class="blockquote">
+<p>Has completado la teoría del <strong>Bloque 3</strong>. Ahora pasa al taller práctico: <strong><a href="../evaluables/hpd4-rag-mixto.html">HPD 4 — Sistema RAG sobre datos mixtos</a></strong>.</p>
+</blockquote>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<footer class="footer-custom">
+  <div class="footer-logos">
+    <img src="../images/logo_cfp.png" alt="Formación Permanente · Universidad de Sevilla">
+  </div>
+  <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
+</footer>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "03c — Fine-tuning Eficiente: LoRA, QLoRA y Cuándo Adaptar Modelos"</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> jupyter</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="al">![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)</span><span class="co">](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque3/03c-fine-tuning.ipynb)</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Este tema forma parte del **Bloque 3 — Aplicaciones**. Se recomienda haber completado los </span><span class="co">[</span><span class="ot">Bloques 1</span><span class="co">](../bloque1/01-fundamentos.qmd)</span><span class="at"> y </span><span class="co">[</span><span class="ot">2</span><span class="co">](../bloque2/02-orquestacion.qmd)</span><span class="at"> primero.</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q transformers peft bitsandbytes trl datasets torch accelerate python<span class="op">-</span>dotenv</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
+<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span>
+<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="fu">## Fine-tuning Eficiente</span></span>
+<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="fu">### ¿Qué es fine-tuning y por qué es difícil?</span></span>
+<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a>Un LLM preentrenado es como un **médico generalista**: sabe de todo un poco. Hacer fine-tuning es como enviarlo a una **especialización de 6 meses**: sale sabiendo mucho de un tema concreto sin olvidar lo general.</span>
+<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a>El fine-tuning consiste en tomar un modelo base preentrenado y **entrenarlo adicionalmente** con datos de tu dominio para que adapte su comportamiento: nuevo tono, nuevo formato de salida, nuevo vocabulario técnico, o nuevo conocimiento específico.</span>
+<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a>graph LR</span>
+<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Preentrenamiento</span><span class="ot">"</span></span>
+<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>        A[<span class="ot">"</span><span class="st">Datos generales&lt;br/&gt;(internet, libros, código)</span><span class="ot">"</span>] --&gt; B[<span class="ot">"</span><span class="st">Modelo base&lt;br/&gt;(GPT, Llama, Qwen)</span><span class="ot">"</span>]</span>
+<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Fine-tuning</span><span class="ot">"</span></span>
+<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>        B --&gt; C[<span class="ot">"</span><span class="st">Modelo base&lt;br/&gt;(congelado o no)</span><span class="ot">"</span>]</span>
+<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>        D[<span class="ot">"</span><span class="st">Datos específicos&lt;br/&gt;(tu dominio)</span><span class="ot">"</span>] --&gt; C</span>
+<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>        C --&gt; E[<span class="ot">"</span><span class="st">Modelo adaptado&lt;br/&gt;a tu dominio</span><span class="ot">"</span>]</span>
+<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>    style B fill:<span class="co">#306998,color:#fff</span></span>
+<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#FFD43B,color:#000</span></span>
+<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a>    style E fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>El problema es la **escala**. Los modelos modernos tienen miles de millones de parámetros, y entrenarlos completamente requiere una cantidad de memoria GPU prohibitiva:</span>
+<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Modelo <span class="pp">|</span> Parámetros <span class="pp">|</span> RAM para fine-tuning completo <span class="pp">|</span> Coste GPU/hora <span class="pp">|</span></span>
+<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Llama 3.3 70B <span class="pp">|</span> 70 mil millones <span class="pp">|</span> ~560 GB <span class="pp">|</span> ~$50/h (A100 80GB) <span class="pp">|</span></span>
+<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Qwen 3 7B <span class="pp">|</span> 7 mil millones <span class="pp">|</span> ~56 GB <span class="pp">|</span> ~$5/h (A100 80GB) <span class="pp">|</span></span>
+<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Gemma 2B <span class="pp">|</span> 2 mil millones <span class="pp">|</span> ~16 GB <span class="pp">|</span> ~$1/h (T4 16GB) <span class="pp">|</span></span>
+<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a><span class="fu">## El problema de memoria</span></span>
+<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>Fine-tuning completo de un modelo 7B requiere ~56 GB de RAM: 14 GB para los pesos + 28 GB para los gradientes + 14 GB para los estados del optimizador Adam. Una GPU de consumidor (RTX 4090: 24 GB) no basta. Aquí entran las técnicas **PEFT** (Parameter-Efficient Fine-Tuning).</span>
+<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a><span class="fu">### La decisión clave: ¿Fine-tuning, RAG o Prompting?</span></span>
+<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>Antes de hacer fine-tuning, pregúntate si realmente lo necesitas. La mayoría de las veces, **RAG o prompting son suficientes**.</span>
+<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb8-89"><a href="#cb8-89" aria-hidden="true" tabindex="-1"></a>    Q[<span class="ot">"</span><span class="st">¿Qué necesitas cambiar?</span><span class="ot">"</span>] --&gt; A{¿Nuevo conocimiento?}</span>
+<span id="cb8-90"><a href="#cb8-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-91"><a href="#cb8-91" aria-hidden="true" tabindex="-1"></a>    A --&gt;|Sí| B{¿Los datos cambian&lt;br/&gt;frecuentemente?}</span>
+<span id="cb8-92"><a href="#cb8-92" aria-hidden="true" tabindex="-1"></a>    A --&gt;|No| C{¿Nuevo comportamiento&lt;br/&gt;o formato?}</span>
+<span id="cb8-93"><a href="#cb8-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-94"><a href="#cb8-94" aria-hidden="true" tabindex="-1"></a>    B --&gt;|Sí| RAG[<span class="ot">"</span><span class="st">RAG&lt;br/&gt;(re-indexar es barato)</span><span class="ot">"</span>]</span>
+<span id="cb8-95"><a href="#cb8-95" aria-hidden="true" tabindex="-1"></a>    B --&gt;|No| D{¿Mucho conocimiento&lt;br/&gt;nuevo?}</span>
+<span id="cb8-96"><a href="#cb8-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-97"><a href="#cb8-97" aria-hidden="true" tabindex="-1"></a>    D --&gt;|Sí| RAG</span>
+<span id="cb8-98"><a href="#cb8-98" aria-hidden="true" tabindex="-1"></a>    D --&gt;|No| FT[<span class="ot">"</span><span class="st">Fine-tuning&lt;br/&gt;(conocimiento estable)</span><span class="ot">"</span>]</span>
+<span id="cb8-99"><a href="#cb8-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-100"><a href="#cb8-100" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Sí| FT2[<span class="ot">"</span><span class="st">Fine-tuning&lt;br/&gt;(tono, formato, dominio)</span><span class="ot">"</span>]</span>
+<span id="cb8-101"><a href="#cb8-101" aria-hidden="true" tabindex="-1"></a>    C --&gt;|No| P[<span class="ot">"</span><span class="st">Prompting&lt;br/&gt;(instrucciones bastan)</span><span class="ot">"</span>]</span>
+<span id="cb8-102"><a href="#cb8-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-103"><a href="#cb8-103" aria-hidden="true" tabindex="-1"></a>    style Q fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb8-104"><a href="#cb8-104" aria-hidden="true" tabindex="-1"></a>    style RAG fill:<span class="co">#FFD43B,color:#000</span></span>
+<span id="cb8-105"><a href="#cb8-105" aria-hidden="true" tabindex="-1"></a>    style FT fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb8-106"><a href="#cb8-106" aria-hidden="true" tabindex="-1"></a>    style FT2 fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb8-107"><a href="#cb8-107" aria-hidden="true" tabindex="-1"></a>    style P fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb8-108"><a href="#cb8-108" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-109"><a href="#cb8-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-110"><a href="#cb8-110" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Criterio <span class="pp">|</span> Prompting <span class="pp">|</span> RAG <span class="pp">|</span> Fine-tuning <span class="pp">|</span></span>
+<span id="cb8-111"><a href="#cb8-111" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb8-112"><a href="#cb8-112" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Nuevo conocimiento** <span class="pp">|</span> No <span class="pp">|</span> Sí <span class="pp">|</span> Sí (limitado) <span class="pp">|</span></span>
+<span id="cb8-113"><a href="#cb8-113" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Nuevo formato/comportamiento** <span class="pp">|</span> Limitado <span class="pp">|</span> No <span class="pp">|</span> Sí <span class="pp">|</span></span>
+<span id="cb8-114"><a href="#cb8-114" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Latencia añadida** <span class="pp">|</span> Ninguna <span class="pp">|</span> Retrieval (ms) <span class="pp">|</span> Ninguna <span class="pp">|</span></span>
+<span id="cb8-115"><a href="#cb8-115" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Coste de setup** <span class="pp">|</span> Minutos <span class="pp">|</span> Horas <span class="pp">|</span> Horas + GPU <span class="pp">|</span></span>
+<span id="cb8-116"><a href="#cb8-116" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Mantenimiento** <span class="pp">|</span> Editar prompt <span class="pp">|</span> Pipeline + Vector DB <span class="pp">|</span> Re-entrenar <span class="pp">|</span></span>
+<span id="cb8-117"><a href="#cb8-117" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Actualización de datos** <span class="pp">|</span> Editar prompt <span class="pp">|</span> Re-indexar <span class="pp">|</span> Re-entrenar <span class="pp">|</span></span>
+<span id="cb8-118"><a href="#cb8-118" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Ejemplo de uso** <span class="pp">|</span> Extraer JSON <span class="pp">|</span> Buscar en documentos corporativos <span class="pp">|</span> Adaptar tono médico/legal <span class="pp">|</span></span>
+<span id="cb8-119"><a href="#cb8-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-120"><a href="#cb8-120" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb8-121"><a href="#cb8-121" aria-hidden="true" tabindex="-1"></a><span class="fu">## Regla práctica</span></span>
+<span id="cb8-122"><a href="#cb8-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-123"><a href="#cb8-123" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Empieza con prompting.** Si no basta, añade RAG.</span>
+<span id="cb8-124"><a href="#cb8-124" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Si necesitas un comportamiento muy específico** (tono, formato, vocabulario de dominio), considera fine-tuning.</span>
+<span id="cb8-125"><a href="#cb8-125" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Si necesitas conocimiento actualizable**, usa RAG. El fine-tuning no se actualiza sin re-entrenar.</span>
+<span id="cb8-126"><a href="#cb8-126" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Si necesitas ambos** (conocimiento + comportamiento), combina RAG + fine-tuning.</span>
+<span id="cb8-127"><a href="#cb8-127" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-128"><a href="#cb8-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-129"><a href="#cb8-129" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-130"><a href="#cb8-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-131"><a href="#cb8-131" aria-hidden="true" tabindex="-1"></a><span class="fu">### LoRA: Low-Rank Adaptation</span></span>
+<span id="cb8-132"><a href="#cb8-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-133"><a href="#cb8-133" aria-hidden="true" tabindex="-1"></a>**LoRA** es la técnica PEFT más popular. En vez de reescribir todos los pesos del modelo, añade pequeñas "notas adhesivas" (matrices de bajo rango) que modifican el comportamiento sin tocar el modelo original.</span>
+<span id="cb8-134"><a href="#cb8-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-135"><a href="#cb8-135" aria-hidden="true" tabindex="-1"></a>**En vez de reescribir todo el libro (fine-tuning completo), LoRA añade notas adhesivas en las páginas clave. El libro original no cambia, pero las notas modifican cómo se lee.**</span>
+<span id="cb8-136"><a href="#cb8-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-139"><a href="#cb8-139" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb8-140"><a href="#cb8-140" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb8-141"><a href="#cb8-141" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Modelo original (congelado)</span><span class="ot">"</span></span>
+<span id="cb8-142"><a href="#cb8-142" aria-hidden="true" tabindex="-1"></a>        X[<span class="ot">"</span><span class="st">Entrada </span><span class="dt">$$x</span><span class="wa">$$</span><span class="ot">"</span>] --&gt; W[<span class="ot">"</span><span class="st">Matriz </span><span class="dt">$$W</span><span class="wa">$$</span><span class="st">&lt;br/&gt;(</span><span class="dt">$$d</span><span class="st"> </span><span class="ch">\t</span><span class="st">imes d</span><span class="wa">$$</span><span class="st">, congelada)</span><span class="ot">"</span>]</span>
+<span id="cb8-143"><a href="#cb8-143" aria-hidden="true" tabindex="-1"></a>        W --&gt; WX[<span class="ot">"</span><span class="dt">$$Wx</span><span class="wa">$$</span><span class="ot">"</span>]</span>
+<span id="cb8-144"><a href="#cb8-144" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb8-145"><a href="#cb8-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-146"><a href="#cb8-146" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Adaptadores LoRA (entrenables)</span><span class="ot">"</span></span>
+<span id="cb8-147"><a href="#cb8-147" aria-hidden="true" tabindex="-1"></a>        X --&gt; A[<span class="ot">"</span><span class="st">Matriz </span><span class="dt">$$A</span><span class="wa">$$</span><span class="st">&lt;br/&gt;(</span><span class="dt">$$d</span><span class="st"> </span><span class="ch">\t</span><span class="st">imes r</span><span class="wa">$$</span><span class="st">, </span><span class="dt">$$r</span><span class="st"> </span><span class="ch">\l</span><span class="st">l d</span><span class="wa">$$</span><span class="st">)</span><span class="ot">"</span>]</span>
+<span id="cb8-148"><a href="#cb8-148" aria-hidden="true" tabindex="-1"></a>        A --&gt; B[<span class="ot">"</span><span class="st">Matriz </span><span class="dt">$$B</span><span class="wa">$$</span><span class="st">&lt;br/&gt;(</span><span class="dt">$$r</span><span class="st"> </span><span class="ch">\t</span><span class="st">imes d</span><span class="wa">$$</span><span class="st">)</span><span class="ot">"</span>]</span>
+<span id="cb8-149"><a href="#cb8-149" aria-hidden="true" tabindex="-1"></a>        B --&gt; BAX[<span class="ot">"</span><span class="dt">$$BAx</span><span class="wa">$$</span><span class="ot">"</span>]</span>
+<span id="cb8-150"><a href="#cb8-150" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb8-151"><a href="#cb8-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-152"><a href="#cb8-152" aria-hidden="true" tabindex="-1"></a>    WX --&gt; SUM[<span class="ot">"</span><span class="wa">$$</span><span class="st">+</span><span class="wa">$$</span><span class="ot">"</span>]</span>
+<span id="cb8-153"><a href="#cb8-153" aria-hidden="true" tabindex="-1"></a>    BAX --&gt; SUM</span>
+<span id="cb8-154"><a href="#cb8-154" aria-hidden="true" tabindex="-1"></a>    SUM --&gt; OUT[<span class="ot">"</span><span class="st">Salida: </span><span class="dt">$$Wx</span><span class="st"> + BAx</span><span class="wa">$$</span><span class="ot">"</span>]</span>
+<span id="cb8-155"><a href="#cb8-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-156"><a href="#cb8-156" aria-hidden="true" tabindex="-1"></a>    style W fill:<span class="co">#306998,color:#fff</span></span>
+<span id="cb8-157"><a href="#cb8-157" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb8-158"><a href="#cb8-158" aria-hidden="true" tabindex="-1"></a>    style B fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb8-159"><a href="#cb8-159" aria-hidden="true" tabindex="-1"></a>    style SUM fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb8-160"><a href="#cb8-160" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-161"><a href="#cb8-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-162"><a href="#cb8-162" aria-hidden="true" tabindex="-1"></a>La idea es que los **cambios necesarios** para adaptar el modelo son de "bajo rango": no necesitas modificar los millones de pesos de W, solo unas pocas direcciones principales. Las matrices A y B capturan esas direcciones con una fracción de los parámetros.</span>
+<span id="cb8-163"><a href="#cb8-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-164"><a href="#cb8-164" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Intuición del rango bajo</span></span>
+<span id="cb8-165"><a href="#cb8-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-166"><a href="#cb8-166" aria-hidden="true" tabindex="-1"></a>Imagina una imagen de 1000×1000 píxeles (1 millón de valores). Si la describes con 10 factores principales (rango 10), solo necesitas 1000×10 + 10×1000 = 20.000 valores. Has comprimido **50×** sin perder la esencia.</span>
+<span id="cb8-167"><a href="#cb8-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-168"><a href="#cb8-168" aria-hidden="true" tabindex="-1"></a>Lo mismo aplica a las matrices de pesos del Transformer: los cambios necesarios para adaptar el modelo a un nuevo dominio ocupan pocas direcciones principales.</span>
+<span id="cb8-169"><a href="#cb8-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-170"><a href="#cb8-170" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Parámetro <span class="pp">|</span> Qué controla <span class="pp">|</span> Valor típico <span class="pp">|</span> Impacto <span class="pp">|</span></span>
+<span id="cb8-171"><a href="#cb8-171" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb8-172"><a href="#cb8-172" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **r** (rank) <span class="pp">|</span> Tamaño de las matrices A y B <span class="pp">|</span> 8-64 <span class="pp">|</span> Más alto = más capacidad, más VRAM <span class="pp">|</span></span>
+<span id="cb8-173"><a href="#cb8-173" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **alpha** <span class="pp">|</span> Factor de escala (alpha/r) <span class="pp">|</span> 16-128 <span class="pp">|</span> Controla cuánto influye LoRA vs el modelo base <span class="pp">|</span></span>
+<span id="cb8-174"><a href="#cb8-174" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **target_modules** <span class="pp">|</span> Qué capas del Transformer se adaptan <span class="pp">|</span> <span class="in">`q_proj, v_proj`</span> <span class="pp">|</span> Más módulos = más parámetros <span class="pp">|</span></span>
+<span id="cb8-175"><a href="#cb8-175" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **dropout** <span class="pp">|</span> Regularización <span class="pp">|</span> 0.05-0.1 <span class="pp">|</span> Evita overfitting en datasets pequeños <span class="pp">|</span></span>
+<span id="cb8-176"><a href="#cb8-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-179"><a href="#cb8-179" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-180"><a href="#cb8-180" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb8-181"><a href="#cb8-181" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb8-182"><a href="#cb8-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-183"><a href="#cb8-183" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig</span>
+<span id="cb8-184"><a href="#cb8-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-185"><a href="#cb8-185" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> LoraConfig(</span>
+<span id="cb8-186"><a href="#cb8-186" aria-hidden="true" tabindex="-1"></a>    r<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb8-187"><a href="#cb8-187" aria-hidden="true" tabindex="-1"></a>    lora_alpha<span class="op">=</span><span class="dv">32</span>,</span>
+<span id="cb8-188"><a href="#cb8-188" aria-hidden="true" tabindex="-1"></a>    target_modules<span class="op">=</span>[<span class="st">"q_proj"</span>, <span class="st">"v_proj"</span>],</span>
+<span id="cb8-189"><a href="#cb8-189" aria-hidden="true" tabindex="-1"></a>    lora_dropout<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb8-190"><a href="#cb8-190" aria-hidden="true" tabindex="-1"></a>    bias<span class="op">=</span><span class="st">"none"</span>,</span>
+<span id="cb8-191"><a href="#cb8-191" aria-hidden="true" tabindex="-1"></a>    task_type<span class="op">=</span><span class="st">"CAUSAL_LM"</span>,</span>
+<span id="cb8-192"><a href="#cb8-192" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-193"><a href="#cb8-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-194"><a href="#cb8-194" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Configuración LoRA:"</span>)</span>
+<span id="cb8-195"><a href="#cb8-195" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Rank (r): </span><span class="sc">{</span>config<span class="sc">.</span>r<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-196"><a href="#cb8-196" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Alpha: </span><span class="sc">{</span>config<span class="sc">.</span>lora_alpha<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-197"><a href="#cb8-197" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Escala efectiva: alpha/r = </span><span class="sc">{</span>config<span class="sc">.</span>lora_alpha <span class="op">/</span> config<span class="sc">.</span>r<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-198"><a href="#cb8-198" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Módulos objetivo: </span><span class="sc">{</span>config<span class="sc">.</span>target_modules<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-199"><a href="#cb8-199" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Dropout: </span><span class="sc">{</span>config<span class="sc">.</span>lora_dropout<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-200"><a href="#cb8-200" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-201"><a href="#cb8-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-202"><a href="#cb8-202" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb8-203"><a href="#cb8-203" aria-hidden="true" tabindex="-1"></a><span class="fu">## Configuración recomendada para empezar</span></span>
+<span id="cb8-204"><a href="#cb8-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-205"><a href="#cb8-205" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**r=8, alpha=16, target_modules=['q_proj', 'v_proj']** — mínima, funciona bien para la mayoría de casos</span>
+<span id="cb8-206"><a href="#cb8-206" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**r=16, alpha=32, target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj']** — más capacidad, más VRAM</span>
+<span id="cb8-207"><a href="#cb8-207" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**r=64, alpha=128** — solo si tienes muchos datos (&gt;10k ejemplos) y VRAM suficiente</span>
+<span id="cb8-208"><a href="#cb8-208" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-209"><a href="#cb8-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-210"><a href="#cb8-210" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-211"><a href="#cb8-211" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-212"><a href="#cb8-212" aria-hidden="true" tabindex="-1"></a><span class="fu">### QLoRA: fine-tuning en GPU de consumidor</span></span>
+<span id="cb8-213"><a href="#cb8-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-214"><a href="#cb8-214" aria-hidden="true" tabindex="-1"></a>**QLoRA** combina LoRA con **cuantización a 4 bits**: el modelo base se comprime para que ocupe menos memoria, y solo los adaptadores LoRA se entrenan en precisión completa.</span>
+<span id="cb8-215"><a href="#cb8-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-216"><a href="#cb8-216" aria-hidden="true" tabindex="-1"></a>**QLoRA es como hacer la mudanza en una furgoneta en vez de un camión: el modelo base viaja comprimido (4 bits) y solo las notas adhesivas (LoRA) ocupan espacio real.**</span>
+<span id="cb8-217"><a href="#cb8-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-220"><a href="#cb8-220" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb8-221"><a href="#cb8-221" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb8-222"><a href="#cb8-222" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">QLoRA</span><span class="ot">"</span></span>
+<span id="cb8-223"><a href="#cb8-223" aria-hidden="true" tabindex="-1"></a>        A[<span class="ot">"</span><span class="st">Modelo base 7B</span><span class="ot">"</span>] --&gt; B[<span class="ot">"</span><span class="st">Cuantizar a 4-bit (NF4)</span><span class="ot">"</span>]</span>
+<span id="cb8-224"><a href="#cb8-224" aria-hidden="true" tabindex="-1"></a>        B --&gt; C[<span class="ot">"</span><span class="st">~4 GB en GPU</span><span class="ot">"</span>]</span>
+<span id="cb8-225"><a href="#cb8-225" aria-hidden="true" tabindex="-1"></a>        C --&gt; D[<span class="ot">"</span><span class="st">+ Adaptadores LoRA (16-bit)</span><span class="ot">"</span>]</span>
+<span id="cb8-226"><a href="#cb8-226" aria-hidden="true" tabindex="-1"></a>        D --&gt; E[<span class="ot">"</span><span class="st">Entrenar solo LoRA</span><span class="ot">"</span>]</span>
+<span id="cb8-227"><a href="#cb8-227" aria-hidden="true" tabindex="-1"></a>        E --&gt; F[<span class="ot">"</span><span class="st">Modelo base 4-bit&lt;br/&gt;+ LoRA 16-bit</span><span class="ot">"</span>]</span>
+<span id="cb8-228"><a href="#cb8-228" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb8-229"><a href="#cb8-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-230"><a href="#cb8-230" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#306998,color:#fff</span></span>
+<span id="cb8-231"><a href="#cb8-231" aria-hidden="true" tabindex="-1"></a>    style B fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb8-232"><a href="#cb8-232" aria-hidden="true" tabindex="-1"></a>    style E fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb8-233"><a href="#cb8-233" aria-hidden="true" tabindex="-1"></a>    style F fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb8-234"><a href="#cb8-234" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-235"><a href="#cb8-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-236"><a href="#cb8-236" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Enfoque <span class="pp">|</span> Modelo 7B en GPU <span class="pp">|</span> VRAM necesaria <span class="pp">|</span></span>
+<span id="cb8-237"><a href="#cb8-237" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb8-238"><a href="#cb8-238" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fine-tuning completo (16-bit) <span class="pp">|</span> 14 GB pesos + 42 GB optimizador <span class="pp">|</span> ~56 GB <span class="pp">|</span></span>
+<span id="cb8-239"><a href="#cb8-239" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> LoRA (16-bit) <span class="pp">|</span> 14 GB pesos (congelados) + 0.1 GB LoRA <span class="pp">|</span> ~16 GB <span class="pp">|</span></span>
+<span id="cb8-240"><a href="#cb8-240" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **QLoRA (4-bit)** | **4 GB pesos (congelados) + 0.1 GB LoRA** | **~6 GB** <span class="pp">|</span></span>
+<span id="cb8-241"><a href="#cb8-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-242"><a href="#cb8-242" aria-hidden="true" tabindex="-1"></a>Con QLoRA puedes hacer fine-tuning de un modelo 7B en una **GPU de Colab gratuita** (T4, 16 GB VRAM).</span>
+<span id="cb8-243"><a href="#cb8-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-246"><a href="#cb8-246" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-247"><a href="#cb8-247" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb8-248"><a href="#cb8-248" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-249"><a href="#cb8-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-250"><a href="#cb8-250" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModelForCausalLM, BitsAndBytesConfig</span>
+<span id="cb8-251"><a href="#cb8-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-252"><a href="#cb8-252" aria-hidden="true" tabindex="-1"></a>bnb_config <span class="op">=</span> BitsAndBytesConfig(</span>
+<span id="cb8-253"><a href="#cb8-253" aria-hidden="true" tabindex="-1"></a>    load_in_4bit<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-254"><a href="#cb8-254" aria-hidden="true" tabindex="-1"></a>    bnb_4bit_quant_type<span class="op">=</span><span class="st">"nf4"</span>,</span>
+<span id="cb8-255"><a href="#cb8-255" aria-hidden="true" tabindex="-1"></a>    bnb_4bit_compute_dtype<span class="op">=</span><span class="st">"float16"</span>,</span>
+<span id="cb8-256"><a href="#cb8-256" aria-hidden="true" tabindex="-1"></a>    bnb_4bit_use_double_quant<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-257"><a href="#cb8-257" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-258"><a href="#cb8-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-259"><a href="#cb8-259" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForCausalLM.from_pretrained(</span>
+<span id="cb8-260"><a href="#cb8-260" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Qwen/Qwen3-0.6B"</span>,</span>
+<span id="cb8-261"><a href="#cb8-261" aria-hidden="true" tabindex="-1"></a>    quantization_config<span class="op">=</span>bnb_config,</span>
+<span id="cb8-262"><a href="#cb8-262" aria-hidden="true" tabindex="-1"></a>    device_map<span class="op">=</span><span class="st">"auto"</span>,</span>
+<span id="cb8-263"><a href="#cb8-263" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-264"><a href="#cb8-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-265"><a href="#cb8-265" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Modelo cargado en 4-bit"</span>)</span>
+<span id="cb8-266"><a href="#cb8-266" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  Parámetros totales: </span><span class="sc">{</span>model<span class="sc">.</span>num_parameters()<span class="sc">:,}</span><span class="ss">"</span>)</span>
+<span id="cb8-267"><a href="#cb8-267" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"  VRAM usada: ~</span><span class="sc">{</span><span class="bu">sum</span>(p.numel() <span class="op">*</span> p.element_size() <span class="cf">for</span> p <span class="kw">in</span> model.parameters()) <span class="op">/</span> <span class="fl">1e6</span><span class="sc">:.0f}</span><span class="ss"> MB (solo pesos)"</span>)</span>
+<span id="cb8-268"><a href="#cb8-268" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-269"><a href="#cb8-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-270"><a href="#cb8-270" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb8-271"><a href="#cb8-271" aria-hidden="true" tabindex="-1"></a><span class="fu">## QLoRA vs LoRA: ¿pierdes calidad?</span></span>
+<span id="cb8-272"><a href="#cb8-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-273"><a href="#cb8-273" aria-hidden="true" tabindex="-1"></a>QLoRA reduce la calidad ligeramente vs LoRA 16-bit. Para la mayoría de casos la diferencia es despreciable (&lt;2% en benchmarks), pero si necesitas máxima precisión y tienes VRAM suficiente, usa LoRA sin cuantizar.</span>
+<span id="cb8-274"><a href="#cb8-274" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-275"><a href="#cb8-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-276"><a href="#cb8-276" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-277"><a href="#cb8-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-278"><a href="#cb8-278" aria-hidden="true" tabindex="-1"></a><span class="fu">### Otras técnicas PEFT</span></span>
+<span id="cb8-279"><a href="#cb8-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-280"><a href="#cb8-280" aria-hidden="true" tabindex="-1"></a>LoRA y QLoRA cubren el 95% de los casos prácticos. Las demás técnicas son relevantes si lees papers o trabajas en investigación:</span>
+<span id="cb8-281"><a href="#cb8-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-282"><a href="#cb8-282" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Técnica <span class="pp">|</span> Idea <span class="pp">|</span> Parámetros añadidos <span class="pp">|</span> Cuándo usarla <span class="pp">|</span></span>
+<span id="cb8-283"><a href="#cb8-283" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb8-284"><a href="#cb8-284" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **LoRA** <span class="pp">|</span> Matrices de bajo rango en capas lineales <span class="pp">|</span> ~0.1-1% <span class="pp">|</span> La más versátil, recomendada por defecto <span class="pp">|</span></span>
+<span id="cb8-285"><a href="#cb8-285" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **QLoRA** <span class="pp">|</span> LoRA + cuantización 4-bit <span class="pp">|</span> ~0.1-1% <span class="pp">|</span> Cuando la VRAM es limitada <span class="pp">|</span></span>
+<span id="cb8-286"><a href="#cb8-286" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Adapters** <span class="pp">|</span> Capas bottleneck entre capas del Transformer <span class="pp">|</span> ~1-3% <span class="pp">|</span> Investigación, menos soporte en herramientas <span class="pp">|</span></span>
+<span id="cb8-287"><a href="#cb8-287" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Prefix-tuning** <span class="pp">|</span> Prefijos aprendidos en cada capa <span class="pp">|</span> ~0.1% <span class="pp">|</span> Generación de texto, menos popular <span class="pp">|</span></span>
+<span id="cb8-288"><a href="#cb8-288" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Prompt-tuning** <span class="pp">|</span> Soft prompts aprendidos <span class="pp">|</span> ~0.01% <span class="pp">|</span> Modelos muy grandes (&gt;10B), pocos datos <span class="pp">|</span></span>
+<span id="cb8-289"><a href="#cb8-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-290"><a href="#cb8-290" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb8-291"><a href="#cb8-291" aria-hidden="true" tabindex="-1"></a><span class="fu">## En la práctica</span></span>
+<span id="cb8-292"><a href="#cb8-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-293"><a href="#cb8-293" aria-hidden="true" tabindex="-1"></a>Si estás empezando, usa **LoRA** (o **QLoRA** si tienes poca VRAM). Las demás técnicas tienen casos de uso muy específicos y menos soporte en las herramientas habituales (Hugging Face, TRL, etc.).</span>
+<span id="cb8-294"><a href="#cb8-294" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-295"><a href="#cb8-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-296"><a href="#cb8-296" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-297"><a href="#cb8-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-298"><a href="#cb8-298" aria-hidden="true" tabindex="-1"></a><span class="fu">### Infraestructura y ejemplo en Colab</span></span>
+<span id="cb8-299"><a href="#cb8-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-300"><a href="#cb8-300" aria-hidden="true" tabindex="-1"></a>El stack tecnológico para fine-tuning eficiente es:</span>
+<span id="cb8-301"><a href="#cb8-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-304"><a href="#cb8-304" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb8-305"><a href="#cb8-305" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb8-306"><a href="#cb8-306" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Stack de fine-tuning</span><span class="ot">"</span></span>
+<span id="cb8-307"><a href="#cb8-307" aria-hidden="true" tabindex="-1"></a>        A[<span class="ot">"</span><span class="st">Hugging Face TRL&lt;br/&gt;(entrenamiento SFT/RLHF)</span><span class="ot">"</span>] --&gt; B[<span class="ot">"</span><span class="st">PEFT&lt;br/&gt;(LoRA/QLoRA)</span><span class="ot">"</span>]</span>
+<span id="cb8-308"><a href="#cb8-308" aria-hidden="true" tabindex="-1"></a>        B --&gt; C[<span class="ot">"</span><span class="st">bitsandbytes&lt;br/&gt;(cuantización 4-bit)</span><span class="ot">"</span>]</span>
+<span id="cb8-309"><a href="#cb8-309" aria-hidden="true" tabindex="-1"></a>        C --&gt; D[<span class="ot">"</span><span class="st">Transformers&lt;br/&gt;(modelo base)</span><span class="ot">"</span>]</span>
+<span id="cb8-310"><a href="#cb8-310" aria-hidden="true" tabindex="-1"></a>        D --&gt; E[<span class="ot">"</span><span class="st">GPU Colab T4&lt;br/&gt;(16 GB VRAM, gratuita)</span><span class="ot">"</span>]</span>
+<span id="cb8-311"><a href="#cb8-311" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb8-312"><a href="#cb8-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-313"><a href="#cb8-313" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb8-314"><a href="#cb8-314" aria-hidden="true" tabindex="-1"></a>    style B fill:<span class="co">#306998,color:#fff</span></span>
+<span id="cb8-315"><a href="#cb8-315" aria-hidden="true" tabindex="-1"></a>    style C fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb8-316"><a href="#cb8-316" aria-hidden="true" tabindex="-1"></a>    style E fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb8-317"><a href="#cb8-317" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-318"><a href="#cb8-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-319"><a href="#cb8-319" aria-hidden="true" tabindex="-1"></a>El siguiente ejemplo muestra un fine-tuning mínimo con TRL (Supervised Fine-Tuning) sobre un modelo pequeño. Está diseñado para ejecutarse en **Colab con GPU T4 gratuita**.</span>
+<span id="cb8-320"><a href="#cb8-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-323"><a href="#cb8-323" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb8-324"><a href="#cb8-324" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb8-325"><a href="#cb8-325" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb8-326"><a href="#cb8-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-327"><a href="#cb8-327" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig</span>
+<span id="cb8-328"><a href="#cb8-328" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig, get_peft_model</span>
+<span id="cb8-329"><a href="#cb8-329" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> trl <span class="im">import</span> SFTConfig, SFTTrainer</span>
+<span id="cb8-330"><a href="#cb8-330" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> Dataset</span>
+<span id="cb8-331"><a href="#cb8-331" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-332"><a href="#cb8-332" aria-hidden="true" tabindex="-1"></a>model_name <span class="op">=</span> <span class="st">"Qwen/Qwen3-0.6B"</span></span>
+<span id="cb8-333"><a href="#cb8-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-334"><a href="#cb8-334" aria-hidden="true" tabindex="-1"></a>bnb_config <span class="op">=</span> BitsAndBytesConfig(</span>
+<span id="cb8-335"><a href="#cb8-335" aria-hidden="true" tabindex="-1"></a>    load_in_4bit<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-336"><a href="#cb8-336" aria-hidden="true" tabindex="-1"></a>    bnb_4bit_quant_type<span class="op">=</span><span class="st">"nf4"</span>,</span>
+<span id="cb8-337"><a href="#cb8-337" aria-hidden="true" tabindex="-1"></a>    bnb_4bit_compute_dtype<span class="op">=</span><span class="st">"float16"</span>,</span>
+<span id="cb8-338"><a href="#cb8-338" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-339"><a href="#cb8-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-340"><a href="#cb8-340" aria-hidden="true" tabindex="-1"></a>tokenizer <span class="op">=</span> AutoTokenizer.from_pretrained(model_name)</span>
+<span id="cb8-341"><a href="#cb8-341" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> AutoModelForCausalLM.from_pretrained(</span>
+<span id="cb8-342"><a href="#cb8-342" aria-hidden="true" tabindex="-1"></a>    model_name,</span>
+<span id="cb8-343"><a href="#cb8-343" aria-hidden="true" tabindex="-1"></a>    quantization_config<span class="op">=</span>bnb_config,</span>
+<span id="cb8-344"><a href="#cb8-344" aria-hidden="true" tabindex="-1"></a>    device_map<span class="op">=</span><span class="st">"auto"</span>,</span>
+<span id="cb8-345"><a href="#cb8-345" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-346"><a href="#cb8-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-347"><a href="#cb8-347" aria-hidden="true" tabindex="-1"></a>lora_config <span class="op">=</span> LoraConfig(</span>
+<span id="cb8-348"><a href="#cb8-348" aria-hidden="true" tabindex="-1"></a>    r<span class="op">=</span><span class="dv">8</span>,</span>
+<span id="cb8-349"><a href="#cb8-349" aria-hidden="true" tabindex="-1"></a>    lora_alpha<span class="op">=</span><span class="dv">16</span>,</span>
+<span id="cb8-350"><a href="#cb8-350" aria-hidden="true" tabindex="-1"></a>    target_modules<span class="op">=</span>[<span class="st">"q_proj"</span>, <span class="st">"v_proj"</span>],</span>
+<span id="cb8-351"><a href="#cb8-351" aria-hidden="true" tabindex="-1"></a>    lora_dropout<span class="op">=</span><span class="fl">0.05</span>,</span>
+<span id="cb8-352"><a href="#cb8-352" aria-hidden="true" tabindex="-1"></a>    task_type<span class="op">=</span><span class="st">"CAUSAL_LM"</span>,</span>
+<span id="cb8-353"><a href="#cb8-353" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-354"><a href="#cb8-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-355"><a href="#cb8-355" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> get_peft_model(model, lora_config)</span>
+<span id="cb8-356"><a href="#cb8-356" aria-hidden="true" tabindex="-1"></a>model.print_trainable_parameters()</span>
+<span id="cb8-357"><a href="#cb8-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-358"><a href="#cb8-358" aria-hidden="true" tabindex="-1"></a>train_data <span class="op">=</span> {</span>
+<span id="cb8-359"><a href="#cb8-359" aria-hidden="true" tabindex="-1"></a>    <span class="st">"text"</span>: [</span>
+<span id="cb8-360"><a href="#cb8-360" aria-hidden="true" tabindex="-1"></a>        <span class="st">"### Instrucción:</span><span class="ch">\n</span><span class="st">Clasifica el sentimiento de esta reseña.</span><span class="ch">\n\n</span><span class="st">### Entrada:</span><span class="ch">\n</span><span class="st">El producto llegó roto y la atención fue pésima.</span><span class="ch">\n\n</span><span class="st">### Respuesta:</span><span class="ch">\n</span><span class="st">Sentimiento: NEGATIVO. El cliente expresa insatisfacción con el estado del producto y el servicio recibido."</span>,</span>
+<span id="cb8-361"><a href="#cb8-361" aria-hidden="true" tabindex="-1"></a>        <span class="st">"### Instrucción:</span><span class="ch">\n</span><span class="st">Clasifica el sentimiento de esta reseña.</span><span class="ch">\n\n</span><span class="st">### Entrada:</span><span class="ch">\n</span><span class="st">Todo perfecto, entrega rápida y bien embalado.</span><span class="ch">\n\n</span><span class="st">### Respuesta:</span><span class="ch">\n</span><span class="st">Sentimiento: POSITIVO. El cliente destaca la calidad del envío y el embalaje."</span>,</span>
+<span id="cb8-362"><a href="#cb8-362" aria-hidden="true" tabindex="-1"></a>        <span class="st">"### Instrucción:</span><span class="ch">\n</span><span class="st">Clasifica el sentimiento de esta reseña.</span><span class="ch">\n\n</span><span class="st">### Entrada:</span><span class="ch">\n</span><span class="st">El paquete llegó ayer por la tarde.</span><span class="ch">\n\n</span><span class="st">### Respuesta:</span><span class="ch">\n</span><span class="st">Sentimiento: NEUTRAL. El cliente solo informa de la recepción sin expresar valoración."</span>,</span>
+<span id="cb8-363"><a href="#cb8-363" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb8-364"><a href="#cb8-364" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb8-365"><a href="#cb8-365" aria-hidden="true" tabindex="-1"></a>dataset <span class="op">=</span> Dataset.from_dict(train_data)</span>
+<span id="cb8-366"><a href="#cb8-366" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-367"><a href="#cb8-367" aria-hidden="true" tabindex="-1"></a>training_args <span class="op">=</span> SFTConfig(</span>
+<span id="cb8-368"><a href="#cb8-368" aria-hidden="true" tabindex="-1"></a>    output_dir<span class="op">=</span><span class="st">"./lora-output"</span>,</span>
+<span id="cb8-369"><a href="#cb8-369" aria-hidden="true" tabindex="-1"></a>    num_train_epochs<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb8-370"><a href="#cb8-370" aria-hidden="true" tabindex="-1"></a>    per_device_train_batch_size<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb8-371"><a href="#cb8-371" aria-hidden="true" tabindex="-1"></a>    gradient_accumulation_steps<span class="op">=</span><span class="dv">4</span>,</span>
+<span id="cb8-372"><a href="#cb8-372" aria-hidden="true" tabindex="-1"></a>    learning_rate<span class="op">=</span><span class="fl">2e-4</span>,</span>
+<span id="cb8-373"><a href="#cb8-373" aria-hidden="true" tabindex="-1"></a>    fp16<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb8-374"><a href="#cb8-374" aria-hidden="true" tabindex="-1"></a>    logging_steps<span class="op">=</span><span class="dv">1</span>,</span>
+<span id="cb8-375"><a href="#cb8-375" aria-hidden="true" tabindex="-1"></a>    save_strategy<span class="op">=</span><span class="st">"no"</span>,</span>
+<span id="cb8-376"><a href="#cb8-376" aria-hidden="true" tabindex="-1"></a>    report_to<span class="op">=</span><span class="st">"none"</span>,</span>
+<span id="cb8-377"><a href="#cb8-377" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-378"><a href="#cb8-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-379"><a href="#cb8-379" aria-hidden="true" tabindex="-1"></a>trainer <span class="op">=</span> SFTTrainer(</span>
+<span id="cb8-380"><a href="#cb8-380" aria-hidden="true" tabindex="-1"></a>    model<span class="op">=</span>model,</span>
+<span id="cb8-381"><a href="#cb8-381" aria-hidden="true" tabindex="-1"></a>    args<span class="op">=</span>training_args,</span>
+<span id="cb8-382"><a href="#cb8-382" aria-hidden="true" tabindex="-1"></a>    train_dataset<span class="op">=</span>dataset,</span>
+<span id="cb8-383"><a href="#cb8-383" aria-hidden="true" tabindex="-1"></a>    processing_class<span class="op">=</span>tokenizer,</span>
+<span id="cb8-384"><a href="#cb8-384" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb8-385"><a href="#cb8-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-386"><a href="#cb8-386" aria-hidden="true" tabindex="-1"></a>trainer.train()</span>
+<span id="cb8-387"><a href="#cb8-387" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-388"><a href="#cb8-388" aria-hidden="true" tabindex="-1"></a>prompt <span class="op">=</span> <span class="st">"### Instrucción:</span><span class="ch">\n</span><span class="st">Clasifica el sentimiento de esta reseña.</span><span class="ch">\n\n</span><span class="st">### Entrada:</span><span class="ch">\n</span><span class="st">El diseño es bonito pero la batería no dura nada.</span><span class="ch">\n\n</span><span class="st">### Respuesta:</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb8-389"><a href="#cb8-389" aria-hidden="true" tabindex="-1"></a>inputs <span class="op">=</span> tokenizer(prompt, return_tensors<span class="op">=</span><span class="st">"pt"</span>).to(model.device)</span>
+<span id="cb8-390"><a href="#cb8-390" aria-hidden="true" tabindex="-1"></a>outputs <span class="op">=</span> model.generate(<span class="op">**</span>inputs, max_new_tokens<span class="op">=</span><span class="dv">50</span>)</span>
+<span id="cb8-391"><a href="#cb8-391" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tokenizer.decode(outputs[<span class="dv">0</span>], skip_special_tokens<span class="op">=</span><span class="va">True</span>))</span>
+<span id="cb8-392"><a href="#cb8-392" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb8-393"><a href="#cb8-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-394"><a href="#cb8-394" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb8-395"><a href="#cb8-395" aria-hidden="true" tabindex="-1"></a><span class="fu">## Sobre este ejemplo</span></span>
+<span id="cb8-396"><a href="#cb8-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-397"><a href="#cb8-397" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El modelo <span class="in">`Qwen3-0.6B`</span> es pequeño (600M parámetros) para que el ejemplo sea rápido. En tu proyecto puedes usar modelos mayores (7B) con QLoRA.</span>
+<span id="cb8-398"><a href="#cb8-398" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El dataset tiene solo 3 ejemplos para ilustrar el formato. En la práctica necesitas **cientos o miles** de ejemplos para un fine-tuning efectivo.</span>
+<span id="cb8-399"><a href="#cb8-399" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El formato <span class="in">`### Instrucción / ### Entrada / ### Respuesta`</span> es el estándar para SFT (Supervised Fine-Tuning).</span>
+<span id="cb8-400"><a href="#cb8-400" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-401"><a href="#cb8-401" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-402"><a href="#cb8-402" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb8-403"><a href="#cb8-403" aria-hidden="true" tabindex="-1"></a><span class="fu">## La calidad del dataset es lo más importante</span></span>
+<span id="cb8-404"><a href="#cb8-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-405"><a href="#cb8-405" aria-hidden="true" tabindex="-1"></a>El fine-tuning con datos de baja calidad produce un modelo **peor** que el base. Antes de hacer fine-tuning:</span>
+<span id="cb8-406"><a href="#cb8-406" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-407"><a href="#cb8-407" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Revisa** cada ejemplo manualmente</span>
+<span id="cb8-408"><a href="#cb8-408" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Asegura** consistencia en el formato</span>
+<span id="cb8-409"><a href="#cb8-409" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Incluye** casos edge (respuestas negativas, neutrales, ambiguas)</span>
+<span id="cb8-410"><a href="#cb8-410" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Empieza** con 100-500 ejemplos de alta calidad antes de escalar</span>
+<span id="cb8-411"><a href="#cb8-411" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-412"><a href="#cb8-412" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-413"><a href="#cb8-413" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-414"><a href="#cb8-414" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-415"><a href="#cb8-415" aria-hidden="true" tabindex="-1"></a><span class="fu">### Resumen</span></span>
+<span id="cb8-416"><a href="#cb8-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-417"><a href="#cb8-417" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Técnica <span class="pp">|</span> VRAM (modelo 7B) <span class="pp">|</span> Calidad <span class="pp">|</span> Caso de uso <span class="pp">|</span></span>
+<span id="cb8-418"><a href="#cb8-418" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb8-419"><a href="#cb8-419" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fine-tuning completo <span class="pp">|</span> ~56 GB <span class="pp">|</span> Máxima <span class="pp">|</span> Investigación, recursos ilimitados <span class="pp">|</span></span>
+<span id="cb8-420"><a href="#cb8-420" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> LoRA <span class="pp">|</span> ~16 GB <span class="pp">|</span> Alta <span class="pp">|</span> Uso general, GPU A100/4090 <span class="pp">|</span></span>
+<span id="cb8-421"><a href="#cb8-421" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> QLoRA <span class="pp">|</span> ~6 GB <span class="pp">|</span> Alta (ligeramente menor) <span class="pp">|</span> GPU de consumidor, Colab gratuito <span class="pp">|</span></span>
+<span id="cb8-422"><a href="#cb8-422" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Prompting / RAG <span class="pp">|</span> 0 GB extra <span class="pp">|</span> Depende del modelo base <span class="pp">|</span> La mayoría de casos prácticos <span class="pp">|</span></span>
+<span id="cb8-423"><a href="#cb8-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-424"><a href="#cb8-424" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb8-425"><a href="#cb8-425" aria-hidden="true" tabindex="-1"></a><span class="fu">## Árbol de decisión final</span></span>
+<span id="cb8-426"><a href="#cb8-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-427"><a href="#cb8-427" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>¿Tu problema se resuelve con **prompting**? → No hagas fine-tuning.</span>
+<span id="cb8-428"><a href="#cb8-428" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>¿Necesitas **conocimiento actualizable**? → Usa **RAG**.</span>
+<span id="cb8-429"><a href="#cb8-429" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>¿Necesitas **comportamiento/formato específico** y tienes datos de calidad? → **LoRA** (o **QLoRA** si tienes poca VRAM).</span>
+<span id="cb8-430"><a href="#cb8-430" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>¿Necesitas **ambos** (conocimiento + comportamiento)? → **RAG + LoRA**.</span>
+<span id="cb8-431"><a href="#cb8-431" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb8-432"><a href="#cb8-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-433"><a href="#cb8-433" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-434"><a href="#cb8-434" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-435"><a href="#cb8-435" aria-hidden="true" tabindex="-1"></a><span class="fu">## Referencias</span></span>
+<span id="cb8-436"><a href="#cb8-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-437"><a href="#cb8-437" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Hu, E. et al. (2022). **LoRA: Low-Rank Adaptation of Large Language Models**. ICLR. <span class="co">[</span><span class="ot">arXiv:2106.09685</span><span class="co">](https://arxiv.org/abs/2106.09685)</span></span>
+<span id="cb8-438"><a href="#cb8-438" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Dettmers, T. et al. (2023). **QLoRA: Efficient Finetuning of Quantized Language Models**. NeurIPS. <span class="co">[</span><span class="ot">arXiv:2305.14314</span><span class="co">](https://arxiv.org/abs/2305.14314)</span></span>
+<span id="cb8-439"><a href="#cb8-439" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>He, J. et al. (2022). **Towards a Unified View of Parameter-Efficient Transfer Learning**. ICLR. <span class="co">[</span><span class="ot">arXiv:2110.04366</span><span class="co">](https://arxiv.org/abs/2110.04366)</span></span>
+<span id="cb8-440"><a href="#cb8-440" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Lester, B. et al. (2021). **The Power of Scale for Parameter-Efficient Prompt Tuning**. EMNLP. <span class="co">[</span><span class="ot">arXiv:2104.08691</span><span class="co">](https://arxiv.org/abs/2104.08691)</span></span>
+<span id="cb8-441"><a href="#cb8-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-442"><a href="#cb8-442" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb8-443"><a href="#cb8-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-444"><a href="#cb8-444" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Has completado la teoría del **Bloque 3**. Ahora pasa al taller práctico: **[HPD 4 — Sistema RAG sobre datos mixtos](../evaluables/hpd4-rag-mixto.qmd)**.</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

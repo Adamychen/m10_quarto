@@ -1,0 +1,2320 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.37">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>02a — Prompt Engineering Avanzado – Módulo 10 — IA Generativa para Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-f97a59afa23c78b76dca51217b896fc0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="mermaid-theme" content="neutral">
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque2/02-orquestacion.html">Bloque 2 — Orquestación</a></li><li class="breadcrumb-item"><a href="../bloque2/02a-prompt-engineering.html">Prompt Engineering</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Módulo 10 — IA Generativa para Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inicio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acerca de</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 1 — Fundamentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01a-transformer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01b-llms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs e inferencia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01c-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01d-vectordb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bases de datos vectoriales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-evaluables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ejercicios evaluables HPD 1</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-extension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extensión HPD 1</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 2 — Orquestación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02-orquestacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02a-prompt-engineering.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Prompt Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02b-langchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LangChain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02c-llamaindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LlamaIndex</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02d-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02e-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentes Inteligentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd2-evaluables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ejercicios evaluables HPD 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd2-extension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extensión HPD 2</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd3-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Servidor MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd3-evaluables.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ejercicios evaluables HPD 3</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd3-extension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extensión HPD 3</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 3 — Aplicaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03-aplicaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03b-rag-avanzado.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAG Avanzado</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03a-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tuning eficiente</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — RAG Mixto</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Ejercicios — Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-datos-sinteticos-extension.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Extensión — Datos Sintéticos</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 4 — Gobernanza</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Teoría y Despliegue</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Evaluación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación y Proyecto</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../06-herramientas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Herramientas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../07-bibliografia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliografía</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#prompt-engineering-avanzado" id="toc-prompt-engineering-avanzado" class="nav-link active" data-scroll-target="#prompt-engineering-avanzado">Prompt Engineering Avanzado</a>
+  <ul class="collapse">
+  <li><a href="#qué-es-un-prompt" id="toc-qué-es-un-prompt" class="nav-link" data-scroll-target="#qué-es-un-prompt">¿Qué es un prompt?</a></li>
+  <li><a href="#primer-contacto-llamada-a-un-llm" id="toc-primer-contacto-llamada-a-un-llm" class="nav-link" data-scroll-target="#primer-contacto-llamada-a-un-llm">Primer contacto: llamada a un LLM</a></li>
+  <li><a href="#few-shot-prompting" id="toc-few-shot-prompting" class="nav-link" data-scroll-target="#few-shot-prompting">Few-shot prompting</a></li>
+  <li><a href="#zero-shot-vs-few-shot-vs-one-shot" id="toc-zero-shot-vs-few-shot-vs-one-shot" class="nav-link" data-scroll-target="#zero-shot-vs-few-shot-vs-one-shot">Zero-shot vs Few-shot vs One-shot</a></li>
+  <li><a href="#chain-of-thought-cot" id="toc-chain-of-thought-cot" class="nav-link" data-scroll-target="#chain-of-thought-cot">Chain-of-Thought (CoT)</a></li>
+  <li><a href="#tree-of-thought-tot" id="toc-tree-of-thought-tot" class="nav-link" data-scroll-target="#tree-of-thought-tot">Tree-of-Thought (ToT)</a></li>
+  <li><a href="#output-structuring-con-json-schema" id="toc-output-structuring-con-json-schema" class="nav-link" data-scroll-target="#output-structuring-con-json-schema">Output Structuring con JSON Schema</a></li>
+  <li><a href="#de-json-schema-a-datos-sintéticos-el-enfoque-intuitivo" id="toc-de-json-schema-a-datos-sintéticos-el-enfoque-intuitivo" class="nav-link" data-scroll-target="#de-json-schema-a-datos-sintéticos-el-enfoque-intuitivo">De JSON Schema a datos sintéticos: el enfoque intuitivo</a></li>
+  <li><a href="#role-prompting" id="toc-role-prompting" class="nav-link" data-scroll-target="#role-prompting">Role Prompting</a></li>
+  <li><a href="#técnicas-adicionales" id="toc-técnicas-adicionales" class="nav-link" data-scroll-target="#técnicas-adicionales">Técnicas adicionales</a></li>
+  <li><a href="#buenas-prácticas-resumen" id="toc-buenas-prácticas-resumen" class="nav-link" data-scroll-target="#buenas-prácticas-resumen">Buenas prácticas resumen</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="02a-prompt-engineering.ipynb" download="02a-prompt-engineering.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque2/02-orquestacion.html">Bloque 2 — Orquestación</a></li><li class="breadcrumb-item"><a href="../bloque2/02a-prompt-engineering.html">Prompt Engineering</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">02a — Prompt Engineering Avanzado</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02a-prompt-engineering.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img"></a></p>
+<figcaption>Open In Colab</figcaption>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p>Este tema forma parte del <strong>Bloque 2 — Orquestación</strong>. Se recomienda haber completado el <a href="../bloque1/01-fundamentos.html">Bloque 1</a> primero.</p>
+</blockquote>
+<div id="b40315a5" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q openai python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="c685dc77" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Librerías cargadas correctamente.</code></pre>
+</div>
+</div>
+<div id="b7c7519a" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>LLM_URL <span class="op">=</span> <span class="st">"https://llamus.cs.us.es/api/v1"</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Crea un archivo .env en la raíz del proyecto con:</span><span class="ch">\n</span><span class="st">    LLM_API_KEY=tu_api_key</span><span class="ch">\n</span><span class="st">    Las celdas siguientes mostrarán este mensaje hasta que configures la clave."</span>)</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    client <span class="op">=</span> OpenAI(base_url<span class="op">=</span>LLM_URL, api_key<span class="op">=</span>LLM_KEY)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Utilidad para parsear JSON que puede venir envuelto en ```json ... ```</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse_json_response(content: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        content <span class="op">=</span> content.strip()</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> content.startswith(<span class="st">"```"</span>):</span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>            content <span class="op">=</span> content.split(<span class="st">"```"</span>, <span class="dv">1</span>)[<span class="dv">1</span>]</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">"```"</span> <span class="kw">in</span> content:</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>                content <span class="op">=</span> content.rsplit(<span class="st">"```"</span>, <span class="dv">1</span>)[<span class="dv">0</span>]</span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>            content <span class="op">=</span> content.strip()</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> content.startswith(<span class="st">"json"</span>):</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>                content <span class="op">=</span> content[<span class="dv">4</span>:].strip()</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> json.loads(content)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"✅ Cliente OpenAI configurado. Las celdas de ejemplo funcionarán correctamente."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>✅ Cliente OpenAI configurado. Las celdas de ejemplo funcionarán correctamente.</code></pre>
+</div>
+</div>
+<section id="prompt-engineering-avanzado" class="level2">
+<h2 class="anchored" data-anchor-id="prompt-engineering-avanzado">Prompt Engineering Avanzado</h2>
+<section id="qué-es-un-prompt" class="level3">
+<h3 class="anchored" data-anchor-id="qué-es-un-prompt">¿Qué es un prompt?</h3>
+<p>Un <strong>prompt</strong> es la instrucción textual que le damos a un LLM. Piensa en ello como la pregunta o la orden que le das a un asistente muy capaz pero muy literal: si la instrucción es ambigua, la respuesta será imprecisa. Si es clara y con contexto, la respuesta será mucho mejor.</p>
+<p>El Prompt Engineering consiste en diseñar estas instrucciones de forma sistemática para obtener respuestas fiables, estructuradas y útiles, no solo “texto bonito”.</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph LR
+    A[Usuario&lt;br/&gt;formula prompt] --&gt; B[LLM&lt;br/&gt;procesa instrucción]
+    B --&gt; C{¿Prompt claro?}
+    C --&gt;|Sí| D[Respuesta&lt;br/&gt;precisa y útil]
+    C --&gt;|No| E[Respuesta&lt;br/&gt;ambigua o incorrecta]
+    D --&gt; F[Iteración&lt;br/&gt;mejora continua]
+    E --&gt; F
+    F --&gt; A
+    style A fill:#4B8BBE,color:#fff
+    style D fill:#2e7d32,color:#fff
+    style E fill:#c62828,color:#fff
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+<section id="primer-contacto-llamada-a-un-llm" class="level3">
+<h3 class="anchored" data-anchor-id="primer-contacto-llamada-a-un-llm">Primer contacto: llamada a un LLM</h3>
+<p>Antes de profundizar, veamos cómo invocar un LLM desde Python con la API de OpenAI (compatible con Llamus US, Ollama local, etc.):</p>
+<div id="851ca219" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Explica qué es la desviación estándar en una frase."</span>}]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>La desviación estándar es una medida que indica cuánto se dispersan los datos de un conjunto respecto a su promedio o media.</code></pre>
+</div>
+</div>
+<p>Este es el patrón base para todo lo que veremos: <code>model</code> + <code>messages</code> → respuesta. Los <code>messages</code> pueden tener varios roles:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Rol</th>
+<th>Propósito</th>
+<th>Ejemplo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>system</code></td>
+<td>Instrucción global de comportamiento</td>
+<td>“Eres un analista de datos experto”</td>
+</tr>
+<tr class="even">
+<td><code>user</code></td>
+<td>Pregunta o instrucción del usuario</td>
+<td>“Analiza este CSV…”</td>
+</tr>
+<tr class="odd">
+<td><code>assistant</code></td>
+<td>Respuestas previas del modelo (historial)</td>
+<td>“La media es 42.3…”</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="few-shot-prompting" class="level3">
+<h3 class="anchored" data-anchor-id="few-shot-prompting">Few-shot prompting</h3>
+<p>El <strong>few-shot</strong> consiste en incluir ejemplos dentro del prompt para que el modelo entienda exactamente qué formato y estilo esperamos. Es como enseñarle con el ejemplo.</p>
+<div id="4778b942" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    prompt_few_shot <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="st">    Clasifica el sentimiento de cada frase como POSITIVO, NEGATIVO o NEUTRAL.</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="st">    Ejemplos:</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="st">    Frase: "El producto llegó roto y la atención fue pésima" → NEGATIVO</span></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="st">    Frase: "Todo perfecto, entrega rápida y bien embalado" → POSITIVO</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="st">    Frase: "El paquete llegó ayer por la tarde" → NEUTRAL</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="st">    Ahora clasifica:</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a><span class="st">    Frase: "El diseño es bonito pero la batería no dura nada"</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt_few_shot}]</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>NEGATIVO</code></pre>
+</div>
+</div>
+<p><strong>¿Por qué funciona?</strong> Los LLMs son excelentes reconociendo patrones. Al darles 2-3 ejemplos, el modelo “aprende” el patrón en contexto (<em>in-context learning</em>) sin necesidad de fine-tuning.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Regla de oro del few-shot
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>2-3 ejemplos suelen bastar</li>
+<li>Los ejemplos deben cubrir los casos extremos (edge cases)</li>
+<li>Mantén consistencia exacta en el formato de los ejemplos</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="zero-shot-vs-few-shot-vs-one-shot" class="level3">
+<h3 class="anchored" data-anchor-id="zero-shot-vs-few-shot-vs-one-shot">Zero-shot vs Few-shot vs One-shot</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Estrategia</th>
+<th>Ejemplos en el prompt</th>
+<th>Cuándo usarlo</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Zero-shot</strong></td>
+<td>0 — solo la instrucción</td>
+<td>Tareas sencillas, modelos muy capaces</td>
+</tr>
+<tr class="even">
+<td><strong>One-shot</strong></td>
+<td>1 ejemplo</td>
+<td>Cuando necesitas mostrar el formato exacto</td>
+</tr>
+<tr class="odd">
+<td><strong>Few-shot</strong></td>
+<td>2-5 ejemplos</td>
+<td>Tareas complejas, formatos muy específicos</td>
+</tr>
+</tbody>
+</table>
+<div id="308341d2" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ZERO-SHOT: sin ejemplos</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    respuesta_zero <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Traduce al inglés: 'El gato está en el tejado'"</span>}]</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ONE-SHOT: un ejemplo</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>    respuesta_one <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"""</span></span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="st">    Traduce español → inglés.</span></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="st">    Ejemplo: "Hola mundo" → "Hello world"</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="st">    Ahora traduce: "El gato está en el tejado"</span></span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span>}]</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Zero-shot:"</span>, respuesta_zero.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"One-shot:"</span>, respuesta_one.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Zero-shot: The cat is on the roof.
+One-shot: The cat is on the roof.</code></pre>
+</div>
+</div>
+</section>
+<section id="chain-of-thought-cot" class="level3">
+<h3 class="anchored" data-anchor-id="chain-of-thought-cot">Chain-of-Thought (CoT)</h3>
+<p>El <strong>Chain-of-Thought</strong> consiste en pedir al modelo que razone paso a paso antes de dar la respuesta final. La clave está en añadir algo como <em>“pensemos paso a paso”</em> o incluir ejemplos donde se muestra el razonamiento.</p>
+<div id="2dd7ca06" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    problema <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="st">    Un tren sale de Madrid a las 08:00 hacia Barcelona (620 km) a 120 km/h.</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="st">    Otro tren sale de Barcelona a las 09:00 hacia Madrid a 150 km/h.</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="st">    ¿A qué hora se cruzan?</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>    prompt_cot <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="ss">    </span><span class="sc">{</span>problema<span class="sc">}</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="ss">    Resuelve paso a paso:</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="ss">    1. Calcula cuánto ha avanzado el primer tren cuando sale el segundo</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="ss">    2. Calcula la distancia restante entre ambos en ese momento</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="ss">    3. Calcula el tiempo hasta que se cruzan</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="ss">    4. Suma el tiempo a la hora de salida</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="ss">    """</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a>    respuesta_cot <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt_cot}]</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta_cot.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Este es un problema de movimiento relativo. Debemos seguir los pasos solicitados para determinar la hora exacta del cruce.
+
+Datos:
+* Distancia total (Madrid a Barcelona): 620 km
+* Tren 1 (Madrid $\rightarrow$ Barcelona): Sale a las 08:00, velocidad $V_1 = 120 \text{ km/h}$
+* Tren 2 (Barcelona $\rightarrow$ Madrid): Sale a las 09:00, velocidad $V_2 = 150 \text{ km/h}$
+
+---
+
+### 1. Calcula cuánto ha avanzado el primer tren cuando sale el segundo (a las 09:00).
+
+El primer tren sale a las 08:00 y el segundo a las 09:00, por lo tanto tiempo ha recorrido el Tren 1 1 hora.
+
+$$\text{Distancia recorrida por el Tren 1} = \text{Velocidad} \times \text{Tiempo}$$
+$$\text{Distancia}_1 = 120 \text{ km/h} \times 1 \text{ h} = 120 \text{ km}$$
+
+**Respuesta:** Cuando sale el segundo tren (a las 09:00), el primer tren ha avanzado **120 km**.
+
+### 2. Calcula la distancia restante entre ambos en ese momento.
+
+La distancia total es 620 km. Si el Tren 1 está a 120 km, la distancia restante que deben cubrir hasta cruzarse es:
+
+$$\text{Distancia restante} = \text{Distancia total} - \text{Distancia recorrida}$$
+$$\text{Distancia restante} = 620 \text{ km} - 120 \text{ km} = 500 \text{ km}$$
+
+**Respuesta:** La distancia que separa a los dos trenes a las 09:00 es de **500 km**.
+
+### 3. Calcula el tiempo hasta que se cruzan (a partir de las 09:00).
+
+Dado que los trenes se mueven uno hacia el otro, usamos la velocidad relativa (la suma de sus velocidades) para calcular el tiempo que tardarán en cubrir los 500 km restantes.
+
+$$\text{Velocidad relativa} = V_1 + V_2 = 120 \text{ km/h} + 150 \text{ km/h} = 270 \text{ km/h}$$
+
+$$\text{Tiempo de cruce (t)} = \frac{\text{Distancia restante}}{\text{Velocidad relativa}}$$
+$$t = \frac{500 \text{ km}}{270 \text{ km/h}} = \frac{50}{27} \text{ horas}$$
+
+Para convertir este tiempo a minutos (y segundos):
+$$\text{Tiempo en minutos} = \frac{50}{27} \times 60$$
+$$\text{Tiempo en minutos} = \frac{3000}{27} = \frac{1000}{9} \approx 111.11 \text{ minutos}$$
+
+Convertimos la fracción a horas y minutos:
+$$1000 \div 9 = 111 \text{ con un resto de } 1$$
+Esto significa $111 \frac{1}{9}$ minutos, es decir: **111 minutos y 6 segundos** ($1/9$ de 60 segundos).
+
+### 4. Suma el tiempo a la hora de salida.
+
+El cálculo del cruce comienza a las 09:00. Debemos sumar el tiempo calculado (1 hora, 51 minutos y 6 segundos) a esta hora.
+
+$$\text{Hora de salida} = 09:00:00$$
+$$\text{Tiempo transcurrido} = 1 \text{ hora}, 51 \text{ minutos}, 6 \text{ segundos}$$
+
+$$\text{Hora del cruce} = 09:00:00 + 01:51:06$$
+$$\text{Hora del cruce} = 10:51:06$$
+
+---
+**Respuesta final:** Los trenes se cruzan a las **10:51:06**.</code></pre>
+</div>
+</div>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    A[Pregunta compleja] --&gt; B[LLM razona paso a paso]
+    B --&gt; C[Paso 1: identifica datos]
+    C --&gt; D[Paso 2: calcula intermedio]
+    D --&gt; E[Paso 3: combina resultados]
+    E --&gt; F[Respuesta final&lt;br/&gt;razonada y verificable]
+
+    style A fill:#4B8BBE,color:#fff
+    style F fill:#2e7d32,color:#fff
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<p><strong>¿Por qué funciona?</strong> Al obligar al modelo a generar tokens intermedios de razonamiento, cada paso condiciona el siguiente. Es como si el modelo “pensara en voz alta”, reduciendo drásticamente los errores en tareas matemáticas y lógicas.</p>
+</section>
+<section id="tree-of-thought-tot" class="level3">
+<h3 class="anchored" data-anchor-id="tree-of-thought-tot">Tree-of-Thought (ToT)</h3>
+<p>El <strong>Tree-of-Thought</strong> extiende CoT: en lugar de un único camino de razonamiento, el modelo explora múltiples ramas y elige la mejor. Es útil para problemas con múltiples soluciones posibles (planificación, puzzles, creatividad).</p>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph TD
+    A[Problema] --&gt; B1[Idea 1]
+    A --&gt; B2[Idea 2]
+    A --&gt; B3[Idea 3]
+    B1 --&gt; C1[Desarrollo 1A]
+    B1 --&gt; C2[Desarrollo 1B]
+    B2 --&gt; C3[Desarrollo 2A]
+    B3 --&gt; C4[Desarrollo 3A]
+    B3 --&gt; C5[Desarrollo 3B]
+    C1 --&gt; D{Evaluar&lt;br/&gt;mejor rama}
+    C3 --&gt; D
+    C4 --&gt; D
+    D --&gt; E[Solución&lt;br/&gt;óptima]
+
+    style A fill:#4B8BBE,color:#fff
+    style E fill:#2e7d32,color:#fff
+    style D fill:#e65100,color:#fff
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+<div id="e78850d7" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    prompt_tot <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="st">    Quiero organizar una jornada de team building de 4 horas para 20 personas de un equipo de Data Science.</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="st">    Genera 3 enfoques distintos y para cada uno:</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="st">    - Describe brevemente la actividad principal</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a><span class="st">    - Evalúa pros y contras (coste, engagement, logística)</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a><span class="st">    - Elige el mejor y justifica por qué</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a><span class="st">    Al final, desarrolla en detalle solo la opción elegida.</span></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt_tot}]</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Este es un desafío excelente. Dado que el equipo es de **Data Science**, la jornada debe enfocarse en habilidades cognitivas, lógica, comunicación y resolución de problemas bajo presión, en lugar de actividades puramente físicas o lúdicas genéricas.
+
+A continuación, presento 3 enfoques distintos para una jornada de team building de 4 horas.
+
+---
+
+## Enfoque 1: El Desafío del Detective (Escape Room Temático)
+
+Este enfoque se centra en la resolución de acertijos y el pensamiento lateral bajo presión de tiempo. Ideal para fomentar la colaboración y la toma de decisiones rápida.
+
+| Aspecto | Descripción |
+| :--- | :--- |
+| **Actividad Principal** | Un escape room diseñado a medida (físico o virtual) donde los participantes deben usar su lógica, habilidades analíticas y comunicación para descifrar códigos, resolver acertijos y encontrar pistas en un tiempo limitado. |
+| **Pros** | - Alta inmersión y alto nivel de engagement. - Fomenta el pensamiento crítico y la resolución estructurada de problemas. - Ideal para equipos que disfrutan de los desafíos intelectuales. - Resultados muy claros al final (logro o fracaso). |
+| **Contras** | - Puede ser costoso si se necesita un espacio físico o una plataforma compleja. - La presión del tiempo puede generar ansiedad en algunos. - Requiere un diseño y materialización muy cuidadosos para que sea relevante. |
+| **Logística** | Moderada a Alta (Depende de la complejidad). Se requiere un espacio cerrado con mesas/áreas de juego. El montaje es crucial. |
+
+## Enfoque 2: La Estrategia del Futuro (Simulación y Pitch)
+
+Este enfoque utiliza las habilidades del equipo (análisis, síntesis de información, toma de decisiones) para resolver un problema complejo y presentar una solución. Es muy relevante para el contexto de Data Science.
+
+| Aspecto | Descripción |
+| :--- | :--- |
+| **Actividad Principal** | Se divide al grupo en sub-equipos. Cada equipo recibe un "caso" o un escenario empresarial ficticio (ej. predecir el éxito de un nuevo producto, optimizar una cadena logística). Deben analizar los datos proporcionados (simulados) durante 2 horas y luego presentar su estrategia y modelo predictivo a un "panel de jueces" (el resto del equipo). |
+| **Pros** | - Muy relevante para Data Science. - Fomenta la interpretación de datos, la argumentación lógica y la síntesis colaborativa. - Excelente para mejorar la comunicación técnica dentro del equipo. - Alto impacto en el desarrollo profesional (skills). |
+| **Contras** | - Requiere tiempo para preparar los escenarios y las métricas de éxito. - Puede ser percibido como "demasiado técnico" si no se maneja con un tono ligero. - El riesgo es que el enfoque sea demasiado centrado en la técnica y no en el *team building* puro. |
+| **Logística** | Baja (Requiere solo pizarras, flip charts, post-its y tiempo). Se puede adaptar a cualquier espacio de oficina. |
+
+## Enfoque 3: El Arte de la Colaboración (Construcción Creativa bajo Restricciones)
+
+Este enfoque se centra en el pensamiento creativo, la gestión de recursos limitados y la colaboración no lineal. Busca romper los silos e ideas de manera divertida.
+
+| Aspecto | Descripción |
+| :--- | :--- |
+| **Actividad Principal** | Los participantes deben trabajar en grupos pequeños para construir un objeto o solución abstracta utilizando un conjunto limitado de materiales, bajo una restricción temática o funcional (ej. "Construir la mejor interfaz para un robot", "Diseñar un ecosistema sostenible"). El objetivo no es el producto final, sino el proceso colaborativo y la justificación de su diseño. |
+| **Pros** | - Fomenta la creatividad, la flexibilidad mental y la aceptación de ideas diferentes. - Excelente para romper barreras jerárquicas. - Bajo nivel de presión por resultados técnicos; alta presión por la colaboración. - Muy divertido y relajado. |
+| **Contras** | - El resultado final puede ser subjetivo o poco estructurado. - Puede no ser percibido como una actividad "profesional" si el equipo es muy rígido. - Requiere un anfitrión que sea excelente en manejar dinámicas grupales. |
+| **Logística** | Baja (Requiere materiales simples: cartón, marcadores, cinta, etc.). Fácil de montar y desmontar. |
+
+---
+
+## Elección y Justificación
+
+### Opción Elegida: Enfoque 2 - La Estrategia del Futuro (Simulación y Pitch)
+
+Esta opción es la mejor para un equipo de Data Science por las siguientes razones:
+
+1. **Relevancia Directa:** Aprovecha al máximo sus habilidades naturales (análisis, modelado, argumentación) en un contexto que les resulta familiar. Esto convierte el *team building* en una herramienta de desarrollo profesional.
+2. **Impacto Profesional:** El resultado no es solo diversión, sino la mejora de las habilidades clave en el trabajo diario (pensamiento estratégico y comunicación de resultados).
+3. **Flexibilidad Logística:** Requiere menos infraestructura física que un escape room, lo que facilita la organización para un equipo de 20 personas dentro de una jornada de 4 horas.
+
+**El objetivo principal es: Transformar el *Team Building* en un *Workshop Colaborativo*.**
+
+---
+
+## Desarrollo Detallado de la Opción Elegida: "La Estrategia del Futuro"
+
+### Objetivo de la Jornada
+Desarrollar habilidades de análisis, pensamiento estratégico y comunicación estructurada, permitiendo al equipo practicar cómo abordar problemas complejos como un equipo.
+
+### Duración Total: 4 horas (240 minutos)
+
+### Materiales Necesarios
+* Pizarras blancas o rotafolios grandes.
+* Post-its de varios colores.
+* Marcadores.
+* Cronómetro visible para la gestión del tiempo.
+* Fichas/Cartas con escenarios (preparadas con antelación).
+
+### Estructura de la Jornada (4 Horas)
+
+#### Fase 1: Introducción y Formación de Equipos (30 minutos)
+**Objetivo:** Establecer el tono y las reglas del juego.
+1. **Bienvenida y Reglas:** Explicar que no buscamos una respuesta perfecta, sino un proceso de análisis colaborativo.
+2. **División de Equipos:** Dividir a los 20 participantes en 4 o 5 equipos de 4-5 personas. (Asegurar que los equipos sean mixtos si es posible).
+3. **Asignación del Escenario:** Cada equipo recibe su caso (ejemplo: "Deben decidir si invertir en la IA para el servicio X o en un nuevo producto Y, basándose en métricas de riesgo y potencial impacto").
+
+#### Fase 2: Análisis y Estrategia (105 minutos)
+**Objetivo:** Aplicar habilidades analíticas bajo presión.
+1. **Análisis de Datos (30 min):** Los equipos reciben los datos simulados (tablas, gráficos, métricas de riesgo/recompensa). Deben discutir y llegar a una conclusión compartida sobre la situación actual. *Énfasis: Discutir el "qué significan" los datos.*
+2. **Desarrollo de la Estrategia (45 min):** El equipo debe diseñar su propuesta: ¿Cuál es el plan de acción? ¿Qué variables considerarían? ¿Cómo medirían el éxito? Deben definir un modelo predictivo o una decisión clara. *Énfasis: Cómo se comunican sus conclusiones.*
+3. **Preparación del Pitch (30 min):** Preparar la presentación final de 5 minutos, enfocándose en la narrativa y la justificación lógica de su propuesta.
+
+#### Fase 3: Presentación y Debate (60 minutos)
+**Objetivo:** Comunicación efectiva y crítica constructiva.
+1. **Pitch (25 min/equipo):** Cada equipo presenta su estrategia ante el "Panel de Jueces" (el resto del equipo o un facilitador).
+2. **Retroalimentación (35 min):** Después de cada pitch, el panel proporciona retroalimentación estructurada: ¿Qué fue claro? ¿Dónde falló la lógica? ¿Cómo se puede mejorar la comunicación?
+
+#### Fase 4: Cierre y Reflexión (15 minutos)
+**Objetivo:** Conectar la experiencia con el trabajo diario.
+1. **Debriefing Grupal:** El facilitador guía una discusión final sobre las lecciones aprendidas. Preguntas clave: "¿Qué aprendimos sobre nuestra comunicación?", "¿Cómo aplicaremos esta estrategia en nuestros proyectos de Data Science?"
+
+### Métricas de Éxito
+* **Alta Colaboración:** Los equipos debaten y llegan a un consenso (no solo una persona domina).
+* **Claridad Estratégica:** La propuesta es lógica, fundamentada en los "datos" proporcionados.
+* **Mejora en la Comunicación:** Se observa un uso de lenguaje estructurado para argumentar ideas complejas.
+
+### Recomendaciones del Facilitador
+* Mantener el ambiente profesional pero relajado. Evitar el juicio personal; enfocarse siempre en la calidad del proceso y la colaboración.
+* Asegurarse de que el "Panel de Jueces" sea respetuoso y constructivo en sus comentarios.</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>ToT requiere más tokens (y por tanto más coste) que CoT simple, ya que se generan y evalúan múltiples ramas. En la práctica, se implementa con múltiples llamadas al LLM o agentes que evalúan cada rama.</p>
+</div>
+</div>
+</section>
+<section id="output-structuring-con-json-schema" class="level3">
+<h3 class="anchored" data-anchor-id="output-structuring-con-json-schema">Output Structuring con JSON Schema</h3>
+<p>Forzar que el modelo devuelva JSON nos permite integrar el LLM en pipelines automatizados. La API de OpenAI ofrece el parámetro <code>response_format</code> para garantizar JSON válido:</p>
+<div id="3da4d1a7" class="cell" data-execution_count="9">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    texto_a_analizar <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="st">    Reunión del 15/03/2026. Asistentes: Ana (Data), Carlos (ML), Bea (Product).</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="st">    Se acordó migrar el pipeline ETL a Spark antes del Q2.</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="st">    Presupuesto estimado: 45.000€. Carlos se encarga de la POC.</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    system_prompt <span class="op">=</span> <span class="ss">f"""Eres un extractor de datos de actas de reunión.</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a><span class="ss">Devuelve ÚNICAMENTE un JSON válido con esta estructura exacta, sin texto adicional:</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a><span class="ch">{{</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a><span class="ss">  "fecha": "string (formato YYYY-MM-DD)",</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a><span class="ss">  "asistentes": ["lista de nombres"],</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a><span class="ss">  "decisiones": ["lista de decisiones tomadas"],</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a><span class="ss">  "presupuesto_euros": 0.0,</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a><span class="ss">  "responsables": [</span><span class="ch">{{</span><span class="ss">"nombre": "string", "tarea": "string"</span><span class="ch">}}</span><span class="ss">]</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="ch">}}</span><span class="ss">"""</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: system_prompt},</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: texto_a_analizar}</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>        resultado <span class="op">=</span> parse_json_response(respuesta.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(json.dumps(resultado, indent<span class="op">=</span><span class="dv">2</span>, ensure_ascii<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> json.JSONDecodeError:</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"⚠️ El modelo no devolvió JSON válido. Intenta de nuevo o usa un modelo con soporte nativo de structured output."</span>)</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content[:<span class="dv">200</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>{
+  "fecha": "2026-03-15",
+  "asistentes": [
+    "Ana",
+    "Carlos",
+    "Bea"
+  ],
+  "decisiones": [
+    "Migrar el pipeline ETL a Spark antes del Q2"
+  ],
+  "presupuesto_euros": 45000.0,
+  "responsables": [
+    {
+      "nombre": "Carlos",
+      "tarea": "POC"
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>JSON vía prompt vs.&nbsp;structured output nativo
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Pedir JSON en el prompt funciona con <strong>cualquier modelo</strong>, pero <strong>no garantiza</strong> que el JSON sea válido (por eso añadimos <code>try/except</code>). Algunos modelos como Qwen 3 ofrecen <code>response_format</code> nativo que fuerza la estructura desde el API. La ventaja del prompting es que es <strong>model-agnostic</strong>: funciona con Gemma, Llama, Mistral, etc.</p>
+</div>
+</div>
+</section>
+<section id="de-json-schema-a-datos-sintéticos-el-enfoque-intuitivo" class="level3">
+<h3 class="anchored" data-anchor-id="de-json-schema-a-datos-sintéticos-el-enfoque-intuitivo">De JSON Schema a datos sintéticos: el enfoque intuitivo</h3>
+<p>Lo que acabas de hacer —extraer 1 registro JSON de un texto— es el mismo mecanismo que permite <strong>generar datasets sintéticos completos</strong>. La diferencia es de escala: en lugar de pedir 1 registro, pides N. En lugar de extraer de un texto real, pides al modelo que <em>invente</em> datos verosímiles.</p>
+<p>La receta es simple:</p>
+<ol type="1">
+<li><strong>Define el schema</strong> de tus datos (igual que en la sección anterior)</li>
+<li><strong>Añade few-shot examples</strong> para que el modelo entienda el dominio y los rangos esperados</li>
+<li><strong>Controla la diversidad</strong> con temperatura: baja produce datos conservadores, alta inyecta variedad</li>
+<li><strong>Itera en batch</strong> para generar cientos o miles de registros</li>
+</ol>
+<div id="8300efe8" class="cell" data-execution_count="10">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    system_prompt <span class="op">=</span> <span class="st">"""Eres un generador de datos sintéticos de clientes españoles.</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="st">Devuelve ÚNICAMENTE un JSON válido con esta estructura exacta, sin texto adicional:</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="st">  "clientes": [</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a><span class="st">    {</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a><span class="st">      "id": 1,</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="st">      "edad": 34,</span></span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="st">      "ingresos_anuales": 42000.0,</span></span>
+<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a><span class="st">      "provincia": "Madrid",</span></span>
+<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a><span class="st">      "segmento": "premium"</span></span>
+<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a><span class="st">  ]</span></span>
+<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a><span class="st">Reglas:</span></span>
+<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a><span class="st">- Edad entre 18 y 80 años</span></span>
+<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a><span class="st">- Ingresos entre 12000 y 120000, correlacionados con la edad</span></span>
+<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="st">- Provincias: Madrid, Barcelona, Valencia, Sevilla, Bilbao, Málaga, Zaragoza</span></span>
+<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a><span class="st">- Segmentos: premium, estandar, basic</span></span>
+<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="st">- Genera variedad realista"""</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>        temperature<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[</span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: system_prompt},</span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Genera 10 clientes sintéticos. Usa variedad realista en edades, ingresos y provincias."</span>}</span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a>        datos <span class="op">=</span> parse_json_response(respuesta.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> pd.DataFrame(datos[<span class="st">"clientes"</span>])</span>
+<span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(df.to_string(index<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> registros generados"</span>)</span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"   Edad: </span><span class="sc">{</span>df[<span class="st">'edad'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>df[<span class="st">'edad'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">}</span><span class="ss"> (media </span><span class="sc">{</span>df[<span class="st">'edad'</span>]<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">)"</span>)</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"   Ingresos: </span><span class="sc">{</span>df[<span class="st">'ingresos_anuales'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">-</span><span class="sc">{</span>df[<span class="st">'ingresos_anuales'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.0f}</span><span class="ss"> (media </span><span class="sc">{</span>df[<span class="st">'ingresos_anuales'</span>]<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">)"</span>)</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> (json.JSONDecodeError, <span class="pp">KeyError</span>) <span class="im">as</span> e:</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"⚠️ Error al parsear respuesta: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content[:<span class="dv">200</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> id  edad  ingresos_anuales provincia segmento
+  1    34          55000.50    Madrid  premium
+  2    58          78500.00 Barcelona  premium
+  3    22          14500.75  Valencia estandar
+  4    45          32000.00   Sevilla estandar
+  5    67          91200.30    Bilbao  premium
+  6    29          28500.50  Zaragoza estandar
+  7    75         115000.00    Madrid  premium
+  8    41          25500.90    Málaga estandar
+  9    62          88000.00  Valencia  premium
+ 10    39          13500.00    Bilbao    basic
+
+10 registros generados
+   Edad: 22-75 (media 47)
+   Ingresos: 13500-115000 (media 54170)</code></pre>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>¿Por qué funciona?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>El LLM no “conoce” clientes reales, pero ha visto millones de patrones en sus datos de entrenamiento: distribuciones de edad, rangos de ingresos típicos, provincias españolas. El <strong>prompt con el schema</strong>, el <strong>few-shot</strong> y la <strong>temperatura</strong> controlan estructura, dominio y diversidad. Algunos modelos (Qwen, OpenAI) ofrecen además <code>response_format</code> nativo para forzar la estructura desde el API.</p>
+<p><strong>Este es el enfoque más intuitivo y accesible para datos sintéticos:</strong> - Sin entrenar modelos adicionales - Sin GPU - En menos de 20 líneas de código - Funciona con cualquier modelo (Gemma, Qwen, Llama, etc.) - Ideal para prototipado, testing y aumento rápido de datasets pequeños</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Limitaciones del enfoque intuitivo
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>No garantiza <strong>correlaciones realistas</strong> entre columnas (ej. ingresos vs.&nbsp;edad pueden no seguir la relación esperada)</li>
+<li>Puede generar <strong>valores atípicos</strong> no representativos</li>
+<li>Depende de la <strong>calidad del prompt</strong> y los ejemplos</li>
+<li><strong>No hay garantía de privacidad</strong> diferencial</li>
+</ul>
+<p>Para datasets de producción donde la fidelidad estadística es crítica, necesitarás modelos generativos especializados (CTGAN, TVAE, TabDDPM) que veremos en el <strong>Bloque 3</strong> con SDV.</p>
+</div>
+</div>
+</section>
+<section id="role-prompting" class="level3">
+<h3 class="anchored" data-anchor-id="role-prompting">Role Prompting</h3>
+<p>Asignar un <strong>rol</strong> al modelo en el mensaje <code>system</code> cambia radicalmente su comportamiento. No es magia: el modelo, entrenado con textos de diversos perfiles, “activa” los patrones asociados a ese rol.</p>
+<div id="756ff02f" class="cell" data-execution_count="11">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> consultar_como(rol, pregunta):</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> client.chat.completions.create(</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: rol},</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: pregunta}</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    ).choices[<span class="dv">0</span>].message.content</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sin rol (genérico)</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"=== SIN ROL ==="</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(consultar_como(<span class="st">"Eres un asistente útil."</span>, <span class="st">"¿Qué opinas de usar la media en datos con outliers?"</span>))</span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Con rol de analista senior</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== ANALISTA SENIOR ==="</span>)</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(consultar_como(</span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Eres un analista de datos senior con 15 años de experiencia en finanzas. "</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Respondes con rigor estadístico, mencionas alternativas robustas y das ejemplos concretos."</span>,</span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>        <span class="st">"¿Qué opinas de usar la media en datos con outliers?"</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Con rol de profesor divulgador</span></span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== PROFESOR DIVULGADOR ==="</span>)</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(consultar_como(</span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Eres un profesor de estadística que explica conceptos a estudiantes de primero de carrera. "</span></span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Usas analogías cotidianas, evitas jerga innecesaria y pones ejemplos sencillos."</span>,</span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">"¿Qué opinas de usar la media en datos con outliers?"</span></span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>    ))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>=== SIN ROL ===
+
+
+=== ANALISTA SENIOR ===
+
+
+=== PROFESOR DIVULGADOR ===
+</code></pre>
+</div>
+</div>
+</section>
+<section id="técnicas-adicionales" class="level3">
+<h3 class="anchored" data-anchor-id="técnicas-adicionales">Técnicas adicionales</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Técnica</th>
+<th>Descripción</th>
+<th>Cuándo usarla</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Self-consistency</strong></td>
+<td>Ejecutar CoT varias veces y votar la respuesta mayoritaria</td>
+<td>Razonamiento matemático/lógico</td>
+</tr>
+<tr class="even">
+<td><strong>Generated knowledge</strong></td>
+<td>Pedir al modelo que genere contexto antes de responder</td>
+<td>Preguntas que requieren conocimiento factual</td>
+</tr>
+<tr class="odd">
+<td><strong>Re-reading (RE2)</strong></td>
+<td>Hacer que el modelo lea la pregunta dos veces</td>
+<td>Mejora comprensión en tareas largas</td>
+</tr>
+<tr class="even">
+<td><strong>Emotion prompting</strong></td>
+<td>Añadir estímulos emocionales al prompt</td>
+<td>Tareas creativas o subjetivas</td>
+</tr>
+<tr class="odd">
+<td><strong>Step-back prompting</strong></td>
+<td>Preguntar primero por principios generales</td>
+<td>Problemas muy específicos</td>
+</tr>
+</tbody>
+</table>
+<div id="94eb6075" class="cell" data-execution_count="12">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    prompt_step_back <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a><span class="st">    Pregunta original: ¿Es 17 un número primo de Mersenne?</span></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="st">    Antes de responder, contesta:</span></span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a><span class="st">    1. ¿Qué es un número primo de Mersenne? (definición general)</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a><span class="st">    2. ¿Cómo se comprueba si un número es primo de Mersenne? (método)</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a><span class="st">    3. Ahora aplica el método a 17 y concluye.</span></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(client.chat.completions.create(</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt_step_back}]</span>
+<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    ).choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Esta es una excelente pregunta que requiere la comprensión de la estructura específica de los números primos de Mersenne.
+
+A continuación, se responde a las preguntas pre-requisito y luego se aplica el método al número 17.
+
+---
+
+### 1. ¿Qué es un número primo de Mersenne? (Definición general)
+
+Un **número primo de Mersenne** es un número primo que tiene la forma $M_p = 2^p - 1$, donde $p$ es necesariamente un número primo.
+
+*   **Propiedades clave:**
+    1.  El número en cuestión debe ser una potencia de 2 menos uno.
+    2.  El exponente $p$ debe ser primo.
+    3. El resultado $M_p$ debe ser primo.
+
+**Ejemplos de Primos de Mersenne:**
+*   Si $p=2$, $M_2 = 2^2 - 1 = 3$. (3 es primo).
+*   Si $p=3$, $M_3 = 2^3 - 1 = 7$. (7 es primo).
+*   Si $p=5$, $M_5 = 2^5 - 1 = 31$. (31 es primo).
+
+### 2. ¿Cómo se comprueba si un número es primo de Mersenne? (Método)
+
+Para determinar si un número $N$ es un primo de Mersenne, se deben seguir tres pasos:
+
+**Paso A: Verificar la forma.**
+Se verifica si el número $N$ tiene la estructura $2^p - 1$. Esto implica despejar $2^p$: $2^p = N + 1$. Luego, se comprueba si $N+1$ es una potencia entera de 2 y, crucialmente, si el exponente $p$ es un número primo.
+
+**Paso B: Verificar la primalidad del resultado.**
+Se comprueba si el resultado obtenido ($N$) es un número primo. (Si no cumple la forma, ya no es un primo de Mersenne).
+
+**Paso C: Aplicar pruebas de primalidad (si es posible) o pruebas específicas.**
+Una vez que se ha identificado que $N$ tiene la forma $2^p - 1$, el último paso crucial es probar si $N$ es realmente un número primo. Esto puede hacerse mediante:
+*   **Prueba de división por trial (división por prueba):** Dividir $N$ por todos los números primos menores o iguales a $\sqrt{N}$. Si no se encuentra ningún divisor, entonces $N$ es primo.
+* **Pruebas probabilísticas:** Para números muy grandes, se utilizan pruebas de primalidad como la prueba de Lucas-Lehmer, que es específica para Mersenne.
+
+**En resumen:** Se comprueba si $(N+1)$ es una potencia de 2 con exponente primo $p$, y si $N$ es primo.
+
+### 3. Ahora aplica el método a 17 y concluye.
+
+Queremos saber si **17** es un número primo de Mersenne.
+
+#### Paso A: Verificar la forma ($N = 2^p - 1$)
+Necesitamos determinar si existe un exponente $p$ tal que:
+$$17 = 2^p - 1$$
+Despejamos $2^p$:
+$$18 = 2^p$$
+
+Para encontrar el valor de $p$, debemos saber qué potencia de 2 es igual a 18.
+*   $2^1 = 2$
+*   $2^2 = 4$
+*   $2^3 = 8$
+*   $2^4 = 16$
+*   $2^5 = 32$
+
+Dado que 18 no es una potencia exacta de 2, **el número 17 no tiene la forma $2^p - 1$.**
+
+#### Paso B: Conclusión
+Dado que el número 17 no cumple con la estructura requerida para ser un primo de Mersenne, no es clasificado como tal.
+
+---
+
+### Respuesta Final
+
+**No**, 17 **no es** un número primo de Mersenne.</code></pre>
+</div>
+</div>
+</section>
+<section id="buenas-prácticas-resumen" class="level3">
+<h3 class="anchored" data-anchor-id="buenas-prácticas-resumen">Buenas prácticas resumen</h3>
+<ol type="1">
+<li><strong>Sé específico</strong>: “analiza los datos” → malo. “calcula media, mediana y desviación típica de la columna ‘ventas’ agrupada por ‘región’” → bueno</li>
+<li><strong>Muestra, no solo digas</strong>: incluye ejemplos del formato que esperas (few-shot)</li>
+<li><strong>Divide y vencerás</strong>: tareas complejas → CoT, desglosa en pasos</li>
+<li><strong>Formato forzado</strong>: usa <code>response_format</code> / JSON Schema cuando integres con código</li>
+<li><strong>Itera</strong>: el primer prompt casi nunca es el óptimo. Prueba, compara, mejora</li>
+<li><strong>System prompt</strong>: define el tono, rol y restricciones al inicio</li>
+</ol>
+<blockquote class="blockquote">
+<p><strong>Lectura recomendada:</strong> <a href="https://www.promptingguide.ai/">Prompt Engineering Guide (DAIR.AI)</a></p>
+</blockquote>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<footer class="footer-custom">
+  <div class="footer-logos">
+    <img src="../images/logo_cfp.png" alt="Formación Permanente · Universidad de Sevilla">
+  </div>
+  <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
+</footer>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+        for (let i=0; i<detailsSrc.length; i++) {
+          const details = detailsSrc[i].parentElement;
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb24" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "02a — Prompt Engineering Avanzado"</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> jupyter</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="al">![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)</span><span class="co">](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02a-prompt-engineering.ipynb)</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber completado el </span><span class="co">[</span><span class="ot">Bloque 1</span><span class="co">](../bloque1/01-fundamentos.qmd)</span><span class="at"> primero.</span></span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q openai python<span class="op">-</span>dotenv</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-21"><a href="#cb24-21" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-22"><a href="#cb24-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-23"><a href="#cb24-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-24"><a href="#cb24-24" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb24-25"><a href="#cb24-25" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
+<span id="cb24-26"><a href="#cb24-26" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
+<span id="cb24-27"><a href="#cb24-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-28"><a href="#cb24-28" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
+<span id="cb24-29"><a href="#cb24-29" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb24-30"><a href="#cb24-30" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb24-31"><a href="#cb24-31" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
+<span id="cb24-32"><a href="#cb24-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span>
+<span id="cb24-33"><a href="#cb24-33" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-34"><a href="#cb24-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-37"><a href="#cb24-37" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-38"><a href="#cb24-38" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-39"><a href="#cb24-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-40"><a href="#cb24-40" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
+<span id="cb24-41"><a href="#cb24-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-42"><a href="#cb24-42" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
+<span id="cb24-43"><a href="#cb24-43" aria-hidden="true" tabindex="-1"></a>LLM_URL <span class="op">=</span> <span class="st">"https://llamus.cs.us.es/api/v1"</span></span>
+<span id="cb24-44"><a href="#cb24-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-45"><a href="#cb24-45" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb24-46"><a href="#cb24-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Crea un archivo .env en la raíz del proyecto con:</span><span class="ch">\n</span><span class="st">    LLM_API_KEY=tu_api_key</span><span class="ch">\n</span><span class="st">    Las celdas siguientes mostrarán este mensaje hasta que configures la clave."</span>)</span>
+<span id="cb24-47"><a href="#cb24-47" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-48"><a href="#cb24-48" aria-hidden="true" tabindex="-1"></a>    client <span class="op">=</span> OpenAI(base_url<span class="op">=</span>LLM_URL, api_key<span class="op">=</span>LLM_KEY)</span>
+<span id="cb24-49"><a href="#cb24-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-50"><a href="#cb24-50" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Utilidad para parsear JSON que puede venir envuelto en ```json ... ```</span></span>
+<span id="cb24-51"><a href="#cb24-51" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> parse_json_response(content: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
+<span id="cb24-52"><a href="#cb24-52" aria-hidden="true" tabindex="-1"></a>        content <span class="op">=</span> content.strip()</span>
+<span id="cb24-53"><a href="#cb24-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> content.startswith(<span class="st">"```"</span>):</span>
+<span id="cb24-54"><a href="#cb24-54" aria-hidden="true" tabindex="-1"></a>            content <span class="op">=</span> content.split(<span class="st">"```"</span>, <span class="dv">1</span>)[<span class="dv">1</span>]</span>
+<span id="cb24-55"><a href="#cb24-55" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="st">"```"</span> <span class="kw">in</span> content:</span>
+<span id="cb24-56"><a href="#cb24-56" aria-hidden="true" tabindex="-1"></a>                content <span class="op">=</span> content.rsplit(<span class="st">"```"</span>, <span class="dv">1</span>)[<span class="dv">0</span>]</span>
+<span id="cb24-57"><a href="#cb24-57" aria-hidden="true" tabindex="-1"></a>            content <span class="op">=</span> content.strip()</span>
+<span id="cb24-58"><a href="#cb24-58" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> content.startswith(<span class="st">"json"</span>):</span>
+<span id="cb24-59"><a href="#cb24-59" aria-hidden="true" tabindex="-1"></a>                content <span class="op">=</span> content[<span class="dv">4</span>:].strip()</span>
+<span id="cb24-60"><a href="#cb24-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> json.loads(content)</span>
+<span id="cb24-61"><a href="#cb24-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-62"><a href="#cb24-62" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"✅ Cliente OpenAI configurado. Las celdas de ejemplo funcionarán correctamente."</span>)</span>
+<span id="cb24-63"><a href="#cb24-63" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-64"><a href="#cb24-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-65"><a href="#cb24-65" aria-hidden="true" tabindex="-1"></a><span class="fu">## Prompt Engineering Avanzado</span></span>
+<span id="cb24-66"><a href="#cb24-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-67"><a href="#cb24-67" aria-hidden="true" tabindex="-1"></a><span class="fu">### ¿Qué es un prompt?</span></span>
+<span id="cb24-68"><a href="#cb24-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-69"><a href="#cb24-69" aria-hidden="true" tabindex="-1"></a>Un **prompt** es la instrucción textual que le damos a un LLM. Piensa en ello como la pregunta o la orden que le das a un asistente muy capaz pero muy literal: si la instrucción es ambigua, la respuesta será imprecisa. Si es clara y con contexto, la respuesta será mucho mejor.</span>
+<span id="cb24-70"><a href="#cb24-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-71"><a href="#cb24-71" aria-hidden="true" tabindex="-1"></a>El Prompt Engineering consiste en diseñar estas instrucciones de forma sistemática para obtener respuestas fiables, estructuradas y útiles, no solo "texto bonito".</span>
+<span id="cb24-72"><a href="#cb24-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-75"><a href="#cb24-75" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb24-76"><a href="#cb24-76" aria-hidden="true" tabindex="-1"></a>graph LR</span>
+<span id="cb24-77"><a href="#cb24-77" aria-hidden="true" tabindex="-1"></a>    A[Usuario&lt;br/&gt;formula prompt] --&gt; B[LLM&lt;br/&gt;procesa instrucción]</span>
+<span id="cb24-78"><a href="#cb24-78" aria-hidden="true" tabindex="-1"></a>    B --&gt; C{¿Prompt claro?}</span>
+<span id="cb24-79"><a href="#cb24-79" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Sí| D[Respuesta&lt;br/&gt;precisa y útil]</span>
+<span id="cb24-80"><a href="#cb24-80" aria-hidden="true" tabindex="-1"></a>    C --&gt;|No| E[Respuesta&lt;br/&gt;ambigua o incorrecta]</span>
+<span id="cb24-81"><a href="#cb24-81" aria-hidden="true" tabindex="-1"></a>    D --&gt; F[Iteración&lt;br/&gt;mejora continua]</span>
+<span id="cb24-82"><a href="#cb24-82" aria-hidden="true" tabindex="-1"></a>    E --&gt; F</span>
+<span id="cb24-83"><a href="#cb24-83" aria-hidden="true" tabindex="-1"></a>    F --&gt; A</span>
+<span id="cb24-84"><a href="#cb24-84" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb24-85"><a href="#cb24-85" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb24-86"><a href="#cb24-86" aria-hidden="true" tabindex="-1"></a>    style E fill:<span class="co">#c62828,color:#fff</span></span>
+<span id="cb24-87"><a href="#cb24-87" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-88"><a href="#cb24-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-89"><a href="#cb24-89" aria-hidden="true" tabindex="-1"></a><span class="fu">### Primer contacto: llamada a un LLM</span></span>
+<span id="cb24-90"><a href="#cb24-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-91"><a href="#cb24-91" aria-hidden="true" tabindex="-1"></a>Antes de profundizar, veamos cómo invocar un LLM desde Python con la API de OpenAI (compatible con Llamus US, Ollama local, etc.):</span>
+<span id="cb24-92"><a href="#cb24-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-95"><a href="#cb24-95" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-96"><a href="#cb24-96" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-97"><a href="#cb24-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-98"><a href="#cb24-98" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb24-99"><a href="#cb24-99" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb24-100"><a href="#cb24-100" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-101"><a href="#cb24-101" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb24-102"><a href="#cb24-102" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb24-103"><a href="#cb24-103" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Explica qué es la desviación estándar en una frase."</span>}]</span>
+<span id="cb24-104"><a href="#cb24-104" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-105"><a href="#cb24-105" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb24-106"><a href="#cb24-106" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-107"><a href="#cb24-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-108"><a href="#cb24-108" aria-hidden="true" tabindex="-1"></a>Este es el patrón base para todo lo que veremos: <span class="in">`model`</span> + <span class="in">`messages`</span> → respuesta. Los <span class="in">`messages`</span> pueden tener varios roles:</span>
+<span id="cb24-109"><a href="#cb24-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-110"><a href="#cb24-110" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Rol <span class="pp">|</span> Propósito <span class="pp">|</span> Ejemplo <span class="pp">|</span></span>
+<span id="cb24-111"><a href="#cb24-111" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb24-112"><a href="#cb24-112" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`system`</span> <span class="pp">|</span> Instrucción global de comportamiento <span class="pp">|</span> "Eres un analista de datos experto" <span class="pp">|</span></span>
+<span id="cb24-113"><a href="#cb24-113" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`user`</span> <span class="pp">|</span> Pregunta o instrucción del usuario <span class="pp">|</span> "Analiza este CSV..." <span class="pp">|</span></span>
+<span id="cb24-114"><a href="#cb24-114" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`assistant`</span> <span class="pp">|</span> Respuestas previas del modelo (historial) <span class="pp">|</span> "La media es 42.3..." <span class="pp">|</span></span>
+<span id="cb24-115"><a href="#cb24-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-116"><a href="#cb24-116" aria-hidden="true" tabindex="-1"></a><span class="fu">### Few-shot prompting</span></span>
+<span id="cb24-117"><a href="#cb24-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-118"><a href="#cb24-118" aria-hidden="true" tabindex="-1"></a>El **few-shot** consiste en incluir ejemplos dentro del prompt para que el modelo entienda exactamente qué formato y estilo esperamos. Es como enseñarle con el ejemplo.</span>
+<span id="cb24-119"><a href="#cb24-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-122"><a href="#cb24-122" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-123"><a href="#cb24-123" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-124"><a href="#cb24-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-125"><a href="#cb24-125" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb24-126"><a href="#cb24-126" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb24-127"><a href="#cb24-127" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-128"><a href="#cb24-128" aria-hidden="true" tabindex="-1"></a>    prompt_few_shot <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb24-129"><a href="#cb24-129" aria-hidden="true" tabindex="-1"></a><span class="st">    Clasifica el sentimiento de cada frase como POSITIVO, NEGATIVO o NEUTRAL.</span></span>
+<span id="cb24-130"><a href="#cb24-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-131"><a href="#cb24-131" aria-hidden="true" tabindex="-1"></a><span class="st">    Ejemplos:</span></span>
+<span id="cb24-132"><a href="#cb24-132" aria-hidden="true" tabindex="-1"></a><span class="st">    Frase: "El producto llegó roto y la atención fue pésima" → NEGATIVO</span></span>
+<span id="cb24-133"><a href="#cb24-133" aria-hidden="true" tabindex="-1"></a><span class="st">    Frase: "Todo perfecto, entrega rápida y bien embalado" → POSITIVO</span></span>
+<span id="cb24-134"><a href="#cb24-134" aria-hidden="true" tabindex="-1"></a><span class="st">    Frase: "El paquete llegó ayer por la tarde" → NEUTRAL</span></span>
+<span id="cb24-135"><a href="#cb24-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-136"><a href="#cb24-136" aria-hidden="true" tabindex="-1"></a><span class="st">    Ahora clasifica:</span></span>
+<span id="cb24-137"><a href="#cb24-137" aria-hidden="true" tabindex="-1"></a><span class="st">    Frase: "El diseño es bonito pero la batería no dura nada"</span></span>
+<span id="cb24-138"><a href="#cb24-138" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb24-139"><a href="#cb24-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-140"><a href="#cb24-140" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb24-141"><a href="#cb24-141" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb24-142"><a href="#cb24-142" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt_few_shot}]</span>
+<span id="cb24-143"><a href="#cb24-143" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-144"><a href="#cb24-144" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb24-145"><a href="#cb24-145" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-146"><a href="#cb24-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-147"><a href="#cb24-147" aria-hidden="true" tabindex="-1"></a>**¿Por qué funciona?** Los LLMs son excelentes reconociendo patrones. Al darles 2-3 ejemplos, el modelo "aprende" el patrón en contexto (*in-context learning*) sin necesidad de fine-tuning.</span>
+<span id="cb24-148"><a href="#cb24-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-149"><a href="#cb24-149" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb24-150"><a href="#cb24-150" aria-hidden="true" tabindex="-1"></a><span class="fu">## Regla de oro del few-shot</span></span>
+<span id="cb24-151"><a href="#cb24-151" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>2-3 ejemplos suelen bastar</span>
+<span id="cb24-152"><a href="#cb24-152" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Los ejemplos deben cubrir los casos extremos (edge cases)</span>
+<span id="cb24-153"><a href="#cb24-153" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Mantén consistencia exacta en el formato de los ejemplos</span>
+<span id="cb24-154"><a href="#cb24-154" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb24-155"><a href="#cb24-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-156"><a href="#cb24-156" aria-hidden="true" tabindex="-1"></a><span class="fu">### Zero-shot vs Few-shot vs One-shot</span></span>
+<span id="cb24-157"><a href="#cb24-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-158"><a href="#cb24-158" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Estrategia <span class="pp">|</span> Ejemplos en el prompt <span class="pp">|</span> Cuándo usarlo <span class="pp">|</span></span>
+<span id="cb24-159"><a href="#cb24-159" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb24-160"><a href="#cb24-160" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Zero-shot** <span class="pp">|</span> 0 — solo la instrucción <span class="pp">|</span> Tareas sencillas, modelos muy capaces <span class="pp">|</span></span>
+<span id="cb24-161"><a href="#cb24-161" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **One-shot** <span class="pp">|</span> 1 ejemplo <span class="pp">|</span> Cuando necesitas mostrar el formato exacto <span class="pp">|</span></span>
+<span id="cb24-162"><a href="#cb24-162" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Few-shot** <span class="pp">|</span> 2-5 ejemplos <span class="pp">|</span> Tareas complejas, formatos muy específicos <span class="pp">|</span></span>
+<span id="cb24-163"><a href="#cb24-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-166"><a href="#cb24-166" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-167"><a href="#cb24-167" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-168"><a href="#cb24-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-169"><a href="#cb24-169" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb24-170"><a href="#cb24-170" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb24-171"><a href="#cb24-171" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-172"><a href="#cb24-172" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ZERO-SHOT: sin ejemplos</span></span>
+<span id="cb24-173"><a href="#cb24-173" aria-hidden="true" tabindex="-1"></a>    respuesta_zero <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb24-174"><a href="#cb24-174" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb24-175"><a href="#cb24-175" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Traduce al inglés: 'El gato está en el tejado'"</span>}]</span>
+<span id="cb24-176"><a href="#cb24-176" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-177"><a href="#cb24-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-178"><a href="#cb24-178" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ONE-SHOT: un ejemplo</span></span>
+<span id="cb24-179"><a href="#cb24-179" aria-hidden="true" tabindex="-1"></a>    respuesta_one <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb24-180"><a href="#cb24-180" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb24-181"><a href="#cb24-181" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"""</span></span>
+<span id="cb24-182"><a href="#cb24-182" aria-hidden="true" tabindex="-1"></a><span class="st">    Traduce español → inglés.</span></span>
+<span id="cb24-183"><a href="#cb24-183" aria-hidden="true" tabindex="-1"></a><span class="st">    Ejemplo: "Hola mundo" → "Hello world"</span></span>
+<span id="cb24-184"><a href="#cb24-184" aria-hidden="true" tabindex="-1"></a><span class="st">    Ahora traduce: "El gato está en el tejado"</span></span>
+<span id="cb24-185"><a href="#cb24-185" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span>}]</span>
+<span id="cb24-186"><a href="#cb24-186" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-187"><a href="#cb24-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-188"><a href="#cb24-188" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"Zero-shot:"</span>, respuesta_zero.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb24-189"><a href="#cb24-189" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"One-shot:"</span>, respuesta_one.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb24-190"><a href="#cb24-190" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-191"><a href="#cb24-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-192"><a href="#cb24-192" aria-hidden="true" tabindex="-1"></a><span class="fu">### Chain-of-Thought (CoT)</span></span>
+<span id="cb24-193"><a href="#cb24-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-194"><a href="#cb24-194" aria-hidden="true" tabindex="-1"></a>El **Chain-of-Thought** consiste en pedir al modelo que razone paso a paso antes de dar la respuesta final. La clave está en añadir algo como _"pensemos paso a paso"_ o incluir ejemplos donde se muestra el razonamiento.</span>
+<span id="cb24-195"><a href="#cb24-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-198"><a href="#cb24-198" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-199"><a href="#cb24-199" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-200"><a href="#cb24-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-201"><a href="#cb24-201" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb24-202"><a href="#cb24-202" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb24-203"><a href="#cb24-203" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-204"><a href="#cb24-204" aria-hidden="true" tabindex="-1"></a>    problema <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb24-205"><a href="#cb24-205" aria-hidden="true" tabindex="-1"></a><span class="st">    Un tren sale de Madrid a las 08:00 hacia Barcelona (620 km) a 120 km/h.</span></span>
+<span id="cb24-206"><a href="#cb24-206" aria-hidden="true" tabindex="-1"></a><span class="st">    Otro tren sale de Barcelona a las 09:00 hacia Madrid a 150 km/h.</span></span>
+<span id="cb24-207"><a href="#cb24-207" aria-hidden="true" tabindex="-1"></a><span class="st">    ¿A qué hora se cruzan?</span></span>
+<span id="cb24-208"><a href="#cb24-208" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb24-209"><a href="#cb24-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-210"><a href="#cb24-210" aria-hidden="true" tabindex="-1"></a>    prompt_cot <span class="op">=</span> <span class="ss">f"""</span></span>
+<span id="cb24-211"><a href="#cb24-211" aria-hidden="true" tabindex="-1"></a><span class="ss">    </span><span class="sc">{</span>problema<span class="sc">}</span></span>
+<span id="cb24-212"><a href="#cb24-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-213"><a href="#cb24-213" aria-hidden="true" tabindex="-1"></a><span class="ss">    Resuelve paso a paso:</span></span>
+<span id="cb24-214"><a href="#cb24-214" aria-hidden="true" tabindex="-1"></a><span class="ss">    1. Calcula cuánto ha avanzado el primer tren cuando sale el segundo</span></span>
+<span id="cb24-215"><a href="#cb24-215" aria-hidden="true" tabindex="-1"></a><span class="ss">    2. Calcula la distancia restante entre ambos en ese momento</span></span>
+<span id="cb24-216"><a href="#cb24-216" aria-hidden="true" tabindex="-1"></a><span class="ss">    3. Calcula el tiempo hasta que se cruzan</span></span>
+<span id="cb24-217"><a href="#cb24-217" aria-hidden="true" tabindex="-1"></a><span class="ss">    4. Suma el tiempo a la hora de salida</span></span>
+<span id="cb24-218"><a href="#cb24-218" aria-hidden="true" tabindex="-1"></a><span class="ss">    """</span></span>
+<span id="cb24-219"><a href="#cb24-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-220"><a href="#cb24-220" aria-hidden="true" tabindex="-1"></a>    respuesta_cot <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb24-221"><a href="#cb24-221" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb24-222"><a href="#cb24-222" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt_cot}]</span>
+<span id="cb24-223"><a href="#cb24-223" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-224"><a href="#cb24-224" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta_cot.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb24-225"><a href="#cb24-225" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-226"><a href="#cb24-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-229"><a href="#cb24-229" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb24-230"><a href="#cb24-230" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb24-231"><a href="#cb24-231" aria-hidden="true" tabindex="-1"></a>    A[Pregunta compleja] --&gt; B[LLM razona paso a paso]</span>
+<span id="cb24-232"><a href="#cb24-232" aria-hidden="true" tabindex="-1"></a>    B --&gt; C[Paso <span class="dv">1</span>: identifica datos]</span>
+<span id="cb24-233"><a href="#cb24-233" aria-hidden="true" tabindex="-1"></a>    C --&gt; D[Paso <span class="dv">2</span>: calcula intermedio]</span>
+<span id="cb24-234"><a href="#cb24-234" aria-hidden="true" tabindex="-1"></a>    D --&gt; E[Paso <span class="dv">3</span>: combina resultados]</span>
+<span id="cb24-235"><a href="#cb24-235" aria-hidden="true" tabindex="-1"></a>    E --&gt; F[Respuesta final&lt;br/&gt;razonada y verificable]</span>
+<span id="cb24-236"><a href="#cb24-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-237"><a href="#cb24-237" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb24-238"><a href="#cb24-238" aria-hidden="true" tabindex="-1"></a>    style F fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb24-239"><a href="#cb24-239" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-240"><a href="#cb24-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-241"><a href="#cb24-241" aria-hidden="true" tabindex="-1"></a>**¿Por qué funciona?** Al obligar al modelo a generar tokens intermedios de razonamiento, cada paso condiciona el siguiente. Es como si el modelo "pensara en voz alta", reduciendo drásticamente los errores en tareas matemáticas y lógicas.</span>
+<span id="cb24-242"><a href="#cb24-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-243"><a href="#cb24-243" aria-hidden="true" tabindex="-1"></a><span class="fu">### Tree-of-Thought (ToT)</span></span>
+<span id="cb24-244"><a href="#cb24-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-245"><a href="#cb24-245" aria-hidden="true" tabindex="-1"></a>El **Tree-of-Thought** extiende CoT: en lugar de un único camino de razonamiento, el modelo explora múltiples ramas y elige la mejor. Es útil para problemas con múltiples soluciones posibles (planificación, puzzles, creatividad).</span>
+<span id="cb24-246"><a href="#cb24-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-249"><a href="#cb24-249" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb24-250"><a href="#cb24-250" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb24-251"><a href="#cb24-251" aria-hidden="true" tabindex="-1"></a>    A[Problema] --&gt; B1[Idea <span class="dv">1</span>]</span>
+<span id="cb24-252"><a href="#cb24-252" aria-hidden="true" tabindex="-1"></a>    A --&gt; B2[Idea <span class="dv">2</span>]</span>
+<span id="cb24-253"><a href="#cb24-253" aria-hidden="true" tabindex="-1"></a>    A --&gt; B3[Idea <span class="dv">3</span>]</span>
+<span id="cb24-254"><a href="#cb24-254" aria-hidden="true" tabindex="-1"></a>    B1 --&gt; C1[Desarrollo <span class="dv">1</span>A]</span>
+<span id="cb24-255"><a href="#cb24-255" aria-hidden="true" tabindex="-1"></a>    B1 --&gt; C2[Desarrollo <span class="dv">1</span>B]</span>
+<span id="cb24-256"><a href="#cb24-256" aria-hidden="true" tabindex="-1"></a>    B2 --&gt; C3[Desarrollo <span class="dv">2</span>A]</span>
+<span id="cb24-257"><a href="#cb24-257" aria-hidden="true" tabindex="-1"></a>    B3 --&gt; C4[Desarrollo <span class="dv">3</span>A]</span>
+<span id="cb24-258"><a href="#cb24-258" aria-hidden="true" tabindex="-1"></a>    B3 --&gt; C5[Desarrollo <span class="dv">3</span>B]</span>
+<span id="cb24-259"><a href="#cb24-259" aria-hidden="true" tabindex="-1"></a>    C1 --&gt; D{Evaluar&lt;br/&gt;mejor rama}</span>
+<span id="cb24-260"><a href="#cb24-260" aria-hidden="true" tabindex="-1"></a>    C3 --&gt; D</span>
+<span id="cb24-261"><a href="#cb24-261" aria-hidden="true" tabindex="-1"></a>    C4 --&gt; D</span>
+<span id="cb24-262"><a href="#cb24-262" aria-hidden="true" tabindex="-1"></a>    D --&gt; E[Solución&lt;br/&gt;óptima]</span>
+<span id="cb24-263"><a href="#cb24-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-264"><a href="#cb24-264" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb24-265"><a href="#cb24-265" aria-hidden="true" tabindex="-1"></a>    style E fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb24-266"><a href="#cb24-266" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb24-267"><a href="#cb24-267" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-268"><a href="#cb24-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-271"><a href="#cb24-271" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-272"><a href="#cb24-272" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-273"><a href="#cb24-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-274"><a href="#cb24-274" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb24-275"><a href="#cb24-275" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb24-276"><a href="#cb24-276" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-277"><a href="#cb24-277" aria-hidden="true" tabindex="-1"></a>    prompt_tot <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb24-278"><a href="#cb24-278" aria-hidden="true" tabindex="-1"></a><span class="st">    Quiero organizar una jornada de team building de 4 horas para 20 personas de un equipo de Data Science.</span></span>
+<span id="cb24-279"><a href="#cb24-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-280"><a href="#cb24-280" aria-hidden="true" tabindex="-1"></a><span class="st">    Genera 3 enfoques distintos y para cada uno:</span></span>
+<span id="cb24-281"><a href="#cb24-281" aria-hidden="true" tabindex="-1"></a><span class="st">    - Describe brevemente la actividad principal</span></span>
+<span id="cb24-282"><a href="#cb24-282" aria-hidden="true" tabindex="-1"></a><span class="st">    - Evalúa pros y contras (coste, engagement, logística)</span></span>
+<span id="cb24-283"><a href="#cb24-283" aria-hidden="true" tabindex="-1"></a><span class="st">    - Elige el mejor y justifica por qué</span></span>
+<span id="cb24-284"><a href="#cb24-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-285"><a href="#cb24-285" aria-hidden="true" tabindex="-1"></a><span class="st">    Al final, desarrolla en detalle solo la opción elegida.</span></span>
+<span id="cb24-286"><a href="#cb24-286" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb24-287"><a href="#cb24-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-288"><a href="#cb24-288" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb24-289"><a href="#cb24-289" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb24-290"><a href="#cb24-290" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt_tot}]</span>
+<span id="cb24-291"><a href="#cb24-291" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-292"><a href="#cb24-292" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb24-293"><a href="#cb24-293" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-294"><a href="#cb24-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-295"><a href="#cb24-295" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb24-296"><a href="#cb24-296" aria-hidden="true" tabindex="-1"></a>ToT requiere más tokens (y por tanto más coste) que CoT simple, ya que se generan y evalúan múltiples ramas. En la práctica, se implementa con múltiples llamadas al LLM o agentes que evalúan cada rama.</span>
+<span id="cb24-297"><a href="#cb24-297" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb24-298"><a href="#cb24-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-299"><a href="#cb24-299" aria-hidden="true" tabindex="-1"></a><span class="fu">### Output Structuring con JSON Schema</span></span>
+<span id="cb24-300"><a href="#cb24-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-301"><a href="#cb24-301" aria-hidden="true" tabindex="-1"></a>Forzar que el modelo devuelva JSON nos permite integrar el LLM en pipelines automatizados. La API de OpenAI ofrece el parámetro <span class="in">`response_format`</span> para garantizar JSON válido:</span>
+<span id="cb24-302"><a href="#cb24-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-305"><a href="#cb24-305" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-306"><a href="#cb24-306" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-307"><a href="#cb24-307" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-308"><a href="#cb24-308" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb24-309"><a href="#cb24-309" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb24-310"><a href="#cb24-310" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-311"><a href="#cb24-311" aria-hidden="true" tabindex="-1"></a>    texto_a_analizar <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb24-312"><a href="#cb24-312" aria-hidden="true" tabindex="-1"></a><span class="st">    Reunión del 15/03/2026. Asistentes: Ana (Data), Carlos (ML), Bea (Product).</span></span>
+<span id="cb24-313"><a href="#cb24-313" aria-hidden="true" tabindex="-1"></a><span class="st">    Se acordó migrar el pipeline ETL a Spark antes del Q2.</span></span>
+<span id="cb24-314"><a href="#cb24-314" aria-hidden="true" tabindex="-1"></a><span class="st">    Presupuesto estimado: 45.000€. Carlos se encarga de la POC.</span></span>
+<span id="cb24-315"><a href="#cb24-315" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb24-316"><a href="#cb24-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-317"><a href="#cb24-317" aria-hidden="true" tabindex="-1"></a>    system_prompt <span class="op">=</span> <span class="ss">f"""Eres un extractor de datos de actas de reunión.</span></span>
+<span id="cb24-318"><a href="#cb24-318" aria-hidden="true" tabindex="-1"></a><span class="ss">Devuelve ÚNICAMENTE un JSON válido con esta estructura exacta, sin texto adicional:</span></span>
+<span id="cb24-319"><a href="#cb24-319" aria-hidden="true" tabindex="-1"></a><span class="ch">{{</span></span>
+<span id="cb24-320"><a href="#cb24-320" aria-hidden="true" tabindex="-1"></a><span class="ss">  "fecha": "string (formato YYYY-MM-DD)",</span></span>
+<span id="cb24-321"><a href="#cb24-321" aria-hidden="true" tabindex="-1"></a><span class="ss">  "asistentes": ["lista de nombres"],</span></span>
+<span id="cb24-322"><a href="#cb24-322" aria-hidden="true" tabindex="-1"></a><span class="ss">  "decisiones": ["lista de decisiones tomadas"],</span></span>
+<span id="cb24-323"><a href="#cb24-323" aria-hidden="true" tabindex="-1"></a><span class="ss">  "presupuesto_euros": 0.0,</span></span>
+<span id="cb24-324"><a href="#cb24-324" aria-hidden="true" tabindex="-1"></a><span class="ss">  "responsables": [</span><span class="ch">{{</span><span class="ss">"nombre": "string", "tarea": "string"</span><span class="ch">}}</span><span class="ss">]</span></span>
+<span id="cb24-325"><a href="#cb24-325" aria-hidden="true" tabindex="-1"></a><span class="ch">}}</span><span class="ss">"""</span></span>
+<span id="cb24-326"><a href="#cb24-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-327"><a href="#cb24-327" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb24-328"><a href="#cb24-328" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb24-329"><a href="#cb24-329" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[</span>
+<span id="cb24-330"><a href="#cb24-330" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: system_prompt},</span>
+<span id="cb24-331"><a href="#cb24-331" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: texto_a_analizar}</span>
+<span id="cb24-332"><a href="#cb24-332" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb24-333"><a href="#cb24-333" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-334"><a href="#cb24-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-335"><a href="#cb24-335" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb24-336"><a href="#cb24-336" aria-hidden="true" tabindex="-1"></a>        resultado <span class="op">=</span> parse_json_response(respuesta.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb24-337"><a href="#cb24-337" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(json.dumps(resultado, indent<span class="op">=</span><span class="dv">2</span>, ensure_ascii<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb24-338"><a href="#cb24-338" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> json.JSONDecodeError:</span>
+<span id="cb24-339"><a href="#cb24-339" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"⚠️ El modelo no devolvió JSON válido. Intenta de nuevo o usa un modelo con soporte nativo de structured output."</span>)</span>
+<span id="cb24-340"><a href="#cb24-340" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content[:<span class="dv">200</span>])</span>
+<span id="cb24-341"><a href="#cb24-341" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-342"><a href="#cb24-342" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-343"><a href="#cb24-343" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
+<span id="cb24-344"><a href="#cb24-344" aria-hidden="true" tabindex="-1"></a><span class="fu">## JSON vía prompt vs. structured output nativo</span></span>
+<span id="cb24-345"><a href="#cb24-345" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-346"><a href="#cb24-346" aria-hidden="true" tabindex="-1"></a>Pedir JSON en el prompt funciona con **cualquier modelo**, pero **no garantiza** que el JSON sea válido (por eso añadimos `try/except`). Algunos modelos como Qwen 3 ofrecen `response_format` nativo que fuerza la estructura desde el API. La ventaja del prompting es que es **model-agnostic**: funciona con Gemma, Llama, Mistral, etc.</span>
+<span id="cb24-347"><a href="#cb24-347" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb24-348"><a href="#cb24-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-349"><a href="#cb24-349" aria-hidden="true" tabindex="-1"></a><span class="fu">### De JSON Schema a datos sintéticos: el enfoque intuitivo</span></span>
+<span id="cb24-350"><a href="#cb24-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-351"><a href="#cb24-351" aria-hidden="true" tabindex="-1"></a>Lo que acabas de hacer —extraer 1 registro JSON de un texto— es el mismo mecanismo que permite **generar datasets sintéticos completos**. La diferencia es de escala: en lugar de pedir 1 registro, pides N. En lugar de extraer de un texto real, pides al modelo que *invente* datos verosímiles.</span>
+<span id="cb24-352"><a href="#cb24-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-353"><a href="#cb24-353" aria-hidden="true" tabindex="-1"></a>La receta es simple:</span>
+<span id="cb24-354"><a href="#cb24-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-355"><a href="#cb24-355" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Define el schema** de tus datos (igual que en la sección anterior)</span>
+<span id="cb24-356"><a href="#cb24-356" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Añade few-shot examples** para que el modelo entienda el dominio y los rangos esperados</span>
+<span id="cb24-357"><a href="#cb24-357" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Controla la diversidad** con temperatura: baja produce datos conservadores, alta inyecta variedad</span>
+<span id="cb24-358"><a href="#cb24-358" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Itera en batch** para generar cientos o miles de registros</span>
+<span id="cb24-359"><a href="#cb24-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-362"><a href="#cb24-362" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-363"><a href="#cb24-363" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-364"><a href="#cb24-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-365"><a href="#cb24-365" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb24-366"><a href="#cb24-366" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb24-367"><a href="#cb24-367" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-368"><a href="#cb24-368" aria-hidden="true" tabindex="-1"></a>    <span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb24-369"><a href="#cb24-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-370"><a href="#cb24-370" aria-hidden="true" tabindex="-1"></a>    system_prompt <span class="op">=</span> <span class="st">"""Eres un generador de datos sintéticos de clientes españoles.</span></span>
+<span id="cb24-371"><a href="#cb24-371" aria-hidden="true" tabindex="-1"></a><span class="st">Devuelve ÚNICAMENTE un JSON válido con esta estructura exacta, sin texto adicional:</span></span>
+<span id="cb24-372"><a href="#cb24-372" aria-hidden="true" tabindex="-1"></a><span class="st">{</span></span>
+<span id="cb24-373"><a href="#cb24-373" aria-hidden="true" tabindex="-1"></a><span class="st">  "clientes": [</span></span>
+<span id="cb24-374"><a href="#cb24-374" aria-hidden="true" tabindex="-1"></a><span class="st">    {</span></span>
+<span id="cb24-375"><a href="#cb24-375" aria-hidden="true" tabindex="-1"></a><span class="st">      "id": 1,</span></span>
+<span id="cb24-376"><a href="#cb24-376" aria-hidden="true" tabindex="-1"></a><span class="st">      "edad": 34,</span></span>
+<span id="cb24-377"><a href="#cb24-377" aria-hidden="true" tabindex="-1"></a><span class="st">      "ingresos_anuales": 42000.0,</span></span>
+<span id="cb24-378"><a href="#cb24-378" aria-hidden="true" tabindex="-1"></a><span class="st">      "provincia": "Madrid",</span></span>
+<span id="cb24-379"><a href="#cb24-379" aria-hidden="true" tabindex="-1"></a><span class="st">      "segmento": "premium"</span></span>
+<span id="cb24-380"><a href="#cb24-380" aria-hidden="true" tabindex="-1"></a><span class="st">    }</span></span>
+<span id="cb24-381"><a href="#cb24-381" aria-hidden="true" tabindex="-1"></a><span class="st">  ]</span></span>
+<span id="cb24-382"><a href="#cb24-382" aria-hidden="true" tabindex="-1"></a><span class="st">}</span></span>
+<span id="cb24-383"><a href="#cb24-383" aria-hidden="true" tabindex="-1"></a><span class="st">Reglas:</span></span>
+<span id="cb24-384"><a href="#cb24-384" aria-hidden="true" tabindex="-1"></a><span class="st">- Edad entre 18 y 80 años</span></span>
+<span id="cb24-385"><a href="#cb24-385" aria-hidden="true" tabindex="-1"></a><span class="st">- Ingresos entre 12000 y 120000, correlacionados con la edad</span></span>
+<span id="cb24-386"><a href="#cb24-386" aria-hidden="true" tabindex="-1"></a><span class="st">- Provincias: Madrid, Barcelona, Valencia, Sevilla, Bilbao, Málaga, Zaragoza</span></span>
+<span id="cb24-387"><a href="#cb24-387" aria-hidden="true" tabindex="-1"></a><span class="st">- Segmentos: premium, estandar, basic</span></span>
+<span id="cb24-388"><a href="#cb24-388" aria-hidden="true" tabindex="-1"></a><span class="st">- Genera variedad realista"""</span></span>
+<span id="cb24-389"><a href="#cb24-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-390"><a href="#cb24-390" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> client.chat.completions.create(</span>
+<span id="cb24-391"><a href="#cb24-391" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb24-392"><a href="#cb24-392" aria-hidden="true" tabindex="-1"></a>        temperature<span class="op">=</span><span class="fl">0.8</span>,</span>
+<span id="cb24-393"><a href="#cb24-393" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[</span>
+<span id="cb24-394"><a href="#cb24-394" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: system_prompt},</span>
+<span id="cb24-395"><a href="#cb24-395" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: <span class="st">"Genera 10 clientes sintéticos. Usa variedad realista en edades, ingresos y provincias."</span>}</span>
+<span id="cb24-396"><a href="#cb24-396" aria-hidden="true" tabindex="-1"></a>        ],</span>
+<span id="cb24-397"><a href="#cb24-397" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb24-398"><a href="#cb24-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-399"><a href="#cb24-399" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb24-400"><a href="#cb24-400" aria-hidden="true" tabindex="-1"></a>        datos <span class="op">=</span> parse_json_response(respuesta.choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb24-401"><a href="#cb24-401" aria-hidden="true" tabindex="-1"></a>        df <span class="op">=</span> pd.DataFrame(datos[<span class="st">"clientes"</span>])</span>
+<span id="cb24-402"><a href="#cb24-402" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(df.to_string(index<span class="op">=</span><span class="va">False</span>))</span>
+<span id="cb24-403"><a href="#cb24-403" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span><span class="bu">len</span>(df)<span class="sc">}</span><span class="ss"> registros generados"</span>)</span>
+<span id="cb24-404"><a href="#cb24-404" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"   Edad: </span><span class="sc">{</span>df[<span class="st">'edad'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">}</span><span class="ss">-</span><span class="sc">{</span>df[<span class="st">'edad'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">}</span><span class="ss"> (media </span><span class="sc">{</span>df[<span class="st">'edad'</span>]<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">)"</span>)</span>
+<span id="cb24-405"><a href="#cb24-405" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"   Ingresos: </span><span class="sc">{</span>df[<span class="st">'ingresos_anuales'</span>]<span class="sc">.</span><span class="bu">min</span>()<span class="sc">:.0f}</span><span class="ss">-</span><span class="sc">{</span>df[<span class="st">'ingresos_anuales'</span>]<span class="sc">.</span><span class="bu">max</span>()<span class="sc">:.0f}</span><span class="ss"> (media </span><span class="sc">{</span>df[<span class="st">'ingresos_anuales'</span>]<span class="sc">.</span>mean()<span class="sc">:.0f}</span><span class="ss">)"</span>)</span>
+<span id="cb24-406"><a href="#cb24-406" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> (json.JSONDecodeError, <span class="pp">KeyError</span>) <span class="im">as</span> e:</span>
+<span id="cb24-407"><a href="#cb24-407" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"⚠️ Error al parsear respuesta: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb24-408"><a href="#cb24-408" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content[:<span class="dv">200</span>])</span>
+<span id="cb24-409"><a href="#cb24-409" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-410"><a href="#cb24-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-411"><a href="#cb24-411" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb24-412"><a href="#cb24-412" aria-hidden="true" tabindex="-1"></a><span class="fu">## ¿Por qué funciona?</span></span>
+<span id="cb24-413"><a href="#cb24-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-414"><a href="#cb24-414" aria-hidden="true" tabindex="-1"></a>El LLM no "conoce" clientes reales, pero ha visto millones de patrones en sus datos de entrenamiento: distribuciones de edad, rangos de ingresos típicos, provincias españolas. El **prompt con el schema**, el **few-shot** y la **temperatura** controlan estructura, dominio y diversidad. Algunos modelos (Qwen, OpenAI) ofrecen además <span class="in">`response_format`</span> nativo para forzar la estructura desde el API.</span>
+<span id="cb24-415"><a href="#cb24-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-416"><a href="#cb24-416" aria-hidden="true" tabindex="-1"></a>**Este es el enfoque más intuitivo y accesible para datos sintéticos:**</span>
+<span id="cb24-417"><a href="#cb24-417" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Sin entrenar modelos adicionales</span>
+<span id="cb24-418"><a href="#cb24-418" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Sin GPU</span>
+<span id="cb24-419"><a href="#cb24-419" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>En menos de 20 líneas de código</span>
+<span id="cb24-420"><a href="#cb24-420" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Funciona con cualquier modelo (Gemma, Qwen, Llama, etc.)</span>
+<span id="cb24-421"><a href="#cb24-421" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Ideal para prototipado, testing y aumento rápido de datasets pequeños</span>
+<span id="cb24-422"><a href="#cb24-422" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb24-423"><a href="#cb24-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-424"><a href="#cb24-424" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb24-425"><a href="#cb24-425" aria-hidden="true" tabindex="-1"></a><span class="fu">## Limitaciones del enfoque intuitivo</span></span>
+<span id="cb24-426"><a href="#cb24-426" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-427"><a href="#cb24-427" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>No garantiza **correlaciones realistas** entre columnas (ej. ingresos vs. edad pueden no seguir la relación esperada)</span>
+<span id="cb24-428"><a href="#cb24-428" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Puede generar **valores atípicos** no representativos</span>
+<span id="cb24-429"><a href="#cb24-429" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Depende de la **calidad del prompt** y los ejemplos</span>
+<span id="cb24-430"><a href="#cb24-430" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**No hay garantía de privacidad** diferencial</span>
+<span id="cb24-431"><a href="#cb24-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-432"><a href="#cb24-432" aria-hidden="true" tabindex="-1"></a>Para datasets de producción donde la fidelidad estadística es crítica, necesitarás modelos generativos especializados (CTGAN, TVAE, TabDDPM) que veremos en el **Bloque 3** con SDV.</span>
+<span id="cb24-433"><a href="#cb24-433" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb24-434"><a href="#cb24-434" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-435"><a href="#cb24-435" aria-hidden="true" tabindex="-1"></a><span class="fu">### Role Prompting</span></span>
+<span id="cb24-436"><a href="#cb24-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-437"><a href="#cb24-437" aria-hidden="true" tabindex="-1"></a>Asignar un **rol** al modelo en el mensaje <span class="in">`system`</span> cambia radicalmente su comportamiento. No es magia: el modelo, entrenado con textos de diversos perfiles, "activa" los patrones asociados a ese rol.</span>
+<span id="cb24-438"><a href="#cb24-438" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-441"><a href="#cb24-441" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-442"><a href="#cb24-442" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-443"><a href="#cb24-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-444"><a href="#cb24-444" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> consultar_como(rol, pregunta):</span>
+<span id="cb24-445"><a href="#cb24-445" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> client.chat.completions.create(</span>
+<span id="cb24-446"><a href="#cb24-446" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb24-447"><a href="#cb24-447" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[</span>
+<span id="cb24-448"><a href="#cb24-448" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"system"</span>, <span class="st">"content"</span>: rol},</span>
+<span id="cb24-449"><a href="#cb24-449" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: pregunta}</span>
+<span id="cb24-450"><a href="#cb24-450" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb24-451"><a href="#cb24-451" aria-hidden="true" tabindex="-1"></a>    ).choices[<span class="dv">0</span>].message.content</span>
+<span id="cb24-452"><a href="#cb24-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-453"><a href="#cb24-453" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb24-454"><a href="#cb24-454" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb24-455"><a href="#cb24-455" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-456"><a href="#cb24-456" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Sin rol (genérico)</span></span>
+<span id="cb24-457"><a href="#cb24-457" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"=== SIN ROL ==="</span>)</span>
+<span id="cb24-458"><a href="#cb24-458" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(consultar_como(<span class="st">"Eres un asistente útil."</span>, <span class="st">"¿Qué opinas de usar la media en datos con outliers?"</span>))</span>
+<span id="cb24-459"><a href="#cb24-459" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-460"><a href="#cb24-460" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Con rol de analista senior</span></span>
+<span id="cb24-461"><a href="#cb24-461" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== ANALISTA SENIOR ==="</span>)</span>
+<span id="cb24-462"><a href="#cb24-462" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(consultar_como(</span>
+<span id="cb24-463"><a href="#cb24-463" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Eres un analista de datos senior con 15 años de experiencia en finanzas. "</span></span>
+<span id="cb24-464"><a href="#cb24-464" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Respondes con rigor estadístico, mencionas alternativas robustas y das ejemplos concretos."</span>,</span>
+<span id="cb24-465"><a href="#cb24-465" aria-hidden="true" tabindex="-1"></a>        <span class="st">"¿Qué opinas de usar la media en datos con outliers?"</span></span>
+<span id="cb24-466"><a href="#cb24-466" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb24-467"><a href="#cb24-467" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-468"><a href="#cb24-468" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Con rol de profesor divulgador</span></span>
+<span id="cb24-469"><a href="#cb24-469" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== PROFESOR DIVULGADOR ==="</span>)</span>
+<span id="cb24-470"><a href="#cb24-470" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(consultar_como(</span>
+<span id="cb24-471"><a href="#cb24-471" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Eres un profesor de estadística que explica conceptos a estudiantes de primero de carrera. "</span></span>
+<span id="cb24-472"><a href="#cb24-472" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Usas analogías cotidianas, evitas jerga innecesaria y pones ejemplos sencillos."</span>,</span>
+<span id="cb24-473"><a href="#cb24-473" aria-hidden="true" tabindex="-1"></a>        <span class="st">"¿Qué opinas de usar la media en datos con outliers?"</span></span>
+<span id="cb24-474"><a href="#cb24-474" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb24-475"><a href="#cb24-475" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-476"><a href="#cb24-476" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-477"><a href="#cb24-477" aria-hidden="true" tabindex="-1"></a><span class="fu">### Técnicas adicionales</span></span>
+<span id="cb24-478"><a href="#cb24-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-479"><a href="#cb24-479" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Técnica <span class="pp">|</span> Descripción <span class="pp">|</span> Cuándo usarla <span class="pp">|</span></span>
+<span id="cb24-480"><a href="#cb24-480" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb24-481"><a href="#cb24-481" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Self-consistency** <span class="pp">|</span> Ejecutar CoT varias veces y votar la respuesta mayoritaria <span class="pp">|</span> Razonamiento matemático/lógico <span class="pp">|</span></span>
+<span id="cb24-482"><a href="#cb24-482" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Generated knowledge** <span class="pp">|</span> Pedir al modelo que genere contexto antes de responder <span class="pp">|</span> Preguntas que requieren conocimiento factual <span class="pp">|</span></span>
+<span id="cb24-483"><a href="#cb24-483" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Re-reading (RE2)** <span class="pp">|</span> Hacer que el modelo lea la pregunta dos veces <span class="pp">|</span> Mejora comprensión en tareas largas <span class="pp">|</span></span>
+<span id="cb24-484"><a href="#cb24-484" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Emotion prompting** <span class="pp">|</span> Añadir estímulos emocionales al prompt <span class="pp">|</span> Tareas creativas o subjetivas <span class="pp">|</span></span>
+<span id="cb24-485"><a href="#cb24-485" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Step-back prompting** <span class="pp">|</span> Preguntar primero por principios generales <span class="pp">|</span> Problemas muy específicos <span class="pp">|</span></span>
+<span id="cb24-486"><a href="#cb24-486" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-489"><a href="#cb24-489" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb24-490"><a href="#cb24-490" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb24-491"><a href="#cb24-491" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-492"><a href="#cb24-492" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb24-493"><a href="#cb24-493" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb24-494"><a href="#cb24-494" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb24-495"><a href="#cb24-495" aria-hidden="true" tabindex="-1"></a>    prompt_step_back <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb24-496"><a href="#cb24-496" aria-hidden="true" tabindex="-1"></a><span class="st">    Pregunta original: ¿Es 17 un número primo de Mersenne?</span></span>
+<span id="cb24-497"><a href="#cb24-497" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-498"><a href="#cb24-498" aria-hidden="true" tabindex="-1"></a><span class="st">    Antes de responder, contesta:</span></span>
+<span id="cb24-499"><a href="#cb24-499" aria-hidden="true" tabindex="-1"></a><span class="st">    1. ¿Qué es un número primo de Mersenne? (definición general)</span></span>
+<span id="cb24-500"><a href="#cb24-500" aria-hidden="true" tabindex="-1"></a><span class="st">    2. ¿Cómo se comprueba si un número es primo de Mersenne? (método)</span></span>
+<span id="cb24-501"><a href="#cb24-501" aria-hidden="true" tabindex="-1"></a><span class="st">    3. Ahora aplica el método a 17 y concluye.</span></span>
+<span id="cb24-502"><a href="#cb24-502" aria-hidden="true" tabindex="-1"></a><span class="st">    """</span></span>
+<span id="cb24-503"><a href="#cb24-503" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-504"><a href="#cb24-504" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(client.chat.completions.create(</span>
+<span id="cb24-505"><a href="#cb24-505" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
+<span id="cb24-506"><a href="#cb24-506" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt_step_back}]</span>
+<span id="cb24-507"><a href="#cb24-507" aria-hidden="true" tabindex="-1"></a>    ).choices[<span class="dv">0</span>].message.content)</span>
+<span id="cb24-508"><a href="#cb24-508" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb24-509"><a href="#cb24-509" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-510"><a href="#cb24-510" aria-hidden="true" tabindex="-1"></a><span class="fu">### Buenas prácticas resumen</span></span>
+<span id="cb24-511"><a href="#cb24-511" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-512"><a href="#cb24-512" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Sé específico**: "analiza los datos" → malo. "calcula media, mediana y desviación típica de la columna 'ventas' agrupada por 'región'" → bueno</span>
+<span id="cb24-513"><a href="#cb24-513" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Muestra, no solo digas**: incluye ejemplos del formato que esperas (few-shot)</span>
+<span id="cb24-514"><a href="#cb24-514" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Divide y vencerás**: tareas complejas → CoT, desglosa en pasos</span>
+<span id="cb24-515"><a href="#cb24-515" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Formato forzado**: usa <span class="in">`response_format`</span> / JSON Schema cuando integres con código</span>
+<span id="cb24-516"><a href="#cb24-516" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Itera**: el primer prompt casi nunca es el óptimo. Prueba, compara, mejora</span>
+<span id="cb24-517"><a href="#cb24-517" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**System prompt**: define el tono, rol y restricciones al inicio</span>
+<span id="cb24-518"><a href="#cb24-518" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-519"><a href="#cb24-519" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Lectura recomendada:** </span><span class="co">[</span><span class="ot">Prompt Engineering Guide (DAIR.AI)</span><span class="co">](https://www.promptingguide.ai/)</span></span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
