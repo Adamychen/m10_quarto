@@ -481,10 +481,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 2 — Orquestación</strong>. Se recomienda haber completado el <a href="../bloque1/01-fundamentos.html">Bloque 1</a> primero.</p>
 </blockquote>
-<div id="b40315a5" class="cell" data-execution_count="1">
+<div id="d3b828cf" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q openai python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="c685dc77" class="cell" data-execution_count="2">
+<div id="ce32b1d3" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -498,7 +498,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="b7c7519a" class="cell" data-execution_count="3">
+<div id="8c3bdb27" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -558,7 +558,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="primer-contacto-llamada-a-un-llm" class="level3">
 <h3 class="anchored" data-anchor-id="primer-contacto-llamada-a-un-llm">Primer contacto: llamada a un LLM</h3>
 <p>Antes de profundizar, veamos cómo invocar un LLM desde Python con la API de OpenAI (compatible con Llamus US, Ollama local, etc.):</p>
-<div id="851ca219" class="cell" data-execution_count="4">
+<div id="ba82c6d7" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -568,7 +568,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>La desviación estándar es una medida que indica cuánto se dispersan los datos de un conjunto respecto a su promedio o media.</code></pre>
+<pre><code>La desviación estándar es una medida que indica cuánto se dispersan o varían los datos respecto a su promedio.</code></pre>
 </div>
 </div>
 <p>Este es el patrón base para todo lo que veremos: <code>model</code> + <code>messages</code> → respuesta. Los <code>messages</code> pueden tener varios roles:</p>
@@ -607,7 +607,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="few-shot-prompting" class="level3">
 <h3 class="anchored" data-anchor-id="few-shot-prompting">Few-shot prompting</h3>
 <p>El <strong>few-shot</strong> consiste en incluir ejemplos dentro del prompt para que el modelo entienda exactamente qué formato y estilo esperamos. Es como enseñarle con el ejemplo.</p>
-<div id="4778b942" class="cell" data-execution_count="5">
+<div id="17599854" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -684,7 +684,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<div id="308341d2" class="cell" data-execution_count="6">
+<div id="1de61028" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -715,7 +715,7 @@ One-shot: The cat is on the roof.</code></pre>
 <section id="chain-of-thought-cot" class="level3">
 <h3 class="anchored" data-anchor-id="chain-of-thought-cot">Chain-of-Thought (CoT)</h3>
 <p>El <strong>Chain-of-Thought</strong> consiste en pedir al modelo que razone paso a paso antes de dar la respuesta final. La clave está en añadir algo como <em>“pensemos paso a paso”</em> o incluir ejemplos donde se muestra el razonamiento.</p>
-<div id="2dd7ca06" class="cell" data-execution_count="7">
+<div id="84f92a37" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -741,62 +741,71 @@ One-shot: The cat is on the roof.</code></pre>
 <span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta_cot.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Este es un problema de movimiento relativo. Debemos seguir los pasos solicitados para determinar la hora exacta del cruce.
+<pre><code>Este es un problema de movimiento relativo. Para resolverlo, seguiremos los pasos propuestos para determinar la hora exacta en que se cruzan los trenes.
 
-Datos:
-* Distancia total (Madrid a Barcelona): 620 km
-* Tren 1 (Madrid $\rightarrow$ Barcelona): Sale a las 08:00, velocidad $V_1 = 120 \text{ km/h}$
-* Tren 2 (Barcelona $\rightarrow$ Madrid): Sale a las 09:00, velocidad $V_2 = 150 \text{ km/h}$
+**Datos iniciales:**
+* **Tren Madrid $\to$ Barcelona (Tren 1):** Sale a las 08:00. Velocidad = $120 \text{ km/h}$.
+* **Tren Barcelona $\to$ Madrid (Tren 2):** Sale a las 09:00. Velocidad = $150 \text{ km/h}$.
+* **Distancia total:** $620 \text{ km}$.
+
+---
+
+### 1. Calcula cuánto ha avanzado el primer tren cuando sale el segundo (al momento en que sale el Tren 2)
+
+El Tren 1 sale a las 08:00 y el Tren 2 sale a las 09:00. Esto significa que el Tren 1 viaja durante 1 hora.
+
+* **Tiempo de viaje del Tren 1:** $1 \text{ hora}$
+* **Distancia recorrida por el Tren 1:** $120 \text{ km/h} \times 1 \text{ h} = 120 \text{ km}$.
+
+**Respuesta Paso 1:** Cuando sale el segundo tren (a las 09:00), el primer tren ya ha avanzado $120 \text{ km}$.
 
 ---
 
-### 1. Calcula cuánto ha avanzado el primer tren cuando sale el segundo (a las 09:00).
+### 2. Calcula la distancia restante entre ambos en ese momento
 
-El primer tren sale a las 08:00 y el segundo a las 09:00, por lo tanto tiempo ha recorrido el Tren 1 1 hora.
+La distancia total es $620 \text{ km}$. Ya han recorrido $120 \text{ km}$.
 
-$$\text{Distancia recorrida por el Tren 1} = \text{Velocidad} \times \text{Tiempo}$$
-$$\text{Distancia}_1 = 120 \text{ km/h} \times 1 \text{ h} = 120 \text{ km}$$
+* **Distancia restante:** $620 \text{ km} - 120 \text{ km} = 500 \text{ km}$.
 
-**Respuesta:** Cuando sale el segundo tren (a las 09:00), el primer tren ha avanzado **120 km**.
-
-### 2. Calcula la distancia restante entre ambos en ese momento.
-
-La distancia total es 620 km. Si el Tren 1 está a 120 km, la distancia restante que deben cubrir hasta cruzarse es:
-
-$$\text{Distancia restante} = \text{Distancia total} - \text{Distancia recorrida}$$
-$$\text{Distancia restante} = 620 \text{ km} - 120 \text{ km} = 500 \text{ km}$$
-
-**Respuesta:** La distancia que separa a los dos trenes a las 09:00 es de **500 km**.
-
-### 3. Calcula el tiempo hasta que se cruzan (a partir de las 09:00).
-
-Dado que los trenes se mueven uno hacia el otro, usamos la velocidad relativa (la suma de sus velocidades) para calcular el tiempo que tardarán en cubrir los 500 km restantes.
-
-$$\text{Velocidad relativa} = V_1 + V_2 = 120 \text{ km/h} + 150 \text{ km/h} = 270 \text{ km/h}$$
-
-$$\text{Tiempo de cruce (t)} = \frac{\text{Distancia restante}}{\text{Velocidad relativa}}$$
-$$t = \frac{500 \text{ km}}{270 \text{ km/h}} = \frac{50}{27} \text{ horas}$$
-
-Para convertir este tiempo a minutos (y segundos):
-$$\text{Tiempo en minutos} = \frac{50}{27} \times 60$$
-$$\text{Tiempo en minutos} = \frac{3000}{27} = \frac{1000}{9} \approx 111.11 \text{ minutos}$$
-
-Convertimos la fracción a horas y minutos:
-$$1000 \div 9 = 111 \text{ con un resto de } 1$$
-Esto significa $111 \frac{1}{9}$ minutos, es decir: **111 minutos y 6 segundos** ($1/9$ de 60 segundos).
-
-### 4. Suma el tiempo a la hora de salida.
-
-El cálculo del cruce comienza a las 09:00. Debemos sumar el tiempo calculado (1 hora, 51 minutos y 6 segundos) a esta hora.
-
-$$\text{Hora de salida} = 09:00:00$$
-$$\text{Tiempo transcurrido} = 1 \text{ hora}, 51 \text{ minutos}, 6 \text{ segundos}$$
-
-$$\text{Hora del cruce} = 09:00:00 + 01:51:06$$
-$$\text{Hora del cruce} = 10:51:06$$
+**Respuesta Paso 2:** A las 09:00, la distancia restante entre ambos trenes es de $500 \text{ km}$.
 
 ---
-**Respuesta final:** Los trenes se cruzan a las **10:51:06**.</code></pre>
+
+### 3. Calcula el tiempo hasta que se cruzan (a partir de las 09:00)
+
+A partir de las 09:00, ambos trenes están en movimiento simultáneo y deben cubrir la distancia restante ($500 \text{ km}$) al unirse. Usaremos la velocidad relativa (la suma de sus velocidades).
+
+* **Velocidad Relativa:** $120 \text{ km/h} + 150 \text{ km/h} = 270 \text{ km/h}$.
+* **Tiempo para cruzarse ($T$):** $\frac{\text{Distancia restante}}{\text{Velocidad relativa}} = \frac{500 \text{ km}}{270 \text{ km/h}}$
+
+$$T = \frac{500}{270} = \frac{50}{27} \text{ horas}$$
+
+Para convertir este tiempo a minutos y segundos:
+$$\frac{50}{27} \times 60 \text{ minutos} = \frac{3000}{27} \text{ minutos} = \frac{1000}{9} \text{ minutos}$$
+$$1000 \div 9 = 111 \text{ con un resto de } 1.$$
+Esto significa que el tiempo es $111$ minutos y $\frac{1}{9}$ minuto.
+
+* **Conversión:** $111$ minutos $= 1$ hora y $51$ minutos.
+* El resto es $\frac{1}{9}$ de un minuto. $(\frac{1}{9} \times 60 \text{ segundos}) = 6.67 \text{ segundos}$.
+
+**Tiempo total:** 1 hora, 51 minutos y aproximadamente $6.67$ segundos.
+
+---
+
+### 4. Suma el tiempo a la hora de salida para encontrar la hora de cruce
+
+El tiempo se suma a la hora en que ambos trenes comenzaron su viaje simultáneo (las 09:00).
+
+* **Hora de inicio del cálculo:** 09:00
+* **Tiempo de espera:** 1 hora, 51 minutos, 6.67 segundos
+
+$$09:00:00 + 01:51:06 = 10:51:06$$
+
+---
+
+### Respuesta final
+
+Los trenes se cruzarán aproximadamente a las **10:51** (con unos 6 segundos de diferencia).</code></pre>
 </div>
 </div>
 <div class="cell" data-layout-align="default">
@@ -852,7 +861,7 @@ $$\text{Hora del cruce} = 10:51:06$$
 </div>
 </div>
 </div>
-<div id="e78850d7" class="cell" data-execution_count="8">
+<div id="ee4440fc" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -873,106 +882,114 @@ $$\text{Hora del cruce} = 10:51:06$$
 <span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Este es un desafío excelente. Dado que el equipo es de **Data Science**, la jornada debe enfocarse en habilidades cognitivas, lógica, comunicación y resolución de problemas bajo presión, en lugar de actividades puramente físicas o lúdicas genéricas.
+<pre><code>Esta es una excelente iniciativa. Dada la naturaleza de un equipo de Data Science, las actividades deben estimular el pensamiento lógico, la resolución de problemas bajo presión y la comunicación efectiva, en lugar de solo ejercicios físicos genéricos.
 
-A continuación, presento 3 enfoques distintos para una jornada de team building de 4 horas.
-
----
-
-## Enfoque 1: El Desafío del Detective (Escape Room Temático)
-
-Este enfoque se centra en la resolución de acertijos y el pensamiento lateral bajo presión de tiempo. Ideal para fomentar la colaboración y la toma de decisiones rápida.
-
-| Aspecto | Descripción |
-| :--- | :--- |
-| **Actividad Principal** | Un escape room diseñado a medida (físico o virtual) donde los participantes deben usar su lógica, habilidades analíticas y comunicación para descifrar códigos, resolver acertijos y encontrar pistas en un tiempo limitado. |
-| **Pros** | - Alta inmersión y alto nivel de engagement. - Fomenta el pensamiento crítico y la resolución estructurada de problemas. - Ideal para equipos que disfrutan de los desafíos intelectuales. - Resultados muy claros al final (logro o fracaso). |
-| **Contras** | - Puede ser costoso si se necesita un espacio físico o una plataforma compleja. - La presión del tiempo puede generar ansiedad en algunos. - Requiere un diseño y materialización muy cuidadosos para que sea relevante. |
-| **Logística** | Moderada a Alta (Depende de la complejidad). Se requiere un espacio cerrado con mesas/áreas de juego. El montaje es crucial. |
-
-## Enfoque 2: La Estrategia del Futuro (Simulación y Pitch)
-
-Este enfoque utiliza las habilidades del equipo (análisis, síntesis de información, toma de decisiones) para resolver un problema complejo y presentar una solución. Es muy relevante para el contexto de Data Science.
-
-| Aspecto | Descripción |
-| :--- | :--- |
-| **Actividad Principal** | Se divide al grupo en sub-equipos. Cada equipo recibe un "caso" o un escenario empresarial ficticio (ej. predecir el éxito de un nuevo producto, optimizar una cadena logística). Deben analizar los datos proporcionados (simulados) durante 2 horas y luego presentar su estrategia y modelo predictivo a un "panel de jueces" (el resto del equipo). |
-| **Pros** | - Muy relevante para Data Science. - Fomenta la interpretación de datos, la argumentación lógica y la síntesis colaborativa. - Excelente para mejorar la comunicación técnica dentro del equipo. - Alto impacto en el desarrollo profesional (skills). |
-| **Contras** | - Requiere tiempo para preparar los escenarios y las métricas de éxito. - Puede ser percibido como "demasiado técnico" si no se maneja con un tono ligero. - El riesgo es que el enfoque sea demasiado centrado en la técnica y no en el *team building* puro. |
-| **Logística** | Baja (Requiere solo pizarras, flip charts, post-its y tiempo). Se puede adaptar a cualquier espacio de oficina. |
-
-## Enfoque 3: El Arte de la Colaboración (Construcción Creativa bajo Restricciones)
-
-Este enfoque se centra en el pensamiento creativo, la gestión de recursos limitados y la colaboración no lineal. Busca romper los silos e ideas de manera divertida.
-
-| Aspecto | Descripción |
-| :--- | :--- |
-| **Actividad Principal** | Los participantes deben trabajar en grupos pequeños para construir un objeto o solución abstracta utilizando un conjunto limitado de materiales, bajo una restricción temática o funcional (ej. "Construir la mejor interfaz para un robot", "Diseñar un ecosistema sostenible"). El objetivo no es el producto final, sino el proceso colaborativo y la justificación de su diseño. |
-| **Pros** | - Fomenta la creatividad, la flexibilidad mental y la aceptación de ideas diferentes. - Excelente para romper barreras jerárquicas. - Bajo nivel de presión por resultados técnicos; alta presión por la colaboración. - Muy divertido y relajado. |
-| **Contras** | - El resultado final puede ser subjetivo o poco estructurado. - Puede no ser percibido como una actividad "profesional" si el equipo es muy rígido. - Requiere un anfitrión que sea excelente en manejar dinámicas grupales. |
-| **Logística** | Baja (Requiere materiales simples: cartón, marcadores, cinta, etc.). Fácil de montar y desmontar. |
+A continuación, te presento 3 enfoques distintos para tu jornada de Team Building de 4 horas.
 
 ---
 
-## Elección y Justificación
+## 🎯 ENFOQUE 1: La Simulación Estratégica (The Strategy Simulation)
 
-### Opción Elegida: Enfoque 2 - La Estrategia del Futuro (Simulación y Pitch)
+Este enfoque apela directamente a la mentalidad analítica del equipo, obligándolos a tomar decisiones basadas en datos y estrategias en un entorno competitivo.
 
-Esta opción es la mejor para un equipo de Data Science por las siguientes razones:
+### Descripción de la Actividad Principal
+**Simulación Empresarial o "Shark Tank" Analítico.** Se divide al grupo en equipos pequeños (4-5 personas). Cada equipo recibe un caso complejo (ej. un desafío de negocio, un mercado emergente) con recursos limitados y un tiempo definido para desarrollar una estrategia, justificar sus decisiones y presentarla a un "jurado". El objetivo es no solo ganar, sino entender cómo el equipo colaboró y qué funcionó en su proceso de toma de decisiones.
 
-1. **Relevancia Directa:** Aprovecha al máximo sus habilidades naturales (análisis, modelado, argumentación) en un contexto que les resulta familiar. Esto convierte el *team building* en una herramienta de desarrollo profesional.
-2. **Impacto Profesional:** El resultado no es solo diversión, sino la mejora de las habilidades clave en el trabajo diario (pensamiento estratégico y comunicación de resultados).
-3. **Flexibilidad Logística:** Requiere menos infraestructura física que un escape room, lo que facilita la organización para un equipo de 20 personas dentro de una jornada de 4 horas.
+### Evaluación (Pros y Contras)
+| Aspecto | Pros (+) | Contras (-) |
+| :--- | :--- | :--- |
+| **Engagement** | 🔥 Alto. Estimula la competencia sana y el debate intelectual. Ideal para un equipo de Data Science que disfruta del desafío lógico. | Puede generar ansiedad si los participantes son muy introvertidos o no disfrutan de la confrontación directa. |
+| **Logística** | ✅ Moderada. Requiere materiales sencillos (pizarras, plantillas) y tiempo definido. Fácil de adaptar al espacio de oficina. | ⏱ Necesita un anfitrión fuerte para gestionar el tiempo y asegurar que las reglas sean claras. |
+| **Coste** | 💰 Bajo. Principalmente requiere tiempo y material impreso/digital. No se necesitan instalaciones externas. | El coste principal es el tiempo del facilitador. |
 
-**El objetivo principal es: Transformar el *Team Building* en un *Workshop Colaborativo*.**
+### ENFOQUE 2: El Diseño Colaborativo (The Collaborative Design)
+
+Este enfoque se centra en la creatividad, la comunicación no verbal y la capacidad de construir algo complejo a partir de ideas abstractas.
+
+### Descripción de la Actividad Principal
+**Construcción de un "MVP" (Minimum Viable Product) o Storytelling.** Se divide al equipo en grupos. Cada grupo recibe un problema o una idea vaga y debe diseñar, crear un prototipo (físico o digital simple) o desarrollar una narrativa convincente en un tiempo limitado, utilizando los recursos disponibles (cartones, post-its, marcadores, etc.). El foco está en la **iteración rápida** y la **adaptación**.
+
+### Evaluación (Pros y Contras)
+| Aspecto | Pros (+) | Contras (-) |
+| :--- | :--- | :--- |
+| **Engagement** | ✨ Alto. Fomenta la creatividad, el pensamiento lateral y la comunicación fluida. Excelente para romper el hielo. | Puede ser menos intenso para quienes prefieren estructuras rígidas o resultados muy cuantificables. |
+| **Logística** | ✅ Baja. Requiere materiales comunes (material de arte, post-its). Flexible para cualquier espacio. | 📏 El resultado final es subjetivo, lo que puede requerir una discusión posterior más profunda. |
+| **Coste** | 💰 Muy bajo. Materiales de papelería y suministros básicos. | No hay coste monetario significativo. |
+
+### ENFOQUE 3: El Desafío Físico/Lógico (The Physical &amp; Logical Challenge)
+
+Este enfoque busca romper la rutina, utilizando el movimiento físico para mejorar la conexión entre los miembros del equipo a través de desafíos que requieren coordinación y comunicación física.
+
+### Descripción de la Actividad Principal
+**Desafíos de Coordinación en Equipo (Ej. "El Nudo Humano" o "Construcción por Sentido").** Se plantean una serie de retos físicos sencillos donde todos los miembros deben trabajar sincronizadamente sin usar la lógica de Data Science, sino su comunicación y confianza para resolver el problema. El objetivo es poner a prueba la **confianza mutua** y la capacidad de escuchar en situaciones de presión física.
+
+### Evaluación (Pros y Contras)
+| Aspecto | Pros (+) | Contras (-) |
+| :--- | :--- | :--- |
+| **Engagement** | 💪 Alto. Energizante, ayuda a liberar tensiones y mejora el *rapport* personal rápidamente. | Puede ser demasiado "casual" para un equipo que opera en entornos muy formales o intelectuales. |
+| **Logística** | ✅ Moderada. Requiere un espacio despejado (puede ser en una oficina grande o un área de esparcimiento). Necesita seguridad y supervisión. | 🚧 Requiere un manejo cuidadoso si hay personas con limitaciones físicas. |
+| **Coste** | 💰 Bajo. Solo se necesitan los espacios y, posiblemente, algún material de seguridad. | El riesgo logístico es ligeramente mayor que en las otras opciones. |
 
 ---
 
-## Desarrollo Detallado de la Opción Elegida: "La Estrategia del Futuro"
+## 🏆 Elección del Mejor Enfoque y Justificación
 
-### Objetivo de la Jornada
-Desarrollar habilidades de análisis, pensamiento estratégico y comunicación estructurada, permitiendo al equipo practicar cómo abordar problemas complejos como un equipo.
+**Opción Elegida: ENFOQUE 1 - La Simulación Estratégica (The Strategy Simulation)**
 
-### Duración Total: 4 horas (240 minutos)
+### Justificación
+Para un equipo de Data Science, la **Simulación Estratégica** es el enfoque más adecuado porque capitaliza su mayor fortaleza: **el pensamiento lógico, la toma de decisiones basada en evidencia y el análisis de escenarios**. Esta actividad no solo fomenta la colaboración y la comunicación, sino también refuerza sus habilidades profesionales (estrategia, modelado de escenarios, justificación de resultados) en un ambiente lúdico. Es una inversión que tiene un retorno directo en su capacidad para trabajar mejor juntos bajo presión.
 
-### Materiales Necesarios
-* Pizarras blancas o rotafolios grandes.
-* Post-its de varios colores.
-* Marcadores.
-* Cronómetro visible para la gestión del tiempo.
-* Fichas/Cartas con escenarios (preparadas con antelación).
+* **Beneficios Específicos:**
+1. **Relevancia Profesional:** La actividad se siente como un ejercicio profesional disfrazado de juego.
+2. **Compromiso Intelectual:** Asegura que el tiempo invertido sea productivo y estimulante.
+3. **Adaptabilidad:** Puede ser adaptada a cualquier tema (marketing, finanzas, tecnología) para mantenerla fresca.
+
+---
+
+## 📋 Desarrollo Detallado de la Opción Elegida: Simulación Estratégica
+
+**Título del Evento:** Data Strategy Challenge: Decidiendo el Futuro
+
+**Duración total:** 4 horas (240 minutos)
+**Participantes:** 20 personas
+**Materiales necesarios:** Pizarras blancas o rotafolios, marcadores de colores, hojas de caso impresas.
 
 ### Estructura de la Jornada (4 Horas)
 
-#### Fase 1: Introducción y Formación de Equipos (30 minutos)
-**Objetivo:** Establecer el tono y las reglas del juego.
-1. **Bienvenida y Reglas:** Explicar que no buscamos una respuesta perfecta, sino un proceso de análisis colaborativo.
-2. **División de Equipos:** Dividir a los 20 participantes en 4 o 5 equipos de 4-5 personas. (Asegurar que los equipos sean mixtos si es posible).
-3. **Asignación del Escenario:** Cada equipo recibe su caso (ejemplo: "Deben decidir si invertir en la IA para el servicio X o en un nuevo producto Y, basándose en métricas de riesgo y potencial impacto").
+#### Fase 1: Introducción y Formación de Equipos (30 min)
 
-#### Fase 2: Análisis y Estrategia (105 minutos)
-**Objetivo:** Aplicar habilidades analíticas bajo presión.
-1. **Análisis de Datos (30 min):** Los equipos reciben los datos simulados (tablas, gráficos, métricas de riesgo/recompensa). Deben discutir y llegar a una conclusión compartida sobre la situación actual. *Énfasis: Discutir el "qué significan" los datos.*
-2. **Desarrollo de la Estrategia (45 min):** El equipo debe diseñar su propuesta: ¿Cuál es el plan de acción? ¿Qué variables considerarían? ¿Cómo medirían el éxito? Deben definir un modelo predictivo o una decisión clara. *Énfasis: Cómo se comunican sus conclusiones.*
-3. **Preparación del Pitch (30 min):** Preparar la presentación final de 5 minutos, enfocándose en la narrativa y la justificación lógica de su propuesta.
+1. **Bienvenida y Contexto (10 min):** El facilitador explica el objetivo del Team Building (mejorar la toma de decisiones bajo presión, no solo ganar) y las reglas. Se enfatiza que el enfoque es la colaboración y el proceso, no solo el resultado final.
+2. **Formación de Equipos (10 min):** Dividir a los 20 participantes en 4 equipos de 5 personas cada uno. Asignar un nombre estratégico para cada equipo (ej. "Team Alpha", "Equipo Insight", etc.).
+3. **Presentación del Caso (10 min):** Presentar el escenario principal que enfrentarán los equipos. *Sugerencia de tema:* Un caso sobre la implementación de una nueva tecnología disruptiva en un mercado específico, o cómo optimizar un proceso interno para lograr un objetivo ambicioso con recursos limitados.
 
-#### Fase 3: Presentación y Debate (60 minutos)
-**Objetivo:** Comunicación efectiva y crítica constructiva.
-1. **Pitch (25 min/equipo):** Cada equipo presenta su estrategia ante el "Panel de Jueces" (el resto del equipo o un facilitador).
-2. **Retroalimentación (35 min):** Después de cada pitch, el panel proporciona retroalimentación estructurada: ¿Qué fue claro? ¿Dónde falló la lógica? ¿Cómo se puede mejorar la comunicación?
+#### Fase 2: Desarrollo Estratégico (120 min)
 
-#### Fase 4: Cierre y Reflexión (15 minutos)
-**Objetivo:** Conectar la experiencia con el trabajo diario.
-1. **Debriefing Grupal:** El facilitador guía una discusión final sobre las lecciones aprendidas. Preguntas clave: "¿Qué aprendimos sobre nuestra comunicación?", "¿Cómo aplicaremos esta estrategia en nuestros proyectos de Data Science?"
+1. **Análisis del Caso (30 min):** Los equipos tienen tiempo para discutir el caso, identificar variables clave, establecer hipótesis y determinar sus opciones estratégicas. Deben definir: ¿Cuál es el problema real? ¿Cuáles son los riesgos?
+2. **Desarrollo de la Estrategia (60 min):** Los equipos deben crear un plan de acción detallado. Esto incluye la justificación de por qué eligieron ciertas acciones, cómo se distribuirán los recursos y cuáles serán sus métricas de éxito. Deben documentar su lógica en la pizarra o rotafolio.
+3. **Preparación de la Presentación (30 min):** Los equipos preparan un resumen conciso de su estrategia para poder defenderla ante el jurado.
 
-### Métricas de Éxito
-* **Alta Colaboración:** Los equipos debaten y llegan a un consenso (no solo una persona domina).
-* **Claridad Estratégica:** La propuesta es lógica, fundamentada en los "datos" proporcionados.
-* **Mejora en la Comunicación:** Se observa un uso de lenguaje estructurado para argumentar ideas complejas.
+#### Fase 3: Presentación y Debate (60 min)
 
-### Recomendaciones del Facilitador
-* Mantener el ambiente profesional pero relajado. Evitar el juicio personal; enfocarse siempre en la calidad del proceso y la colaboración.
-* Asegurarse de que el "Panel de Jueces" sea respetuoso y constructivo en sus comentarios.</code></pre>
+1. **Presentación (25 min por equipo):** Cada equipo presenta su propuesta estratégica (máximo 5 minutos). Deben explicar su problema, sus decisiones clave y la justificación de sus supuestos.
+2. **Debate y Evaluación (35 min):** El facilitador modera un debate constructivo. Se pide a los equipos que hagan preguntas críticas a otros equipos para poner a prueba sus estrategias. Finalmente, el equipo de facilitadores o el grupo vota (o hace una evaluación cualitativa) sobre: la lógica aplicada, la colaboración y el proceso de toma de decisiones.
+
+#### Fase 4: Cierre y Reflexión (30 min)
+
+1. **Debriefing Grupal (15 min):** Sesión de reflexión guiada. Preguntas clave:
+    * ¿Qué aprendimos sobre cómo colaboramos en esta simulación?
+    * ¿Cómo se relaciona este proceso con la toma de decisiones en nuestro trabajo diario (Data Science)?
+    * ¿Qué estrategia o herramienta de comunicación funcionó mejor para el equipo?
+2. **Cierre (15 min):** Agradecer la participación y vincular las lecciones aprendidas a los objetivos del equipo.
+
+### Checklist Logístico Detallado
+
+| Elemento | Descripción | Responsable | Notas Importantes |
+| :--- | :--- | :--- | :--- |
+| **Tiempo (4h)** | 30 min Setup / 120 min Desarrollo / 60 min Presentación / 30 min Debrief. | Facilitador Principal | El control del tiempo es crucial para mantener el ritmo y la presión. |
+| **Materiales** | Casos impresos, Pizarras/rotafolios, Marcadores. | Logística/ Apoyo | Asegurar que haya suficientes hojas de trabajo por equipo (4x5=20). |
+| **Espacio** | Sala grande o espacio con mesas redondas para facilitar el debate. | Logística | Se necesita un área visible para la presentación final. |
+| **Roles** | Facilitador, Moderador de tiempo. | Facilitador Principal | El facilitador debe ser firme al mantener las reglas y enfocar el debate en la colaboración. |
+| **Resultado Esperado** | Entender cómo se toman decisiones bajo presión, mejorar la comunicación, y fomentar un pensamiento estratégico dentro del equipo. | - | Este es el objetivo de una simulación profesionalizada. |</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -992,7 +1009,7 @@ Note
 <section id="output-structuring-con-json-schema" class="level3">
 <h3 class="anchored" data-anchor-id="output-structuring-con-json-schema">Output Structuring con JSON Schema</h3>
 <p>Forzar que el modelo devuelva JSON nos permite integrar el LLM en pipelines automatizados. La API de OpenAI ofrece el parámetro <code>response_format</code> para garantizar JSON válido:</p>
-<div id="3da4d1a7" class="cell" data-execution_count="9">
+<div id="742fbec4" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1071,7 +1088,7 @@ Note
 <li><strong>Controla la diversidad</strong> con temperatura: baja produce datos conservadores, alta inyecta variedad</li>
 <li><strong>Itera en batch</strong> para generar cientos o miles de registros</li>
 </ol>
-<div id="8300efe8" class="cell" data-execution_count="10">
+<div id="e838f944" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1118,20 +1135,20 @@ Note
 <span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content[:<span class="dv">200</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> id  edad  ingresos_anuales provincia segmento
-  1    34          55000.50    Madrid  premium
-  2    58          78500.00 Barcelona  premium
-  3    22          14500.75  Valencia estandar
-  4    45          32000.00   Sevilla estandar
-  5    67          91200.30    Bilbao  premium
-  6    29          28500.50  Zaragoza estandar
-  7    75         115000.00    Madrid  premium
-  8    41          25500.90    Málaga estandar
-  9    62          88000.00  Valencia  premium
- 10    39          13500.00    Bilbao    basic
+  1    32           35000.0    Madrid estandar
+  2    48           78500.0 Barcelona  premium
+  3    65           41200.0  Valencia estandar
+  4    25           21000.0   Sevilla    basic
+  5    39           55800.0    Bilbao  premium
+  6    55           62400.0    Málaga estandar
+  7    29           18500.0  Zaragoza    basic
+  8    42           51000.0    Madrid  premium
+  9    71           38000.0    Bilbao estandar
+ 10    28           45000.0  Valencia  premium
 
 10 registros generados
-   Edad: 22-75 (media 47)
-   Ingresos: 13500-115000 (media 54170)</code></pre>
+   Edad: 25-71 (media 43)
+   Ingresos: 18500-78500 (media 44640)</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -1171,7 +1188,7 @@ Note
 <section id="role-prompting" class="level3">
 <h3 class="anchored" data-anchor-id="role-prompting">Role Prompting</h3>
 <p>Asignar un <strong>rol</strong> al modelo en el mensaje <code>system</code> cambia radicalmente su comportamiento. No es magia: el modelo, entrenado con textos de diversos perfiles, “activa” los patrones asociados a ese rol.</p>
-<div id="756ff02f" class="cell" data-execution_count="11">
+<div id="9de4ca55" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> consultar_como(rol, pregunta):</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> client.chat.completions.create(</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>,</span>
@@ -1258,7 +1275,7 @@ Note
 </tr>
 </tbody>
 </table>
-<div id="94eb6075" class="cell" data-execution_count="12">
+<div id="2d10d93c" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1276,70 +1293,66 @@ Note
 <span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt_step_back}]</span>
 <span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    ).choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Esta es una excelente pregunta que requiere la comprensión de la estructura específica de los números primos de Mersenne.
-
-A continuación, se responde a las preguntas pre-requisito y luego se aplica el método al número 17.
+<pre><code>Esta es una pregunta interesante que requiere la revisión de la definición de los números de Mersenne. Para responderla correctamente, seguiremos el proceso solicitado.
 
 ---
 
 ### 1. ¿Qué es un número primo de Mersenne? (Definición general)
 
-Un **número primo de Mersenne** es un número primo que tiene la forma $M_p = 2^p - 1$, donde $p$ es necesariamente un número primo.
+Un **Número de Mersenne** es un número generado por la fórmula $M_p = 2^p - 1$, donde $p$ debe ser un número primo.
 
-*   **Propiedades clave:**
-    1.  El número en cuestión debe ser una potencia de 2 menos uno.
-    2.  El exponente $p$ debe ser primo.
-    3. El resultado $M_p$ debe ser primo.
+Un **Número Primo de Mersenne** es un Número de Mersenne ($M_p$) que, además de ser generado por la fórmula, también es un número primo.
 
-**Ejemplos de Primos de Mersenne:**
-*   Si $p=2$, $M_2 = 2^2 - 1 = 3$. (3 es primo).
-*   Si $p=3$, $M_3 = 2^3 - 1 = 7$. (7 es primo).
-*   Si $p=5$, $M_5 = 2^5 - 1 = 31$. (31 es primo).
+*Ejemplos:*
+Si $p=2$, $M_2 = 2^2 - 1 = 3$ (3 es primo). $\rightarrow 3$ es un primo de Mersenne.
+Si $p=3$, $M_3 = 2^3 - 1 = 7$ (7 es primo). $\rightarrow 7$ es un primo de Mersenne.
+Si $p=5$, $M_5 = 2^5 - 1 = 31$ (31 es primo). $\rightarrow 31$ es un primo de Mersenne.
 
 ### 2. ¿Cómo se comprueba si un número es primo de Mersenne? (Método)
 
-Para determinar si un número $N$ es un primo de Mersenne, se deben seguir tres pasos:
+Para determinar si un número dado $N$ es un primo de Mersenne, debemos seguir dos pasos cruciales:
 
-**Paso A: Verificar la forma.**
-Se verifica si el número $N$ tiene la estructura $2^p - 1$. Esto implica despejar $2^p$: $2^p = N + 1$. Luego, se comprueba si $N+1$ es una potencia entera de 2 y, crucialmente, si el exponente $p$ es un número primo.
+**Paso A: Verificar la forma de Mersenne.**
+Se debe intentar encontrar un exponente primo $p$ tal que $N = 2^p - 1$. Esto implica despejar $2^p$:
+$$2^p = N + 1$$
+Luego, se calcula $p$ (usando logaritmos base 2) y se verifica si el resultado es un número primo.
 
-**Paso B: Verificar la primalidad del resultado.**
-Se comprueba si el resultado obtenido ($N$) es un número primo. (Si no cumple la forma, ya no es un primo de Mersenne).
-
-**Paso C: Aplicar pruebas de primalidad (si es posible) o pruebas específicas.**
-Una vez que se ha identificado que $N$ tiene la forma $2^p - 1$, el último paso crucial es probar si $N$ es realmente un número primo. Esto puede hacerse mediante:
-*   **Prueba de división por trial (división por prueba):** Dividir $N$ por todos los números primos menores o iguales a $\sqrt{N}$. Si no se encuentra ningún divisor, entonces $N$ es primo.
-* **Pruebas probabilísticas:** Para números muy grandes, se utilizan pruebas de primalidad como la prueba de Lucas-Lehmer, que es específica para Mersenne.
-
-**En resumen:** Se comprueba si $(N+1)$ es una potencia de 2 con exponente primo $p$, y si $N$ es primo.
-
-### 3. Ahora aplica el método a 17 y concluye.
-
-Queremos saber si **17** es un número primo de Mersenne.
-
-#### Paso A: Verificar la forma ($N = 2^p - 1$)
-Necesitamos determinar si existe un exponente $p$ tal que:
-$$17 = 2^p - 1$$
-Despejamos $2^p$:
-$$18 = 2^p$$
-
-Para encontrar el valor de $p$, debemos saber qué potencia de 2 es igual a 18.
-*   $2^1 = 2$
-*   $2^2 = 4$
-*   $2^3 = 8$
-*   $2^4 = 16$
-*   $2^5 = 32$
-
-Dado que 18 no es una potencia exacta de 2, **el número 17 no tiene la forma $2^p - 1$.**
-
-#### Paso B: Conclusión
-Dado que el número 17 no cumple con la estructura requerida para ser un primo de Mersenne, no es clasificado como tal.
+**Paso B: Verificar la primalidad.**
+Una vez que se encuentra un exponente primo $p$, se debe verificar si el número generado ($M_p$) es efectivamente un número primo. (Para números muy grandes, se usa el Test de Lucas-Lehmer). Para números pequeños, basta con realizar una prueba de división por números primos hasta $\sqrt{N}$.
 
 ---
 
-### Respuesta Final
+### 3. Aplicación del método a 17 y conclusión
 
-**No**, 17 **no es** un número primo de Mersenne.</code></pre>
+Vamos a aplicar el método a $N = 17$. Queremos saber si 17 es un primo de Mersenne, es decir, si existe un primo $p$ tal que $2^p - 1 = 17$.
+
+**Paso A: Verificar la forma de Mersenne.**
+
+Despejamos $2^p$:
+$$2^p = 17 + 1$$
+$$2^p = 18$$
+
+Para encontrar el exponente $p$, necesitamos determinar qué potencia de 2 es igual a 18.
+
+* $2^1 = 2$
+* $2^2 = 4$
+* $2^3 = 8$
+* $2^4 = 16$
+* $2^5 = 32$
+
+Dado que 18 no es una potencia entera de 2, **no existe un exponente entero $p$** tal que $2^p = 18$.
+
+**Paso B: Verificar la primalidad (Implícito).**
+
+Como el número 17 no puede expresarse en la forma $2^p - 1$, no es un Número de Mersenne. Por lo tanto, no puede ser un primo de Mersenne. (Nota: El número 17 sí es un número primo, pero no cumple con la condición estructural para pertenecer a la secuencia de Mersenne).
+
+---
+
+### Conclusión
+
+**No**, el número 17 **no es un número primo de Mersenne**.
+
+Esto se debe a que 17 no puede ser expresado en la forma $2^p - 1$ donde $p$ es un número primo, ya que $17 + 1 = 18$, y 18 no es una potencia de 2.</code></pre>
 </div>
 </div>
 </section>
@@ -1494,7 +1507,7 @@ Dado que el número 17 no cumple con la estructura requerida para ser un primo d
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

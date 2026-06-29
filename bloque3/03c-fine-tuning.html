@@ -478,10 +478,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 3 — Aplicaciones</strong>. Se recomienda haber completado los <a href="../bloque1/01-fundamentos.html">Bloques 1</a> y <a href="../bloque2/02-orquestacion.html">2</a> primero.</p>
 </blockquote>
-<div id="c0665326" class="cell" data-execution_count="1">
+<div id="d5460f9f" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q transformers peft bitsandbytes trl datasets torch accelerate python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="bbe2fb21" class="cell" data-execution_count="2">
+<div id="805ef0c2" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -771,7 +771,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<div id="1c58a5cd" class="cell" data-execution_count="3">
+<div id="c313a4db" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> LoraConfig(</span>
@@ -878,7 +878,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tbody>
 </table>
 <p>Con QLoRA puedes hacer fine-tuning de un modelo 7B en una <strong>GPU de Colab gratuita</strong> (T4, 16 GB VRAM).</p>
-<div id="0d9d3b12" class="cell" data-execution_count="4">
+<div id="b2605494" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModelForCausalLM, BitsAndBytesConfig</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>bnb_config <span class="op">=</span> BitsAndBytesConfig(</span>
@@ -1006,7 +1006,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p>El siguiente ejemplo muestra un fine-tuning mínimo con TRL (Supervised Fine-Tuning) sobre un modelo pequeño. Está diseñado para ejecutarse en <strong>Colab con GPU T4 gratuita</strong>.</p>
-<div id="f61aca2e" class="cell" data-execution_count="5">
+<div id="ca1b7849" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig, get_peft_model</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> trl <span class="im">import</span> SFTConfig, SFTTrainer</span>
@@ -1325,7 +1325,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

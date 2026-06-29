@@ -571,10 +571,10 @@ Note
 <p><strong>Teoría obligatoria.</strong> Los temas listados arriba son obligatorios. Puedes profundizar en cada uno según tu interés.</p>
 </div>
 </div>
-<div id="0cee655f" class="cell" data-execution_count="1">
+<div id="3a9d51c4" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q chromadb faiss<span class="op">-</span>cpu sentence<span class="op">-</span>transformers</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="cfa2f73f" class="cell" data-execution_count="2">
+<div id="5bc0a487" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
@@ -796,7 +796,7 @@ NumPy: 2.5.0</code></pre>
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

@@ -478,10 +478,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 2 — Orquestación</strong>. Se recomienda haber visto <a href="../bloque2/02a-prompt-engineering.html">Prompt Engineering</a> primero.</p>
 </blockquote>
-<div id="0ed3989b" class="cell" data-execution_count="1">
+<div id="5b17e9a4" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q langchain langchain<span class="op">-</span>openai langchain<span class="op">-</span>community python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="5e5214a0" class="cell" data-execution_count="2">
+<div id="b216e1f5" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -494,7 +494,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="620f356b" class="cell" data-execution_count="3">
+<div id="7d8f3523" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_openai <span class="im">import</span> ChatOpenAI</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -579,7 +579,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="lcel-langchain-expression-language" class="level3">
 <h3 class="anchored" data-anchor-id="lcel-langchain-expression-language">LCEL — LangChain Expression Language</h3>
 <p>LCEL usa el operador <code>|</code> (pipe) para encadenar componentes, como en las tuberías de Unix:</p>
-<div id="30438b85" class="cell" data-execution_count="4">
+<div id="ebdc00f0" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.prompts <span class="im">import</span> ChatPromptTemplate</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.output_parsers <span class="im">import</span> StrOutputParser</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -597,7 +597,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>    })</span>
 <span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(resultado)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>La desviación estándar mide la dispersión o variabilidad de un conjunto de datos respecto a su media. Cuantifica qué tan separados están los valores de la media. Una desviación alta indica que los datos están muy dispersos, mientras que una baja sugiere que los datos están agrupados estrechamente alrededor del promedio.</code></pre>
+<pre><code>La desviación estándar mide la dispersión o variabilidad de un conjunto de datos alrededor de su media. Cuantifica qué tan separados están los valores; una desviación baja indica que los datos están agrupados cerca del promedio, mientras que una alta señala una gran dispersión. Es clave para entender el riesgo y la confiabilidad de los datos.</code></pre>
 </div>
 </div>
 <div class="cell" data-layout-align="default">
@@ -619,7 +619,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <p><strong>¿Por qué LCEL?</strong> Esta sintaxis de tubería permite: - Componer cadenas complejas de forma legible - Ejecución asíncrona, streaming y paralela sin código extra - Trazabilidad automática con LangSmith</p>
-<div id="5a9858e0" class="cell" data-execution_count="5">
+<div id="325f0f8d" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.runnables <span class="im">import</span> RunnableLambda</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> procesar_intermedio(texto):</span>
@@ -632,14 +632,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
 <span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(cadena_compleja.invoke({<span class="st">"concepto"</span>: <span class="st">"p-valor"</span>, <span class="st">"num_palabras"</span>: <span class="st">"30"</span>}))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>EL P-VALOR ES LA PROBABILIDAD DE OBTENER LOS RESULTADOS OBSERVADOS, ASUMIENDO QUE LA HIPÓTESIS NULA ES VERDADERA. UN VALOR BAJO INDICA QUE LOS RESULTADOS SON ESTADÍSTICAMENTE SIGNIFICATIVOS Y SE DEBE RECHAZAR LA HIPÓTESIS NULA.</code></pre>
+<pre><code>EL P-VALOR ES LA PROBABILIDAD DE OBSERVAR LOS RESULTADOS OBTENIDOS SI LA HIPÓTESIS NULA FUERA CIERTA. UN VALOR BAJO SUGIERE QUE EL RESULTADO ES ESTADÍSTICAMENTE SIGNIFICATIVO Y PERMITE RECHAZAR LA HIPÓTESIS NULA.</code></pre>
 </div>
 </div>
 </section>
 <section id="prompt-templates" class="level3">
 <h3 class="anchored" data-anchor-id="prompt-templates">Prompt Templates</h3>
 <p>Las plantillas permiten separar la lógica del prompt del código. Soporta variables, few-shot examples y carga desde archivo:</p>
-<div id="95c757cf" class="cell" data-execution_count="6">
+<div id="2e4d44f3" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.prompts <span class="im">import</span> PromptTemplate, FewShotPromptTemplate</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>plantilla_simple <span class="op">=</span> PromptTemplate.from_template(</span>
@@ -687,7 +687,7 @@ R:</code></pre>
 <section id="memoria-conversacional" class="level3">
 <h3 class="anchored" data-anchor-id="memoria-conversacional">Memoria conversacional</h3>
 <p>Sin memoria, cada llamada al LLM es independiente: el modelo no recuerda lo que dijiste antes. La memoria almacena el historial y lo inyecta en cada nuevo prompt:</p>
-<div id="630f6257" class="cell" data-execution_count="7">
+<div id="c9a44af1" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_community.chat_message_histories <span class="im">import</span> ChatMessageHistory</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.prompts <span class="im">import</span> ChatPromptTemplate, MessagesPlaceholder</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.runnables.history <span class="im">import</span> RunnableWithMessageHistory</span>
@@ -726,8 +726,8 @@ R:</code></pre>
   exec(code_obj, self.user_global_ns, self.user_ns)</code></pre>
 </div>
 <div class="cell-output cell-output-stdout">
-<pre><code>R1: La desviación estándar mide qué tan dispersos o variados están los datos respecto a su valor promedio. Un valor bajo indica que los datos están agrupados, mientras que un valor alto muestra una mayor dispersión.
-R2: La varianza mide la dispersión o variabilidad de un conjunto de datos alrededor de su media. Cuanto mayor es la varianza, más dispersos están los valores en tu muestra.</code></pre>
+<pre><code>R1: La desviación estándar mide qué tan dispersos están los datos alrededor de la media. Nos indica cuánto varían los valores individuales en un conjunto.
+R2: La varianza cuantifica qué tan dispersos están los datos respecto a su media. Es decir, mide la variabilidad o el grado de dispersión dentro de un conjunto de datos.</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -782,7 +782,7 @@ R2: La varianza mide la dispersión o variabilidad de un conjunto de datos alred
 <section id="retrievers" class="level3">
 <h3 class="anchored" data-anchor-id="retrievers">Retrievers</h3>
 <p>Un <strong>retriever</strong> busca documentos relevantes en una base de conocimiento (vectorial o clásica) y los inyecta en el prompt. Es el corazón del patrón RAG (Retrieval-Augmented Generation):</p>
-<div id="df4b019f" class="cell" data-execution_count="8">
+<div id="25bf6129" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_community.document_loaders <span class="im">import</span> TextLoader</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_text_splitters <span class="im">import</span> RecursiveCharacterTextSplitter</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_community.vectorstores <span class="im">import</span> Chroma</span>
@@ -878,7 +878,7 @@ Q4: Cierre de año récord con 1.8 millones de eu</code></pre>
 <section id="output-parsers" class="level3">
 <h3 class="anchored" data-anchor-id="output-parsers">Output Parsers</h3>
 <p>Los parsers convierten la salida textual del LLM en objetos Python utilizables:</p>
-<div id="0630bbc4" class="cell" data-execution_count="9">
+<div id="53093347" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.output_parsers <span class="im">import</span> JsonOutputParser</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pydantic <span class="im">import</span> BaseModel, Field</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -908,17 +908,17 @@ Q4: Cierre de año récord con 1.8 millones de eu</code></pre>
 <span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Tendencia: </span><span class="sc">{</span>resultado[<span class="st">'tendencia'</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Recomendación: </span><span class="sc">{</span>resultado[<span class="st">'recomendacion'</span>]<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Métrica: Ventas mensuales
+<pre><code>Métrica: Ventas Mensuales
 Valor: 115
-Tendencia: estable
-Recomendación: Monitorear la fluctuación de ventas para identificar patrones</code></pre>
+Tendencia: sube
+Recomendación: Las ventas muestran una tendencia positiva con un pico en febrero, se debe monitorear para asegurar el crecimiento continuo.</code></pre>
 </div>
 </div>
 </section>
 <section id="callbacks" class="level3">
 <h3 class="anchored" data-anchor-id="callbacks">Callbacks</h3>
 <p>Los callbacks permiten ejecutar código en puntos clave del pipeline:</p>
-<div id="f30cbe9b" class="cell" data-execution_count="10">
+<div id="eb7d6fa3" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.callbacks <span class="im">import</span> BaseCallbackHandler</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> MiCallback(BaseCallbackHandler):</span>
@@ -941,9 +941,9 @@ Recomendación: Monitorear la fluctuación de ventas para identificar patrones</
 <span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Resultado: </span><span class="sc">{</span>resultado<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[CALLBACK] Llamando al LLM con 1 prompt(s)
-[CALLBACK] Respuesta recibida. Tokens usados: 299
+[CALLBACK] Respuesta recibida. Tokens usados: 326
 
-Resultado: Regresión lineal modela la relación lineal entre variables, encontrando la línea recta que mejor se ajusta a los datos para predecir el valor de una variable basándose en otra.</code></pre>
+Resultado: Regresión lineal modela la relación entre variables ajustando una línea recta para predecir el valor de una variable dependiente a partir de otra, encontrando el mejor ajuste matemático.</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -1125,7 +1125,7 @@ Note
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

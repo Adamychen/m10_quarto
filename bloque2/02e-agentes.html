@@ -483,10 +483,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 2 — Orquestación</strong>. Aquí unimos todos los conceptos anteriores: prompts, herramientas, memoria y orquestación para construir agentes autónomos.</p>
 </blockquote>
-<div id="75c2c79d" class="cell" data-execution_count="1">
+<div id="caa4328d" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q langchain langchain<span class="op">-</span>openai langchain<span class="op">-</span>community python<span class="op">-</span>dotenv langgraph</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="94ed175d" class="cell" data-execution_count="2">
+<div id="b88046e8" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -499,7 +499,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="71e143e6" class="cell" data-execution_count="3">
+<div id="93ae1a9c" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_openai <span class="im">import</span> ChatOpenAI</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -610,7 +610,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="tool-calling-function-calling-nativo" class="level3">
 <h3 class="anchored" data-anchor-id="tool-calling-function-calling-nativo">Tool Calling (Function Calling nativo)</h3>
 <p>LangChain abstrae el bucle ReAct con <code>create_agent</code>:</p>
-<div id="9c672e38" class="cell" data-execution_count="4">
+<div id="28df8768" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> create_agent</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.tools <span class="im">import</span> tool</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -684,22 +684,25 @@ Datafy Analytics: sector consultoría, 50 empleados, cliente desde 2023, factura
 
 ============================================================
 PREGUNTA: ¿Cuánto factura ACME Corp en dólares?
-RESPUESTA: El cliente ACME Corp tiene una facturación de 150k€/año. Convertido a dólares, esto es aproximadamente **$138,888.89**.
+RESPUESTA: ACME Corp factura 150,000 EUR al año, lo que equivale aproximadamente a 138,888.89 USD.
 
 ============================================================
 PREGUNTA: ¿Cuál es el 15% de la facturación anual de IberTech?
-RESPUESTA: El 15% de la facturación anual de IberTech es de 67,500 €.
+RESPUESTA: Necesito la facturación anual de IberTech para poder calcular el 15%. ¿Podrías proporcionarla?
 
 ============================================================
 PREGUNTA: Busca datos de Datafy y convierte su facturación a libras esterlinas
-RESPUESTA: La facturación anual de Datafy es de 80,000 €. Convertida a libras esterlinas, equivale a 68,000.00 GBP.</code></pre>
+RESPUESTA: Para poder ayudarte, necesito más información. Por favor, especifica:
+
+1.  ¿Cuál es el nombre exacto del cliente que deseas buscar?
+2. ¿Cuál es la cantidad de facturación y la moneda actual para realizar la conversión a libras esterlinas (GBP)?</code></pre>
 </div>
 </div>
 </section>
 <section id="cómo-definir-una-buena-herramienta" class="level3">
 <h3 class="anchored" data-anchor-id="cómo-definir-una-buena-herramienta">Cómo definir una buena herramienta</h3>
 <p>El secreto de un agente que funciona está en cómo describes las herramientas:</p>
-<div id="37cdeb56" class="cell" data-execution_count="5">
+<div id="b2a8569a" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ❌ MAL — descripción vaga</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="at">@tool</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> consultar(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -763,7 +766,7 @@ Descripción de 'consultar_ventas_por_mes' (✅ BIEN):
 <section id="pipeline-rag-supervisado-con-langgraph" class="level3">
 <h3 class="anchored" data-anchor-id="pipeline-rag-supervisado-con-langgraph">Pipeline RAG Supervisado con LangGraph</h3>
 <p>LangGraph permite construir flujos complejos donde el LLM decide qué hacer en cada paso. En este ejemplo, un <strong>supervisor</strong> recibe una pregunta sobre productos y decide si consultar una base de datos SQL, buscar en informes trimestrales (Chroma), o ambas fuentes. Luego un generador produce la respuesta final con el contexto recuperado.</p>
-<div id="58513425" class="cell" data-execution_count="6">
+<div id="8e53ef83" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3, chromadb</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -799,7 +802,7 @@ Descripción de 'consultar_ventas_por_mes' (✅ BIEN):
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"84c15c69e7f5498598c8d5be81042e98","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"fde62e026b88434c8a24525af948d7c7","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -807,7 +810,7 @@ Descripción de 'consultar_ventas_por_mes' (✅ BIEN):
 ✅ Chroma: 4 informes</code></pre>
 </div>
 </div>
-<div id="ec892ce3" class="cell" data-execution_count="7">
+<div id="66b1dacb" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> TypedDict</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langgraph.graph <span class="im">import</span> StateGraph, END</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.messages <span class="im">import</span> SystemMessage, HumanMessage</span>
@@ -885,7 +888,7 @@ Descripción de 'consultar_ventas_por_mes' (✅ BIEN):
 <pre><code>✅ Pipeline RAG Supervisado listo</code></pre>
 </div>
 </div>
-<div id="46c64ef7" class="cell" data-execution_count="8">
+<div id="3225425a" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>preguntas_prueba <span class="op">=</span> [</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"¿Qué productos tienen menos de 30 unidades en stock?"</span>,</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"¿Qué dice el informe sobre el Monitor 4K?"</span>,</span>
@@ -909,21 +912,21 @@ PREGUNTA 1: ¿Qué productos tienen menos de 30 unidades en stock?
 ======================================================================
 Ruta elegida: sql
 
-RESPUESTA: La Silla Ergonómica y la Bicicleta Eléctrica tienen menos de 30 unidades en stock.
+RESPUESTA: La Silla Ergonómica y la Bicicleta Eléctrica.
 
 ======================================================================
 PREGUNTA 2: ¿Qué dice el informe sobre el Monitor 4K?
 ======================================================================
 Ruta elegida: sql
 
-RESPUESTA: El Monitor 4K tiene un precio de 349.0€ y hay 50 unidades disponibles.
+RESPUESTA: El informe indica que el Monitor 4K es un producto Electrónico con un precio de 349.0€ y una cantidad de 50 unidades.
 
 ======================================================================
 PREGUNTA 3: ¿Cuál es el producto más caro y qué se dice de él en los informes?
 ======================================================================
-Ruta elegida: ambos
+Ruta elegida: sql
 
-RESPUESTA: El producto más caro es la Bicicleta Eléctrica. No se dice nada sobre ella en los informes.</code></pre>
+RESPUESTA: El producto más caro es la Bicicleta Eléctrica (899.0€). No hay información en el contexto sobre lo que se dice de él en los informes.</code></pre>
 </div>
 </div>
 </section>
@@ -965,7 +968,7 @@ RESPUESTA: El producto más caro es la Bicicleta Eléctrica. No se dice nada sob
 </tr>
 </tbody>
 </table>
-<div id="55d79188" class="cell" data-execution_count="9">
+<div id="c94674e3" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time, asyncio</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="at">@tool</span></span>
@@ -1026,7 +1029,7 @@ RESPUESTA: El producto más caro es la Bicicleta Eléctrica. No se dice nada sob
 <section id="ejemplo-final-agente-analítico-con-pandas" class="level3">
 <h3 class="anchored" data-anchor-id="ejemplo-final-agente-analítico-con-pandas">Ejemplo final: agente analítico con pandas</h3>
 <p>Uniendo todos los conceptos, creamos un agente que analiza datos con pandas:</p>
-<div id="a6e81a1d" class="cell" data-execution_count="10">
+<div id="a5f6cd0f" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Datos de ejemplo (sin necesidad de archivo externo)</span></span>
@@ -1109,7 +1112,7 @@ A
 
 ============================================================
 PREGUNTA: ¿Cuál es la región con mayor facturación total y a cuánto asciende?
-RESPUESTA: La región con mayor facturación total es Madrid, y su facturación asciende a 1800.</code></pre>
+RESPUESTA: La región con mayor facturación total es Madrid, con una facturación total de 8200.</code></pre>
 </div>
 </div>
 </section>
@@ -1153,7 +1156,7 @@ RESPUESTA: La región con mayor facturación total es Madrid, y su facturación 
   <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
 </footer>
 <script type="application/vnd.jupyter.widget-state+json">
-{"state":{"081f8e6d0abd4c5899f2fa2e08450953":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"10b1c42aad79435895a054479bbe3e2f":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"15701c39aafd44449b9dd5243598a3a1":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_93f7eb454184483c917b65fbb1125d5f","placeholder":"​","style":"IPY_MODEL_7bde8ddb858e4c20a1282968a03388ad","tabbable":null,"tooltip":null,"value":"Loading weights: 100%"}},"2142bd5ecdea4e40a3688a0ff129dff0":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"2efba205e4bf47beb499a8cb0410d74a":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_b16e56bee5fd4685942ac15f87d9b594","placeholder":"​","style":"IPY_MODEL_081f8e6d0abd4c5899f2fa2e08450953","tabbable":null,"tooltip":null,"value":" 103/103 [00:00&lt;00:00, 11203.66it/s]"}},"7bde8ddb858e4c20a1282968a03388ad":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"84c15c69e7f5498598c8d5be81042e98":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_15701c39aafd44449b9dd5243598a3a1","IPY_MODEL_8f0b334ae4d04adabccadb09ed7de79e","IPY_MODEL_2efba205e4bf47beb499a8cb0410d74a"],"layout":"IPY_MODEL_10b1c42aad79435895a054479bbe3e2f","tabbable":null,"tooltip":null}},"8f0b334ae4d04adabccadb09ed7de79e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_9c154a72ebc742b09ef1f1d1d9f62216","max":103,"min":0,"orientation":"horizontal","style":"IPY_MODEL_2142bd5ecdea4e40a3688a0ff129dff0","tabbable":null,"tooltip":null,"value":103}},"93f7eb454184483c917b65fbb1125d5f":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"9c154a72ebc742b09ef1f1d1d9f62216":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"b16e56bee5fd4685942ac15f87d9b594":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}}},"version_major":2,"version_minor":0}
+{"state":{"4e5dd6474b06421b85a14261f93fdf85":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"586b93a29efc48c6827e7eb642b6790b":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_5e03ceca2dba4edab0379db74b83efc4","placeholder":"​","style":"IPY_MODEL_cc3ad9f6ea584f8891bf6f5c3615062e","tabbable":null,"tooltip":null,"value":" 103/103 [00:00&lt;00:00, 14858.07it/s]"}},"5def8723749647c78259ca24c62a4d7f":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"5df2319353bf4ec9bc09899db84a6e3f":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"5e03ceca2dba4edab0379db74b83efc4":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"8421a74fb1c244f698f586cb9a3a8c70":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_5def8723749647c78259ca24c62a4d7f","placeholder":"​","style":"IPY_MODEL_e2d3a0dfbdfc4bfd8229ec82590c09df","tabbable":null,"tooltip":null,"value":"Loading weights: 100%"}},"a4051130cdc047d386af5e448ce4c922":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_a7e38691c44d48df8753379fb89ada88","max":103,"min":0,"orientation":"horizontal","style":"IPY_MODEL_5df2319353bf4ec9bc09899db84a6e3f","tabbable":null,"tooltip":null,"value":103}},"a7e38691c44d48df8753379fb89ada88":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"cc3ad9f6ea584f8891bf6f5c3615062e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"e2d3a0dfbdfc4bfd8229ec82590c09df":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"fde62e026b88434c8a24525af948d7c7":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_8421a74fb1c244f698f586cb9a3a8c70","IPY_MODEL_a4051130cdc047d386af5e448ce4c922","IPY_MODEL_586b93a29efc48c6827e7eb642b6790b"],"layout":"IPY_MODEL_4e5dd6474b06421b85a14261f93fdf85","tabbable":null,"tooltip":null}}},"version_major":2,"version_minor":0}
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1279,7 +1282,7 @@ RESPUESTA: La región con mayor facturación total es Madrid, y su facturación 
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

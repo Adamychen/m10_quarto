@@ -485,10 +485,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/corregir_hpd2.py <span class="at">--extension</span> tu_notebook.ipynb</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
-<div id="850796dc" class="cell" data-execution_count="1">
+<div id="cbfa3327" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q langchain langchain<span class="op">-</span>openai langchain<span class="op">-</span>community pandas matplotlib seaborn python<span class="op">-</span>dotenv langgraph chromadb</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="3739da0e" class="cell" data-execution_count="2">
+<div id="322f3d00" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -609,7 +609,7 @@ Setup listo.</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="7e978506" class="cell" data-execution_count="3">
+<div id="b1212c4a" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Implementa 2 herramientas adicionales (mínimo) ───</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">@tool</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> correlacion(col1: <span class="bu">str</span>, col2: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -634,7 +634,7 @@ Setup listo.</code></pre>
 <span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>ext1_log <span class="op">=</span> []  <span class="co"># ← lista de 3 dicts</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="d8c6ca40" class="cell" data-execution_count="4">
+<div id="c9f249b2" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(ext1_log, <span class="bu">list</span>), <span class="st">"❌ ext1_log debe ser una lista"</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(ext1_log) <span class="op">==</span> <span class="dv">3</span>, <span class="ss">f"❌ 3 preguntas esperadas, tienes </span><span class="sc">{</span><span class="bu">len</span>(ext1_log)<span class="sc">}</span><span class="ss">"</span></span>
@@ -673,7 +673,7 @@ Setup listo.</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="5c1f37af" class="cell" data-execution_count="5">
+<div id="fad194a2" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_community.vectorstores <span class="im">import</span> Chroma</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_openai <span class="im">import</span> OpenAIEmbeddings</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_text_splitters <span class="im">import</span> RecursiveCharacterTextSplitter</span>
@@ -705,7 +705,7 @@ Setup listo.</code></pre>
 <span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>ext2_log <span class="op">=</span> []  <span class="co"># ← lista de 4 dicts</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="95b5b99e" class="cell" data-execution_count="6">
+<div id="786e1745" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(ext2_log, <span class="bu">list</span>), <span class="st">"❌ ext2_log debe ser una lista"</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(ext2_log) <span class="op">==</span> <span class="dv">4</span>, <span class="ss">f"❌ 4 preguntas esperadas, tienes </span><span class="sc">{</span><span class="bu">len</span>(ext2_log)<span class="sc">}</span><span class="ss">"</span></span>
@@ -741,7 +741,7 @@ Setup listo.</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="673ae857" class="cell" data-execution_count="7">
+<div id="9a6fa363" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Configura un segundo LLM ───</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co"># llm2 = ChatOpenAI(model="OTRO_MODELO", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -762,7 +762,7 @@ Setup listo.</code></pre>
 <span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>ext3_tabla <span class="op">=</span> []  <span class="co"># ← lista de 5 dicts</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="52d8da35" class="cell" data-execution_count="8">
+<div id="386cb4af" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(ext3_tabla, <span class="bu">list</span>), <span class="st">"❌ ext3_tabla debe ser una lista"</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(ext3_tabla) <span class="op">==</span> <span class="dv">5</span>, <span class="ss">f"❌ 5 preguntas esperadas, tienes </span><span class="sc">{</span><span class="bu">len</span>(ext3_tabla)<span class="sc">}</span><span class="ss">"</span></span>
@@ -801,7 +801,7 @@ Setup listo.</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="9b125670" class="cell" data-execution_count="9">
+<div id="73735256" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> TypedDict, Literal</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langgraph.graph <span class="im">import</span> StateGraph, END</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -851,7 +851,7 @@ Setup listo.</code></pre>
 <span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a>ext4_log <span class="op">=</span> []  <span class="co"># ← lista de 3 dicts</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="896265d6" class="cell" data-execution_count="10">
+<div id="6f8755ad" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(ext4_log, <span class="bu">list</span>), <span class="st">"❌ ext4_log debe ser una lista"</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(ext4_log) <span class="op">==</span> <span class="dv">3</span>, <span class="ss">f"❌ 3 preguntas esperadas, tienes </span><span class="sc">{</span><span class="bu">len</span>(ext4_log)<span class="sc">}</span><span class="ss">"</span></span>
@@ -999,7 +999,7 @@ Setup listo.</code></pre>
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

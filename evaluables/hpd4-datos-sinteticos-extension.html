@@ -485,10 +485,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/corregir_hpd4_ds.py <span class="at">--extension</span> tu_notebook.ipynb</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
-<div id="3a6ba6ab" class="cell" data-execution_count="1">
+<div id="9a8dba8a" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q sdv scipy pandas scikit<span class="op">-</span>learn matplotlib seaborn</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="224dc4f6" class="cell" data-execution_count="2">
+<div id="536fdbfc" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
@@ -510,7 +510,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="dataset-de-trabajo" class="level2">
 <h2 class="anchored" data-anchor-id="dataset-de-trabajo">Dataset de trabajo</h2>
 <p>Igual que en <code>hpd4-datos-sinteticos.qmd</code>: Adult Census Income.</p>
-<div id="a5beb841" class="cell" data-execution_count="3">
+<div id="22ea2062" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_real <span class="op">=</span> pd.read_csv(<span class="st">"https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data"</span>,</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                       header<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                       names<span class="op">=</span>[<span class="st">"age"</span>, <span class="st">"workclass"</span>, <span class="st">"fnlwgt"</span>, <span class="st">"education"</span>, <span class="st">"education_num"</span>,</span>
@@ -540,7 +540,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sin_privacidad"</span>: {<span class="st">"dcr_mean"</span>: <span class="bu">float</span>, <span class="st">"dcr_min"</span>: <span class="bu">float</span>},</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"con_privacidad"</span>: {<span class="st">"dcr_mean"</span>: <span class="bu">float</span>, <span class="st">"dcr_min"</span>: <span class="bu">float</span>}</span>
 <span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div id="d5720304" class="cell" data-execution_count="4">
+<div id="b5854571" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>eval1_dcr <span class="op">=</span> <span class="va">None</span>  <span class="co"># Sustituir con tu código</span></span>
@@ -576,7 +576,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>El resultado debe ser un <strong>diccionario</strong> <code>eval2_oversampling</code>:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>{<span class="st">"f1_antes"</span>: <span class="bu">float</span>, <span class="st">"f1_despues"</span>: <span class="bu">float</span>, <span class="st">"mejora"</span>: <span class="bu">float</span>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>donde <code>mejora = f1_despues - f1_antes</code>.</p>
-<div id="9e74c08c" class="cell" data-execution_count="5">
+<div id="54c1ca5e" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>eval2_oversampling <span class="op">=</span> <span class="va">None</span>  <span class="co"># Sustituir con tu código</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Validación automática</span></span>
@@ -615,7 +615,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"chi2_income"</span>: <span class="bu">float</span>,</span>
 <span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"corr_diff"</span>: <span class="bu">float</span></span>
 <span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div id="ae69792c" class="cell" data-execution_count="6">
+<div id="e85d0b0d" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>eval3_metrics <span class="op">=</span> <span class="va">None</span>  <span class="co"># Sustituir con tu código</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Validación automática</span></span>
@@ -776,7 +776,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

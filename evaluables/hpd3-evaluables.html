@@ -485,10 +485,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/corregir_hpd3.py tu_notebook.ipynb</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
-<div id="0a589197" class="cell" data-execution_count="1">
+<div id="e97910f2" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q fastmcp openai python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="7088b972" class="cell" data-execution_count="2">
+<div id="9bdd878e" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os, sqlite3, tempfile, json</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -585,7 +585,7 @@ Dataset listo: 15 empleados, 8 proyectos, 15 registros de horas</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="c252e5fd" class="cell" data-execution_count="3">
+<div id="8c03ec94" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Implementa aquí tu servidor MCP completo ───</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Define todas las tools y resources dentro de este bloque</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -602,7 +602,7 @@ Dataset listo: 15 empleados, 8 proyectos, 15 registros de horas</code></pre>
 <span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>eval1_server <span class="op">=</span> <span class="va">None</span>  <span class="co"># ← asigna aquí el código del servidor (str)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="e720cce1" class="cell" data-execution_count="4">
+<div id="e58f62e2" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval1_server, <span class="bu">str</span>), <span class="st">"❌ eval1_server debe ser un string"</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="st">"FastMCP"</span> <span class="kw">in</span> eval1_server, <span class="st">"❌ No se encuentra FastMCP"</span></span>
@@ -639,7 +639,7 @@ Dataset listo: 15 empleados, 8 proyectos, 15 registros de horas</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="1a2e30c4" class="cell" data-execution_count="5">
+<div id="e0d49731" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Define las tools en formato OpenAI function calling ───</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>tools_definition <span class="op">=</span> [</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    {</span>
@@ -720,7 +720,7 @@ Dataset listo: 15 empleados, 8 proyectos, 15 registros de horas</code></pre>
 <span id="cb7-78"><a href="#cb7-78" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Ejecutar y guardar ───</span></span>
 <span id="cb7-79"><a href="#cb7-79" aria-hidden="true" tabindex="-1"></a>eval2_respuesta <span class="op">=</span> <span class="va">None</span>  <span class="co"># ← asigna aquí la respuesta del LLM (str)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="380289f1" class="cell" data-execution_count="6">
+<div id="ce00a18f" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval2_respuesta, <span class="bu">str</span>), <span class="st">"❌ eval2_respuesta debe ser un string"</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(eval2_respuesta) <span class="op">&gt;</span> <span class="dv">10</span>, <span class="ss">f"❌ Respuesta demasiado corta (</span><span class="sc">{</span><span class="bu">len</span>(eval2_respuesta)<span class="sc">}</span><span class="ss"> chars)"</span></span>
@@ -759,7 +759,7 @@ Dataset listo: 15 empleados, 8 proyectos, 15 registros de horas</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="9017a67c" class="cell" data-execution_count="7">
+<div id="03bb1a6e" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Implementa la sanitización ───</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sanitizar_query(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># </span><span class="al">TODO</span><span class="co">: Bloquear comandos peligrosos</span></span>
@@ -784,7 +784,7 @@ Dataset listo: 15 empleados, 8 proyectos, 15 registros de horas</code></pre>
 <span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>eval3_ataques <span class="op">=</span> []  <span class="co"># ← lista de 5 dicts</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="6d54d43f" class="cell" data-execution_count="8">
+<div id="1a8ac995" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval3_ataques, <span class="bu">list</span>), <span class="st">"❌ eval3_ataques debe ser una lista"</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(eval3_ataques) <span class="op">&gt;=</span> <span class="dv">5</span>, <span class="ss">f"❌ Se esperaban al menos 5 ataques, tienes </span><span class="sc">{</span><span class="bu">len</span>(eval3_ataques)<span class="sc">}</span><span class="ss">"</span></span>
@@ -824,7 +824,7 @@ Dataset listo: 15 empleados, 8 proyectos, 15 registros de horas</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="06148888" class="cell" data-execution_count="9">
+<div id="f56a2fdb" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Documenta tus riesgos ───</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Para cada riesgo, describe:</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   - riesgo: nombre del riesgo</span></span>
@@ -838,7 +838,7 @@ Dataset listo: 15 empleados, 8 proyectos, 15 registros de horas</code></pre>
 <span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>eval4_riesgos <span class="op">=</span> []  <span class="co"># ← lista de 2 dicts</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="24d75c92" class="cell" data-execution_count="10">
+<div id="fb478de6" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval4_riesgos, <span class="bu">list</span>), <span class="st">"❌ eval4_riesgos debe ser una lista"</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(eval4_riesgos) <span class="op">==</span> <span class="dv">2</span>, <span class="ss">f"❌ Se esperaban 2 riesgos, tienes </span><span class="sc">{</span><span class="bu">len</span>(eval4_riesgos)<span class="sc">}</span><span class="ss">"</span></span>
@@ -985,7 +985,7 @@ Dataset listo: 15 empleados, 8 proyectos, 15 registros de horas</code></pre>
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

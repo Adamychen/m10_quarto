@@ -563,10 +563,10 @@ window.Quarto = {
 <p>Al final de este taller sabrás construir ese pipeline de principio a fin. Y lo mejor: cambiar de dominio (legal, médico, financiero) solo requiere cambiar los documentos de entrada — el código es el mismo.</p>
 </div>
 </div>
-<div id="632b7ed4" class="cell" data-execution_count="1">
+<div id="3df03bc5" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q chromadb sentence<span class="op">-</span>transformers fpdf2 arxiv mteb matplotlib scikit<span class="op">-</span>learn pandas langchain langchain<span class="op">-</span>community langchain<span class="op">-</span>text<span class="op">-</span>splitters pypdf</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="20dec8dd" class="cell" data-execution_count="2">
+<div id="663a0411" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
@@ -613,7 +613,7 @@ window.Quarto = {
 <section id="corpus-abstracts-reales-de-arxiv" class="level2">
 <h2 class="anchored" data-anchor-id="corpus-abstracts-reales-de-arxiv">1.1 Corpus: abstracts reales de ArXiv</h2>
 <p>Usamos <code>arxiv</code> para descargar los abstracts de 3 papers clave del módulo. Con <code>fpdf2</code> los convertimos en PDFs para que el pipeline de ingesta (carga → chunking → indexación) sea idéntico al que usarás con documentos reales.</p>
-<div id="fc3df4d3" class="cell" data-execution_count="3">
+<div id="7f9cca73" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PDF(FPDF):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -654,7 +654,7 @@ window.Quarto = {
 <section id="carga-de-pdfs-con-langchain" class="level2">
 <h2 class="anchored" data-anchor-id="carga-de-pdfs-con-langchain">1.2 Carga de PDFs con LangChain</h2>
 <p><code>PyPDFLoader</code> carga documentos PDF y devuelve una lista de objetos <code>Document</code> de LangChain. Cada <code>Document</code> tiene <code>.page_content</code> (texto) y <code>.metadata</code> (fuente, nº de página, etc.).</p>
-<div id="43cf7525" class="cell" data-execution_count="4">
+<div id="ae88a5b3" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cargar_pdfs(dir_path: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Carga todos los PDFs de un directorio usando PyPDFLoader de LangChain.</span></span>
@@ -704,7 +704,7 @@ window.Quarto = {
 <section id="chunking-con-recursivecharactertextsplitter" class="level2">
 <h2 class="anchored" data-anchor-id="chunking-con-recursivecharactertextsplitter">1.3 Chunking con RecursiveCharacterTextSplitter</h2>
 <p>En vez de partir a mano por palabras, usamos <code>RecursiveCharacterTextSplitter</code> de LangChain: intenta cortar por párrafos (<code>\n\n</code>), luego por saltos de línea, luego por frases (<code>.</code>) y por último por espacios. Así los chunks mantienen sentido y no se cortan a mitad de una frase.</p>
-<div id="55a0074d" class="cell" data-execution_count="5">
+<div id="087ec70b" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Crear un RecursiveCharacterTextSplitter configurando:</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   chunk_size       — caracteres por chunk</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   chunk_overlap    — caracteres de solapamiento</span></span>
@@ -724,7 +724,7 @@ window.Quarto = {
 <section id="embeddings-e-indexación-en-chroma" class="level2">
 <h2 class="anchored" data-anchor-id="embeddings-e-indexación-en-chroma">1.4 Embeddings e indexación en Chroma</h2>
 <p>Cada chunk se codifica con <code>model.encode()</code> y se inserta en la colección vectorial.</p>
-<div id="22de6c0c" class="cell" data-execution_count="6">
+<div id="fc50728a" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>collection <span class="op">=</span> client.get_or_create_collection(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"hpd1_sintetico"</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    metadata<span class="op">=</span>{<span class="st">"hnsw:space"</span>: <span class="st">"cosine"</span>}</span>
@@ -811,7 +811,7 @@ window.Quarto = {
 <section id="búsqueda-semántica" class="level2">
 <h2 class="anchored" data-anchor-id="búsqueda-semántica">1.5 Búsqueda semántica</h2>
 <p>La consulta se codifica y se recuperan los <code>k</code> chunks más similares por distancia coseno.</p>
-<div id="5f725e68" class="cell" data-execution_count="7">
+<div id="b7112bef" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> buscar(collection, query: <span class="bu">str</span>, k: <span class="bu">int</span> <span class="op">=</span> <span class="dv">5</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Realiza una búsqueda semántica en una colección vectorial.</span></span>
@@ -888,7 +888,7 @@ window.Quarto = {
 <section id="más-allá-del-texto-embeddings-de-datos-tabulares" class="level2">
 <h2 class="anchored" data-anchor-id="más-allá-del-texto-embeddings-de-datos-tabulares">1.6 Más allá del texto: embeddings de datos tabulares</h2>
 <p>Hasta ahora hemos hecho embeddings de PDFs. Pero, ¿y si tus datos están en un Excel? La buena noticia: <strong>el pipeline no cambia</strong>. Solo cambia cómo conviertes cada fila en texto.</p>
-<div id="77ff0cc1" class="cell" data-execution_count="8">
+<div id="fa9e5f64" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dataset tabular de ejemplo: empleados</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df_empleados <span class="op">=</span> pd.DataFrame({</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nombre"</span>:       [<span class="st">"Ana García"</span>, <span class="st">"Carlos Ruiz"</span>, <span class="st">"Beatriz López"</span>, <span class="st">"David Martín"</span>],</span>
@@ -912,7 +912,7 @@ window.Quarto = {
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>embeddings_tab <span class="op">=</span> model.encode(df_empleados[<span class="st">"documento"</span>].tolist())</span>
 <span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Embeddings tabulares: </span><span class="sc">{</span>embeddings_tab<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="b185bbe6" class="cell" data-execution_count="9">
+<div id="13615f92" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Indexar en Chroma — idéntico a como hiciste con PDFs</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>collection_tab <span class="op">=</span> client.get_or_create_collection(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"hpd1_tabular"</span>,</span>
@@ -1045,7 +1045,7 @@ window.Quarto = {
 <p>Definimos manualmente qué chunks esperamos para cada consulta. Esa lista es el <em>ground truth</em>: el criterio humano contra el que medimos al sistema.</p>
 </div>
 </div>
-<div id="acafd1e0" class="cell" data-execution_count="10">
+<div id="1a5dfa5d" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> recall_at_k(retrieved_ids: <span class="bu">list</span>, relevant_ids: <span class="bu">list</span>, k: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Calcula recall@k: proporción de documentos relevantes recuperados en el top-k.</span></span>
@@ -1105,7 +1105,7 @@ window.Quarto = {
 </section>
 <section id="limpieza-parte-1" class="level2">
 <h2 class="anchored" data-anchor-id="limpieza-parte-1">Limpieza parte 1</h2>
-<div id="f4d29880" class="cell" data-execution_count="11">
+<div id="c49da120" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>client.delete_collection(<span class="st">"hpd1_sintetico"</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>client.delete_collection(<span class="st">"hpd1_tabular"</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>shutil.rmtree(CORPUS_SINTETICO)</span>
@@ -1119,7 +1119,7 @@ window.Quarto = {
 <p>En esta segunda parte repetimos el pipeline sobre un corpus real: <strong>6 papers descargados de ArXiv</strong>. Además añadimos una <strong>evaluación profesional con MTEB</strong> para validar la calidad del modelo de embeddings.</p>
 <section id="corpus-real-descarga-de-arxiv" class="level2">
 <h2 class="anchored" data-anchor-id="corpus-real-descarga-de-arxiv">2.1 Corpus real — Descarga de ArXiv</h2>
-<div id="23044aba" class="cell" data-execution_count="12">
+<div id="4b6d3412" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>PAPERS <span class="op">=</span> {</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1706.03762"</span>: <span class="st">"Attention Is All You Need (Vaswani et al., 2017)"</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1810.04805"</span>: <span class="st">"BERT: Pre-training of Deep Bidirectional Transformers (Devlin et al., 2019)"</span>,</span>
@@ -1173,7 +1173,7 @@ window.Quarto = {
 </section>
 <section id="carga-chunking-e-indexación-del-corpus-real" class="level2">
 <h2 class="anchored" data-anchor-id="carga-chunking-e-indexación-del-corpus-real">2.2 Carga, chunking e indexación del corpus real</h2>
-<div id="4aae6b4b" class="cell" data-execution_count="13">
+<div id="78e36fdd" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>docs_real <span class="op">=</span> cargar_pdfs(CORPUS_REAL)</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Documentos reales cargados: </span><span class="sc">{</span><span class="bu">len</span>(docs_real)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1209,7 +1209,7 @@ window.Quarto = {
 </section>
 <section id="búsqueda-semántica-sobre-papers-reales" class="level2">
 <h2 class="anchored" data-anchor-id="búsqueda-semántica-sobre-papers-reales">2.3 Búsqueda semántica sobre papers reales</h2>
-<div id="65e31b41" class="cell" data-execution_count="14">
+<div id="15353545" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>consultas <span class="op">=</span> [</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"How does multi-head attention work?"</span>,</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"How is BERT pre-trained with masked language modeling?"</span>,</span>
@@ -1233,7 +1233,7 @@ window.Quarto = {
 </section>
 <section id="recallk-sobre-corpus-real" class="level2">
 <h2 class="anchored" data-anchor-id="recallk-sobre-corpus-real">2.4 Recall@k sobre corpus real</h2>
-<div id="2aca6af8" class="cell" data-execution_count="15">
+<div id="c1174776" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>QUERIES_PRUEBA_REAL <span class="op">=</span> {</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"How does multi-head attention work?"</span>: [</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"1706.03762_chunk_0"</span>, <span class="st">"1706.03762_chunk_1"</span>,</span>
@@ -1322,7 +1322,7 @@ window.Quarto = {
 <p>Usamos dos tareas complementarias: <strong>BIOSSES</strong> (100 pares, dominio biomédico, rapidísimo) y <strong>STS12</strong> (621 pares, dominio general). Juntas dan una foto fiable del modelo en menos de 1 minuto.</p>
 </div>
 </div>
-<div id="9be83f2a" class="cell" data-execution_count="16">
+<div id="3da8badb" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mteb</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>STS_TASKS <span class="op">=</span> [<span class="st">"BIOSSES"</span>, <span class="st">"STS12"</span>]</span>
@@ -1354,7 +1354,7 @@ window.Quarto = {
 </section>
 <section id="limpieza-final" class="level2">
 <h2 class="anchored" data-anchor-id="limpieza-final">Limpieza final</h2>
-<div id="3981aad1" class="cell" data-execution_count="17">
+<div id="0d355480" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Limpiando recursos temporales..."</span>)</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>client.delete_collection(<span class="st">"hpd1_real"</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>shutil.rmtree(BASE_DIR)</span>
@@ -1640,7 +1640,7 @@ Note
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

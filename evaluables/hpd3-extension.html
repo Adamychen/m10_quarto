@@ -484,10 +484,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/corregir_hpd3.py <span class="at">--extension</span> tu_notebook.ipynb</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
-<div id="ca911c8d" class="cell" data-execution_count="1">
+<div id="b5bf44cf" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q fastmcp openai python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="cd4f7dca" class="cell" data-execution_count="2">
+<div id="f031b5a8" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os, sqlite3, tempfile, json</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -576,7 +576,7 @@ Dataset listo.</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="445bfba3" class="cell" data-execution_count="3">
+<div id="c22774d9" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Implementa auditoría ───</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. Crea la tabla auditoria en la BD</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. Modifica consultar_sql para registrar cada query</span></span>
@@ -588,7 +588,7 @@ Dataset listo.</code></pre>
 <span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>eval1_auditoria <span class="op">=</span> <span class="va">None</span>  <span class="co"># ← dict con métricas de auditoría</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="4b0155cd" class="cell" data-execution_count="4">
+<div id="d7d1ea9c" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval1_auditoria, <span class="bu">dict</span>), <span class="st">"❌ eval1_auditoria debe ser un dict"</span></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> (<span class="st">"total_queries"</span>, <span class="st">"bloqueadas"</span>, <span class="st">"ultimas_3"</span>):</span>
@@ -629,7 +629,7 @@ Dataset listo.</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="3b39c870" class="cell" data-execution_count="5">
+<div id="28bb9c57" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Implementa rate limiting ───</span></span>
@@ -657,7 +657,7 @@ Dataset listo.</code></pre>
 <span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a>eval2_ratelimit <span class="op">=</span> <span class="va">None</span>  <span class="co"># ← dict con resultados del test de rate limiting</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="fb036c88" class="cell" data-execution_count="6">
+<div id="d9a17627" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval2_ratelimit, <span class="bu">dict</span>), <span class="st">"❌ eval2_ratelimit debe ser un dict"</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> (<span class="st">"permitidas"</span>, <span class="st">"bloqueadas_rate"</span>, <span class="st">"mensaje_bloqueo"</span>):</span>
@@ -695,7 +695,7 @@ Dataset listo.</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="e4bc9582" class="cell" data-execution_count="7">
+<div id="31e391a7" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_openai <span class="im">import</span> ChatOpenAI</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> create_agent</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.tools <span class="im">import</span> tool</span>
@@ -736,7 +736,7 @@ Dataset listo.</code></pre>
 <span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>    result <span class="op">=</span> agente.invoke({<span class="st">"messages"</span>: [{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: pregunta}]})</span>
 <span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>    eval3_integracion <span class="op">=</span> result[<span class="st">"messages"</span>][<span class="op">-</span><span class="dv">1</span>].content</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="fbfd45c2" class="cell" data-execution_count="8">
+<div id="7ed7a7b0" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval3_integracion, <span class="bu">str</span>), <span class="st">"❌ eval3_integracion debe ser un string"</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(eval3_integracion) <span class="op">&gt;</span> <span class="dv">10</span>, <span class="ss">f"❌ Respuesta demasiado corta (</span><span class="sc">{</span><span class="bu">len</span>(eval3_integracion)<span class="sc">}</span><span class="ss"> chars)"</span></span>
@@ -881,7 +881,7 @@ Dataset listo.</code></pre>
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

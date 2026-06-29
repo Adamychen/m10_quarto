@@ -554,10 +554,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="parte-1-setup-y-dataset-corporativo" class="level1">
 <h1>Parte 1 — Setup y dataset corporativo</h1>
 <p>Empezamos instalando dependencias y creando una base de datos SQLite con 3 tablas interrelacionadas: <code>empleados</code>, <code>proyectos</code> y <code>horas</code>.</p>
-<div id="f4ddf073" class="cell" data-execution_count="1">
+<div id="6dc8d048" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q fastmcp openai python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="aefe9732" class="cell" data-execution_count="2">
+<div id="42098cda" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os, sqlite3, tempfile, json</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -576,7 +576,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="crear-la-base-de-datos-corporativa" class="level2">
 <h2 class="anchored" data-anchor-id="crear-la-base-de-datos-corporativa">1.1 Crear la base de datos corporativa</h2>
 <p>Vamos a crear 3 tablas que simulan los datos de una empresa con ~30 empleados repartidos en 5 departamentos, 12 proyectos y 150 registros de horas imputadas.</p>
-<div id="75a876a8" class="cell" data-execution_count="3">
+<div id="52ce1cbe" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> sqlite3.<span class="ex">connect</span>(<span class="st">":memory:"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Tabla empleados</span></span>
@@ -619,7 +619,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>✅ Tablas creadas: empleados, proyectos, horas</code></pre>
 </div>
 </div>
-<div id="428a69cf" class="cell" data-execution_count="4">
+<div id="3c4d070d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Datos: empleados</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>empleados_data <span class="op">=</span> [</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span>, <span class="st">"Ana García"</span>, <span class="st">"I+D"</span>, <span class="dv">55000</span>, <span class="dv">7</span>),</span>
@@ -665,7 +665,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    Departamentos: Finanzas, I+D, Operaciones, RRHH, Ventas</code></pre>
 </div>
 </div>
-<div id="27ced34d" class="cell" data-execution_count="5">
+<div id="425d6d71" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>proyectos_data <span class="op">=</span> [</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">1</span>, <span class="st">"Alpha"</span>, <span class="st">"I+D"</span>, <span class="dv">200000</span>, <span class="st">"activo"</span>),</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    (<span class="dv">2</span>, <span class="st">"Beta"</span>, <span class="st">"I+D"</span>, <span class="dv">150000</span>, <span class="st">"activo"</span>),</span>
@@ -696,7 +696,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    Pausados: 2</code></pre>
 </div>
 </div>
-<div id="4cdff61a" class="cell" data-execution_count="6">
+<div id="bd05f17c" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generar 150 registros de horas realistas</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>horas_data <span class="op">=</span> []</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>horas_por_proyecto <span class="op">=</span> {</span>
@@ -735,7 +735,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    Proyectos con horas: 12</code></pre>
 </div>
 </div>
-<div id="a51cee0d" class="cell" data-execution_count="7">
+<div id="2f3be5f4" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Explorar el schema</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"SCHEMA — Base de datos corporativa"</span>)</span>
@@ -821,7 +821,7 @@ CREATE TABLE proyectos (
 <p>Creamos un servidor con <strong>FastMCP</strong> que expone una herramienta de consulta SQL. De momento <strong>sin sanitización</strong> — la añadiremos en la Parte 5 cuando hablemos de seguridad.</p>
 <section id="servidor-mínimo-con-una-tool" class="level2">
 <h2 class="anchored" data-anchor-id="servidor-mínimo-con-una-tool">2.1 Servidor mínimo con una tool</h2>
-<div id="6812d11f" class="cell" data-execution_count="8">
+<div id="a6f5084a" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> FastMCP</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>mcp <span class="op">=</span> FastMCP(<span class="st">"Servidor Corporativo"</span>)</span>
@@ -857,7 +857,7 @@ CREATE TABLE proyectos (
 <pre><code>✅ Servidor MCP creado con 1 tool: consultar_sql</code></pre>
 </div>
 </div>
-<div id="87ca2027" class="cell" data-execution_count="9">
+<div id="c7cdf038" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Probar la tool directamente (sin lanzar el servidor)</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando tool consultar_sql directamente ==="</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"1. Empleados de I+D:"</span>)</span>
@@ -897,7 +897,7 @@ CREATE TABLE proyectos (
 <p>Un servidor MCP de verdad expone más que una sola tool. Añadimos resources (datos de solo lectura) y tools especializadas para consultas frecuentes.</p>
 <section id="resource-schema-de-la-base-de-datos" class="level2">
 <h2 class="anchored" data-anchor-id="resource-schema-de-la-base-de-datos">3.1 Resource: schema de la base de datos</h2>
-<div id="27d17bea" class="cell" data-execution_count="10">
+<div id="f57b5ac1" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa el resource schema://tablas ───</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"schema://tablas"</span>)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> esquema_bd() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -912,7 +912,7 @@ CREATE TABLE proyectos (
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span>  <span class="co"># ← completar</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="f967ee4a" class="cell" data-execution_count="11">
+<div id="f34ca046" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Probar el resource directamente</span></span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando resource schema://tablas ==="</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(esquema_bd())</span></span>
@@ -925,7 +925,7 @@ CREATE TABLE proyectos (
 </section>
 <section id="tool-buscar-empleado-por-id" class="level2">
 <h2 class="anchored" data-anchor-id="tool-buscar-empleado-por-id">3.2 Tool: buscar empleado por ID</h2>
-<div id="56127e22" class="cell" data-execution_count="12">
+<div id="98e3c0a6" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa la tool empleado_por_id ───</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> empleado_por_id(id_empleado: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -946,7 +946,7 @@ CREATE TABLE proyectos (
 <span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span>  <span class="co"># ← completar</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="ca348adf" class="cell" data-execution_count="13">
+<div id="359226fc" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando tool empleado_por_id ==="</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(empleado_por_id(1))</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(empleado_por_id(99))  # Debería dar error</span></span>
@@ -959,7 +959,7 @@ CREATE TABLE proyectos (
 </section>
 <section id="tool-resumen-de-proyecto" class="level2">
 <h2 class="anchored" data-anchor-id="tool-resumen-de-proyecto">3.3 Tool: resumen de proyecto</h2>
-<div id="1c857430" class="cell" data-execution_count="14">
+<div id="cd2f02db" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa la tool resumen_proyecto ───</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> resumen_proyecto(id_proyecto: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -981,7 +981,7 @@ CREATE TABLE proyectos (
 <span id="cb24-19"><a href="#cb24-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-20"><a href="#cb24-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span>  <span class="co"># ← completar</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="844b86ed" class="cell" data-execution_count="15">
+<div id="fa10f988" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando tool resumen_proyecto ==="</span>)</span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(resumen_proyecto(1))</span></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(resumen_proyecto(10))</span></span>
@@ -994,7 +994,7 @@ CREATE TABLE proyectos (
 </section>
 <section id="resource-estadísticas-del-servidor" class="level2">
 <h2 class="anchored" data-anchor-id="resource-estadísticas-del-servidor">3.4 Resource: estadísticas del servidor</h2>
-<div id="92237f39" class="cell" data-execution_count="16">
+<div id="b2837773" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa el resource stats://resumen ───</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"stats://resumen"</span>)</span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> stats_servidor() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -1008,7 +1008,7 @@ CREATE TABLE proyectos (
 <span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span>  <span class="co"># ← completar</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="d476d943" class="cell" data-execution_count="17">
+<div id="619efcab" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando resource stats://resumen ==="</span>)</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(stats_servidor())</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"⚠️  Descomenta la línea anterior cuando hayas implementado el resource."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1017,7 +1017,7 @@ CREATE TABLE proyectos (
 ⚠️  Descomenta la línea anterior cuando hayas implementado el resource.</code></pre>
 </div>
 </div>
-<div id="0badf10f" class="cell" data-execution_count="18">
+<div id="ac8147d4" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verificar cuántas tools y resources tenemos registrados</span></span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>tools <span class="op">=</span> <span class="cf">await</span> mcp.list_tools()</span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>resources <span class="op">=</span> <span class="cf">await</span> mcp.list_resources()</span>
@@ -1034,7 +1034,7 @@ CREATE TABLE proyectos (
 <p>Ahora conectamos un LLM real al servidor MCP. El LLM recibirá la lista de tools disponibles (con sus descripciones y schemas) y decidirá cuál usar para cada pregunta.</p>
 <section id="configurar-el-llm" class="level2">
 <h2 class="anchored" data-anchor-id="configurar-el-llm">4.1 Configurar el LLM</h2>
-<div id="94efe9b9" class="cell" data-execution_count="19">
+<div id="3a2330fa" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -1079,7 +1079,7 @@ CREATE TABLE proyectos (
 <p>En HPD 2 usaste <code>create_agent</code> de LangChain para crear el agente. Aquí implementas el mismo bucle ReAct manualmente con la API de OpenAI. La diferencia es que las tools no son funciones Python decoradas con <code>@tool</code> — están en un servidor MCP independiente. El patrón de razonamiento (LLM decide → ejecuta tool → observa resultado → responde) es <strong>exactamente el mismo</strong>.</p>
 </div>
 </div>
-<div id="74f23f6d" class="cell" data-execution_count="20">
+<div id="68f2afa3" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json</span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ejecutar_tool_mcp(nombre: <span class="bu">str</span>, args: <span class="bu">dict</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -1127,7 +1127,7 @@ CREATE TABLE proyectos (
 <pre><code>Tools definidas: ['consultar_sql']</code></pre>
 </div>
 </div>
-<div id="eecb2dee" class="cell" data-execution_count="21">
+<div id="d3f27dbb" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preguntar_al_llm(pregunta: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Envía una pregunta al LLM. Si el LLM decide usar una tool,</span></span>
@@ -1171,7 +1171,7 @@ CREATE TABLE proyectos (
 <p>Implementar el bucle de tool calling a mano requiere gestionar <code>tool_calls</code>, ejecutar las tools y reinyectar los resultados en el historial. El patrón es idéntico al que usaste en HPD 2 con LangChain, pero sin la abstracción. Si te atascas, consulta el código de referencia en <code>evaluables/hpd3-evaluables.qmd</code>.</p>
 </div>
 </div>
-<div id="0f48c6f8" class="cell" data-execution_count="22">
+<div id="22e2fda2" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver al LLM en acción."</span>)</span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1217,7 +1217,7 @@ PREGUNTA: ¿Cuántos empleados hay en el departamento de I+D?
 </div>
 <section id="añadir-sanitización" class="level2">
 <h2 class="anchored" data-anchor-id="añadir-sanitización">5.1 Añadir sanitización</h2>
-<div id="992ec7b8" class="cell" data-execution_count="23">
+<div id="0a04a5f1" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa la sanitización de queries SQL ───</span></span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>PALABRAS_PROHIBIDAS <span class="op">=</span> [<span class="st">"DROP"</span>, <span class="st">"DELETE"</span>, <span class="st">"UPDATE"</span>, <span class="st">"INSERT"</span>, <span class="st">"ALTER"</span>, <span class="st">"CREATE"</span>, <span class="st">"TRUNCATE"</span>]</span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1253,7 +1253,7 @@ PREGUNTA: ¿Cuántos empleados hay en el departamento de I+D?
 <section id="probar-ataques-de-prompt-injection" class="level2">
 <h2 class="anchored" data-anchor-id="probar-ataques-de-prompt-injection">5.2 Probar ataques de prompt injection</h2>
 <p>Ejecutamos varios intentos de ataque para verificar que nuestras defensas funcionan.</p>
-<div id="2f572e39" class="cell" data-execution_count="24">
+<div id="a63f29dc" class="cell" data-execution_count="24">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
 <span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"TEST DE SEGURIDAD — Prompt Injection"</span>)</span>
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
@@ -1291,7 +1291,7 @@ TEST DE SEGURIDAD — Prompt Injection
 </section>
 <section id="límite-de-resultados" class="level2">
 <h2 class="anchored" data-anchor-id="límite-de-resultados">5.3 Límite de resultados</h2>
-<div id="755ee4db" class="cell" data-execution_count="25">
+<div id="4827e415" class="cell" data-execution_count="25">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: añade límite de filas a consultar_sql ───</span></span>
 <span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Después de ejecutar la query, limita la salida a un máximo de 30 filas.</span></span>
 <span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Si hay más de 30, muestra las primeras 30 y añade "... y N filas más".</span></span>
@@ -1384,7 +1384,7 @@ TEST DE SEGURIDAD — Prompt Injection
 <section id="parte-6-batería-de-pruebas" class="level1">
 <h1>Parte 6 — Batería de pruebas</h1>
 <p>Probamos el servidor MCP con preguntas de dificultad creciente. Observa qué herramienta elige el LLM para cada caso.</p>
-<div id="3a4745de" class="cell" data-execution_count="26">
+<div id="6335bbc3" class="cell" data-execution_count="26">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>preguntas_prueba <span class="op">=</span> [</span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Nivel 1: consulta simple → debería usar consultar_sql</span></span>
 <span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"¿Cuántos empleados hay en el departamento de Finanzas?"</span>,</span>
@@ -1755,7 +1755,7 @@ Note
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

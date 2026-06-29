@@ -517,10 +517,10 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 3 — Aplicaciones</strong>. Se recomienda haber completado los <a href="../bloque1/01-fundamentos.html">Bloques 1</a> y <a href="../bloque2/02-orquestacion.html">2</a> primero, especialmente <a href="../bloque2/02a-prompt-engineering.html">Prompt Engineering</a>.</p>
 </blockquote>
-<div id="4bcd815a" class="cell" data-execution_count="1">
+<div id="00f7e1c1" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q sdv pandas matplotlib seaborn scipy openai python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="109c44ea" class="cell" data-execution_count="2">
+<div id="c9980a08" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -538,7 +538,7 @@ window.Quarto = {
 <pre><code>Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="03e18cbe" class="cell" data-execution_count="3">
+<div id="799967b5" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -673,7 +673,7 @@ window.Quarto = {
 <li><strong>Columnas mixtas (continuas + discretas):</strong> aplica <em>mode-specific normalization</em> a cada columna numérica. Si una columna tiene distribución multimodal (ej. mezcla de salarios junior/senior), la normaliza por separado para cada modo.</li>
 <li><strong>Desequilibrio categórico:</strong> usa <em>training-by-sampling</em> condicional: muestrea las categorías minoritarias con más frecuencia durante el entrenamiento para que el generador aprenda a producirlas.</li>
 </ol>
-<div id="e601e6af" class="cell" data-execution_count="4">
+<div id="e5144204" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -708,7 +708,7 @@ Target: {0: 1685, 1: 315}
 7    51     22242               587   tarjeta   Sevilla       0</code></pre>
 </div>
 </div>
-<div id="e0b3853b" class="cell" data-execution_count="5">
+<div id="e84a1651" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sdv.single_table <span class="im">import</span> CTGANSynthesizer</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sdv.metadata <span class="im">import</span> SingleTableMetadata</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -723,15 +723,15 @@ Target: {0: 1685, 1: 315}
 <span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>df_sintetico_gan<span class="sc">.</span>head(<span class="dv">8</span>)<span class="sc">.</span>to_string()<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Datos sintéticos generados: 2000 filas
-   edad  ingresos  score_crediticio  producto provincia  target
-0    18     17250               520   tarjeta    Madrid       0
-1    21    130596               704  depósito    Madrid       1
-2    52    130307               666  préstamo    Bilbao       0
-3    22      8000               554   tarjeta    Madrid       1
-4    29     26240               702  hipoteca  Valencia       0
-5    40     22048               418  depósito    Madrid       0
-6    53     48303               616  hipoteca    Madrid       1
-7    60     25880               624   tarjeta    Madrid       1</code></pre>
+   edad  ingresos  score_crediticio  producto  provincia  target
+0    59     24416               780  hipoteca     Madrid       0
+1    27    132017               524  depósito    Sevilla       0
+2    55     33484               534   tarjeta     Bilbao       0
+3    48     23283               684   tarjeta     Madrid       0
+4    48     43123               601   tarjeta   Valencia       0
+5    47     62054               725  depósito     Madrid       1
+6    38     35217               840   tarjeta  Barcelona       1
+7    30     93475               845   tarjeta  Barcelona       1</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -794,7 +794,7 @@ Target: {0: 1685, 1: 315}
 <h3 class="anchored" data-anchor-id="tvae-tabular-vae">TVAE (Tabular VAE)</h3>
 <p>TVAE aplica la misma lógica que CTGAN al preprocesamiento de datos tabulares (mode-specific normalization para columnas continuas) pero usando la arquitectura VAE en lugar de la adversarial.</p>
 <p><strong>¿Cuándo elegir CTGAN vs.&nbsp;TVAE?</strong> No hay un ganador universal. La recomendación práctica es probar ambos (SDV lo hace trivial) y comparar las métricas de validación.</p>
-<div id="922cd4d1" class="cell" data-execution_count="6">
+<div id="2ced36e5" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sdv.single_table <span class="im">import</span> TVAESynthesizer</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>synthesizer_tvae <span class="op">=</span> TVAESynthesizer(metadata, epochs<span class="op">=</span><span class="dv">600</span>, batch_size<span class="op">=</span><span class="dv">100</span>, verbose<span class="op">=</span><span class="va">False</span>)</span>
@@ -896,7 +896,7 @@ Note
 <p>Generar datos sintéticos no basta. Hay que <strong>demostrar</strong> que son útiles, fieles y seguros.</p>
 <section id="fidelidad-se-parecen-a-los-datos-reales" class="level3">
 <h3 class="anchored" data-anchor-id="fidelidad-se-parecen-a-los-datos-reales">6.1 Fidelidad: ¿se parecen a los datos reales?</h3>
-<div id="3f8ea4e7" class="cell" data-execution_count="7">
+<div id="73db6dad" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.stats <span class="im">import</span> ks_2samp, chi2_contingency</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
@@ -930,23 +930,23 @@ Note
 KS TEST — Variables numéricas
 H₀: las distribuciones real y sintética son iguales
 ============================================================
-  edad                 | KS=0.2360 | p=0.0000 | ❌ Difieren (p ≤ 0.05)
-  ingresos             | KS=0.1830 | p=0.0000 | ❌ Difieren (p ≤ 0.05)
-  score_crediticio     | KS=0.0450 | p=0.0348 | ❌ Difieren (p ≤ 0.05)
+  edad                 | KS=0.0530 | p=0.0073 | ❌ Difieren (p ≤ 0.05)
+  ingresos             | KS=0.1865 | p=0.0000 | ❌ Difieren (p ≤ 0.05)
+  score_crediticio     | KS=0.2630 | p=0.0000 | ❌ Difieren (p ≤ 0.05)
 
 ============================================================
 CHI-CUADRADO — Variables categóricas
 H₀: las frecuencias real y sintética son iguales
 ============================================================
-  producto             | χ²=71.69 | p=0.0000 | ❌ Difieren (p ≤ 0.05)
-  provincia            | χ²=74.80 | p=0.0000 | ❌ Difieren (p ≤ 0.05)</code></pre>
+  producto             | χ²=3.81 | p=0.2827 | ✅ Se parecen (p &gt; 0.05)
+  provincia            | χ²=67.57 | p=0.0000 | ❌ Difieren (p ≤ 0.05)</code></pre>
 </div>
 </div>
 </section>
 <section id="utilidad-sirven-para-entrenar-un-modelo" class="level3">
 <h3 class="anchored" data-anchor-id="utilidad-sirven-para-entrenar-un-modelo">6.2 Utilidad: ¿sirven para entrenar un modelo?</h3>
 <p>La prueba definitiva: entrenar un clasificador con datos sintéticos y evaluarlo con datos reales.</p>
-<div id="b03c96dd" class="cell" data-execution_count="8">
+<div id="7b1888fa" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.ensemble <span class="im">import</span> RandomForestClassifier</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> classification_report</span>
@@ -975,15 +975,15 @@ H₀: las frecuencias real y sintética son iguales
 <span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Diferencia:                                  </span><span class="sc">{</span>f1_real <span class="op">-</span> f1_gan<span class="sc">:.4f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>F1 (modelo entrenado con datos REALES):      0.4785
-F1 (modelo entrenado con datos SINTÉTICOS):  0.4890
-Diferencia:                                  -0.0106</code></pre>
+F1 (modelo entrenado con datos SINTÉTICOS):  0.4854
+Diferencia:                                  -0.0069</code></pre>
 </div>
 </div>
 </section>
 <section id="visualización-pca-del-espacio-de-features" class="level3">
 <h3 class="anchored" data-anchor-id="visualización-pca-del-espacio-de-features">6.3 Visualización: PCA del espacio de features</h3>
 <p>Proyectar datos reales y sintéticos a 2 dimensiones con PCA y visualizar el solapamiento.</p>
-<div id="efc2cc72" class="cell" data-execution_count="9">
+<div id="90588f79" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.decomposition <span class="im">import</span> PCA</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1263,7 +1263,7 @@ Diferencia:                                  -0.0106</code></pre>
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

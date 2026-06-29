@@ -486,10 +486,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/corregir_hpd4_ds.py tu_notebook.ipynb</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
-<div id="9b4efa49" class="cell" data-execution_count="1">
+<div id="4afdd628" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q sdv scipy pandas matplotlib seaborn openai python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="ff7928a0" class="cell" data-execution_count="2">
+<div id="96ac4bd2" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -516,7 +516,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="dataset-de-trabajo" class="level2">
 <h2 class="anchored" data-anchor-id="dataset-de-trabajo">Dataset de trabajo</h2>
 <p>Para todos los ejercicios usarás el dataset <code>Adult Census Income</code> (UCI), cargado directamente. Contiene ~32k filas con datos demográficos y laborales.</p>
-<div id="599d1e4f" class="cell" data-execution_count="3">
+<div id="63323547" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_real <span class="op">=</span> pd.read_csv(<span class="st">"https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data"</span>,</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                       header<span class="op">=</span><span class="va">None</span>,</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                       names<span class="op">=</span>[<span class="st">"age"</span>, <span class="st">"workclass"</span>, <span class="st">"fnlwgt"</span>, <span class="st">"education"</span>, <span class="st">"education_num"</span>,</span>
@@ -544,7 +544,7 @@ Columnas categóricas: ['workclass', 'education', 'marital_status', 'occupation'
 <h2 class="anchored" data-anchor-id="ejercicio-1-generar-datos-sintéticos-con-llm-enfoque-intuitivo">Ejercicio 1 — Generar datos sintéticos con LLM (enfoque intuitivo)</h2>
 <p>Genera 20 filas sintéticas usando la API de Llamus. Pide el JSON en el prompt (como en <code>02a-prompt-engineering.qmd</code>) y extrae la respuesta con el helper <code>parse_json_response()</code>. Usa como columnas: <code>age</code>, <code>hours_per_week</code>, <code>education</code>, <code>income</code>. Incluye 2 ejemplos few-shot en el prompt. Usa temperatura 0.8.</p>
 <p>El resultado debe ser un <strong>DataFrame</strong> asignado a <code>eval1_df</code> con exactamente 4 columnas en este orden: <code>age</code>, <code>hours_per_week</code>, <code>education</code>, <code>income</code>.</p>
-<div id="a63ff234" class="cell" data-execution_count="4">
+<div id="8a9bc433" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> json, re</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -576,7 +576,7 @@ Columnas categóricas: ['workclass', 'education', 'marital_status', 'occupation'
 <h2 class="anchored" data-anchor-id="ejercicio-2-ks-test-datos-reales-vs.-sintéticos">Ejercicio 2 — KS test: datos reales vs.&nbsp;sintéticos</h2>
 <p>Entrena un CTGAN con SDV sobre <code>df_real</code> (usa solo las columnas <code>["age", "education_num", "hours_per_week", "sex", "income"]</code> para que entrene más rápido, 50 epochs bastan). Genera 1000 filas sintéticas. Calcula el <strong>KS test</strong> comparando la distribución de <code>age</code> entre datos reales y sintéticos.</p>
 <p>El resultado debe ser un <strong>diccionario</strong> <code>eval2_ks</code> con claves <code>"statistic"</code> (float) y <code>"p_value"</code> (float).</p>
-<div id="fcdd76fa" class="cell" data-execution_count="5">
+<div id="c6313377" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sdv.single_table <span class="im">import</span> CTGANSynthesizer</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sdv.metadata <span class="im">import</span> SingleTableMetadata</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -602,7 +602,7 @@ Columnas categóricas: ['workclass', 'education', 'marital_status', 'occupation'
 <h2 class="anchored" data-anchor-id="ejercicio-3-utilidad-downstream-clasificador-con-datos-sintéticos">Ejercicio 3 — Utilidad downstream: clasificador con datos sintéticos</h2>
 <p>Entrena un <code>RandomForestClassifier(n_estimators=50, random_state=42)</code> con los datos sintéticos generados en el Ejercicio 2 (usa <code>eval2_df_synth</code>). Evalúa sobre el 30 % de <code>df_real</code> como test set. Usa <code>get_dummies</code> para codificar las categóricas y <code>reindex</code> para alinear columnas entre train y test.</p>
 <p>El resultado debe ser un <strong>float</strong> <code>eval3_f1</code> con el macro F1-score sobre el test set real.</p>
-<div id="e3f22144" class="cell" data-execution_count="6">
+<div id="425628a2" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>eval3_f1 <span class="op">=</span> <span class="va">None</span>  <span class="co"># Sustituir con tu código</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Validación automática</span></span>
@@ -630,7 +630,7 @@ Columnas categóricas: ['workclass', 'education', 'marital_status', 'occupation'
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ctgan"</span>: {<span class="st">"ks_age_pvalue"</span>: <span class="bu">float</span>, <span class="st">"chi2_sex_pvalue"</span>: <span class="bu">float</span>},</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"tvae"</span>:  {<span class="st">"ks_age_pvalue"</span>: <span class="bu">float</span>, <span class="st">"chi2_sex_pvalue"</span>: <span class="bu">float</span>}</span>
 <span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div id="f200819c" class="cell" data-execution_count="7">
+<div id="b226ea2c" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>eval4_dict <span class="op">=</span> <span class="va">None</span>  <span class="co"># Sustituir con tu código</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Validación automática</span></span>
@@ -788,7 +788,7 @@ Columnas categóricas: ['workclass', 'education', 'marital_status', 'occupation'
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

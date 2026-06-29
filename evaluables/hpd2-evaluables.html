@@ -485,10 +485,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> scripts/corregir_hpd2.py tu_notebook.ipynb</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
-<div id="fa23e4b6" class="cell" data-execution_count="1">
+<div id="17593d00" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q langchain langchain<span class="op">-</span>openai langchain<span class="op">-</span>community pandas matplotlib seaborn python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="83b16759" class="cell" data-execution_count="2">
+<div id="2550c004" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -521,7 +521,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 Dataset Titanic: 891 filas × 15 columnas</code></pre>
 </div>
 </div>
-<div id="728f925d" class="cell" data-execution_count="3">
+<div id="b914fd51" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Herramienta base compartida para todos los ejercicios ───</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">@tool</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> consulta_pandas(expresion: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -633,7 +633,7 @@ Dataset Titanic: 891 filas × 15 columnas</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="57c8ef40" class="cell" data-execution_count="4">
+<div id="de529a47" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Implementa aquí la herramienta correlacion ───</span></span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="at">@tool</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> correlacion(col1: <span class="bu">str</span>, col2: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -667,7 +667,7 @@ Dataset Titanic: 891 filas × 15 columnas</code></pre>
 <span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>eval1_resultado <span class="op">=</span> <span class="va">None</span>  <span class="co"># ← asigna aquí la respuesta del agente (str)</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="ad711370" class="cell" data-execution_count="5">
+<div id="14ae468b" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval1_resultado, <span class="bu">str</span>), <span class="st">"❌ eval1_resultado debe ser un string"</span></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(eval1_resultado) <span class="op">&gt;</span> <span class="dv">10</span>, <span class="ss">f"❌ Respuesta demasiado corta (</span><span class="sc">{</span><span class="bu">len</span>(eval1_resultado)<span class="sc">}</span><span class="ss"> chars)"</span></span>
@@ -700,7 +700,7 @@ Dataset Titanic: 891 filas × 15 columnas</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="6d88dfc7" class="cell" data-execution_count="6">
+<div id="62f183f8" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Preguntas de evaluación ───</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>preguntas_eval <span class="op">=</span> [</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"¿Cuál es la tarifa media pagada por los pasajeros de primera clase?"</span>,</span>
@@ -724,7 +724,7 @@ Dataset Titanic: 891 filas × 15 columnas</code></pre>
 <span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>eval2_tabla <span class="op">=</span> []  <span class="co"># ← lista de 5 dicts</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="aaf9dccf" class="cell" data-execution_count="7">
+<div id="06b32c5b" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval2_tabla, <span class="bu">list</span>), <span class="st">"❌ eval2_tabla debe ser una lista"</span></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(eval2_tabla) <span class="op">==</span> <span class="dv">5</span>, <span class="ss">f"❌ Se esperaban 5 evaluaciones, tienes </span><span class="sc">{</span><span class="bu">len</span>(eval2_tabla)<span class="sc">}</span><span class="ss">"</span></span>
@@ -763,7 +763,7 @@ Dataset Titanic: 891 filas × 15 columnas</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="88a7883e" class="cell" data-execution_count="8">
+<div id="5d57b97b" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Define el nuevo system prompt ───</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="co"># SYSTEM_PROMPT_FUERA_AMBITO = """..."""</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -780,7 +780,7 @@ Dataset Titanic: 891 filas × 15 columnas</code></pre>
 <span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>eval3_respuesta <span class="op">=</span> {}  <span class="co"># ← dict con 4 respuestas</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="64380e89" class="cell" data-execution_count="9">
+<div id="9364285a" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval3_respuesta, <span class="bu">dict</span>), <span class="st">"❌ eval3_respuesta debe ser un dict"</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> k <span class="kw">in</span> (<span class="st">"valida_1"</span>, <span class="st">"valida_2"</span>, <span class="st">"fuera_1"</span>, <span class="st">"fuera_2"</span>):</span>
@@ -820,7 +820,7 @@ Dataset Titanic: 891 filas × 15 columnas</code></pre>
 </tr>
 </tbody>
 </table>
-<div id="0a076481" class="cell" data-execution_count="10">
+<div id="13e72bc1" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Define tus 3 preguntas con ground truth ───</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>mi_ground_truth <span class="op">=</span> {</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># "¿tu pregunta original 1?": "respuesta esperada (aproximada)",</span></span>
@@ -837,7 +837,7 @@ Dataset Titanic: 891 filas × 15 columnas</code></pre>
 <span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>eval4_log <span class="op">=</span> []  <span class="co"># ← lista de 3 dicts</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="2195ffa5" class="cell" data-execution_count="11">
+<div id="67a35f7c" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── Auto-verificación ───</span></span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">isinstance</span>(eval4_log, <span class="bu">list</span>), <span class="st">"❌ eval4_log debe ser una lista"</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">assert</span> <span class="bu">len</span>(eval4_log) <span class="op">==</span> <span class="dv">3</span>, <span class="ss">f"❌ Se esperaban 3 entradas, tienes </span><span class="sc">{</span><span class="bu">len</span>(eval4_log)<span class="sc">}</span><span class="ss">"</span></span>
@@ -985,7 +985,7 @@ Dataset Titanic: 891 filas × 15 columnas</code></pre>
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

@@ -498,10 +498,10 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 1 — Fundamentos</strong>. Se recomienda seguir el orden propuesto: Transformer → LLMs → Embeddings → Vector DB.</p>
 </blockquote>
-<div id="7c607398" class="cell" data-execution_count="1">
+<div id="5608959e" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q matplotlib</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="7bdb647b" class="cell" data-execution_count="2">
+<div id="4eb691dc" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
@@ -529,7 +529,7 @@ window.Quarto = {
 <figcaption>Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)</figcaption>
 </figure>
 </div>
-<div id="d5df22f0" class="cell" data-execution_count="3">
+<div id="28d1741b" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="fl">3.5</span>))</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fig.patch.set_facecolor(<span class="st">'white'</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -594,7 +594,7 @@ window.Quarto = {
 </div>
 <section id="scaled-dot-product-attention-low-level-numpy" class="level4">
 <h4 class="anchored" data-anchor-id="scaled-dot-product-attention-low-level-numpy">Scaled Dot-Product Attention — Low Level (numpy)</h4>
-<div id="96b6f541" class="cell" data-execution_count="4">
+<div id="0937d181" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> scaled_dot_product_attention_numpy(Q, K, V):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Atención paso a paso con numpy. Muestra la matemática subyacente."""</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    d_k <span class="op">=</span> K.shape[<span class="op">-</span><span class="dv">1</span>]</span>
@@ -626,7 +626,7 @@ Cada fila suma 1: [1. 1. 1.]</code></pre>
 </section>
 <section id="scaled-dot-product-attention-high-level-pytorch" class="level4">
 <h4 class="anchored" data-anchor-id="scaled-dot-product-attention-high-level-pytorch">Scaled Dot-Product Attention — High Level (PyTorch)</h4>
-<div id="11e5a3a4" class="cell" data-execution_count="5">
+<div id="ffa5e041" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> scaled_dot_product_attention_torch(Q, K, V):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Atención paso a paso con PyTorch, equivalente a la versión numpy."""</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    d_k <span class="op">=</span> K.shape[<span class="op">-</span><span class="dv">1</span>]</span>
@@ -656,7 +656,7 @@ Cada fila suma 1: [1. 1. 1.]</code></pre>
 </section>
 <section id="multi-head-attention-low-level-numpy" class="level4">
 <h4 class="anchored" data-anchor-id="multi-head-attention-low-level-numpy">Multi-Head Attention — Low Level (numpy)</h4>
-<div id="98a4b16f" class="cell" data-execution_count="6">
+<div id="756a2f7a" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> multi_head_attention_numpy(Q, K, V, num_heads<span class="op">=</span><span class="dv">2</span>):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Multi-head atención desde cero: divide en cabezas, atiende, concatena, proyecta."""</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    batch, seq_len, d_model <span class="op">=</span> Q.shape</span>
@@ -701,7 +701,7 @@ Cada cabeza atiende de forma distinta (diferentes pesos).</code></pre>
 </section>
 <section id="multi-head-attention-high-level-pytorch" class="level4">
 <h4 class="anchored" data-anchor-id="multi-head-attention-high-level-pytorch">Multi-Head Attention — High Level (PyTorch)</h4>
-<div id="b165a0a1" class="cell" data-execution_count="7">
+<div id="01e2f57b" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>embed_dim <span class="op">=</span> <span class="dv">8</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>num_heads <span class="op">=</span> <span class="dv">2</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>mha <span class="op">=</span> nn.MultiheadAttention(embed_dim<span class="op">=</span>embed_dim, num_heads<span class="op">=</span>num_heads, batch_first<span class="op">=</span><span class="va">True</span>)</span>
@@ -717,9 +717,9 @@ Cada cabeza atiende de forma distinta (diferentes pesos).</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Salida nn.MultiheadAttention: torch.Size([1, 3, 8])
 Pesos de atención:
-[[[0.271 0.444 0.286]
-  [0.266 0.419 0.315]
-  [0.302 0.386 0.312]]]
+[[[0.365 0.318 0.317]
+  [0.284 0.472 0.244]
+  [0.287 0.52  0.193]]]
 
 Parámetros entrenables de la capa: 288</code></pre>
 </div>
@@ -727,7 +727,7 @@ Parámetros entrenables de la capa: 288</code></pre>
 </section>
 <section id="visualización-de-atención" class="level4">
 <h4 class="anchored" data-anchor-id="visualización-de-atención">Visualización de atención</h4>
-<div id="1d510ac6" class="cell" data-execution_count="8">
+<div id="10b69c09" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">4</span>))</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(attn_np[<span class="dv">0</span>], cmap<span class="op">=</span><span class="st">"Blues"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
@@ -764,7 +764,7 @@ Parámetros entrenables de la capa: 288</code></pre>
 <p><span class="math display">\[PE_{(pos, 2i)} = \sin(pos / 10000^{2i/d_{model}})\]</span> <span class="math display">\[PE_{(pos, 2i+1)} = \cos(pos / 10000^{2i/d_{model}})\]</span></p>
 <section id="codificación-posicional-low-level-numpy" class="level4">
 <h4 class="anchored" data-anchor-id="codificación-posicional-low-level-numpy">Codificación posicional — Low Level (numpy)</h4>
-<div id="437f483a" class="cell" data-execution_count="9">
+<div id="184eb749" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> positional_encoding_numpy(seq_len, d_model):</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Codificación posicional sinusoidal desde cero."""</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    pos <span class="op">=</span> np.arange(seq_len)[:, np.newaxis]</span>
@@ -796,7 +796,7 @@ Parámetros entrenables de la capa: 288</code></pre>
 </section>
 <section id="codificación-posicional-high-level-pytorch" class="level4">
 <h4 class="anchored" data-anchor-id="codificación-posicional-high-level-pytorch">Codificación posicional — High Level (PyTorch)</h4>
-<div id="30643d06" class="cell" data-execution_count="10">
+<div id="642a0e53" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> <span class="dv">50</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>d_model <span class="op">=</span> <span class="dv">32</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>pos_embedding <span class="op">=</span> nn.Embedding(vocab_size, d_model)</span>
@@ -1051,7 +1051,7 @@ Parámetros entrenables de la capa: 288</code></pre>
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

@@ -509,10 +509,10 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 2 — Orquestación</strong>. Aquí se aprende a exponer datos y herramientas a LLMs de forma estandarizada con MCP.</p>
 </blockquote>
-<div id="192e4411" class="cell" data-execution_count="1">
+<div id="76924a96" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q fastmcp</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="9573dd78" class="cell" data-execution_count="2">
+<div id="fd5b96be" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
@@ -688,7 +688,7 @@ window.Quarto = {
 <section id="fastmcp-el-sdk-simplificado" class="level3">
 <h3 class="anchored" data-anchor-id="fastmcp-el-sdk-simplificado">FastMCP: el SDK simplificado</h3>
 <p>FastMCP es una capa por encima del SDK oficial que simplifica mucho crear servidores. Basta con decorar funciones Python normales:</p>
-<div id="70572802" class="cell" data-execution_count="3">
+<div id="753b6bbe" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> FastMCP</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>mcp <span class="op">=</span> FastMCP(<span class="st">"Mi Primer Servidor"</span>)</span>
@@ -737,7 +737,7 @@ Tip
 <section id="recursos-mcp" class="level3">
 <h3 class="anchored" data-anchor-id="recursos-mcp">Recursos MCP</h3>
 <p>Los <strong>Resources</strong> exponen datos de solo lectura que el LLM puede consultar:</p>
-<div id="0047d706" class="cell" data-execution_count="4">
+<div id="bc3cf15d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"config://version"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_version() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Versión del servidor."""</span></span>
@@ -761,7 +761,7 @@ Estadísticas: Tools registradas: 3</code></pre>
 <section id="mcp-sqlite-herramienta-de-consulta" class="level3">
 <h3 class="anchored" data-anchor-id="mcp-sqlite-herramienta-de-consulta">MCP + SQLite: herramienta de consulta</h3>
 <p>El caso de uso más común: permitir que un LLM consulte una base de datos SQLite de forma segura:</p>
-<div id="26cf781f" class="cell" data-execution_count="5">
+<div id="1fd58e80" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos una BD de ejemplo con datos corporativos</span></span>
@@ -793,7 +793,7 @@ Estadísticas: Tools registradas: 3</code></pre>
   Venta 5: 2025-05-18 | DataViz      |  19000€ | IberTech SA</code></pre>
 </div>
 </div>
-<div id="e32287bc" class="cell" data-execution_count="6">
+<div id="018dc767" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Herramienta MCP con validación de seguridad</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sanitizar_query(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -947,7 +947,7 @@ Error: Operación no permitida: DROP. Solo se admiten consultas SELECT.</code></
 <section id="servidor-mcp-completo-para-ejecutar-como-script" class="level3">
 <h3 class="anchored" data-anchor-id="servidor-mcp-completo-para-ejecutar-como-script">Servidor MCP completo para ejecutar como script</h3>
 <p>Guarda el siguiente código en <code>servidor_mcp.py</code> y ejecútalo con <code>python servidor_mcp.py</code>. Los clientes LLM pueden conectarse vía stdio:</p>
-<div id="3faf333f" class="cell" data-execution_count="7">
+<div id="bedd0e32" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># servidor_mcp.py — Servidor listo para producción</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Para ejecutar: python servidor_mcp.py</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># El servidor queda escuchando por stdio</span></span>
@@ -1006,7 +1006,7 @@ Error: Operación no permitida: DROP. Solo se admiten consultas SELECT.</code></
 <section id="conexión-desde-un-cliente-llm" class="level3">
 <h3 class="anchored" data-anchor-id="conexión-desde-un-cliente-llm">Conexión desde un cliente LLM</h3>
 <p>Un cliente (LLM o aplicación) se conecta al servidor MCP lanzándolo como subproceso:</p>
-<div id="4a2ebc25" class="cell" data-execution_count="8">
+<div id="85449c1a" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cliente_mcp.py — Cómo conectar un LLM al servidor MCP</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> asyncio</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> Client</span>
@@ -1217,7 +1217,7 @@ Error: Operación no permitida: DROP. Solo se admiten consultas SELECT.</code></
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

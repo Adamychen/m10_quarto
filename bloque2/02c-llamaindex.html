@@ -478,10 +478,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 2 — Orquestación</strong>. Se recomienda haber visto <a href="../bloque2/02b-langchain.html">LangChain</a> primero.</p>
 </blockquote>
-<div id="19953d23" class="cell" data-execution_count="1">
+<div id="7e1deb4c" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q llama<span class="op">-</span>index llama<span class="op">-</span>index<span class="op">-</span>llms<span class="op">-</span>openai<span class="op">-</span>like python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="8af95706" class="cell" data-execution_count="2">
+<div id="9e42ccd5" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -494,7 +494,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="8689c4ab" class="cell" data-execution_count="3">
+<div id="565ee86e" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.llms.openai_like <span class="im">import</span> OpenAILike</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.base.embeddings.base <span class="im">import</span> BaseEmbedding</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.base.llms.types <span class="im">import</span> LLMMetadata</span>
@@ -643,7 +643,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="primer-contacto-indexar-y-preguntar" class="level3">
 <h3 class="anchored" data-anchor-id="primer-contacto-indexar-y-preguntar">Primer contacto: indexar y preguntar</h3>
-<div id="a95a6c9c" class="cell" data-execution_count="4">
+<div id="7e71d8be" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> VectorStoreIndex, Document</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos documentos de ejemplo en memoria (sin necesidad de archivos externos)</span></span>
@@ -669,7 +669,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Documentos cargados: 4
 
 Pregunta: ¿Cuáles fueron los ingresos totales en 2025?
-Respuesta: Las ventas en 2025 fueron de 5.6 millones de euros.</code></pre>
+Respuesta: Las ventas de 2025 fueron de 5.6 millones de euros.</code></pre>
 </div>
 </div>
 </section>
@@ -699,7 +699,7 @@ Respuesta: Las ventas en 2025 fueron de 5.6 millones de euros.</code></pre>
 </div>
 </div>
 </div>
-<div id="d0406066" class="cell" data-execution_count="5">
+<div id="6a3af5a5" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.node_parser <span class="im">import</span> SentenceSplitter</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.ingestion <span class="im">import</span> IngestionPipeline</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -787,7 +787,7 @@ Ejemplo de nodo: Las ventas de 2025 fueron de 5.6 millones de euros. El producto
 </div>
 </div>
 </div>
-<div id="b99aaf7b" class="cell" data-execution_count="6">
+<div id="5e995cb6" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> VectorStoreIndex, SummaryIndex</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
@@ -805,17 +805,17 @@ Ejemplo de nodo: Las ventas de 2025 fueron de 5.6 millones de euros. El producto
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(summary_index.as_query_engine(response_mode<span class="op">=</span><span class="st">"tree_summarize"</span>).query(pregunta))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== VectorStoreIndex ===
-La información proporcionada no permite determinar el crecimiento de la empresa entre 2024 y 2025.
+La información proporcionada no permite determinar el crecimiento de la empresa entre esos años.
 
 === SummaryIndex (tree_summarize) ===
-Las ventas crecieron de 4.8 millones de euros en 2024 a 5.6 millones de euros en 2025.</code></pre>
+Las ventas en 2025 fueron de 5.6 millones de euros, mientras que en 2024 fueron de 4.8 millones de euros.</code></pre>
 </div>
 </div>
 </section>
 <section id="query-engines" class="level3">
 <h3 class="anchored" data-anchor-id="query-engines">Query Engines</h3>
 <p>Un <strong>Query Engine</strong> es el punto final de la API: recibe una pregunta en lenguaje natural y devuelve una respuesta.</p>
-<div id="6fb324f6" class="cell" data-execution_count="7">
+<div id="253853d7" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -836,7 +836,7 @@ Las ventas crecieron de 4.8 millones de euros en 2024 a 5.6 millones de euros en
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>nodo<span class="sc">.</span>text[:<span class="dv">120</span>]<span class="sc">}</span><span class="ss">..."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-Respuesta: Ana lidera el equipo de Data Science y cuenta con 12 personas.
+Respuesta: Ana lidera el equipo de Data Science, y el equipo está formado por 12 personas.
 
 --- Fuentes utilizadas ---
 Fuente 1 (score: 0.819):
@@ -851,7 +851,7 @@ Fuente 3 (score: 0.162):
 <section id="consultas-sobre-datos-estructurados-sql" class="level3">
 <h3 class="anchored" data-anchor-id="consultas-sobre-datos-estructurados-sql">Consultas sobre datos estructurados (SQL)</h3>
 <p>LlamaIndex también puede traducir lenguaje natural a SQL:</p>
-<div id="63fe5f06" class="cell" data-execution_count="8">
+<div id="bae8837b" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -914,7 +914,7 @@ Fuente 3 (score: 0.162):
   (4, 'AI Toolkit', 180000.0, 'Norte')
 
 Pregunta: ¿Cuánto ha facturado CloudSync en total?
-SQL generado: SELECT SUM(importe) FROM ventas WHERE producto = 'CloudSync';
+SQL generado: SELECT SUM(importe) FROM ventas WHERE producto = 'CloudSync'
 Respuesta: CloudSync ha facturado un total de 770,000.0.</code></pre>
 </div>
 </div>
@@ -943,7 +943,7 @@ Respuesta: CloudSync ha facturado un total de 770,000.0.</code></pre>
 <section id="chunking-estratégico" class="level3">
 <h3 class="anchored" data-anchor-id="chunking-estratégico">Chunking estratégico</h3>
 <p>El tamaño y solapamiento de los chunks afecta drásticamente a la calidad del RAG:</p>
-<div id="3f9e039c" class="cell" data-execution_count="9">
+<div id="0682252e" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.node_parser <span class="im">import</span> SentenceSplitter, TokenTextSplitter</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>texto_largo <span class="op">=</span> <span class="st">"La inteligencia artificial generativa está transformando el panorama del análisis de datos. "</span> <span class="op">*</span> <span class="dv">30</span></span>
@@ -1153,7 +1153,7 @@ Chunks por tokens: 5</code></pre>
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }

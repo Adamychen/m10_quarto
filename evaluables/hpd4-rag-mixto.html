@@ -555,10 +555,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>En este taller construyes ese sistema completo. Y al final lo evalúas con RAGAS para saber <strong>objetivamente</strong> si funciona bien, no solo “a ojo”.</p>
 </div>
 </div>
-<div id="967e6348" class="cell" data-execution_count="1">
+<div id="e4f9d656" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q chromadb sentence<span class="op">-</span>transformers langchain langchain<span class="op">-</span>community langchain<span class="op">-</span>text<span class="op">-</span>splitters pypdf ragas datasets fpdf2 pandas matplotlib scikit<span class="op">-</span>learn python<span class="op">-</span>dotenv flashrank</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="3787ebf1" class="cell" data-execution_count="2">
+<div id="27006722" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os, tempfile, shutil, sqlite3</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
@@ -576,7 +576,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="77737ae7" class="cell" data-execution_count="3">
+<div id="83eed592" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_openai <span class="im">import</span> ChatOpenAI</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -591,7 +591,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>✅ LLM configurado (gemma4:e2b-mlx).</code></pre>
 </div>
 </div>
-<div id="335ebe8a" class="cell" data-execution_count="4">
+<div id="33220df3" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> chromadb</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -610,12 +610,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"c3b6666c7f8b4a31a863630dcccd4b58","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"b960d8d6abc94b4681a98e3709fd5831","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Modelo: intfloat/e5-small-v2 (384 dims)
-Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
+Corpus temporal: /tmp/tmpnr0mtq4y/corpus</code></pre>
 </div>
 </div>
 <hr>
@@ -624,7 +624,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 <p>Creamos un corpus corporativo con dos tipos de datos: - <strong>3 PDFs</strong> de informes trimestrales de ventas (generados con <code>fpdf2</code>) - <strong>1 tabla SQLite</strong> de productos con precios, márgenes y stock</p>
 <section id="generar-los-pdfs-de-informes-trimestrales" class="level2">
 <h2 class="anchored" data-anchor-id="generar-los-pdfs-de-informes-trimestrales">1.1 Generar los PDFs de informes trimestrales</h2>
-<div id="684c6e29" class="cell" data-execution_count="5">
+<div id="aa93dfea" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fpdf <span class="im">import</span> FPDF</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PDF(FPDF):</span>
@@ -717,7 +717,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 <span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>    size_kb <span class="op">=</span> os.path.getsize(os.path.join(CORPUS_DIR, nombre)) <span class="op">/</span> <span class="dv">1024</span></span>
 <span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"   </span><span class="sc">{</span>nombre<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>size_kb<span class="sc">:.0f}</span><span class="ss"> KB"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>✅ 3 PDFs generados en /tmp/tmpvzaucptq/corpus
+<pre><code>✅ 3 PDFs generados en /tmp/tmpnr0mtq4y/corpus
    informe_q1_2026.pdf: 2 KB
    informe_q2_2026.pdf: 2 KB
    informe_q3_2026.pdf: 2 KB</code></pre>
@@ -726,7 +726,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 </section>
 <section id="crear-tabla-sqlite-de-productos" class="level2">
 <h2 class="anchored" data-anchor-id="crear-tabla-sqlite-de-productos">1.2 Crear tabla SQLite de productos</h2>
-<div id="05774015" class="cell" data-execution_count="6">
+<div id="fed06c6e" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>DB_PATH <span class="op">=</span> os.path.join(tempfile.mkdtemp(), <span class="st">"productos.db"</span>)</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>conn <span class="op">=</span> sqlite3.<span class="ex">connect</span>(DB_PATH)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -788,7 +788,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
   Escritorio Ajustable                | stock: 18</code></pre>
 </div>
 </div>
-<div id="d613bd06" class="cell" data-execution_count="7">
+<div id="679262a3" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convertir cada fila de productos a texto (mismo patrón que HPD 1 tabular)</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>df_productos <span class="op">=</span> pd.DataFrame(</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    productos_data,</span>
@@ -820,7 +820,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 <p>Indexamos ambas fuentes en collections separadas. Ya sabes hacer esto del HPD 1.</p>
 <section id="cargar-y-trocear-los-pdfs" class="level2">
 <h2 class="anchored" data-anchor-id="cargar-y-trocear-los-pdfs">2.1 Cargar y trocear los PDFs</h2>
-<div id="b5a7281c" class="cell" data-execution_count="8">
+<div id="436a5f6f" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_community.document_loaders <span class="im">import</span> PyPDFLoader</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_text_splitters <span class="im">import</span> RecursiveCharacterTextSplitter</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -859,7 +859,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 </section>
 <section id="indexar-pdfs-en-chroma" class="level2">
 <h2 class="anchored" data-anchor-id="indexar-pdfs-en-chroma">2.2 Indexar PDFs en Chroma</h2>
-<div id="43722b51" class="cell" data-execution_count="9">
+<div id="9665e2fc" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>collection_pdf <span class="op">=</span> client.get_or_create_collection(</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"hpd4_pdfs"</span>,</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    metadata<span class="op">=</span>{<span class="st">"hnsw:space"</span>: <span class="st">"cosine"</span>}</span>
@@ -882,7 +882,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 </section>
 <section id="indexar-productos-sql-en-chroma" class="level2">
 <h2 class="anchored" data-anchor-id="indexar-productos-sql-en-chroma">2.3 Indexar productos SQL en Chroma</h2>
-<div id="733a89d8" class="cell" data-execution_count="10">
+<div id="67c3ea1d" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>collection_sql <span class="op">=</span> client.get_or_create_collection(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"hpd4_productos"</span>,</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    metadata<span class="op">=</span>{<span class="st">"hnsw:space"</span>: <span class="st">"cosine"</span>}</span>
@@ -907,7 +907,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 <p>Implementamos un retriever para cada fuente y los combinamos. El retriever busca los k chunks más similares a la pregunta del usuario.</p>
 <section id="función-de-búsqueda-unificada" class="level2">
 <h2 class="anchored" data-anchor-id="función-de-búsqueda-unificada">3.1 Función de búsqueda unificada</h2>
-<div id="e4ffcdf1" class="cell" data-execution_count="11">
+<div id="70aa20e5" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> buscar_en_coleccion(collection, query, k<span class="op">=</span><span class="dv">3</span>):</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Busca los k chunks más similares en una colección de Chroma.</span></span>
@@ -957,7 +957,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 <section id="parte-4-re-ranker-con-cross-encoder" class="level1">
 <h1>Parte 4 — Re-ranker con cross-encoder</h1>
 <p>El retriever semántico (embeddings) es rápido pero poco preciso con matices. El re-ranker con cross-encoder relee cada chunk junto a la query y asigna una puntuación de relevancia más fina. Es más lento pero más preciso. Lo aplicamos <strong>después</strong> del retriever para reordenar los top-K resultados.</p>
-<div id="98cfcb57" class="cell" data-execution_count="12">
+<div id="16368303" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_community.document_compressors <span class="im">import</span> FlashrankRerank</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>reranker <span class="op">=</span> FlashrankRerank(top_n<span class="op">=</span><span class="dv">3</span>, model<span class="op">=</span><span class="st">"ms-marco-TinyBERT-L-2-v2"</span>)</span>
@@ -983,7 +983,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 <pre><code>✅ Re-ranker configurado (FlashrankRerank, top_n=3).</code></pre>
 </div>
 </div>
-<div id="17a3f01f" class="cell" data-execution_count="13">
+<div id="4eec9b86" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Probar el re-ranker: comparar antes vs. después</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>query_test <span class="op">=</span> <span class="st">"¿Qué productos de electrónica tienen mejor margen?"</span></span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>resultados_brutos <span class="op">=</span> buscar_combinada(query_test, k_pdf<span class="op">=</span><span class="dv">3</span>, k_sql<span class="op">=</span><span class="dv">3</span>)</span>
@@ -1023,7 +1023,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 <section id="parte-5-pipeline-rag-completo" class="level1">
 <h1>Parte 5 — Pipeline RAG completo</h1>
 <p>Unimos todos los componentes: búsqueda combinada → re-ranker → prompt con contexto → LLM.</p>
-<div id="fc6e6485" class="cell" data-execution_count="14">
+<div id="8cec6bc8" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa el prompt del RAG ───</span></span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>SYSTEM_PROMPT_RAG <span class="op">=</span> <span class="st">"""</span></span>
 <span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="st">Eres un analista de negocio que responde preguntas basándose EXCLUSIVAMENTE</span></span>
@@ -1066,7 +1066,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 <pre><code>✅ Pipeline RAG definido.</code></pre>
 </div>
 </div>
-<div id="a7c6c8c2" class="cell" data-execution_count="15">
+<div id="1e5ba81c" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env."</span>)</span>
 <span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1096,7 +1096,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 </ul>
 <section id="crear-dataset-de-preguntas-anotadas" class="level2">
 <h2 class="anchored" data-anchor-id="crear-dataset-de-preguntas-anotadas">6.1 Crear dataset de preguntas anotadas</h2>
-<div id="7254d8e7" class="cell" data-execution_count="16">
+<div id="04eedaf9" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: crea tu dataset de evaluación ───</span></span>
 <span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Cada pregunta necesita:</span></span>
 <span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   - question: la pregunta en lenguaje natural</span></span>
@@ -1130,7 +1130,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 </section>
 <section id="evaluar-con-ragas" class="level2">
 <h2 class="anchored" data-anchor-id="evaluar-con-ragas">6.2 Evaluar con RAGAS</h2>
-<div id="4ba39926" class="cell" data-execution_count="17">
+<div id="156d0a3a" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ragas <span class="im">import</span> evaluate</span>
 <span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ragas.metrics <span class="im">import</span> faithfulness, answer_relevancy, context_precision</span>
 <span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> datasets <span class="im">import</span> Dataset</span>
@@ -1161,7 +1161,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 <section id="parte-7-iteración-y-mejora" class="level1">
 <h1>Parte 7 — Iteración y mejora</h1>
 <p>La evaluación no es un trámite: es una herramienta para <strong>mejorar</strong>. Vamos a modificar componentes y medir el impacto.</p>
-<div id="b131e0f9" class="cell" data-execution_count="18">
+<div id="3464236e" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: tabla de iteraciones ───</span></span>
 <span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Ejecuta tu RAG con al menos 2 configuraciones distintas y compara:</span></span>
 <span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1191,7 +1191,7 @@ Corpus temporal: /tmp/tmpvzaucptq/corpus</code></pre>
 <section id="batería-de-pruebas" class="level1">
 <h1>Batería de pruebas</h1>
 <p>5 preguntas de dificultad creciente para validar tu pipeline completo.</p>
-<div id="9f5866ca" class="cell" data-execution_count="19">
+<div id="6b78191e" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>preguntas_prueba <span class="op">=</span> [</span>
 <span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Nivel 1: respuesta en un solo tipo de fuente</span></span>
 <span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"¿Cuál es el margen del Monitor 4K?"</span>,</span>
@@ -1432,7 +1432,7 @@ Note
   <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
 </footer>
 <script type="application/vnd.jupyter.widget-state+json">
-{"state":{"245a4d8a6c92460b9d3d51cb861884c0":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_d9bb9e9a7a4d4a93a00d9f1eab3b3b79","max":199,"min":0,"orientation":"horizontal","style":"IPY_MODEL_e504a376f7a44ee9b06a26b1be21f65f","tabbable":null,"tooltip":null,"value":199}},"2563114b431948aaad68a64fb1220e9e":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"3b8f32ca0952471ab592713eb0755f1a":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_2563114b431948aaad68a64fb1220e9e","placeholder":"​","style":"IPY_MODEL_ca9325ff68d343e392c08e8117beef9e","tabbable":null,"tooltip":null,"value":"Loading weights: 100%"}},"5c4cb8839c914488ab963a8a02ae7170":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"8ae93fe45dff429cbd61ed61846309d7":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_a04f2bb3c6ba423f9ad8120ddfeb40b4","placeholder":"​","style":"IPY_MODEL_5c4cb8839c914488ab963a8a02ae7170","tabbable":null,"tooltip":null,"value":" 199/199 [00:00&lt;00:00, 15087.15it/s]"}},"93cf4a8f08bb49f1a020b35532c8f91e":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"a04f2bb3c6ba423f9ad8120ddfeb40b4":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"c3b6666c7f8b4a31a863630dcccd4b58":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_3b8f32ca0952471ab592713eb0755f1a","IPY_MODEL_245a4d8a6c92460b9d3d51cb861884c0","IPY_MODEL_8ae93fe45dff429cbd61ed61846309d7"],"layout":"IPY_MODEL_93cf4a8f08bb49f1a020b35532c8f91e","tabbable":null,"tooltip":null}},"ca9325ff68d343e392c08e8117beef9e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"d9bb9e9a7a4d4a93a00d9f1eab3b3b79":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"e504a376f7a44ee9b06a26b1be21f65f":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}}},"version_major":2,"version_minor":0}
+{"state":{"062a04c17d5841ad95ee92035598782e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"0dbb37330ecb411b90a096ab8f3042e8":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"1ade2b05ffed4a209101764d2d4e0b7a":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_2fdbbbbc4e1f425784cb90ead9908511","max":199,"min":0,"orientation":"horizontal","style":"IPY_MODEL_062a04c17d5841ad95ee92035598782e","tabbable":null,"tooltip":null,"value":199}},"2fdbbbbc4e1f425784cb90ead9908511":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"51cdcafa0ed2481f879a144a187dac3f":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"5afd101eab3b4584bca3ad5d6beafb42":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_c3ef3a6cfbb14bd3829137d7b131bcc5","placeholder":"​","style":"IPY_MODEL_fdb3a75ba4cc4983960ab7d0ba75cf73","tabbable":null,"tooltip":null,"value":" 199/199 [00:00&lt;00:00, 15224.47it/s]"}},"61795ba036a5463cad34bfddfaea3677":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_0dbb37330ecb411b90a096ab8f3042e8","placeholder":"​","style":"IPY_MODEL_51cdcafa0ed2481f879a144a187dac3f","tabbable":null,"tooltip":null,"value":"Loading weights: 100%"}},"6c95a9a431344896b57374c82fc7fbbe":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"b960d8d6abc94b4681a98e3709fd5831":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_61795ba036a5463cad34bfddfaea3677","IPY_MODEL_1ade2b05ffed4a209101764d2d4e0b7a","IPY_MODEL_5afd101eab3b4584bca3ad5d6beafb42"],"layout":"IPY_MODEL_6c95a9a431344896b57374c82fc7fbbe","tabbable":null,"tooltip":null}},"c3ef3a6cfbb14bd3829137d7b131bcc5":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"fdb3a75ba4cc4983960ab7d0ba75cf73":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}}},"version_major":2,"version_minor":0}
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1558,7 +1558,7 @@ Note
     }
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);
-        var filterRegex = new RegExp('/' + window.location.host + '/');
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
       var isInternal = (href) => {
           return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
       }
