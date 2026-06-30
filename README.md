@@ -112,8 +112,6 @@ m10_quarto/
 ├── styles.css                   # Estilos CSS personalizados
 ├── requirements.txt             # Dependencias Python fijadas
 ├── generate_notebooks.sh        # Genera .ipynb desde .qmd
-├── .github/workflows/
-│   └── deploy.yml               # CI/CD a GitHub Pages
 └── AGENTS.md                    # Instrucciones para asistentes IA
 ```
 
@@ -124,9 +122,36 @@ m10_quarto/
 3. Edita `_quarto.yml` para cambiar el sidebar, el grid o el tema
 4. Edita `styles.css` para estilos personalizados
 
-### Despliegue
+### Despliegue (publicación manual con `quarto publish`)
 
-El sitio se despliega automáticamente a GitHub Pages mediante GitHub Actions (`.github/workflows/deploy.yml`) al hacer push a `main`. También puedes lanzarlo manualmente desde la pestaña **Actions** del repositorio.
+**No hay CI/CD en este repositorio.** Los `push` a `main` no despliegan nada: la publicación se hace en local con la CLI de Quarto.
+
+```bash
+# Previsualizar antes de publicar (opcional)
+QUARTO_PYTHON=.venv/bin/python3 quarto preview
+
+# Publicar a GitHub Pages
+quarto publish gh-pages
+```
+
+`quarto publish gh-pages` renderiza el sitio, crea/actualiza la rama `gh-pages` con el contenido de `_site/` y la sube al remoto. GitHub Pages sirve esa rama automáticamente.
+
+#### Configuración en GitHub (una sola vez)
+
+En **Settings → Pages** del repositorio:
+- **Source:** `Deploy from a branch`
+- **Branch:** `gh-pages` / `(root)`
+
+#### Requisitos
+
+- Quarto CLI 1.6+ instalado en local.
+- `git` con permisos de push al repo.
+- No se necesita `LLM_API_KEY` en local: las celdas con `#| eval: false` se omiten en `quarto render`.
+
+#### Limpieza recomendada tras la migración
+
+- En **Settings → Environments**, eliminar el environment `github-pages` (ya no se usa).
+- Si existían ejecuciones previas de Actions, quedan en el historial pero dejan de generarse runs nuevos.
 
 ### Generar notebooks .ipynb
 

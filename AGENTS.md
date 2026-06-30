@@ -53,8 +53,6 @@ m10_quarto/
 ├── styles.css                   # Estilos CSS personalizados
 ├── requirements.txt             # Dependencias Python fijadas
 ├── generate_notebooks.sh        # Genera .ipynb desde .qmd
-├── .github/workflows/
-│   └── deploy.yml               # GitHub Actions → GitHub Pages
 └── AGENTS.md                    # Este archivo
 ```
 
@@ -100,12 +98,43 @@ Los `.ipynb` que se enlazan desde los badges "Open in Colab" se generan desde lo
 
 Esto descubre automáticamente todos los `.qmd` con `engine: jupyter` en `bloque1/..4/` y `evaluables/`, y produce los `.ipynb` correspondientes en `notebooks/` (preservando la estructura de carpetas).
 
-## Despliegue (CI/CD)
+## Despliegue (publicación manual con `quarto publish`)
 
-El repositorio usa GitHub Actions (`.github/workflows/deploy.yml`) que:
-1. Instala Python y dependencias.
-2. Ejecuta `quarto render` con `LLM_API_KEY` desde secrets.
-3. Publica en GitHub Pages.
+**No hay CI/CD en este repositorio.** Los `push` a `main` no despliegan nada. La publicación se hace en local, desde la máquina del mantenedor, con la CLI de Quarto.
+
+### Procedimiento
+
+```bash
+# 1. Renderizar (opcional, para previsualizar antes de publicar)
+QUARTO_PYTHON=.venv/bin/python3 quarto preview
+
+# 2. Publicar a GitHub Pages
+quarto publish gh-pages
+```
+
+`quarto publish gh-pages`:
+1. Ejecuta `quarto render` y genera `_site/`.
+2. Crea (si no existe) o actualiza la rama `gh-pages` con el contenido de `_site/`.
+3. Hace `git push` de esa rama al remoto.
+
+### Configuración requerida en GitHub (una sola vez)
+
+En **Settings → Pages** del repositorio:
+- **Source:** `Deploy from a branch`
+- **Branch:** `gh-pages` / `(root)`
+
+A partir de ahí, cada `quarto publish gh-pages` actualiza la rama `gh-pages` y GitHub Pages la sirve automáticamente (sin Actions).
+
+### Requisitos en la máquina del mantenedor
+
+- Quarto CLI 1.6+ instalado localmente.
+- `git` con permisos de push al repo (escritura sobre la rama `gh-pages`).
+- No se necesita `LLM_API_KEY` en local: las celdas con `#| eval: false` se omiten en `quarto render`.
+
+### Limpieza recomendada tras la migración
+
+- En **Settings → Environments**, eliminar el environment `github-pages` (ya no se usa).
+- Si existían ejecuciones previas de Actions, quedan en el historial pero dejan de generarse runs nuevos.
 
 ## Notas importantes
 
