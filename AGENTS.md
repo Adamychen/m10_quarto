@@ -49,7 +49,9 @@ m10_quarto/
 │   ├── logo_cfp.png
 │   ├── multi-head-attention.webp
 │   └── sbert_figure_2.png
-├── includes/footer.html         # Pie de página
+├── includes/
+│   ├── footer.html              # Pie de página
+│   └── mermaid-init.js          # Tema Mermaid del sitio (paleta Python + semánticos)
 ├── styles.css                   # Estilos CSS personalizados
 ├── requirements.txt             # Dependencias Python fijadas
 ├── generate_notebooks.sh        # Genera .ipynb desde .qmd
@@ -146,3 +148,32 @@ A partir de ahí, cada `quarto publish gh-pages` actualiza la rama `gh-pages` y 
 - `scripts/`, `solutions/` y `guias/` están en `.gitignore` y excluidos del render. Los scripts de corrección (`scripts/corregir_hpdN.py`) referenciados en los `.qmd` evaluables se desarrollarán en una iteración futura.
 - `mod10.md` (raíz) es la guía docente pública del módulo: se renderiza (`*.md` en `_quarto.yml`) y aparece en el sidebar bajo "Inicio".
 - Autoría: Adam Leiyi Chen Abolacio, Fernando Sancho Caparrini (Universidad de Sevilla).
+
+## Paleta de colores Mermaid
+
+El sitio usa una paleta de 6 colores con significado semántico fijo. El tema base está definido en `includes/mermaid-init.js` (carga vía `mermaid: init` en `_quarto.yml`) y aplica los azules y amarillo de Python como colores por defecto. El resto se aplica por diagrama con `classDef`.
+
+| Significado              | Hex       | classDef sugerido  | Notas                          |
+|--------------------------|-----------|--------------------|--------------------------------|
+| Input / fuente           | `#4B8BBE` | `metric` / `input` | Azul Python claro              |
+| Proceso / orquestación   | `#306998` | `proc`             | Azul Python oscuro             |
+| Resultado intermedio     | `#FFD43B` | `doc`              | Amarillo Python (texto negro)  |
+| Aviso / herramienta      | `#e65100` | `obs`              | Naranja                        |
+| Éxito / meta final       | `#2e7d32` | `out` / `ready`    | Verde                          |
+| Riesgo / error           | `#c62828` | `risk`             | Rojo                           |
+
+Texto blanco (`color:#fff`) sobre los oscuros, negro (`color:#000`) sobre amarillo. Bordes con un tono más oscuro del mismo color (p. ej. `#1e3a5f` para los azules).
+
+**Cómo usar `classDef`** en un diagrama:
+
+```
+flowchart LR
+    classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef out   fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
+
+    A[Pregunta del usuario]:::input
+    B[LLM]:::input
+    C[Respuesta validada]:::out
+
+    A --> B --> C
+```

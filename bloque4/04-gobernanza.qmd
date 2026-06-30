@@ -15,35 +15,77 @@ Evaluar modelos generativos con métricas objetivas, detectar y mitigar alucinac
 
 ## Mapa conceptual del bloque
 
+### 📊 Evaluación
+
 ```{mermaid}
-graph TD
-    subgraph "Evaluación"
-        A[Métricas automáticas<br/>ROUGE · BERTScore] --> D[LLM-as-a-judge]
-        B[Benchmarks MTEB] --> D
-    end
-    subgraph "Riesgos"
-        E[Alucinaciones] --> H[Mitigación<br/>grounding · citation]
-        F[Sesgo] --> I[Auditoría]
-        G[Privacidad · PII] --> J[Masking · DP]
-    end
-    subgraph "Documentación"
-        K[Model Card] --> N[Transparencia]
-        L[System Card] --> N
-        M[Audit Log] --> N
-    end
-    subgraph "Despliegue"
-        O[On-premise · Ollama] --> P[API Gateway]
-        Q[Cloud · OpenAI-compat] --> P
-        P --> R[Observabilidad<br/>Langfuse · LangSmith]
-        R --> S[Auditoría continua]
-    end
-    style A fill:#4B8BBE,color:#fff
-    style D fill:#306998,color:#fff
-    style E fill:#c62828,color:#fff
-    style H fill:#2e7d32,color:#fff
-    style K fill:#FFD43B,color:#000
-    style O fill:#306998,color:#fff
-    style R fill:#e65100,color:#fff
+flowchart LR
+    classDef metric fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef bench fill:#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef out fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
+
+    A["Métricas automáticas<br/>ROUGE · BERTScore · BLEU"]:::metric
+    B["Benchmarks<br/>MTEB · GLUE"]:::bench
+    C["LLM-as-a-judge"]:::out
+    D["RAGAS · DeepEval<br/>frameworks"]:::out
+
+    A --> C
+    B --> C
+    C --> D
+```
+
+### ⚠️ Riesgos
+
+```{mermaid}
+flowchart LR
+    classDef risk fill:#c62828,stroke:#7f0000,color:#fff,stroke-width:1.5px
+    classDef out fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
+
+    E["Alucinaciones"]:::risk
+    F["Sesgo"]:::risk
+    G["Privacidad · PII"]:::risk
+    H["Mitigación<br/>grounding · citation · DP"]:::out
+
+    E --> H
+    F --> H
+    G --> H
+```
+
+### 📋 Documentación
+
+```{mermaid}
+flowchart LR
+    classDef doc fill:#FFD43B,stroke:#b8860b,color:#1a1a1a,stroke-width:1.5px
+    classDef out fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
+
+    K["Model Card"]:::doc
+    L["System Card"]:::doc
+    M["Audit Log"]:::doc
+    N["Transparencia"]:::out
+
+    K --> N
+    L --> N
+    M --> N
+```
+
+### 🚀 Despliegue
+
+```{mermaid}
+flowchart LR
+    classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef proc fill:#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef obs fill:#e65100,stroke:#bf360c,color:#fff,stroke-width:2px
+    classDef out fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
+
+    O["On-premise<br/>Ollama · vLLM"]:::input
+    P["Cloud<br/>OpenAI-compat"]:::input
+    Q["API Gateway"]:::proc
+    R["Observabilidad<br/>Langfuse · LangSmith"]:::obs
+    S["Auditoría continua"]:::out
+
+    O --> Q
+    P --> Q
+    Q --> R
+    R ==> S
 ```
 
 Las cuatro áreas de este bloque son **complementarias y se refuerzan mutuamente**: no basta con que el sistema funcione (Bloques 1-3), debe ser medible, trazable, justo y privado. La gobernanza convierte un prototipo en un producto.
@@ -809,17 +851,25 @@ print(cache.buscar(emb_3))  # debería ser None
 ## Resumen del bloque
 
 ```{mermaid}
-graph TD
-    subgraph "Lo que has aprendido"
-        A[Evaluar<br/>métricas + LLM-as-a-judge] --> F[Sistema listo<br/>para producción]
-        B[Detectar alucinaciones<br/>grounding + citation] --> F
-        C[Anonimizar PII<br/>masking + DP] --> F
-        D[Auditar sesgo] --> F
-        E[Documentar<br/>Model Card + System Card] --> F
-    end
-    F --> G["Proyecto integrador<br/>(CE-1 a CE-6)"]
-    style F fill:#2e7d32,color:#fff
-    style G fill:#e65100,color:#fff
+flowchart LR
+    classDef skill fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef ready fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2.5px
+    classDef goal fill:#e65100,stroke:#bf360c,color:#fff,stroke-width:2.5px
+
+    A["Evaluar<br/>métricas + LLM-as-a-judge"]:::skill
+    B["Detectar alucinaciones<br/>grounding + citation"]:::skill
+    C["Anonimizar PII<br/>masking + DP"]:::skill
+    D["Auditar sesgo"]:::skill
+    E["Documentar<br/>Model Card + System Card"]:::skill
+    F["Sistema listo<br/>para producción"]:::ready
+    G["Proyecto integrador<br/>CE-1 a CE-6"]:::goal
+
+    A --> F
+    B --> F
+    C --> F
+    D --> F
+    E --> F
+    F ==> G
 ```
 
 Este bloque te da las herramientas para llevar tus sistemas IA a **calidad de producción**:

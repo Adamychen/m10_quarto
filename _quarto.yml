@@ -115,7 +115,7 @@ format:
     code-fold: false
     code-tools: true
     mermaid:
-      theme: neutral
+      init: includes/mermaid-init.js
     include-after-body: includes/footer.html
   ipynb:
     embed-resources: true

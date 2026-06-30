@@ -92,19 +92,19 @@ graph TD
         L1C --- L0E
         L1D --- L0F
     end
-    style L2 fill:#E74C3C,color:#fff
-    style L2A fill:#E74C3C,color:#fff
-    style L2B fill:#E74C3C,color:#fff
-    style L1A fill:#3498DB,color:#fff
-    style L1B fill:#3498DB,color:#fff
-    style L1C fill:#3498DB,color:#fff
-    style L1D fill:#3498DB,color:#fff
-    style L0A fill:#2ECC71,color:#fff
-    style L0B fill:#2ECC71,color:#fff
-    style L0C fill:#2ECC71,color:#fff
-    style L0D fill:#2ECC71,color:#fff
-    style L0E fill:#2ECC71,color:#fff
-    style L0F fill:#2ECC71,color:#fff
+    style L2 fill:#c62828,color:#fff
+    style L2A fill:#c62828,color:#fff
+    style L2B fill:#c62828,color:#fff
+    style L1A fill:#4B8BBE,color:#fff
+    style L1B fill:#4B8BBE,color:#fff
+    style L1C fill:#4B8BBE,color:#fff
+    style L1D fill:#4B8BBE,color:#fff
+    style L0A fill:#2e7d32,color:#fff
+    style L0B fill:#2e7d32,color:#fff
+    style L0C fill:#2e7d32,color:#fff
+    style L0D fill:#2e7d32,color:#fff
+    style L0E fill:#2e7d32,color:#fff
+    style L0F fill:#2e7d32,color:#fff
 ```
 
 ### Métricas de similitud

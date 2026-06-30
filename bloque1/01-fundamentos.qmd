@@ -28,6 +28,23 @@ Comprender la arquitectura que subyace a los LLMs modernos y dominar la represen
 
 ## Mapa conceptual del bloque
 
+::: {.callout-note}
+## Leyenda de colores
+
+A lo largo del módulo, los diagramas usan una paleta consistente para que
+identifiques rápidamente el rol de cada elemento. Los azules y el amarillo
+coinciden con la paleta oficial de **Python**.
+
+| | Significado |
+|---|---|
+| <span style="display:inline-block;width:1em;height:1em;background:#4B8BBE;border:1px solid #1e3a5f;vertical-align:middle"></span> | **Azul claro** — Input / fuente de datos |
+| <span style="display:inline-block;width:1em;height:1em;background:#306998;border:1px solid #1e3a5f;vertical-align:middle"></span> | **Azul oscuro** — Proceso / orquestación |
+| <span style="display:inline-block;width:1em;height:1em;background:#FFD43B;border:1px solid #b8860b;vertical-align:middle"></span> | **Amarillo** — Resultado intermedio |
+| <span style="display:inline-block;width:1em;height:1em;background:#e65100;border:1px solid #bf360c;vertical-align:middle"></span> | **Naranja** — Aviso / herramienta |
+| <span style="display:inline-block;width:1em;height:1em;background:#2e7d32;border:1px solid #0d3010;vertical-align:middle"></span> | **Verde** — Éxito / meta final |
+| <span style="display:inline-block;width:1em;height:1em;background:#c62828;border:1px solid #7f0000;vertical-align:middle"></span> | **Rojo** — Riesgo / error |
+:::
+
 ```{mermaid}
 graph TD
     subgraph "Fundamentos"
