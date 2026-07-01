@@ -85,12 +85,13 @@ else:
     print("✅ ChatOpenAI configurado. Las celdas de ejemplo funcionarán correctamente.")
 ```
 
-## LangChain
+## LangChain {#sec-langchain}
 
-### ¿Qué es y para qué sirve?
+### ¿Qué es y para qué sirve? {#sec-que-es-langchain}
 
 LangChain es un **framework de orquestación** para aplicaciones con LLMs. Si usar la API de OpenAI directamente es como cocinar con un solo fuego, LangChain te da una cocina completa: fogones, temporizador, nevera con ingredientes y libro de recetas.
 
+::: {#fig-langchain-componentes}
 ```{mermaid}
 graph TD
     subgraph "Aplicación con LangChain"
@@ -108,8 +109,11 @@ graph TD
     style B fill:#306998,color:#fff
     style C fill:#2e7d32,color:#fff
 ```
+:::
 
 **Componentes clave que veremos:**
+
+: Componentes principales de LangChain {#tbl-langchain-componentes}
 
 | Componente | ¿Qué hace? |
 |---|---|
@@ -120,7 +124,7 @@ graph TD
 | **Output Parsers** | Estructurar la salida del modelo |
 | **Callbacks** | Monitorizar y loguear la ejecución |
 
-### LCEL — LangChain Expression Language
+### LCEL — LangChain Expression Language {#sec-lcel}
 
 LCEL usa el operador `|` (pipe) para encadenar componentes, como en las tuberías de Unix:
 
@@ -145,6 +149,7 @@ else:
     print(resultado)
 ```
 
+::: {#fig-lcel-pipe}
 ```{mermaid}
 graph LR
     A["prompt<br/>{concepto}"] -->|"|"| B["llm<br/>Qwen3"]
@@ -154,6 +159,7 @@ graph LR
     style B fill:#306998,color:#fff
     style C fill:#2e7d32,color:#fff
 ```
+:::
 
 **¿Por qué LCEL?** Esta sintaxis de tubería permite:
 - Componer cadenas complejas de forma legible
@@ -176,7 +182,7 @@ else:
     print(cadena_compleja.invoke({"concepto": "p-valor", "num_palabras": "30"}))
 ```
 
-### Prompt Templates
+### Prompt Templates {#sec-prompt-templates}
 
 Las plantillas permiten separar la lógica del prompt del código. Soporta variables, few-shot examples y carga desde archivo:
 
@@ -212,7 +218,7 @@ print("\n--- Prompt generado con few-shot ---")
 print(plantilla_few_shot.format(pregunta="¿Qué es una moda?"))
 ```
 
-### Memoria conversacional
+### Memoria conversacional {#sec-memoria-conversacional}
 
 Sin memoria, cada llamada al LLM es independiente: el modelo no recuerda lo que dijiste antes. La memoria almacena el historial y lo inyecta en cada nuevo prompt:
 
@@ -257,6 +263,8 @@ else:
 ::: {.callout-tip}
 ## Tipos de memoria en LangChain
 
+: Tipos de memoria disponibles en LangChain {#tbl-tipos-memoria}
+
 | Tipo | Estrategia | Ideal para |
 |---|---|---|
 | `ConversationBufferMemory` | Guarda todo el historial | Conversaciones cortas |
@@ -265,7 +273,7 @@ else:
 | `ConversationTokenBufferMemory` | Limita por número de tokens | Control de costes |
 :::
 
-### Retrievers
+### Retrievers {#sec-retrievers}
 
 Un **retriever** busca documentos relevantes en una base de conocimiento (vectorial o clásica) y los inyecta en el prompt. Es el corazón del patrón RAG (Retrieval-Augmented Generation):
 
@@ -327,6 +335,7 @@ else:
 import os as _os; _os.unlink(doc_path)
 ```
 
+::: {#fig-rag-patron}
 ```{mermaid}
 graph LR
     A[Pregunta<br/>usuario] --> B[Retriever<br/>búsqueda semántica]
@@ -340,8 +349,9 @@ graph LR
     style C fill:#FFD43B,color:#000
     style F fill:#2e7d32,color:#fff
 ```
+:::
 
-### Output Parsers
+### Output Parsers {#sec-output-parsers}
 
 Los parsers convierten la salida textual del LLM en objetos Python utilizables:
 
@@ -378,7 +388,7 @@ else:
     print(f"Recomendación: {resultado['recomendacion']}")
 ```
 
-### Callbacks
+### Callbacks {#sec-callbacks}
 
 Los callbacks permiten ejecutar código en puntos clave del pipeline:
 
@@ -411,8 +421,9 @@ else:
 Los callbacks son la base del **tracing** (LangSmith), el **logging** y la **monitorización** en producción. Te permiten saber exactamente qué está pasando dentro de tus cadenas y cuánto te está costando.
 :::
 
-### Resumen del flujo completo
+### Resumen del flujo completo {#sec-resumen-flujo-langchain}
 
+::: {#fig-flujo-completo-langchain}
 ```{mermaid}
 graph TD
     A[Usuario pregunta] --> B[Memory<br/>carga historial]
@@ -426,5 +437,6 @@ graph TD
     style A fill:#4B8BBE,color:#fff
     style H fill:#2e7d32,color:#fff
 ```
+:::
 
 > **Lectura recomendada:** [LangChain Expression Language (LCEL)](https://python.langchain.com/docs/concepts/lcel/)

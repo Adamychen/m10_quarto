@@ -7,7 +7,7 @@ engine: jupyter
 
 > **Duración:** 4h
 >
-> **Competencias:** [CE-2](../index.qmd#competencias-específicas)
+> **Competencias:** [CE-2](../index.qmd#sec-competencias-especificas)
 
 ::: {.callout-tip icon=false}
 ## Objetivos
@@ -43,7 +43,7 @@ herramientas + bucle de decisión) es la misma para cualquier dataset de tu sect
 ventas, finanzas, salud, legal, logística.
 :::
 
-# Parte 1 — Setup
+# Parte 1 — Setup {#sec-hpd2-p1}
 
 Empezamos instalando las dependencias necesarias y configurando el LLM.
 
@@ -132,7 +132,7 @@ else:
     print("✅ LLM configurado.")
 ```
 
-# Parte 2 — Dataset: Titanic
+# Parte 2 — Dataset: Titanic {#sec-hpd2-p2}
 
 Cargamos el dataset del Titanic para que el agente tenga datos reales que analizar.
 
@@ -182,9 +182,9 @@ plt.tight_layout()
 plt.show()
 ```
 
-# Parte 3 — Herramientas del agente
+# Parte 3 — Herramientas del agente {#sec-hpd2-p3}
 
-## Tool 1: consulta_pandas
+## Tool 1: consulta_pandas {#sec-hpd2-tool-pandas}
 
 Permite al LLM ejecutar expresiones de pandas sobre el DataFrame.
 
@@ -238,7 +238,7 @@ print("3. Pasajeros por clase:")
 print("\n⚠️  Descomenta las líneas anteriores cuando hayas implementado la tool.")
 ```
 
-## Tools de visualización
+## Tools de visualización {#sec-hpd2-tools-viz}
 
 Permiten al LLM generar gráficos con matplotlib sobre los datos del Titanic.
 
@@ -280,7 +280,7 @@ print("=== Probando herramientas de visualización (sin LLM) ===")
 print("⚠️  Descomenta las líneas anteriores cuando hayas implementado las tools.")
 ```
 
-### Tool libre: código matplotlib arbitrario
+### Tool libre: código matplotlib arbitrario {#sec-hpd2-tool-libre}
 
 Las 3 tools anteriores cubren los casos más comunes. Para gráficos más complejos
 (dispersión, heatmap, 3D...), esta tool ejecuta código matplotlib libre:
@@ -341,9 +341,9 @@ Fáciles de implementar y seguras.
 Más potente, pero requiere entender `exec()` y `BytesIO`.
 :::
 
-# Parte 4 — Construir el agente ReAct
+# Parte 4 — Construir el agente ReAct {#sec-hpd2-p4}
 
-## Prompt del agente
+## Prompt del agente {#sec-hpd2-prompt-agente}
 
 Definimos el system prompt que le dice al modelo su rol y cómo usar las herramientas.
 
@@ -367,7 +367,7 @@ print(f"System prompt actual ({len(SYSTEM_PROMPT)} caracteres):")
 print(SYSTEM_PROMPT[:200] + "..." if len(SYSTEM_PROMPT) > 200 else SYSTEM_PROMPT)
 ```
 
-## Crear el agente
+## Crear el agente {#sec-hpd2-crear-agente}
 
 ```{python}
 #| echo: true
@@ -392,7 +392,7 @@ else:
         print("⚠️  Completa la creación del agente.")
 ```
 
-# Parte 5 — Batería de pruebas
+# Parte 5 — Batería de pruebas {#sec-hpd2-p5}
 
 Probamos el agente con preguntas de dificultad creciente. Observa cómo razona y qué herramientas elige.
 
@@ -432,7 +432,7 @@ else:
             print(f"ERROR: {e}")
 ```
 
-## Tabla de evaluación
+## Tabla de evaluación {#sec-hpd2-evaluacion}
 
 Completa esta tabla con tus observaciones sobre cada pregunta:
 
@@ -448,6 +448,7 @@ Completa esta tabla con tus observaciones sobre cada pregunta:
 └────┴──────────────────────────────────┴─────────────────┴──────────┴─────────────────────────┘
 ```
 
+::: {#fig-hpd2-agente-react}
 ```{mermaid}
 graph TD
     subgraph "Agente ReAct — Titanic"
@@ -471,6 +472,7 @@ graph TD
     style F fill:#FFD43B,color:#000
     style I fill:#2e7d32,color:#fff
 ```
+:::
 
 ---
 
@@ -484,11 +486,11 @@ producción, cada llamada extra al LLM cuesta tokens y añade latencia. La regla
 empieza con una cadena simple. Si no basta, añade un agente.
 :::
 
-# Ejercicios
+# Ejercicios {#sec-hpd2-ejercicios}
 
 ::: {.callout-tip icon=false}
 
-### Para afianzar lo aprendido (~45 min)
+### Para afianzar lo aprendido (~45 min) {#sec-hpd2-ejercicios-afianzar}
 
 Estos ejercicios no se entregan, pero te preparan para el HPD 2 evaluable y el proyecto integrador.
 
@@ -518,7 +520,7 @@ Ejecuta las mismas 5 preguntas. ¿Cómo cambian las respuestas?
 
 ---
 
-### Para seguir explorando (opcional)
+### Para seguir explorando (opcional) {#sec-hpd2-ejercicios-explorando}
 
 **E1 — Manejo de errores robusto**
 

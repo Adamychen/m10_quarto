@@ -85,11 +85,13 @@ else:
     print("✅ ChatOpenAI configurado. Las celdas de ejemplo funcionarán correctamente.")
 ```
 
-## Diseño de Agentes Inteligentes
+## Diseño de Agentes Inteligentes {#sec-agentes}
 
-### ¿Qué es un agente?
+### ¿Qué es un agente? {#sec-que-es-agente}
 
 Un **agente** es un sistema que combina un LLM con un conjunto de herramientas y un **bucle de decisión autónomo**. La diferencia clave con un simple chatbot es:
+
+: Diferencias entre un chatbot simple y un agente con herramientas {#tbl-chatbot-vs-agente}
 
 | Chatbot | Agente |
 |---|---|
@@ -98,6 +100,7 @@ Un **agente** es un sistema que combina un LLM con un conjunto de herramientas y
 | Un solo turno | Múltiples pasos hasta resolver la tarea |
 | Sin planificación | Planifica, ejecuta, observa, corrige |
 
+::: {#fig-chatbot-vs-agente}
 ```{mermaid}
 graph LR
     subgraph "Chatbot"
@@ -118,14 +121,16 @@ graph LR
     style G fill:#e65100,color:#fff
     style I fill:#2e7d32,color:#fff
 ```
+:::
 
-### El patrón ReAct (Reasoning + Acting)
+### El patrón ReAct (Reasoning + Acting) {#sec-react}
 
 **ReAct** es el patrón de diseño de agentes más popular. El LLM alterna entre:
 - **Reasoning (razonar):** escribir un plan o pensamiento en lenguaje natural
 - **Acting (actuar):** invocar una herramienta con parámetros concretos
 - **Observation (observar):** recibir el resultado de la herramienta y decidir el siguiente paso
 
+::: {#fig-react-bucle}
 ```{mermaid}
 graph TD
     A[Usuario: pregunta] --> B[Thought<br/>¿Qué necesito saber?]
@@ -141,8 +146,9 @@ graph TD
     style D fill:#FFD43B,color:#000
     style F fill:#2e7d32,color:#fff
 ```
+:::
 
-### Tool Calling (Function Calling nativo)
+### Tool Calling (Function Calling nativo) {#sec-tool-calling}
 
 LangChain abstrae el bucle ReAct con `create_agent`:
 
@@ -216,7 +222,7 @@ else:
             print(f"ERROR: {e}")
 ```
 
-### Cómo definir una buena herramienta
+### Cómo definir una buena herramienta {#sec-buena-herramienta}
 
 El secreto de un agente que funciona está en cómo describes las herramientas:
 
@@ -266,7 +272,7 @@ print(repr(consultar_ventas_por_mes.name + ": " + consultar_ventas_por_mes.descr
 5. **Idempotencia cuando sea posible**: misma entrada → misma salida
 :::
 
-### Pipeline RAG Supervisado con LangGraph
+### Pipeline RAG Supervisado con LangGraph {#sec-rag-langgraph}
 
 LangGraph permite construir flujos complejos donde el LLM decide qué hacer en cada paso.
 En este ejemplo, un **supervisor** recibe una pregunta sobre productos y decide si consultar
@@ -407,7 +413,9 @@ else:
         print(f"\nRESPUESTA: {result['respuesta']}")
 ```
 
-### Agentes síncronos vs asíncronos
+### Agentes síncronos vs asíncronos {#sec-sync-vs-async}
+
+: Comparativa entre agentes síncronos y asíncronos {#tbl-sync-vs-async}
 
 | Característica | Síncrono | Asíncrono |
 |---|---|---|
@@ -434,8 +442,9 @@ r2 = consulta_rapida.invoke({"texto": "ventas febrero"})
 print(f"Síncrono: {time.time() - inicio:.2f}s → {r1}, {r2}")
 ```
 
-### Arquitecturas multi-agente
+### Arquitecturas multi-agente {#sec-multi-agente}
 
+::: {#fig-multi-agente}
 ```{mermaid}
 graph TD
     subgraph "Arquitectura Supervisor"
@@ -463,8 +472,9 @@ graph TD
     style S fill:#e65100,color:#fff
     style V fill:#306998,color:#fff
 ```
+:::
 
-### Ejemplo final: agente analítico con pandas
+### Ejemplo final: agente analítico con pandas {#sec-ejemplo-pandas}
 
 Uniendo todos los conceptos, creamos un agente que analiza datos con pandas:
 
@@ -528,7 +538,7 @@ if LLM_KEY:
     print(f"RESPUESTA: {result['messages'][-1].content}")
 ```
 
-### Cuándo usar un agente
+### Cuándo usar un agente {#sec-cuando-usar-agente}
 
 ::: {.callout-important}
 ## No todo necesita un agente

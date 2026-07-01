@@ -7,7 +7,7 @@ engine: jupyter
 
 > **Duración:** 4h
 >
-> **Competencias:** [CE-3](../index.qmd#competencias-específicas)
+> **Competencias:** [CE-3](../index.qmd#sec-competencias-especificas)
 
 ::: {.callout-tip icon=false}
 ## Objetivos
@@ -45,7 +45,7 @@ arquitectura escala a cualquier fuente de datos: SQL, APIs REST, archivos locale
 servicios cloud. El protocolo es el mismo.
 :::
 
-# Parte 1 — Setup y dataset corporativo
+# Parte 1 — Setup y dataset corporativo {#sec-hpd3-p1}
 
 Empezamos instalando dependencias y creando una base de datos SQLite con 3 tablas interrelacionadas: `empleados`, `proyectos` y `horas`.
 
@@ -115,7 +115,7 @@ np.random.seed(42)
 print("Librerías cargadas correctamente.")
 ```
 
-## 1.1 Crear la base de datos corporativa
+## 1.1 Crear la base de datos corporativa {#sec-hpd3-bd-corporativa}
 
 Vamos a crear 3 tablas que simulan los datos de una empresa con ~30 empleados repartidos en 5 departamentos, 12 proyectos y 150 registros de horas imputadas.
 
@@ -304,11 +304,11 @@ for row in db.execute("""
 
 ---
 
-# Parte 2 — Primer servidor MCP
+# Parte 2 — Primer servidor MCP {#sec-hpd3-p2}
 
 Creamos un servidor con **FastMCP** que expone una herramienta de consulta SQL. De momento **sin sanitización** — la añadiremos en la Parte 5 cuando hablemos de seguridad.
 
-## 2.1 Servidor mínimo con una tool
+## 2.1 Servidor mínimo con una tool {#sec-hpd3-servidor-minimo}
 
 ```{python}
 #| echo: true
@@ -371,11 +371,11 @@ FastMCP es una capa simplificada sobre el SDK `mcp`. Ventajas:
 
 ---
 
-# Parte 3 — Resources y más herramientas
+# Parte 3 — Resources y más herramientas {#sec-hpd3-p3}
 
 Un servidor MCP de verdad expone más que una sola tool. Añadimos resources (datos de solo lectura) y tools especializadas para consultas frecuentes.
 
-## 3.1 Resource: schema de la base de datos
+## 3.1 Resource: schema de la base de datos {#sec-hpd3-resource-schema}
 
 ```{python}
 #| echo: true
@@ -404,7 +404,7 @@ print("=== Probando resource schema://tablas ===")
 print("⚠️  Descomenta la línea anterior cuando hayas implementado el resource.")
 ```
 
-## 3.2 Tool: buscar empleado por ID
+## 3.2 Tool: buscar empleado por ID {#sec-hpd3-tool-empleado}
 
 ```{python}
 #| echo: true
@@ -439,7 +439,7 @@ print("=== Probando tool empleado_por_id ===")
 print("⚠️  Descomenta las líneas cuando hayas implementado la tool.")
 ```
 
-## 3.3 Tool: resumen de proyecto
+## 3.3 Tool: resumen de proyecto {#sec-hpd3-tool-resumen}
 
 ```{python}
 #| echo: true
@@ -475,7 +475,7 @@ print("=== Probando tool resumen_proyecto ===")
 print("⚠️  Descomenta las líneas cuando hayas implementado la tool.")
 ```
 
-## 3.4 Resource: estadísticas del servidor
+## 3.4 Resource: estadísticas del servidor {#sec-hpd3-resource-stats}
 
 ```{python}
 #| echo: true
@@ -513,11 +513,11 @@ print(f"✅ Servidor MCP: {len(tools)} tools, ~{len(resources)} resources regist
 
 ---
 
-# Parte 4 — Conexión desde un cliente LLM
+# Parte 4 — Conexión desde un cliente LLM {#sec-hpd3-p4}
 
 Ahora conectamos un LLM real al servidor MCP. El LLM recibirá la lista de tools disponibles (con sus descripciones y schemas) y decidirá cuál usar para cada pregunta.
 
-## 4.1 Configurar el LLM
+## 4.1 Configurar el LLM {#sec-hpd3-config-llm}
 
 ```{python}
 #| echo: true
@@ -534,7 +534,7 @@ else:
     print("✅ Cliente OpenAI configurado.")
 ```
 
-## 4.2 Función de consulta al servidor MCP
+## 4.2 Función de consulta al servidor MCP {#sec-hpd3-funcion-consulta}
 
 Como el servidor MCP se comunica por stdio (no por HTTP), no podemos llamarlo directamente desde el notebook sin lanzarlo como subproceso. Para simplificar la sesión presencial, vamos a simular la conexión cliente-servidor invocando las tools de FastMCP directamente (equivalente funcional).
 
@@ -659,23 +659,25 @@ else:
 
 ---
 
-# Parte 5 — Seguridad en MCP
+# Parte 5 — Seguridad en MCP {#sec-hpd3-p5}
 
 Cada tool MCP es una **superficie de ataque**. El LLM recibe input del usuario, y un atacante puede manipular el prompt para inyectar comandos maliciosos. Vamos a proteger nuestro servidor.
 
+::: {#fig-hpd3-prompt-injection}
 ```{mermaid}
 graph TD
     A[Usuario malicioso<br/>inyecta comandos en el prompt] --> B[LLM<br/>genera query alterada]
     B --> C[Servidor MCP<br/>¿valida?]
     C -->|"Sin validación"| D["Ejecuta<br/>DROP TABLE"]
-    C -->|"Con validación"| E["✅ Bloquea<br/>y notifica"]
+    C -->|"Con validación"| E[✅ Bloquea<br/>y notifica]
 
     style A fill:#c62828,color:#fff
     style D fill:#c62828,color:#fff
     style E fill:#2e7d32,color:#fff
 ```
+:::
 
-## 5.1 Añadir sanitización
+## 5.1 Añadir sanitización {#sec-hpd3-sanitizacion}
 
 ```{python}
 #| echo: true
@@ -709,7 +711,7 @@ def sanitizar_query(query: str) -> str:
 print("✅ Función sanitizar_query definida.")
 ```
 
-## 5.2 Probar ataques de prompt injection
+## 5.2 Probar ataques de prompt injection {#sec-hpd3-test-ataques}
 
 Ejecutamos varios intentos de ataque para verificar que nuestras defensas funcionan.
 
@@ -739,7 +741,7 @@ for ataque in ataques:
 print("\n⚠️  Completa el bucle para ver los resultados de cada ataque.")
 ```
 
-## 5.3 Límite de resultados
+## 5.3 Límite de resultados {#sec-hpd3-limite-resultados}
 
 ```{python}
 #| echo: true
@@ -753,12 +755,14 @@ print("\n⚠️  Completa el bucle para ver los resultados de cada ataque.")
 print("⚠️  Implementa el límite de filas en consultar_sql.")
 ```
 
-## 5.4 Checklist de seguridad
+## 5.4 Checklist de seguridad {#sec-hpd3-checklist-seguridad}
 
 ::: {.callout-warning}
 ## Rellena este checklist
 
 Marca con ✅ lo que has implementado (los que queden vacíos son mitigaciones que añadirías en producción):
+
+: Checklist de seguridad para servidores MCP en producción {#tbl-hpd3-seguridad}
 
 | Riesgo | Mitigación |
 |---|---|
@@ -788,7 +792,7 @@ del checklist (sanitización, límites, mínimo privilegio) aplica en ambos caso
 
 ---
 
-# Parte 6 — Batería de pruebas
+# Parte 6 — Batería de pruebas {#sec-hpd3-p6}
 
 Probamos el servidor MCP con preguntas de dificultad creciente. Observa qué herramienta elige el LLM para cada caso.
 
@@ -827,7 +831,7 @@ else:
             print(f"ERROR: {e}")
 ```
 
-## Tabla de evaluación
+## Tabla de evaluación {#sec-hpd3-evaluacion}
 
 Completa esta tabla con tus observaciones sobre cada pregunta:
 
@@ -843,6 +847,7 @@ Completa esta tabla con tus observaciones sobre cada pregunta:
 └────┴──────────────────────────────────────────┴─────────────────┴──────────┴─────────────────────────┘
 ```
 
+::: {#fig-hpd3-arquitectura-mcp}
 ```{mermaid}
 graph TD
     subgraph "Cliente"
@@ -887,14 +892,15 @@ graph TD
     style I fill:#FFD43B,color:#000
     style J fill:#c62828,color:#fff
 ```
+:::
 
 ---
 
-# Ejercicios
+# Ejercicios {#sec-hpd3-ejercicios}
 
 ::: {.callout-tip icon=false}
 
-### Para afianzar lo aprendido (~45 min)
+### Para afianzar lo aprendido (~45 min) {#sec-hpd3-ejercicios-afianzar}
 
 Estos ejercicios no se entregan, pero te preparan para el HPD 3 evaluable y el proyecto integrador.
 
@@ -935,7 +941,7 @@ Prueba con 3 preguntas y compara el comportamiento con el prompt original.
 
 ---
 
-### Para seguir explorando (opcional)
+### Para seguir explorando (opcional) {#sec-hpd3-ejercicios-explorando}
 
 **E1 — Añade una tool de auditoría**
 
@@ -947,7 +953,7 @@ Modifica `consultar_sql` para que solo permita 10 consultas por minuto. Si se su
 
 **E3 — Servidor MCP real con stdio**
 
-Investiga cómo lanzar el servidor MCP como script independiente (`python servidor_mcp.py`) y conectarte desde un cliente usando `fastmcp.Client`. El código base está en [02d-mcp.qmd](02d-mcp.qmd#servidor-mcp-completo-para-ejecutar-como-script). Adapta tu servidor a ese formato y pruébalo con Ollama local.
+Investiga cómo lanzar el servidor MCP como script independiente (`python servidor_mcp.py`) y conectarte desde un cliente usando `fastmcp.Client`. El código base está en [02d-mcp.qmd](02d-mcp.qmd#sec-servidor-mcp-script). Adapta tu servidor a ese formato y pruébalo con Ollama local.
 
 **E4 — Conecta MCP a tu agente de HPD 2**
 

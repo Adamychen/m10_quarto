@@ -24,9 +24,9 @@ warnings.filterwarnings("ignore")
 print("Librerías cargadas correctamente.")
 ```
 
-## Model Context Protocol (MCP)
+## Model Context Protocol (MCP) {#sec-mcp}
 
-### El problema que resuelve
+### El problema que resuelve {#sec-mcp-problema}
 
 
 Conectar un LLM a múltiples fuentes de datos (SQLite, APIs REST, CSV, Google Drive, un servicio meteorológico) requiere un adaptador por cada combinación de fuente y framework. Con 5 fuentes y 5 frameworks distintos, eso son 5 × 5 = 25 adaptadores. En la práctica, cada fuente expone varios métodos, por lo que el número crece todavía más. Es el problema $n \times m$.
@@ -34,6 +34,7 @@ Conectar un LLM a múltiples fuentes de datos (SQLite, APIs REST, CSV, Google Dr
 Para resolverlo, Anthropic impulsó el Model Context Protocol (MCP), un protocolo abierto que estandariza la conexión entre LLMs y fuentes externas. Funciona como un "USB-C para LLMs": una interfaz única para todo. Con MCP, el número de adaptadores se reduce a $n + m$, ya que las fuentes se conectan a través de un servidor MCP común y solo hace falta un adaptador por modelo.
 
 
+::: {#fig-mcp-vs-sin-mcp}
 ```{mermaid}
 graph TB
     subgraph "Sin MCP — M×N integraciones ad hoc (9 conexiones)"
@@ -77,10 +78,13 @@ graph TB
     style S3 fill:#e65100,color:#fff
     style PROTO fill:#FFD43B,color:#000,stroke:#000,stroke-width:2px
 ```
+:::
 
-### Arquitectura de MCP
+### Arquitectura de MCP {#sec-mcp-arquitectura}
 
 MCP sigue el modelo **cliente-servidor**. Cada servidor expone capacidades en 3 categorías:
+
+: Primitivas del Model Context Protocol y ejemplos {#tbl-mcp-primitivas}
 
 | Primitiva | ¿Qué es? | Ejemplo |
 |---|---|---|
@@ -88,6 +92,7 @@ MCP sigue el modelo **cliente-servidor**. Cada servidor expone capacidades en 3 
 | **Resources** | Datos expuestos como recursos de solo lectura | `schema://tablas`, `datos://ventas_2025` |
 | **Prompts** | Plantillas de prompt predefinidas | `analisis_ventas(mes)`, `resumen_ejecutivo()` |
 
+::: {#fig-mcp-arquitectura}
 ```{mermaid}
 graph LR
     subgraph "Cliente LLM"
@@ -118,8 +123,11 @@ graph LR
     style C fill:#e65100,color:#fff
     style D fill:#306998,color:#fff
 ```
+:::
 
-### Transporte: stdio vs HTTP
+### Transporte: stdio vs HTTP {#sec-mcp-transporte}
+
+: Transportes disponibles en MCP y cuándo usar cada uno {#tbl-mcp-transportes}
 
 | Transporte | Cómo funciona | Cuándo usarlo |
 |---|---|---|
@@ -128,7 +136,7 @@ graph LR
 
 En este curso usamos **stdio** porque es el más simple y seguro para entornos locales.
 
-### FastMCP: el SDK simplificado
+### FastMCP: el SDK simplificado {#sec-fastmcp}
 
 FastMCP es una capa por encima del SDK oficial que simplifica mucho crear servidores. Basta con decorar funciones Python normales:
 
@@ -165,7 +173,7 @@ print(f"contar_palabras('Hola mundo MCP') = {contar_palabras('Hola mundo MCP')}"
 FastMCP **infiere automáticamente el JSON Schema** a partir de los type hints de Python. `a: float` se convierte en `{"type": "number"}`, `texto: str` en `{"type": "string"}`, etc. No necesitas escribir el schema manualmente.
 :::
 
-### Recursos MCP
+### Recursos MCP {#sec-mcp-recursos}
 
 Los **Resources** exponen datos de solo lectura que el LLM puede consultar:
 
@@ -188,7 +196,7 @@ print(f"Versión del servidor: {get_version()}")
 print(f"Estadísticas: {await get_stats()}")
 ```
 
-### MCP + SQLite: herramienta de consulta
+### MCP + SQLite: herramienta de consulta {#sec-mcp-sqlite}
 
 El caso de uso más común: permitir que un LLM consulte una base de datos SQLite de forma segura:
 
@@ -278,10 +286,11 @@ print("--- Test de seguridad ---")
 print(consultar_sql("DROP TABLE ventas"))
 ```
 
-### Seguridad en MCP: el checklist imprescindible
+### Seguridad en MCP: el checklist imprescindible {#sec-mcp-seguridad}
 
 Cada servidor MCP es una **superficie de ataque**. El LLM escribe el input de las herramientas, y un atacante puede manipular el prompt para inyectar comandos maliciosos (**prompt injection**):
 
+::: {#fig-mcp-seguridad}
 ```{mermaid}
 graph TD
     A[Usuario malicioso<br/>inyecta comandos en el prompt] --> B[LLM<br/>genera query alterada]
@@ -293,6 +302,7 @@ graph TD
     style D fill:#c62828,color:#fff
     style E fill:#2e7d32,color:#fff
 ```
+:::
 
 ::: {.callout-warning}
 ## Checklist de seguridad MCP
@@ -305,9 +315,10 @@ graph TD
 | **Denegación de servicio** | Timeout en queries (máx. 5s), límite de memoria |
 | **Acceso no autorizado** | Autenticación en el transporte (API keys), logs de auditoría |
 | **Escalada de privilegios** | Principio de mínimo privilegio: cada tool accede solo a lo que necesita |
+
 :::
 
-### Servidor MCP completo para ejecutar como script
+### Servidor MCP completo para ejecutar como script {#sec-servidor-mcp-script}
 
 Guarda el siguiente código en `servidor_mcp.py` y ejecútalo con `python servidor_mcp.py`. Los clientes LLM pueden conectarse vía stdio:
 
@@ -370,7 +381,7 @@ if __name__ == "__main__":
     mcp.run()
 ```
 
-### Conexión desde un cliente LLM
+### Conexión desde un cliente LLM {#sec-mcp-cliente}
 
 Un cliente (LLM o aplicación) se conecta al servidor MCP lanzándolo como subproceso:
 
@@ -400,8 +411,9 @@ async def main():
 asyncio.run(main())
 ```
 
-### Resumen visual
+### Resumen visual {#sec-mcp-resumen}
 
+::: {#fig-mcp-resumen-visual}
 ```{mermaid}
 graph TD
     subgraph "Tu aplicación"
@@ -438,5 +450,6 @@ graph TD
     style G fill:#FFD43B,color:#000
     style H fill:#c62828,color:#fff
 ```
+:::
 
 > **Lectura recomendada:** [Model Context Protocol Specification](https://spec.modelcontextprotocol.io/) | [FastMCP Documentation](https://gofastmcp.com/)

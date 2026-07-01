@@ -99,14 +99,15 @@ else:
     print("✅ Cliente OpenAI configurado. Las celdas de ejemplo funcionarán correctamente.")
 ```
 
-## Prompt Engineering Avanzado
+## Prompt Engineering Avanzado {#sec-prompt-engineering}
 
-### ¿Qué es un prompt?
+### ¿Qué es un prompt? {#sec-que-es-prompt}
 
 Un **prompt** es la instrucción textual que le damos a un LLM. Piensa en ello como la pregunta o la orden que le das a un asistente muy capaz pero muy literal: si la instrucción es ambigua, la respuesta será imprecisa. Si es clara y con contexto, la respuesta será mucho mejor.
 
 El Prompt Engineering consiste en diseñar estas instrucciones de forma sistemática para obtener respuestas fiables, estructuradas y útiles, no solo "texto bonito".
 
+::: {#fig-ciclo-prompt}
 ```{mermaid}
 graph LR
     A[Usuario<br/>formula prompt] --> B[LLM<br/>procesa instrucción]
@@ -120,8 +121,9 @@ graph LR
     style D fill:#2e7d32,color:#fff
     style E fill:#c62828,color:#fff
 ```
+:::
 
-### Primer contacto: llamada a un LLM
+### Primer contacto: llamada a un LLM {#sec-primer-contacto-llm}
 
 Antes de profundizar, veamos cómo invocar un LLM desde Python con la API de OpenAI (compatible con Llamus US, Ollama local, etc.):
 
@@ -140,13 +142,15 @@ else:
 
 Este es el patrón base para todo lo que veremos: `model` + `messages` → respuesta. Los `messages` pueden tener varios roles:
 
+: Roles de los mensajes en la API de chat {#tbl-roles-chat}
+
 | Rol | Propósito | Ejemplo |
 |---|---|---|
 | `system` | Instrucción global de comportamiento | "Eres un analista de datos experto" |
 | `user` | Pregunta o instrucción del usuario | "Analiza este CSV..." |
 | `assistant` | Respuestas previas del modelo (historial) | "La media es 42.3..." |
 
-### Few-shot prompting
+### Few-shot prompting {#sec-few-shot}
 
 El **few-shot** consiste en incluir ejemplos dentro del prompt para que el modelo entienda exactamente qué formato y estilo esperamos. Es como enseñarle con el ejemplo.
 
@@ -184,7 +188,9 @@ else:
 - Mantén consistencia exacta en el formato de los ejemplos
 :::
 
-### Zero-shot vs Few-shot vs One-shot
+### Zero-shot vs Few-shot vs One-shot {#sec-zero-one-few-shot}
+
+: Comparativa de estrategias de prompting por número de ejemplos {#tbl-prompt-estrategias}
 
 | Estrategia | Ejemplos en el prompt | Cuándo usarlo |
 |---|---|---|
@@ -218,7 +224,7 @@ else:
     print("One-shot:", respuesta_one.choices[0].message.content)
 ```
 
-### Chain-of-Thought (CoT)
+### Chain-of-Thought (CoT) {#sec-cot}
 
 El **Chain-of-Thought** consiste en pedir al modelo que razone paso a paso antes de dar la respuesta final. La clave está en añadir algo como _"pensemos paso a paso"_ o incluir ejemplos donde se muestra el razonamiento.
 
@@ -251,6 +257,7 @@ else:
     print(respuesta_cot.choices[0].message.content)
 ```
 
+::: {#fig-cot}
 ```{mermaid}
 graph TD
     A[Pregunta compleja] --> B[LLM razona paso a paso]
@@ -262,13 +269,15 @@ graph TD
     style A fill:#4B8BBE,color:#fff
     style F fill:#2e7d32,color:#fff
 ```
+:::
 
 **¿Por qué funciona?** Al obligar al modelo a generar tokens intermedios de razonamiento, cada paso condiciona el siguiente. Es como si el modelo "pensara en voz alta", reduciendo drásticamente los errores en tareas matemáticas y lógicas.
 
-### Tree-of-Thought (ToT)
+### Tree-of-Thought (ToT) {#sec-tot}
 
 El **Tree-of-Thought** extiende CoT: en lugar de un único camino de razonamiento, el modelo explora múltiples ramas y elige la mejor. Es útil para problemas con múltiples soluciones posibles (planificación, puzzles, creatividad).
 
+::: {#fig-tot}
 ```{mermaid}
 graph TD
     A[Problema] --> B1[Idea 1]
@@ -288,6 +297,7 @@ graph TD
     style E fill:#2e7d32,color:#fff
     style D fill:#e65100,color:#fff
 ```
+:::
 
 ```{python}
 #| echo: true
@@ -317,7 +327,7 @@ else:
 ToT requiere más tokens (y por tanto más coste) que CoT simple, ya que se generan y evalúan múltiples ramas. En la práctica, se implementa con múltiples llamadas al LLM o agentes que evalúan cada rama.
 :::
 
-### Output Structuring con JSON Schema
+### Output Structuring con JSON Schema {#sec-output-structuring}
 
 Forzar que el modelo devuelva JSON nos permite integrar el LLM en pipelines automatizados. La API de OpenAI ofrece el parámetro `response_format` para garantizar JSON válido:
 
@@ -365,7 +375,7 @@ Devuelve ÚNICAMENTE un JSON válido con esta estructura exacta, sin texto adici
 Pedir JSON en el prompt funciona con **cualquier modelo**, pero **no garantiza** que el JSON sea válido (por eso añadimos `try/except`). Algunos modelos como Qwen 3 ofrecen `response_format` nativo que fuerza la estructura desde el API. La ventaja del prompting es que es **model-agnostic**: funciona con Gemma, Llama, Mistral, etc.
 :::
 
-### De JSON Schema a datos sintéticos: el enfoque intuitivo
+### De JSON Schema a datos sintéticos: el enfoque intuitivo {#sec-json-schema-datos-sint}
 
 Lo que acabas de hacer —extraer 1 registro JSON de un texto— es el mismo mecanismo que permite **generar datasets sintéticos completos**. La diferencia es de escala: en lugar de pedir 1 registro, pides N. En lugar de extraer de un texto real, pides al modelo que *invente* datos verosímiles.
 
@@ -449,7 +459,7 @@ El LLM no "conoce" clientes reales, pero ha visto millones de patrones en sus da
 Para datasets de producción donde la fidelidad estadística es crítica, necesitarás modelos generativos especializados (CTGAN, TVAE, TabDDPM) que veremos en el **Bloque 3** con SDV.
 :::
 
-### Role Prompting
+### Role Prompting {#sec-role-prompting}
 
 Asignar un **rol** al modelo en el mensaje `system` cambia radicalmente su comportamiento. No es magia: el modelo, entrenado con textos de diversos perfiles, "activa" los patrones asociados a ese rol.
 
@@ -489,7 +499,9 @@ else:
     ))
 ```
 
-### Técnicas adicionales
+### Técnicas adicionales {#sec-tecnicas-adicionales}
+
+: Técnicas avanzadas de prompting y cuándo aplicarlas {#tbl-prompt-tecnicas}
 
 | Técnica | Descripción | Cuándo usarla |
 |---|---|---|
@@ -520,7 +532,7 @@ else:
     ).choices[0].message.content)
 ```
 
-### Buenas prácticas resumen
+### Buenas prácticas resumen {#sec-buenas-practicas-prompt}
 
 1. **Sé específico**: "analiza los datos" → malo. "calcula media, mediana y desviación típica de la columna 'ventas' agrupada por 'región'" → bueno
 2. **Muestra, no solo digas**: incluye ejemplos del formato que esperas (few-shot)
