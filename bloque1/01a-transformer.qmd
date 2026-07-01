@@ -33,9 +33,9 @@ plt.rcParams["figure.dpi"] = 100
 print("Librerías cargadas correctamente.")
 ```
 
-## Arquitectura Transformer
+## Arquitectura Transformer {#sec-arquitectura-transformer}
 
-### El problema que resuelve
+### El problema que resuelve {#sec-problema-resuelve}
 
 Antes de la aparición del modelo Transformer, los modelos secuenciales dominaban el procesamiento de lenguaje (RNN, LSTM, GRU, etc.). Estos modelos se catalogan bajo el paraguas de **modelos secuenciales** por su forma de procesar los tokens, uno tras otro, de forma secuencial, lo que imponía ciertas restricciones:
 - Impide la paralelización (cada token depende del anterior).
@@ -44,7 +44,7 @@ Antes de la aparición del modelo Transformer, los modelos secuenciales dominaba
 
 La arquitectura **Transformer** (Vaswani et al., 2017) resolvió estos problemas introduciendo el **mecanismo de atención** para reemplazar el **mecanisno de recurrencia** (limitada) usado hasta el momento, algo que permitió procesar un conjunto de tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones de ese conjunto de tokens.
 
-![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)](../images/diagrama_transformer_original.webp)
+![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)](../images/diagrama_transformer_original.webp){#fig-arquitectura-transformer}
 
 ```{python}
 #| echo: true
@@ -88,7 +88,7 @@ plt.tight_layout()
 plt.show()
 ```
 
-### Atención multi-cabeza (Multi-Head Attention)
+### Atención multi-cabeza (Multi-Head Attention) {#sec-atencion-multi-cabeza}
 
 El núcleo del Transformer se encuentra en el mecanismo de **scaled dot-product attention** (atención basada en el producto escalar). En este proceso, para cada token se calculan tres vectores numéricos, que *presuponen* el siguiente contenido semántico:
 
@@ -102,9 +102,9 @@ $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)
 
 donde el producto $Q·K^T$ mide la similitud entre cada par de tokens; el factor $\sqrt{d_k}$ sirve como escala normalizadora para evitar que los valores crezcan demasiado en módulo; la **multi-cabeza** ejecuta este proceso en paralelo con pesos distintos, permitiendo al modelo *atender* a diferentes relaciones simultáneamente (sintaxis, semántica, coreferencias, etc.).
 
-![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (Vaswani et al., 2017, Figure 2)](../images/multi-head-attention.webp)
+![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (Vaswani et al., 2017, Figure 2)](../images/multi-head-attention.webp){#fig-sdpa-vs-mha}
 
-#### Scaled Dot-Product Attention — Low Level (numpy)
+#### Scaled Dot-Product Attention — Low Level (numpy) {#sec-sdpa-numpy}
 
 ```{python}
 #| echo: true
@@ -134,7 +134,7 @@ print("\nCada fila suma 1:", np.round(attn_np[0].sum(axis=1), 3))
 
 ```
 
-#### Scaled Dot-Product Attention — High Level (PyTorch)
+#### Scaled Dot-Product Attention — High Level (PyTorch) {#sec-sdpa-torch}
 
 ```{python}
 #| echo: true
@@ -162,7 +162,7 @@ print(f"\n¿Resultados idénticos? {np.allclose(out_np, out_th.numpy(), atol=1e-
 
 ```
 
-#### Multi-Head Attention — Low Level (numpy)
+#### Multi-Head Attention — Low Level (numpy) {#sec-mha-numpy}
 
 ```{python}
 #| echo: true
@@ -200,7 +200,7 @@ print(f"\nCada cabeza atiende de forma distinta (diferentes pesos).")
 
 ```
 
-#### Multi-Head Attention — High Level (PyTorch)
+#### Multi-Head Attention — High Level (PyTorch) {#sec-mha-torch}
 
 ```{python}
 #| echo: true
@@ -223,7 +223,7 @@ print(f"\nParámetros entrenables de la capa: {sum(p.numel() for p in mha.parame
 
 ```
 
-#### Visualización de atención
+#### Visualización de atención {#sec-visualizacion-atencion}
 
 ```{python}
 #| echo: true
@@ -262,7 +262,7 @@ La codificación posicional sinusoidal usa frecuencias diferentes para cada dime
 $$PE_{(pos, 2i)} = \sin(pos / 10000^{2i/d_{model}})$$
 $$PE_{(pos, 2i+1)} = \cos(pos / 10000^{2i/d_{model}})$$
 
-#### Codificación posicional — Low Level (numpy)
+#### Codificación posicional — Low Level (numpy) {#sec-pe-numpy}
 
 ```{python}
 #| echo: true
@@ -293,7 +293,7 @@ plt.close(fig)
 
 ```
 
-#### Codificación posicional — High Level (PyTorch)
+#### Codificación posicional — High Level (PyTorch) {#sec-pe-torch}
 
 ```{python}
 #| echo: true
@@ -325,7 +325,9 @@ print("La versión aprendida se adapta a los datos; la sinusoidal es fija pero e
 
 ```
 
-### Variantes de la arquitectura
+### Variantes de la arquitectura {#sec-variantes}
+
+: Comparativa de las tres variantes principales de la arquitectura Transformer {#tbl-variantes-transformer}
 
 | Variante | Arquitectura | Ejemplos | Uso principal |
 |---|---|---|---|
@@ -333,6 +335,7 @@ print("La versión aprendida se adapta a los datos; la sinusoidal es fija pero e
 | **Decoder-only** | Solo decoder (atención causal/masked) | GPT, Llama, Qwen, Gemma, DeepSeek | Generación de texto, chat |
 | **Encoder-decoder** | Encoder + decoder con cross-attention | T5, BART | Traducción, resumen, QA |
 
+::: {#fig-variantes-transformer}
 ```{mermaid}
 graph LR
     subgraph "Encoder-only (BERT)"
@@ -349,6 +352,7 @@ graph LR
         I --> J[Salida]
     end
 ```
+:::
 
 ::: {.callout-important}
 ## Lectura obligatoria

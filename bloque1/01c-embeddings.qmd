@@ -29,12 +29,13 @@ print("Librerías cargadas correctamente.")
 
 ```
 
-## Modelos de Embeddings
+## Modelos de Embeddings {#sec-modelos-embeddings}
 
-### De word2vec a sentence embeddings
+### De word2vec a sentence embeddings {#sec-word2vec-sentence}
 
 La evolución de la representación vectorial del lenguaje:
 
+::: {#fig-timeline-embeddings}
 ```{mermaid}
 timeline
     title Evolución de los embeddings
@@ -47,6 +48,7 @@ timeline
     2024 : BGE-M3 (BAAI) : Multilingüe + multimodal
      2025 : Qwen3-Embedding : Embeddings nativos Qwen
 ```
+:::
 
 ::: {.callout-note}
 ## Idioma de los textos de ejemplo
@@ -56,7 +58,7 @@ Los modelos de embeddings que usamos en este bloque (`all-MiniLM-L6-v2`) están 
 Si necesitas trabajar con español, usa modelos multilingües como `intfloat/multilingual-e5-small` o `BAAI/bge-m3`. La API es la misma; solo cambia el nombre del modelo.
 :::
 
-### Semántica distribucional
+### Semántica distribucional {#sec-semantica-distribucional}
 
 El principio fundamental: **"You shall know a word by the company it keeps"** (Firth, 1957). Palabras con contextos similares tienen significados similares, y por tanto vectores cercanos en el espacio semántico.
 
@@ -109,13 +111,15 @@ print("while the weather phrase (3) is different from the rest.")
 
 ```
 
-### Sentence-BERT
+### Sentence-BERT {#sec-sbert}
 
 Sentence-BERT (SBERT) modifica BERT con una arquitectura **siamese** que permite generar embeddings de frases comparables directamente. Usa funciones de pérdida contrastiva (triplet loss, cosine similarity loss) para que frases semánticamente cercanas tengan vectores cercanos.
 
 ![Arquitectura siamese de SBERT para inferencia.](../images/sbert_figure_2.png){#fig-sbert-arch fig-cap="Arquitectura siamese de SBERT para inferencia: dos torres BERT con pesos compartidos producen embeddings u y v que se comparan con cosine similarity. Adaptada de Reimers & Gurevych (2019), [Figure 2](https://aclanthology.org/D19-1410/), distribuida bajo CC-BY 4.0."}
 
-### Comparativa de modelos de embeddings
+### Comparativa de modelos de embeddings {#sec-comparativa-embeddings}
+
+: Comparativa de modelos de embeddings por dimensiones, tamaño y caso de uso {#tbl-modelos-embeddings}
 
 | Modelo | Dimensiones | Tamaño | Uso |
 |---|---|---|---|
@@ -128,7 +132,7 @@ Sentence-BERT (SBERT) modifica BERT con una arquitectura **siamese** que permite
 | `text-embedding-3-small` | 512 o 1536 | API | Comercial (OpenAI) |
 | `text-embedding-3-large` | 256 o 3072 | API | Alta precisión (OpenAI) |
 
-### Embeddings multimodales y tabulares
+### Embeddings multimodales y tabulares {#sec-multimodales-tabulares}
 
 - **Multimodales (CLIP):** proyectan texto e imágenes en un mismo espacio vectorial, permitiendo búsqueda cross-modal (ej. "un perro jugando en la nieve" → imágenes correspondientes).
 - **Tabulares (TabNet, SCARF):** generan embeddings de filas de datos tabulares usando atención, útiles para búsqueda semántica sobre datos estructurados (ej. encontrar clientes similares por perfil de compra).

@@ -7,7 +7,7 @@ engine: jupyter
 
 > **Carga:** HT: 6h | HPD: 4h
 >
-> **Competencias asociadas:** [CE-1](../index.qmd#competencias-específicas)
+> **Competencias asociadas:** [CE-1](../index.qmd#sec-competencias-especificas)
 >
 > **Dependencias:** `torch`, `transformers`, `sentence-transformers`, `chromadb`, `faiss-cpu`, `matplotlib`, `scikit-learn`, `numpy`
 
@@ -22,11 +22,11 @@ Todas las celdas de código están diseñadas para ejecutarse en **Google Colab*
 Si el badge no funciona, abre [colab.research.google.com](https://colab.research.google.com), ve a **File → Open Notebook → GitHub**, busca `Adamychen/m10_quarto` y selecciona el notebook correspondiente.
 :::
 
-## Objetivos del bloque
+## Objetivos del bloque {#sec-objetivos}
 
 Comprender la arquitectura que subyace a los LLMs modernos y dominar la representación vectorial de texto y datos tabulares, así como las bases de datos vectoriales para búsqueda semántica y recuperación de información.
 
-## Mapa conceptual del bloque
+## Mapa conceptual del bloque {#sec-mapa-conceptual}
 
 ::: {.callout-note}
 ## Leyenda de colores
@@ -45,6 +45,7 @@ coinciden con la paleta oficial de **Python**.
 | <span style="display:inline-block;width:1em;height:1em;background:#c62828;border:1px solid #7f0000;vertical-align:middle"></span> | **Rojo** — Riesgo / error |
 :::
 
+::: {#fig-mapa-fundamentos}
 ```{mermaid}
 graph TD
     subgraph "Fundamentos"
@@ -59,12 +60,15 @@ graph TD
     style C fill:#FFD43B,color:#000
     style E fill:#FFD43B,color:#000
 ```
+:::
 
 Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos los fundamentos de la arquitectura Transformer, pasamos a exponer cómo esta arquitectura escala para construir los LLMs (en su forma más general), continuaremos con la representación de la información haciendo uso de vectores numéricos por medio de los embeddings y, finalmente, explicaremos algunos métodos para almacenar y recuperar esos vectores de representación de forma eficiente.
 
-## Contenido del bloque
+## Contenido del bloque {#sec-contenido-bloque}
 
 La siguiente tabla muestra el itinerario que sigue este bloque en su exposición de objetivos, así como los ficheros interactivos asociados y el tiempo estimado necesario para la exposición de los mismos:
+
+: Itinerario del Bloque 1 con sus ficheros y duración estimada {#tbl-itinerario}
 
 | Tema | Archivo | Duración estimada |
 |---|---|---|
@@ -109,7 +113,7 @@ print(f"NumPy: {np.__version__}")
 
 ---
 
-## Referencias del bloque
+## Referencias del bloque {#sec-referencias}
 
 - Devlin, J., Chang, M., Lee, K. & Toutanova, K. (2018). **BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding**. arXiv:1810.04805
 - Vaswani, A. et al. (2017). **Attention is All You Need**. NeurIPS. [arXiv:1706.03762](https://arxiv.org/abs/1706.03762)
@@ -125,8 +129,9 @@ print(f"NumPy: {np.__version__}")
 
 ---
 
-## Resumen del bloque
+## Resumen del bloque {#sec-resumen-bloque}
 
+::: {#fig-resumen-bloque-1}
 ```{mermaid}
 graph TD
     subgraph "Bloque 1"
@@ -140,6 +145,7 @@ graph TD
     F --> G[HPD 1: Pipeline de embeddings]
     G --> H[Proyecto integrador]
 ```
+:::
 
 Este primer bloque sienta las bases para el resto de bloques que componen el curso. Concretamente:
 

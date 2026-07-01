@@ -40,7 +40,7 @@ print("Librerías cargadas correctamente.")
 
 ```
 
-## Bases de Datos Vectoriales
+## Bases de Datos Vectoriales {#sec-bases-datos-vectoriales}
 
 Una vez que tenemos embeddings, necesitamos almacenarlos y buscarlos eficientemente. Aquí entran las **bases de datos vectoriales**.
 
@@ -50,8 +50,9 @@ Una vez que tenemos embeddings, necesitamos almacenarlos y buscarlos eficienteme
 Los modelos de embeddings que usamos (`all-MiniLM-L6-v2`) están entrenados en inglés, por lo que los ejemplos usan texto en inglés. Usar un tokenizador inglés sobre texto español produce más subtokens por palabra y embeddings de menor calidad. Para trabajar con español, cambia a un modelo multilingüe como `intfloat/multilingual-e5-small`.
 :::
 
-### Búsqueda exacta (KNN) vs. aproximada (ANN)
+### Búsqueda exacta (KNN) vs. aproximada (ANN) {#sec-knn-vs-ann}
 
+::: {#fig-knn-vs-ann}
 ```{mermaid}
 graph TD
     subgraph "Exact KNN"
@@ -65,6 +66,9 @@ graph TD
         F --> G[Top-k aproximado<br/>con alta recall]
     end
 ```
+:::
+
+: Comparativa de métodos de búsqueda exacta vs. aproximada {#tbl-knn-ann}
 
 | Método | Precisión | Velocidad | Memoria |
 |---|---|---|---|
@@ -72,7 +76,7 @@ graph TD
 | HNSW | 99 %+ | O(log n) | Alta |
 | IVF | 95-99 % | O(√n) | Media |
 
-### HNSW (Hierarchical Navigable Small World)
+### HNSW (Hierarchical Navigable Small World) {#sec-hnsw}
 
 El algoritmo más popular en producción (usado por Chroma, Qdrant, Pinecone). Construye un grafo multi-capa donde:
 
@@ -80,6 +84,7 @@ El algoritmo más popular en producción (usado por Chroma, Qdrant, Pinecone). C
 - Las capas inferiores tienen todos los nodos (conexiones cortas)
 - La búsqueda comienza en la capa superior y desciende, recorriendo el grafo greedy
 
+::: {#fig-hnsw-grafo}
 ```{mermaid}
 graph TD
     subgraph "HNSW — Capas"
@@ -106,8 +111,11 @@ graph TD
     style L0E fill:#2e7d32,color:#fff
     style L0F fill:#2e7d32,color:#fff
 ```
+:::
 
-### Métricas de similitud
+### Métricas de similitud {#sec-metricas-similitud}
+
+: Métricas de distancia y similitud entre vectores {#tbl-metricas-similitud}
 
 | Métrica | Fórmula | Cuándo usarla |
 |---|---|---|
@@ -146,7 +154,7 @@ print(f"L2(b, c): {euclidean_dist(b, c):.3f}")
 
 ```
 
-### Chroma — Base de datos vectorial local
+### Chroma — Base de datos vectorial local {#sec-chroma}
 
 Chroma es una base de datos vectorial embebida que funciona en local sin servidor. Ideal para prototipado y proyectos pequeños/medios.
 
@@ -226,7 +234,7 @@ for i, (doc, dist) in enumerate(zip(resultados["documents"][0], resultados["dist
 
 ```
 
-### FAISS — Indexación en memoria
+### FAISS — Indexación en memoria {#sec-faiss}
 
 FAISS (Facebook AI Similarity Search) es una librería de indexación ANN embebible, ideal para integración en pipelines de Python sin necesidad de un servidor de base de datos.
 
@@ -271,7 +279,9 @@ print(f"\n¿Mismos resultados? {set(idx_exact[0]) == set(idx_ivf[0])}")
 
 ```
 
-### Comparativa operacional
+### Comparativa operacional {#sec-comparativa-vdb}
+
+: Comparativa operacional entre Chroma, FAISS, Qdrant y Pinecone {#tbl-comparativa-vdb}
 
 | Característica | Chroma | FAISS | Qdrant | Pinecone |
 |---|---|---|---|---|
@@ -283,8 +293,9 @@ print(f"\n¿Mismos resultados? {set(idx_exact[0]) == set(idx_ivf[0])}")
 | **Coste** | Gratuito | Gratuito | Self-hosted gratis | Por uso |
 | **API** | Python nativa | Python/C++ | REST + gRPC | REST |
 
-### Árbol de decisión para elegir
+### Árbol de decisión para elegir {#sec-arbol-decision}
 
+::: {#fig-arbol-decision-vdb}
 ```{mermaid}
 graph TD
     A[¿Proyecto pequeño<br/>&lt; 100K vectores?] -->|Sí| B[Chroma<br/>FAISS]
@@ -294,6 +305,7 @@ graph TD
     E -->|Sí| F[Qdrant]
     E -->|No| G[Pinecone]
 ```
+:::
 
 ::: {.callout-tip}
 ## Consejo práctico

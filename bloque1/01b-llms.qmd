@@ -81,9 +81,9 @@ print("Librerías cargadas correctamente.")
 
 ```
 
-## Grandes Modelos de Lenguaje (LLMs)
+## Grandes Modelos de Lenguaje (LLMs) {#sec-llms}
 
-### Preentrenamiento
+### Preentrenamiento {#sec-preentrenamiento}
 
 Los LLMs se preentrenan con un objetivo aparentemente simple: **predecir el siguiente token** (next token prediction). Dada una secuencia de tokens $t_1, t_2, ..., t_n$, el modelo aprende a maximizar la probabilidad de $t_{i+1}$ dados los tokens anteriores:
 
@@ -94,9 +94,11 @@ De este proceso emergen capacidades complejas: sintaxis, semántica, razonamient
 - Tamaño del dataset de entrenamiento
 - Cómputo total
 
-### Tokenización
+### Tokenización {#sec-tokenizacion}
 
 Los modelos no procesan caracteres ni palabras directamente, sino **tokens**: unidades subpalabra que equilibran cobertura del vocabulario y eficiencia.
+
+: Algoritmos de tokenización más usados en LLMs modernos {#tbl-tokenizacion}
 
 | Algoritmo | Cómo funciona | Usado en |
 |---|---|---|
@@ -127,7 +129,7 @@ print(f"\nDecodificado: {tokenizer.decode(ids)}")
 
 ```
 
-### Ventana de contexto
+### Ventana de contexto {#sec-ventana-contexto}
 
 La **ventana de contexto** es el número máximo de tokens que el modelo puede procesar en una sola pasada. Limitaciones prácticas:
 - **Memoria:** la atención es O(n²) en memoria (sin optimizaciones)
@@ -136,10 +138,11 @@ La **ventana de contexto** es el número máximo de tokens que el modelo puede p
 
 Técnicas de extensión: RoPE (Rotary Position Embedding), ALiBi, windowing, y atención dispersa.
 
-### Parámetros de inferencia
+### Parámetros de inferencia {#sec-parametros-inferencia}
 
 Controlan cómo el modelo selecciona el siguiente token entre las probabilidades de salida.
 
+::: {#fig-parametros-inferencia}
 ```{mermaid}
 graph LR
     A[Logits del modelo] --> B[Softmax]
@@ -153,6 +156,7 @@ graph LR
     G --> H
     H --> I[Token seleccionado]
 ```
+:::
 
 ```{python}
 #| echo: true
@@ -238,9 +242,11 @@ plt.show()
 - Combinación común: temp=0.7, top-p=0.9, top-k=40.
 :::
 
-### Más allá del texto: el LLM como modelo generativo
+### Más allá del texto: el LLM como modelo generativo {#sec-llm-generativo}
 
 Un LLM no es más que un modelo que aprende una distribución de probabilidad $P(\text{token} \mid \text{contexto})$ y muestrea de ella. Esta misma idea —aprender la distribución subyacente de los datos y generar nuevas muestras— es el **principio unificador de todos los modelos generativos**:
+
+: Modelos generativos y el tipo de distribución que aprenden {#tbl-modelos-generativos}
 
 | Modelo | ¿Qué aprende? | ¿Qué genera? |
 |---|---|---|
@@ -257,7 +263,7 @@ Lo que acabas de entender sobre la temperatura es el equivalente conceptual a:
 
 En el **Bloque 2** verás cómo usar LLMs para generar datos sintéticos de forma intuitiva (sin entrenar nada), y en el **Bloque 3** explorarás modelos especializados (GANs, VAEs, difusión) para cuando necesites rigor estadístico y garantías de privacidad.
 
-## El ecosistema Hugging Face
+## El ecosistema Hugging Face {#sec-huggingface}
 
 [Hugging Face Hub](https://huggingface.co/models) es el repositorio más grande de modelos preentrenados del mundo. Puedes navegar por **task** (text generation, feature extraction, image classification), **framework** (PyTorch, TensorFlow), **licencia** (MIT, Apache 2.0, Llama 2 Community) y **popularidad**.
 
@@ -274,9 +280,11 @@ Para cada modelo encontrarás:
 
 > **Nota:** No necesitas descargar modelos localmente. En este módulo usarás la **API unificada de la Universidad de Sevilla** para hacer inferencia sobre modelos modernos sin necesidad de GPU.
 
-### Modelos privados vs. open-weight vs. open-source
+### Modelos privados vs. open-weight vs. open-source {#sec-licencias-modelos}
 
 No todos los modelos "abiertos" lo son realmente. Existe una distinción clave entre cómo se accede al modelo y qué permisos otorga:
+
+: Tipos de acceso a modelos y sus implicaciones de licencia {#tbl-licencias}
 
 | Tipo | Acceso a pesos | Ejemplos | Licencia típica |
 |---|---|---|---|
@@ -299,7 +307,7 @@ No todos los modelos "abiertos" lo son realmente. Existe una distinción clave e
 
 > En este módulo usarás **modelos open-weight** (Qwen 3.6, Gemma 4, Llama 3.3) a través de la API de Llamus. Desde el código la diferencia es mínima, pero es crucial entender las implicaciones de licencias al elegir un modelo para un proyecto profesional.
 
-## Inferencia con la API unificada de la US (Llamus)
+## Inferencia con la API unificada de la US (Llamus) {#sec-llamus}
 
 La Universidad de Sevilla proporciona un endpoint **OpenAI-compatible** para usar LLMs sin necesidad de GPU local:
 
