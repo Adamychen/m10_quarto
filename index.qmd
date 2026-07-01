@@ -22,10 +22,12 @@ Los notebooks que usan LLMs necesitan una API key de la Universidad de Sevilla. 
 - **En Colab** (recomendado): abre el icono 🔑 (Secrets) en la barra lateral izquierda → "Add new secret" → nombre `LLAMUS_API_KEY` → pega tu clave → activa "Notebook access" → vuelve a ejecutar la celda de setup.
 - **En local**: crea un archivo `.env` en la raíz del proyecto con `LLM_API_KEY=tu_clave`.
 
-La clave te la proporcionará el profesorado al inicio del módulo. Más detalles en [Herramientas → Configuración de la API key](06-herramientas.qmd#configuración-de-la-api-key-de-llamus).
+La clave te la proporcionará el profesorado al inicio del módulo. Más detalles en [Herramientas → Configuración de la API key](06-herramientas.qmd#sec-config-api-key).
 :::
 
-## Distribución de la carga docente
+## Distribución de la carga docente {#sec-carga-docente}
+
+: Distribución de horas por tipo de actividad {#tbl-carga-docente}
 
 | Tipo de actividad | Horas | % del total | Formato |
 |---|---|---|---|
@@ -34,7 +36,7 @@ La clave te la proporcionará el profesorado al inicio del módulo. Más detalle
 | Horas del Alumno (HA) | 45 | 60 % | Proyecto + estudio autónomo |
 | **TOTAL** | **75** | **100 %** | |
 
-## 1. Descripción del módulo
+## 1. Descripción del módulo {#sec-descripcion-modulo}
 
 Este módulo introduce al alumno en el ecosistema de la IA Generativa desde una perspectiva de ingeniería aplicada a Data Science. El objetivo es que el alumno adquiera criterio técnico para seleccionar, integrar y desplegar modelos generativos en contextos reales: desde la consulta semántica sobre datos corporativos hasta la automatización de flujos de análisis mediante agentes.
 
@@ -42,7 +44,9 @@ El módulo está diseñado con un enfoque *hands-on*: cada bloque teórico tiene
 
 > **Prerrequisitos:** haber superado los módulos anteriores del máster, con especial dominio de Python, manipulación de datos con pandas/NumPy y fundamentos de Machine Learning supervisado y no supervisado.
 
-## Contenidos
+## Contenidos {#sec-contenidos}
+
+: Bloques del módulo con su carga teórica y práctica {#tbl-contenidos}
 
 | Bloque | Título | HT | HPD |
 |---|---|---|---|
@@ -51,7 +55,9 @@ El módulo está diseñado con un enfoque *hands-on*: cada bloque teórico tiene
 | 3 | Aplicaciones: RAG, Datos Sintéticos y Fine-tuning | 6h | 4h |
 | 4 | Despliegue y Gobernanza | — | — |
 
-## Competencias específicas
+## Competencias específicas {#sec-competencias-especificas}
+
+: Competencias específicas (CE) del módulo y su descriptor de logro {#tbl-competencias}
 
 | Cód. | Competencia | Descriptor de logro |
 |---|---|---|

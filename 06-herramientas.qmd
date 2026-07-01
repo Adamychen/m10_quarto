@@ -4,6 +4,8 @@ title: "Herramientas y entorno tecnológico recomendado"
 
 El módulo está diseñado para ser completado íntegramente con herramientas gratuitas o de tier libre. El siguiente stack solo muestra algunas opciones; el alumno puede sustituir componentes equivalentes justificando la elección.
 
+: Stack tecnológico recomendado para el módulo {#tbl-stack}
+
 | Categoría | Herramienta recomendada | Alternativas / Notas |
 |---|---|---|
 | **LLM API** | Llamus US (`https://llamus.cs.us.es/api/v1`) | OpenAI, Anthropic, Google (API key propia) |
@@ -19,7 +21,7 @@ El módulo está diseñado para ser completado íntegramente con herramientas gr
 | **MCP** | Python MCP SDK (Anthropic) | Servidor stdio local; sin infraestructura cloud |
 | **Entorno** | VS Code + Python 3.11, Jupyter | Google Colab para talleres con GPU |
 
-## Instalación rápida
+## Instalación rápida {#sec-instalacion}
 
 ```bash
 # Entorno base
@@ -36,11 +38,11 @@ pip install torch torchvision torchaudio
 pip install transformers accelerate peft bitsandbytes trl
 ```
 
-## Configuración de la API key de Llamus
+## Configuración de la API key de Llamus {#sec-config-api-key}
 
 Todos los notebooks que usan LLMs leen la API key desde la variable de entorno `LLM_API_KEY`. La fuente única de la lógica de carga es `includes/setup_keys.py` (se inyecta automáticamente en cada notebook al renderizar). Si la celda de setup imprime `✓ LLM_API_KEY cargada.`, todo está bien. Si imprime `⚠️ LLM_API_KEY no encontrada.`, sigue una de las dos vías de abajo.
 
-### Vía 1 — Google Colab (recomendada, sin instalación local)
+### Vía 1 — Google Colab (recomendada, sin instalación local) {#sec-via-colab}
 
 1. Abre el notebook en Colab (badge "Open in Colab" o desde la página [Inicio](index.qmd)).
 2. En la barra lateral izquierda, haz clic en el icono 🔑 (**Secrets**).
@@ -56,7 +58,7 @@ Todos los notebooks que usan LLMs leen la API key desde la variable de entorno `
 El notebook intenta primero el nombre `LLAMUS_API_KEY` (más descriptivo, identifica la plataforma) y si no existe, recae a `LLM_API_KEY` (compatible con quien ya tenga la variable configurada con el nombre antiguo). Puedes usar cualquiera de los dos.
 :::
 
-### Vía 2 — Local (VSCode, Jupyter, `quarto preview`)
+### Vía 2 — Local (VSCode, Jupyter, `quarto preview`) {#sec-via-local}
 
 1. En la raíz del proyecto (junto a `_quarto.yml`), crea un archivo `.env`:
 
@@ -76,7 +78,7 @@ El notebook intenta primero el nombre `LLAMUS_API_KEY` (más descriptivo, identi
 El archivo `.env` está en `.gitignore` (no se sube al repositorio). Si clonas el repo en otro equipo, tienes que crear el `.env` de nuevo.
 :::
 
-### Orden de resolución
+### Orden de resolución {#sec-orden-resolucion}
 
 Si en algún momento te preguntas de dónde sale la clave, este es el orden que sigue `setup_keys.py` (el primero que la encuentre gana):
 
@@ -84,7 +86,7 @@ Si en algún momento te preguntas de dónde sale la clave, este es el orden que 
 2. Archivo `.env` local (vía `python-dotenv`).
 3. Secret de Colab (`userdata.get("LLAMUS_API_KEY")` o `userdata.get("LLM_API_KEY")`).
 
-### Diagnóstico rápido
+### Diagnóstico rápido {#sec-diagnostico}
 
 Si una celda con LLM devuelve error 401 ("Incorrect API key"), ejecuta en una celda aparte:
 

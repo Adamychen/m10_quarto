@@ -2,7 +2,9 @@
 title: "Evaluación"
 ---
 
-## Estructura de la evaluación
+## Estructura de la evaluación {#sec-estructura-evaluacion}
+
+: Instrumentos de evaluación y su peso en la nota final {#tbl-estructura-evaluacion}
 
 | Instrumento | Peso | Nota mínima | Vinculación |
 |---|---|---|---|
@@ -10,7 +12,9 @@ title: "Evaluación"
 | Participación en foros (mínimo 3 de 4) | 10 % | Participado / No participado | CE-6 (pensamiento crítico) |
 | Proyecto integrador final | 60 % | 5,0 / 10 | CE-1 a CE-6 |
 
-## Entregables parciales
+## Entregables parciales {#sec-entregables-parciales}
+
+: Entregables parciales del módulo por HPD {#tbl-entregables}
 
 | HPD | Título | Duración | Entregable | Enlace |
 |---|---|---|---|---|
@@ -20,7 +24,7 @@ title: "Evaluación"
 | 4 | Sistema RAG sobre datos mixtos con evaluación | 4h | Pipeline RAG evaluado con RAGAS (score > 0,6) | [HPD 4](evaluables/hpd4-rag-mixto.qmd) |
 | — | Generación y validación de datos sintéticos (HA) | — | Notebook con ejercicios de SDV, KS test y F1 | [Ejercicios](evaluables/hpd4-datos-sinteticos.qmd) |
 
-## Proyecto integrador final
+## Proyecto integrador final {#sec-proyecto-integrador}
 
 El proyecto consiste en el diseño e implementación de un sistema de **Inteligencia de Negocio conversacional** orientado a datos corporativos. El alumno debe integrar todos los componentes construidos durante el módulo:
 
@@ -30,7 +34,9 @@ El proyecto consiste en el diseño e implementación de un sistema de **Intelige
 - Opcional: conexión segura mediante servidor MCP o fine-tuning ligero
 - Informe de evaluación con métricas RAGAS y análisis de al menos un riesgo ético / de gobernanza
 
-### Rúbrica de evaluación
+### Rúbrica de evaluación {#sec-rubrica-evaluacion}
+
+: Rúbrica del proyecto integrador por dimensión y nivel de logro {#tbl-rubrica}
 
 | Dimensión | Insuficiente (< 5) | Suficiente (5-6,9) | Notable (7-8,9) | Sobresaliente (9-10) |
 |---|---|---|---|---|
