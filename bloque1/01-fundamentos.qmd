@@ -89,6 +89,7 @@ La siguiente tabla muestra el itinerario que sigue este bloque en su exposición
 
 ```{python}
 #| echo: true
+#| eval: false
 
 import os
 os.environ["TOKENIZERS_PARALLELISM"] = "false"

@@ -19,9 +19,55 @@ engine: jupyter
 
 ```{python}
 #| echo: true
-#| eval: false
+#| eval: true
+
+"""
+Setup compartido para la API key de Llamus en todos los notebooks.
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).
+
+Orden de resolución:
+  1. .env local (python-dotenv)
+  2. os.environ ya configurado externamente
+  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
+
+Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+"""
 
 import os
+
+
+def _load_llm_api_key():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
+    if not os.getenv("LLM_API_KEY"):
+        try:
+            from google.colab import userdata
+            for name in ("LLAMUS_API_KEY", "LLM_API_KEY"):
+                try:
+                    value = userdata.get(name)
+                    if value:
+                        os.environ["LLM_API_KEY"] = value
+                        break
+                except Exception:
+                    continue
+        except ImportError:
+            pass
+
+
+_load_llm_api_key()
+
+if os.getenv("LLM_API_KEY"):
+    print("✓ LLM_API_KEY cargada.")
+else:
+    print("⚠️  LLM_API_KEY no encontrada.")
+    print("    • Local: crea un archivo .env con LLM_API_KEY=tu_clave")
+    print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
+
+
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import warnings
 warnings.filterwarnings("ignore")
@@ -120,7 +166,7 @@ from langchain_openai import ChatOpenAI
 llm = ChatOpenAI(
     model="gemma4:e2b-mlx",
     base_url="https://llamus.cs.us.es/api/v1",
-    api_key="<API_KEY>"
+    api_key=os.getenv("LLM_API_KEY", "<API_KEY>")
 )
 
 for temp in [0.1, 0.7, 1.5]:
@@ -136,24 +182,51 @@ for temp in [0.1, 0.7, 1.5]:
 ```{python}
 #| echo: true
 #| eval: false
+#| code-fold: true
 
-# Visualizar el efecto de la temperatura en la distribución
-logits = torch.randn(10) * 2  # logits simulados
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import torch
+import numpy as np
+import matplotlib.pyplot as plt
 
-fig, axes = plt.subplots(1, 3, figsize=(12, 3))
+MODEL = "distilgpt2"
+tokenizer = AutoTokenizer.from_pretrained(MODEL)
+model = AutoModelForCausalLM.from_pretrained(MODEL)
+model.eval()
+
+prompt = "The future of artificial intelligence is"
+inputs = tokenizer(prompt, return_tensors="pt")
+with torch.no_grad():
+    logits = model(**inputs).logits[0, -1, :]
+
+top_logits, top_ids = torch.topk(logits, 10)
+tokens = [tokenizer.decode([i]) for i in top_ids]
+logprobs = torch.log_softmax(top_logits, dim=0).numpy()
+
+print("Top-10 tokens y log-probabilidades:")
+for t, lp in zip(tokens, logprobs):
+    print(f"  {t!r:20s}  logp = {lp:7.4f}  p = {np.exp(lp):.4f}")
+
+fig, axes = plt.subplots(1, 3, figsize=(14, 3.2))
 for i, temp in enumerate([0.1, 1.0, 2.0]):
-    probs = torch.softmax(logits / temp, dim=0).numpy()
-    axes[i].bar(range(10), probs)
+    scaled = logprobs / temp
+    scaled -= scaled.max()
+    probs = np.exp(scaled)
+    probs /= probs.sum()
+
+    axes[i].bar(range(len(tokens)), probs)
     axes[i].set_title(f"Temperatura = {temp}")
     axes[i].set_ylim(0, 1)
     axes[i].set_xlabel("Token")
     axes[i].set_ylabel("Probabilidad")
+    axes[i].set_xticks(range(len(tokens)))
+    axes[i].set_xticklabels(
+        [t.replace("\n", "\\n").replace("\t", "\\t") for t in tokens],
+        rotation=45, ha="right", fontsize=8,
+    )
 
 plt.tight_layout()
 plt.show()
-
-
-
 ```
 
 ::: {.callout-note}

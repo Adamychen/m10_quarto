@@ -26,7 +26,7 @@ jupyter: python3
 - Corpus real: 6 papers de ArXiv
 
 ## Pipeline
-1. **Parte 1 — Aproximación conceptual:** abstracts reales, pipeline completo en pequeño
+1. **Parte 1 — Aproximación conceptual:** abstracts reales, ejecutar un pipeline completo sobre un ejemplo pequeño
 2. **Parte 2 — Escenario realista:** corpus real de ArXiv, indexación a escala, evaluación MTEB
 :::
 
@@ -192,7 +192,7 @@ for doc in docs:
 
 ## ¿Qué es un embedding?
 
-Un embedding convierte un texto en una lista de números (384 en nuestro caso). La clave está en que **textos con significado parecido producen números parecidos**, aunque usen palabras distintas.
+Un embedding convierte un texto en una lista de números (384 en nuestro caso). La clave está en que textos con significado parecido producen números parecidos, aunque usen palabras distintas.
 
 Imagina un mapa donde cada documento es un punto. Los documentos que hablan de lo mismo quedan cerca. Cuando haces una pregunta, el modelo la sitúa en ese mismo mapa y busca los vecinos más próximos.
 
@@ -314,7 +314,7 @@ for i, (chunk_id, distancia, texto) in enumerate(zip(
 
 ## Similitud coseno vs. distancia coseno
 
-Chroma devuelve **distancias**, no similitudes. La relación es:
+Chroma devuelve distancias, no similitudes. La relación es:
 
 $$\text{distancia} = 1 - \text{similitud}$$
 
@@ -323,14 +323,14 @@ $$\text{distancia} = 1 - \text{similitud}$$
 | **Similitud coseno** | $[-1, 1]$ | $1$ = idénticos, $0$ = ortogonales, $-1$ = opuestos |
 | **Distancia coseno** | $[0, 2]$ | $0$ = idénticos, $1$ = ortogonales, $2$ = opuestos |
 
-Con embeddings normalizados (lo habitual), la similitud coseno equivale al producto escalar y oscila en $[0, 1]$. La distancia, por tanto, está en $[0, 1]$. **Cuanto menor es la distancia, más relevante es el chunk.**
+Con embeddings normalizados (lo habitual), la similitud coseno equivale al producto escalar y oscila en $[0, 1]$. La distancia, por tanto, está en $[0, 1]$. Cuanto menor es la distancia, más relevante es el chunk.
 
 :::
 
 ## 1.6 Más allá del texto: embeddings de datos tabulares
 
 Hasta ahora hemos hecho embeddings de PDFs. Pero, ¿y si tus datos están en un Excel?
-La buena noticia: **el pipeline no cambia**. Solo cambia cómo conviertes cada fila en texto.
+La buena noticia: el pipeline no cambia. Solo cambia cómo conviertes cada fila en texto.
 
 ```{python}
 #| echo: true
@@ -424,7 +424,7 @@ registros por descripción), el texto concatenado es suficiente.
 
 ## ¿Qué mide recall@k?
 
-De todos los chunks que **deberían** aparecer para una consulta (los anotamos a mano como ground truth), ¿cuántos recupera el sistema entre los primeros *k* resultados?
+De todos los chunks que deberían aparecer para una consulta (los anotamos a mano como ground truth), ¿cuántos recupera el sistema entre los primeros *k* resultados?
 
 | Ejemplo con k=1 | Ejemplo con k=5 |
 |---|---|
@@ -513,7 +513,7 @@ print("✅ Parte 1 limpiada (colecciones + corpus temporal eliminados)")
 
 # Parte 2 — Escenario realista
 
-En esta segunda parte repetimos el pipeline sobre un corpus real: **6 papers descargados de ArXiv**. Además añadimos una **evaluación profesional con MTEB** para validar la calidad del modelo de embeddings.
+En esta segunda parte repetimos el pipeline sobre un corpus real: 6 papers descargados de ArXiv. Además añadimos una evaluación profesional con MTEB para validar la calidad del modelo de embeddings.
 
 ## 2.1 Corpus real — Descarga de ArXiv
 

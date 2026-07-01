@@ -35,3 +35,64 @@ pip install mcp  # Python MCP SDK
 pip install torch torchvision torchaudio
 pip install transformers accelerate peft bitsandbytes trl
 ```
+
+## Configuración de la API key de Llamus
+
+Todos los notebooks que usan LLMs leen la API key desde la variable de entorno `LLM_API_KEY`. La fuente única de la lógica de carga es `includes/setup_keys.py` (se inyecta automáticamente en cada notebook al renderizar). Si la celda de setup imprime `✓ LLM_API_KEY cargada.`, todo está bien. Si imprime `⚠️ LLM_API_KEY no encontrada.`, sigue una de las dos vías de abajo.
+
+### Vía 1 — Google Colab (recomendada, sin instalación local)
+
+1. Abre el notebook en Colab (badge "Open in Colab" o desde la página [Inicio](index.qmd)).
+2. En la barra lateral izquierda, haz clic en el icono 🔑 (**Secrets**).
+3. Pulsa **"Add new secret"** y rellena:
+   - **Name:** `LLAMUS_API_KEY` (preferente) o `LLM_API_KEY` (alternativa).
+   - **Value:** pega la clave que te ha proporcionado el profesorado.
+4. Activa la casilla **"Notebook access"** para que el notebook pueda leerla.
+5. Vuelve a la celda de setup del notebook y ejecútala de nuevo. Debería imprimir `✓ LLM_API_KEY cargada.`
+
+::: {.callout-tip}
+## ¿Por qué `LLAMUS_API_KEY` y no `LLM_API_KEY`?
+
+El notebook intenta primero el nombre `LLAMUS_API_KEY` (más descriptivo, identifica la plataforma) y si no existe, recae a `LLM_API_KEY` (compatible con quien ya tenga la variable configurada con el nombre antiguo). Puedes usar cualquiera de los dos.
+:::
+
+### Vía 2 — Local (VSCode, Jupyter, `quarto preview`)
+
+1. En la raíz del proyecto (junto a `_quarto.yml`), crea un archivo `.env`:
+
+   ```bash
+   echo 'LLM_API_KEY=tu_clave_aquí' > .env
+   ```
+
+2. Verifica que `python-dotenv` está instalado (ya está en `requirements.txt`):
+
+   ```bash
+   pip install python-dotenv
+   ```
+
+3. Ejecuta el notebook o `quarto preview`. La celda de setup cargará `.env` automáticamente.
+
+::: {.callout-warning}
+El archivo `.env` está en `.gitignore` (no se sube al repositorio). Si clonas el repo en otro equipo, tienes que crear el `.env` de nuevo.
+:::
+
+### Orden de resolución
+
+Si en algún momento te preguntas de dónde sale la clave, este es el orden que sigue `setup_keys.py` (el primero que la encuentre gana):
+
+1. Variable `LLM_API_KEY` ya configurada en el proceso (`os.environ`).
+2. Archivo `.env` local (vía `python-dotenv`).
+3. Secret de Colab (`userdata.get("LLAMUS_API_KEY")` o `userdata.get("LLM_API_KEY")`).
+
+### Diagnóstico rápido
+
+Si una celda con LLM devuelve error 401 ("Incorrect API key"), ejecuta en una celda aparte:
+
+```python
+import os
+print("LLM_API_KEY set:", bool(os.getenv("LLM_API_KEY")))
+print("Source:", "env" if "LLM_API_KEY" in os.environ else "missing")
+```
+
+- Si imprime `set: False` → la clave no se ha cargado. Revisa los pasos de arriba.
+- Si imprime `set: True` pero el 401 persiste → la clave es incorrecta. Pide una nueva al profesorado.

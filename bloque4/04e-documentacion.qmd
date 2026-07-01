@@ -1,0 +1,125 @@
+---
+title: "04e — Documentación: Model Card y System Card"
+engine: jupyter
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque4/04e-documentacion.ipynb)
+
+> Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). La documentación es el puente entre un sistema que funciona y un sistema que puede auditarse, replicarse y desplegarse con responsabilidad.
+
+## 5. Documentación
+
+### 5.1 Model Card
+
+Una **Model Card** es un documento estructurado que describe un modelo: uso previsto, datos, métricas, limitaciones. Originalmente propuesta por [Mitchell et al. (2019)](https://arxiv.org/abs/1810.03993), es ahora estándar en Hugging Face, OpenAI, Anthropic, Google.
+
+```python
+#| echo: true
+#| eval: true
+
+from datetime import date
+import json
+
+model_card = {
+    "model_details": {
+        "name":               "asistente-corporativo-v1",
+        "version":            "1.0.0",
+        "base_model":         "gemma4:e2b-mlx",
+        "date_released":      str(date.today()),
+        "license":            "Uso interno — Universidad de Sevilla",
+        "authors":            ["Equipo Módulo 10"],
+    },
+    "intended_use": {
+        "primary_users":      ["Alumnos del máster", "Personal investigador"],
+        "use_cases":          ["Consulta sobre informes internos", "Búsqueda semántica"],
+        "out_of_scope":       [
+            "Asistencia médica o legal profesional",
+            "Datos de pacientes o clientes reales",
+            "Cualquier decisión automatizada sin supervisión humana",
+        ],
+    },
+    "training_data": {
+        "datasets":           ["informes_publicos_2020_2024"],
+        "size":               "1.2 GB de texto",
+        "preprocessing":      "Chunking 400 chars, embedding e5-small-v2",
+        "pii_handling":       "Detección con regex + revisión manual",
+    },
+    "metrics": {
+        "ragas_faithfulness":     0.82,
+        "ragas_answer_relevancy": 0.78,
+        "ragas_context_precision":0.71,
+        "human_eval_sample":      "12/15 respuestas correctas (n=15, revisor único)",
+    },
+    "ethical_considerations": {
+        "bias_audit":         "Auditoría básica de género-profesión realizada",
+        "privacy":            "No almacena conversaciones de usuario",
+        "environmental":      "Modelo servido por infraestructura institucional",
+    },
+    "limitations": [
+        "Modelo base multilingüe pero afinado solo en español.",
+        "Ventana de contexto de 8K tokens — documentos largos se trocean.",
+        "No detecta sarcasmo ni ironía en consultas.",
+    ],
+    "caveats_and_recommendations": [
+        "Validar siempre la respuesta contra la fuente original.",
+        "No usar como única fuente para decisiones clínicas o legales.",
+        "Reportar fallos al equipo Módulo 10 (achen@us.es).",
+    ],
+}
+
+# Renderizar como Markdown
+def model_card_a_markdown(card: dict) -> str:
+    md = [f"# Model Card — {card['model_details']['name']}\n"]
+    for seccion, contenido in card.items():
+        md.append(f"## {seccion.replace('_', ' ').title()}\n")
+        if isinstance(contenido, dict):
+            for k, v in contenido.items():
+                md.append(f"- **{k.replace('_', ' ')}:** {v}")
+        else:
+            for item in contenido:
+                md.append(f"- {item}")
+        md.append("")
+    return "\n".join(md)
+
+print(model_card_a_markdown(model_card)[:1200] + "\n[...]")
+```
+
+::: {.callout-note}
+## Ejemplo estructural, no auditoría real
+
+Los valores numéricos de la Model Card anterior (`ragas_faithfulness: 0.82`, `"12/15 respuestas correctas"`, etc.) son **ilustrativos** y solo sirven para mostrar la forma del documento. En tu proyecto integrador debes sustituirlos por los resultados de tu **propia evaluación**, dejando siempre claro el protocolo con que se obtuvieron: tamaño de muestra, número de revisores, fecha y versión del modelo bajo test. Presentar cifras inventadas como si fueran una auditoría real es lo contrario de la transparencia algorítmica que promueve este bloque.
+:::
+
+### 5.2 System Card
+
+Una **System Card** va un paso más allá: documenta no solo el modelo, sino el **sistema completo** que lo envuelve (RAG, agentes, guardas, etc.). Los [System Cards de Anthropic](https://www.anthropic.com/system-cards) son los referentes.
+
+A diferencia de la Model Card (centrada en el modelo), una System Card documenta el **pipeline de extremo a extremo** y debe responder: ¿qué falla cuando el sistema falla? ¿qué se hace para que no falle? Las System Cards públicas más completas comparten cinco bloques:
+
+- **Componentes** del sistema: retrieval, LLM, tools, guardas, capas de moderación.
+- **Hallazgos de red team**: qué ataques se probaron, qué jailbreaks se observaron, qué patrones de prompt injection se documentaron.
+- **Mitigaciones aplicadas**: sanitización de inputs, rate limiting, filtros de salida, audit log, listas de palabras prohibidas.
+- **Monitorización continua**: métricas en producción, alertas automáticas, revisión humana periódica, feedback de usuarios.
+- **Limitaciones y casos fuera de alcance**: lo que el sistema **no** debe usarse para hacer.
+
+### System Cards de referencia en la industria
+
+| Sistema | Organización | Año | Cubre |
+|---|---|---|---|
+| [Claude 3.7 Sonnet](https://www.anthropic.com/claude-3-7-sonnet-system-card) | Anthropic | 2025 | Agentes, computer use, prompt injection, razonamiento oculto, RSP evaluations |
+| [Claude 3.5 Sonnet (model card addendum)](https://www-cdn.anthropic.com/fed9cc193a14b84131812372d8d5857f8f304c52/Model_Card_Claude_3_Addendum.pdf) | Anthropic | 2024 | ASL-2, trabajo con UK AISI, vulnerabilidades identificadas |
+| [GPT-4o](https://openai.com/index/gpt-4o-system-card/) | OpenAI | 2024 | Preparedness framework, voz no autorizada, atribución de rasgos, evaluaciones externas (METR, Apollo) |
+| [o1](https://openai.com/index/openai-o1-system-card/) | OpenAI | 2024 | Chain-of-thought safety, jailbreaks, deliberative alignment, scheming evaluations |
+| [Gemini 1.5](https://storage.googleapis.com/deepmind-media/gemini/gemini_v1_5_report.pdf) | Google DeepMind | 2024 | Long-context safety, evals multilingües, riesgos de agentes |
+| [Índice completo de Anthropic](https://www.anthropic.com/system-cards) | Anthropic | — | Acceso a todas las System Cards de la familia Claude |
+| [Índice de Google DeepMind](https://deepmind.google/models/model-cards/) | Google DeepMind | — | Model Cards de Gemini, Gemma, Veo, Imagen y modelos de robótica |
+
+::: {.callout-tip}
+## Cómo escribir tu propia System Card
+
+1. **Describe el sistema, no solo el modelo.** Lista cada componente (retrieval, LLM, herramientas, guardas) y su versión concreta.
+2. **Audita antes de publicar.** Realiza un red team mínimo (10-20 ataques) y documenta qué funcionó y qué no. Si no hiciste auditoría, dilo explícitamente.
+3. **Mide en producción.** Latencia p95, tasa de error, faithfulness, feedback de usuarios. Define umbrales de alerta.
+4. **Declara lo que NO hace.** Out-of-scope claro (asistencia médica/legal, datos reales, decisiones automatizadas sin supervisión).
+5. **Versiona y fecha.** Una System Card sin fecha ni versión no sirve para auditoría posterior.
+:::

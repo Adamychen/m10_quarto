@@ -1,0 +1,197 @@
+---
+title: "04f — Patrones de despliegue"
+engine: jupyter
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque4/04f-despliegue.ipynb)
+
+> Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). Esta última subsección cierra el bloque llevando los sistemas documentados en [04e — Documentación](04e-documentacion.qmd) a un entorno de producción observable y mantenible.
+
+## 6. Patrones de despliegue
+
+### 6.1 On-premise vs. cloud
+
+| Criterio | On-premise (Ollama / vLLM) | Cloud (OpenAI-compat) |
+|---|---|---|
+| **Coste mensual** | Hardware + energía | Por token (~0,001-0,03 $/1k tokens) |
+| **Privacidad** | Total: los datos no salen de tu red | Depende del proveedor y contrato |
+| **Latencia** | Baja y estable (red local) | Variable, depende de la región |
+| **Mantenimiento** | Tú gestionas actualizaciones, GPU, fallos | Sin mantenimiento |
+| **Modelos disponibles** | Solo open-weight descargados | Acceso a modelos de frontera |
+| **Escalado** | Limitado al hardware | Elástico bajo demanda |
+| **Caso de uso típico** | Datos sensibles, RGPD, costes predecibles | Picos de tráfico, prototipado rápido |
+
+::: {.callout-tip}
+## Regla práctica
+
+- **Datos sensibles (sanidad, legal, finanzas):** on-premise con Ollama o vLLM.
+- **Volumen variable o global:** cloud con API compatible con OpenAI.
+- **Híbrido:** cloud para prototipado, on-premise para producción.
+:::
+
+### 6.2 vLLM y Ollama (un comando cada uno)
+
+```python
+#| echo: true
+#| eval: false
+
+# ─── vLLM (alto rendimiento, GPU) ───
+# Sirve un modelo como API OpenAI-compatible en localhost:8000
+# pip install vllm
+# vllm serve Qwen/Qwen2.5-7B-Instruct --port 8000
+
+# ─── Ollama (más simple, también CPU) ───
+# ollama serve              # arranca el servidor
+# ollama pull gemma3:4b     # descarga el modelo
+# ollama run gemma3:4b      # chat interactivo
+
+# ─── Cliente (idéntico en ambos casos) ───
+# from openai import OpenAI
+# client = OpenAI(base_url="http://localhost:8000/v1", api_key="not-needed")
+# print(client.chat.completions.create(
+#     model="Qwen/Qwen2.5-7B-Instruct",
+#     messages=[{"role": "user", "content": "Hola"}],
+# ).choices[0].message.content)
+```
+
+### 6.3 Observabilidad con Langfuse
+
+[Langfuse](https://langfuse.com) y [LangSmith](https://docs.smith.langchain.com) son las dos plataformas líderes para trazabilidad en producción. Permiten ver cada llamada, sus tokens, su latencia y el feedback de los usuarios.
+
+```python
+#| echo: true
+#| eval: false
+
+import os
+from openai import OpenAI
+"""
+Setup compartido para la API key de Llamus en todos los notebooks.
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
+
+Orden de resolución:
+  1. .env local (python-dotenv)
+  2. os.environ ya configurado externamente
+  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
+
+Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+"""
+
+import os
+
+
+def _load_llm_api_key():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
+    if not os.getenv("LLM_API_KEY"):
+        try:
+            from google.colab import userdata
+            for name in ("LLAMUS_API_KEY", "LLM_API_KEY"):
+                try:
+                    value = userdata.get(name)
+                    if value:
+                        os.environ["LLM_API_KEY"] = value
+                        break
+                except Exception:
+                    continue
+        except ImportError:
+            pass
+
+
+_load_llm_api_key()
+
+if os.getenv("LLM_API_KEY"):
+    print("✓ LLM_API_KEY cargada.")
+else:
+    print("⚠️  LLM_API_KEY no encontrada.")
+    print("    • Local: crea un archivo .env con LLM_API_KEY=tu_clave")
+    print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
+
+# pip install langfuse
+from langfuse import Langfuse
+
+langfuse = Langfuse(
+    public_key="pk-...",
+    secret_key="sk-...",
+    host="https://cloud.langfuse.com",
+)
+
+trace = langfuse.trace(name="consulta-rag")
+
+# Registrar un span (etapa del pipeline)
+span = trace.span(name="retrieve", input={"query": "¿Cuál es el margen?"})
+# ... tu retrieval aquí ...
+span.end(output={"chunks": 3, "top_distance": 0.12})
+
+# Registrar la generación
+gen = trace.generation(
+    name="generate",
+    model="gemma4:e2b-mlx",
+    input={"messages": [...]},
+    output={"text": "..."},
+    usage={"prompt_tokens": 120, "completion_tokens": 50},
+)
+gen.end()
+
+# Feedback del usuario (👍 / 👎)
+trace.score(name="user_feedback", value=1)  # 1 = positivo
+```
+
+::: {.callout-tip}
+## Checklist de observabilidad mínima
+
+- [ ] Cada llamada al LLM queda registrada con timestamp, modelo y tokens.
+- [ ] Latencia por etapa (retrieval, rerank, generación) medida por separado.
+- [ ] Coste acumulado por usuario/equipo visible.
+- [ ] Mecanismo de feedback (👍/👎) integrado en la UI.
+- [ ] Alertas si latencia p95 > N segundos o si error rate > X %.
+:::
+
+### 6.4 Caching semántico
+
+Cuando dos consultas son muy similares, no tiene sentido gastar tokens en una segunda llamada al LLM. El **caching semántico** compara embeddings y reutiliza respuestas anteriores.
+
+```python
+#| echo: true
+#| eval: true
+
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+
+class CacheSemantico:
+    """Caching simple basado en similitud coseno de embeddings."""
+    def __init__(self, umbral: float = 0.92):
+        self.umbral = umbral
+        self.queries = []
+        self.respuestas = []
+
+    def buscar(self, embedding_query: np.ndarray) -> str | None:
+        if not self.queries:
+            return None
+        matriz = np.vstack(self.queries)
+        sims = cosine_similarity(embedding_query.reshape(1, -1), matriz)[0]
+        if sims.max() >= self.umbral:
+            idx = int(sims.argmax())
+            return f"[CACHE HIT · sim={sims[idx]:.3f}] {self.respuestas[idx]}"
+        return None
+
+    def guardar(self, embedding_query: np.ndarray, respuesta: str) -> None:
+        self.queries.append(embedding_query)
+        self.respuestas.append(respuesta)
+
+
+# Mini-demo
+cache = CacheSemantico()
+dim = 8
+np.random.seed(0)
+emb_1 = np.random.randn(dim); emb_1 /= np.linalg.norm(emb_1)
+emb_2 = emb_1 + np.random.randn(dim) * 1e-3  # casi idéntica
+emb_3 = np.random.randn(dim); emb_3 /= np.linalg.norm(emb_3)
+
+cache.guardar(emb_1, "Respuesta a la primera consulta.")
+print(cache.buscar(emb_2))  # debería ser CACHE HIT
+print(cache.buscar(emb_3))  # debería ser None
+```

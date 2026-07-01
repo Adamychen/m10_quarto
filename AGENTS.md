@@ -29,7 +29,13 @@ m10_quarto/
 │   ├── 03b-rag-avanzado.qmd
 │   └── 03c-fine-tuning.qmd
 ├── bloque4/                     # Despliegue y gobernanza (CE-6)
-│   └── 04-gobernanza.qmd
+│   ├── 04-gobernanza.qmd        # Índice del bloque
+│   ├── 04a-evaluacion.qmd       # Métricas + LLM-as-judge + frameworks
+│   ├── 04b-alucinaciones.qmd    # Taxonomía + grounding + citation
+│   ├── 04c-privacidad.qmd       # PII + datos sintéticos + DP
+│   ├── 04d-sesgo.qmd            # Tipos + auditoría de sesgo
+│   ├── 04e-documentacion.qmd    # Model Card + System Card
+│   └── 04f-despliegue.qmd       # On-prem + observabilidad + caching
 ├── evaluables/                  # Ejercicios evaluables (10 ficheros)
 │   ├── hpd1-embeddings.qmd           # Taller presencial HPD 1
 │   ├── hpd1-evaluables.qmd          # HPD 1 — entrega
@@ -51,10 +57,13 @@ m10_quarto/
 │   └── sbert_figure_2.png
 ├── includes/
 │   ├── footer.html              # Pie de página
-│   └── mermaid-init.js          # Tema Mermaid del sitio (paleta Python + semánticos)
+│   ├── mermaid-init.js          # Tema Mermaid del sitio (paleta Python + semánticos)
+│   └── setup_keys.py            # Fuente única de la lógica de carga de LLM_API_KEY
 ├── styles.css                   # Estilos CSS personalizados
 ├── requirements.txt             # Dependencias Python fijadas
 ├── generate_notebooks.sh        # Genera .ipynb desde .qmd
+├── scripts/
+│   └── sync_setup_keys.py       # Pre-render: inyecta setup_keys.py en los .qmd
 └── AGENTS.md                    # Este archivo
 ```
 
@@ -66,7 +75,7 @@ m10_quarto/
 | **Bloque 1 — Fundamentos** | `bloque1/01-fundamentos.qmd`, `01a-transformer.qmd`, `01b-llms.qmd`, `01c-embeddings.qmd`, `01d-vectordb.qmd`, `evaluables/hpd1-embeddings.qmd`, `evaluables/hpd1-evaluables.qmd`, `evaluables/hpd1-extension.qmd` |
 | **Bloque 2 — Orquestación** | `bloque2/02-orquestacion.qmd`, `02a-prompt-engineering.qmd`, `02b-langchain.qmd`, `02c-llamaindex.qmd`, `02d-mcp.qmd`, `02e-agentes.qmd`, `hpd2-agente-tool-calling.qmd`, `evaluables/hpd2-evaluables.qmd`, `evaluables/hpd2-extension.qmd`, `hpd3-servidor-mcp.qmd`, `evaluables/hpd3-evaluables.qmd`, `evaluables/hpd3-extension.qmd` |
 | **Bloque 3 — Aplicaciones** | `bloque3/03-aplicaciones.qmd`, `03b-rag-avanzado.qmd`, `03a-datos-sinteticos.qmd`, `03c-fine-tuning.qmd`, `evaluables/hpd4-rag-mixto.qmd`, `evaluables/hpd4-datos-sinteticos.qmd`, `evaluables/hpd4-datos-sinteticos-extension.qmd` |
-| **Bloque 4 — Gobernanza** | `bloque4/04-gobernanza.qmd` |
+| **Bloque 4 — Gobernanza** | `bloque4/04-gobernanza.qmd`, `04a-evaluacion.qmd`, `04b-alucinaciones.qmd`, `04c-privacidad.qmd`, `04d-sesgo.qmd`, `04e-documentacion.qmd`, `04f-despliegue.qmd` |
 | **Evaluación** | `05-evaluacion.qmd` |
 | **Recursos** | `06-herramientas.qmd`, `07-bibliografia.qmd` |
 
@@ -99,6 +108,146 @@ Los `.ipynb` que se enlazan desde los badges "Open in Colab" se generan desde lo
 ```
 
 Esto descubre automáticamente todos los `.qmd` con `engine: jupyter` en `bloque1/..4/` y `evaluables/`, y produce los `.ipynb` correspondientes en `notebooks/` (preservando la estructura de carpetas).
+
+## API key centralizada (Llamus)
+
+Todos los notebooks que usan Llamus comparten una única lógica de carga de la API key, centralizada en `includes/setup_keys.py`. La fuente de verdad es **un solo archivo**; los `.qmd` consumen un marcador y un pre-render lo expande.
+
+### Orden de resolución de `LLM_API_KEY`
+
+1. `.env` local (cargado con `python-dotenv`).
+2. `os.environ` ya configurado externamente.
+3. **Google Colab userdata:** secret `LLAMUS_API_KEY` (preferente) o `LLM_API_KEY`.
+
+### Cómo se inyecta en los `.qmd`
+
+1. El `.qmd` contiene el marcador `"""
+Setup compartido para la API key de Llamus en todos los notebooks.
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
+
+Orden de resolución:
+  1. .env local (python-dotenv)
+  2. os.environ ya configurado externamente
+  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
+
+Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+"""
+
+import os
+
+
+def _load_llm_api_key():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
+    if not os.getenv("LLM_API_KEY"):
+        try:
+            from google.colab import userdata
+            for name in ("LLAMUS_API_KEY", "LLM_API_KEY"):
+                try:
+                    value = userdata.get(name)
+                    if value:
+                        os.environ["LLM_API_KEY"] = value
+                        break
+                except Exception:
+                    continue
+        except ImportError:
+            pass
+
+
+_load_llm_api_key()
+
+if os.getenv("LLM_API_KEY"):
+    print("✓ LLM_API_KEY cargada.")
+else:
+    print("⚠️  LLM_API_KEY no encontrada.")
+    print("    • Local: crea un archivo .env con LLM_API_KEY=tu_clave")
+    print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
+` en la celda de setup.
+2. `_quarto.yml` declara `pre-render: scripts/sync_setup_keys.py`.
+3. Antes de cada `quarto render`, el script reemplaza el marcador por el contenido de `includes/setup_keys.py` (in-place, idempotente).
+4. Los `.ipynb` generados ya llevan el código inlinado y funcionan en Colab sin necesidad de clonar el repositorio.
+
+### Configurar la API key en Colab
+
+1. Abrir el icono 🔑 (Secrets) en la barra lateral izquierda.
+2. "Add new secret" → nombre: `LLAMUS_API_KEY` (preferente) o `LLM_API_KEY`.
+3. Pegar la clave como valor → activar "Notebook access".
+4. Re-ejecutar la celda de setup.
+
+### Configurar la API key en local
+
+Crear un archivo `.env` en la raíz del proyecto:
+
+```
+LLM_API_KEY=tu_clave_aquí
+```
+
+### Actualizar la lógica centralizada
+
+Si cambia el orden de resolución o el formato de los secrets:
+
+1. Editar `includes/setup_keys.py`.
+2. Re-añadir el marcador `"""
+Setup compartido para la API key de Llamus en todos los notebooks.
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
+
+Orden de resolución:
+  1. .env local (python-dotenv)
+  2. os.environ ya configurado externamente
+  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
+
+Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+"""
+
+import os
+
+
+def _load_llm_api_key():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
+    if not os.getenv("LLM_API_KEY"):
+        try:
+            from google.colab import userdata
+            for name in ("LLAMUS_API_KEY", "LLM_API_KEY"):
+                try:
+                    value = userdata.get(name)
+                    if value:
+                        os.environ["LLM_API_KEY"] = value
+                        break
+                except Exception:
+                    continue
+        except ImportError:
+            pass
+
+
+_load_llm_api_key()
+
+if os.getenv("LLM_API_KEY"):
+    print("✓ LLM_API_KEY cargada.")
+else:
+    print("⚠️  LLM_API_KEY no encontrada.")
+    print("    • Local: crea un archivo .env con LLM_API_KEY=tu_clave")
+    print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
+` en los `.qmd` que lo necesiten (queda oculto tras la primera inyección; buscar con `grep -L "from dotenv" bloque*/evaluables/*.qmd`).
+3. Re-ejecutar `./generate_notebooks.sh` o `quarto render`.
+
+### Diagnóstico rápido
+
+Si una celda con LLM devuelve 401, ejecutar en una celda aparte:
+
+```python
+import os
+print("LLM_API_KEY set:", bool(os.getenv("LLM_API_KEY")))
+print("Source:", "env" if "LLM_API_KEY" in os.environ else "missing")
+```
 
 ## Despliegue (publicación manual con `quarto publish`)
 
@@ -143,6 +292,52 @@ A partir de ahí, cada `quarto publish gh-pages` actualiza la rama `gh-pages` y 
 - Los `.qmd` usan `engine: jupyter` y contienen celdas Python ejecutables.
 - Las celdas con `#| eval: true` se ejecutan durante `quarto render`.
 - Las celdas con `#| eval: false` (típicamente las que llaman al LLM) NO se ejecutan en render; los notebooks Colab son el vehículo de ejecución real.
+- La lógica de carga de `LLM_API_KEY` está centralizada en `includes/setup_keys.py` y se inyecta vía el marcador `"""
+Setup compartido para la API key de Llamus en todos los notebooks.
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
+
+Orden de resolución:
+  1. .env local (python-dotenv)
+  2. os.environ ya configurado externamente
+  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
+
+Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+"""
+
+import os
+
+
+def _load_llm_api_key():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
+    if not os.getenv("LLM_API_KEY"):
+        try:
+            from google.colab import userdata
+            for name in ("LLAMUS_API_KEY", "LLM_API_KEY"):
+                try:
+                    value = userdata.get(name)
+                    if value:
+                        os.environ["LLM_API_KEY"] = value
+                        break
+                except Exception:
+                    continue
+        except ImportError:
+            pass
+
+
+_load_llm_api_key()
+
+if os.getenv("LLM_API_KEY"):
+    print("✓ LLM_API_KEY cargada.")
+else:
+    print("⚠️  LLM_API_KEY no encontrada.")
+    print("    • Local: crea un archivo .env con LLM_API_KEY=tu_clave")
+    print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
+` (pre-render automático, ver sección "API key centralizada").
 - El grid del sitio está configurado en `_quarto.yml` (sidebar 260px, body 850px, margin 0px).
 - Footer con créditos en todas las páginas.
 - `scripts/`, `solutions/` y `guias/` están en `.gitignore` y excluidos del render. Los scripts de corrección (`scripts/corregir_hpdN.py`) referenciados en los `.qmd` evaluables se desarrollarán en una iteración futura.

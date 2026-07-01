@@ -1,0 +1,166 @@
+---
+title: "04b — Alucinaciones"
+engine: jupyter
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque4/04b-alucinaciones.ipynb)
+
+> Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). Se recomienda leer antes la subsección [04a — Evaluación de LLMs](04a-evaluacion.qmd), donde se introducen las métricas que permiten detectar los fenómenos descritos aquí.
+
+## 2. Alucinaciones
+
+Las alucinaciones son el riesgo más visible de los LLMs en producción: el modelo afirma con total seguridad algo que es **falso, no respaldado o simplemente inexistente**. Distinguirlas bien es el primer paso para mitigarlas.
+
+### 2.1 Taxonomía
+
+| Tipo | Descripción | Ejemplo |
+|---|---|---|
+| **Factual** | Inventa datos verificables | "Tesla fue fundada en 1923" |
+| **Faithfulness** | Lo que dice no se apoya en el contexto dado | El contexto dice "margen 42 %" y la respuesta dice "margen 24 %" |
+| **Extrinsic** | Atribuye el contenido a una fuente que no existe | "Según un estudio de la US de 2018..." (no existe) |
+| **Reasoning** | Conclusión correcta a partir de premisas falsas | Mezcla datos reales para inferir algo incoherente |
+
+```python
+#| echo: true
+#| eval: true
+
+def detectar_hallucination_factual(afirmacion: str, hechos: list[str]) -> dict:
+    """
+    Detección de alucinación con verificación de claims.
+    Compara cada afirmación contra una lista de hechos conocidos.
+    En producción, los 'hechos' vienen de RAG/búsqueda web.
+    """
+    afirmacion_lower = afirmacion.lower()
+    evidencias = []
+    for hecho in hechos:
+        # Coincidencia simple: porcentaje de palabras clave compartidas
+        palabras_clave = set(hecho.lower().split()) - {"el", "la", "de", "y", "a", "en"}
+        presentes = sum(1 for p in palabras_clave if p in afirmacion_lower)
+        score = presentes / max(len(palabras_clave), 1)
+        if score > 0.4:
+            evidencias.append({"hecho": hecho, "solapamiento": round(score, 2)})
+
+    if not evidencias:
+        return {"alucinacion_probable": True, "evidencias": []}
+    return {
+        "alucinacion_probable": False,
+        "evidencias": sorted(evidencias, key=lambda x: -x["solapamiento"])[:3],
+    }
+
+
+# Demo
+hechos = [
+    "El Monitor 4K tiene un margen del 42% y 120 unidades en stock.",
+    "La Silla Ergonómica Pro tiene stock de 32 unidades.",
+    "El precio del Monitor 4K es 349 euros.",
+]
+
+pruebas = [
+    "El margen del Monitor 4K es del 42%.",
+    "La Silla Ergonómica tiene margen del 50%.",
+    "Tesla fue fundada en 1923.",
+]
+
+for p in pruebas:
+    r = detectar_hallucination_factual(p, hechos)
+    flag = "ALUCINACIÓN" if r["alucinacion_probable"] else "OK"
+    print(f"  [{flag}] {p}")
+    for ev in r["evidencias"][:1]:
+        print(f"        → {ev['hecho'][:60]}...  (solape {ev['solapamiento']})")
+```
+
+### 2.2 Mitigación: grounding + citation
+
+```python
+#| echo: true
+#| eval: false
+
+import os
+from openai import OpenAI
+"""
+Setup compartido para la API key de Llamus en todos los notebooks.
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
+
+Orden de resolución:
+  1. .env local (python-dotenv)
+  2. os.environ ya configurado externamente
+  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
+
+Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+"""
+
+import os
+
+
+def _load_llm_api_key():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
+    if not os.getenv("LLM_API_KEY"):
+        try:
+            from google.colab import userdata
+            for name in ("LLAMUS_API_KEY", "LLM_API_KEY"):
+                try:
+                    value = userdata.get(name)
+                    if value:
+                        os.environ["LLM_API_KEY"] = value
+                        break
+                except Exception:
+                    continue
+        except ImportError:
+            pass
+
+
+_load_llm_api_key()
+
+if os.getenv("LLM_API_KEY"):
+    print("✓ LLM_API_KEY cargada.")
+else:
+    print("⚠️  LLM_API_KEY no encontrada.")
+    print("    • Local: crea un archivo .env con LLM_API_KEY=tu_clave")
+    print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
+
+LLM_KEY = os.getenv("LLM_API_KEY")
+LLM_URL = "https://llamus.cs.us.es/api/v1"
+
+client = OpenAI(base_url=LLM_URL, api_key=LLM_KEY)
+
+PROMPT_GROUNDED = """Eres un asistente corporativo. Responde a la pregunta del
+usuario usando EXCLUSIVAMENTE la información del contexto.
+
+Reglas estrictas:
+1. Si la respuesta está en el contexto, respóndela y cita el fragmento entre
+   corchetes: [Fragmento N].
+2. Si el contexto NO contiene la información, di literalmente: "No tengo
+   información suficiente para responder a esta pregunta."
+3. NO inventes datos, NO uses conocimiento previo, NO generalices.
+
+Contexto:
+{contexto}
+
+Pregunta: {pregunta}
+"""
+
+def responder_con_citation(pregunta, contexto, llm_client):
+    contexto_txt = "\n\n".join(f"[Fragmento {i+1}]\n{c}" for i, c in enumerate(contexto))
+    return llm_client.chat.completions.create(
+        model="gemma4:e2b-mlx",
+        messages=[{"role": "user", "content": PROMPT_GROUNDED.format(
+            contexto=contexto_txt, pregunta=pregunta
+        )}],
+        temperature=0,
+    ).choices[0].message.content
+```
+
+::: {.callout-tip}
+## Checklist anti-alucinación
+
+- [ ] Prompt instruye explícitamente a no inventar
+- [ ] Prompt obliga a decir "no sé" cuando el contexto no alcanza
+- [ ] El sistema cita las fuentes (fragments) en la respuesta
+- [ ] Post-procesado: verificar que las citas referencian chunks reales
+- [ ] RAGAS `faithfulness` > 0.7 antes de producción
+:::

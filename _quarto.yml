@@ -8,6 +8,8 @@ project:
     - "!scripts/"
     - "!Modulo10_IA_Generativa_DataScience.*"
     - "!README.md"
+  pre-render:
+    - "scripts/sync_setup_keys.py"
 
 website:
   title: "Módulo 10 — IA Generativa para Data Science"
@@ -85,7 +87,19 @@ website:
       - section: "Bloque 4 — Gobernanza"
         contents:
           - href: bloque4/04-gobernanza.qmd
-            text: Teoría y Despliegue
+            text: Visión general
+          - href: bloque4/04a-evaluacion.qmd
+            text: Evaluación de LLMs
+          - href: bloque4/04b-alucinaciones.qmd
+            text: Alucinaciones
+          - href: bloque4/04c-privacidad.qmd
+            text: Privacidad y PII
+          - href: bloque4/04d-sesgo.qmd
+            text: Sesgo en LLMs
+          - href: bloque4/04e-documentacion.qmd
+            text: Documentación
+          - href: bloque4/04f-despliegue.qmd
+            text: Patrones de despliegue
       - section: "Evaluación"
         contents:
           - href: 05-evaluacion.qmd

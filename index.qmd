@@ -14,6 +14,17 @@ title: "Módulo 10 — IA Generativa para Data Science"
 Si prefieres descargar el `.ipynb` y subirlo manualmente: [Ver archivos en GitHub](https://github.com/Adamychen/m10_quarto/tree/main/notebooks/).
 :::
 
+::: {.callout-warning}
+## Configura tu API key de Llamus antes de ejecutar las celdas
+
+Los notebooks que usan LLMs necesitan una API key de la Universidad de Sevilla. **Si la celda de setup te muestra `⚠️ LLM_API_KEY no encontrada`, configúrala antes de seguir:**
+
+- **En Colab** (recomendado): abre el icono 🔑 (Secrets) en la barra lateral izquierda → "Add new secret" → nombre `LLAMUS_API_KEY` → pega tu clave → activa "Notebook access" → vuelve a ejecutar la celda de setup.
+- **En local**: crea un archivo `.env` en la raíz del proyecto con `LLM_API_KEY=tu_clave`.
+
+La clave te la proporcionará el profesorado al inicio del módulo. Más detalles en [Herramientas → Configuración de la API key](06-herramientas.qmd#configuración-de-la-api-key-de-llamus).
+:::
+
 ## Distribución de la carga docente
 
 | Tipo de actividad | Horas | % del total | Formato |
