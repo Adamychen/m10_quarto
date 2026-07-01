@@ -174,7 +174,7 @@ print("Setup listo.")
 
 ---
 
-## Ejercicio 1 — Agente multi-herramienta (2.5 puntos)
+## Ejercicio 1 — Agente multi-herramienta (2.5 puntos) {#sec-hpd2-ext-e1}
 
 Implementa un agente con **4 o más herramientas** distintas (mínimo: consulta_pandas, histograma/barras/boxplot, correlacion, resumen_estadistico). Haz **3 preguntas complejas** que requieran el uso de al menos 2 herramientas distintas cada una. Guarda el log completo de ejecución.
 
@@ -227,7 +227,7 @@ print("✅ Ejercicio 1: formato correcto")
 
 ---
 
-## Ejercicio 2 — Agente con RAG y memoria (2.5 puntos)
+## Ejercicio 2 — Agente con RAG y memoria (2.5 puntos) {#sec-hpd2-ext-e2}
 
 Implementa un agente que combine **3 capacidades**:
 1. Consultar el DataFrame Titanic (consulta_pandas)
@@ -290,7 +290,7 @@ print("✅ Ejercicio 2: formato correcto")
 
 ---
 
-## Ejercicio 3 — Benchmark de modelos (2.5 puntos)
+## Ejercicio 3 — Benchmark de modelos (2.5 puntos) {#sec-hpd2-ext-e3}
 
 Ejecuta el mismo agente (consulta_pandas + tools de visualización) usando **2 LLMs distintos** (el que tengas disponible: gemma4:e2b-mlx + otro como gpt-3.5-turbo, llama3.2, o cualquier otro vía Llamus US). Evalúa las mismas 5 preguntas con cada modelo y compara: velocidad, tokens usados (si la API lo reporta) y aciertos.
 
@@ -339,7 +339,7 @@ print("✅ Ejercicio 3: formato correcto")
 
 ---
 
-## Ejercicio 4 — Agente supervisor con 2 sub-agentes (2.5 puntos)
+## Ejercicio 4 — Agente supervisor con 2 sub-agentes (2.5 puntos) {#sec-hpd2-ext-e4}
 
 Implementa una arquitectura **Supervisor** usando LangGraph: un agente principal (supervisor) que decide si delegar al **Agente Analista** (consulta_pandas, correlacion) o al **Agente Visualizador** (histograma, barras, boxplot, resumen_estadistico).
 

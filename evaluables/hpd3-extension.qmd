@@ -138,7 +138,7 @@ print("Dataset listo.")
 
 ---
 
-## Ejercicio 1 — Tool de auditoría con logs (3.5 puntos)
+## Ejercicio 1 — Tool de auditoría con logs (3.5 puntos) {#sec-hpd3-ext-e1}
 
 Añade una tabla `auditoria(id, timestamp, query, resultado_truncado, bloqueado)` al schema y modifica `consultar_sql` para que **cada consulta** se registre automáticamente. Implementa una nueva tool `ver_auditoria(filtro)` que devuelva los logs filtrados: `"todas"`, `"bloqueadas"` o `"ultimas_10"`.
 
@@ -178,7 +178,7 @@ print("✅ Ejercicio 1: formato correcto")
 
 ---
 
-## Ejercicio 2 — Rate limiting (3.5 puntos)
+## Ejercicio 2 — Rate limiting (3.5 puntos) {#sec-hpd3-ext-e2}
 
 Modifica `consultar_sql` para que imponga un límite de **10 consultas por minuto**. Si se supera, la tool debe devolver el mensaje `"Rate limit: máximo 10 consultas/minuto. Espera X segundos."` donde X son los segundos restantes. Usa una variable global con timestamp + contador.
 
@@ -235,7 +235,7 @@ print("✅ Ejercicio 2: formato correcto")
 
 ---
 
-## Ejercicio 3 — Agente LangChain que consume tools MCP (3 puntos)
+## Ejercicio 3 — Agente LangChain que consume tools MCP (3 puntos) {#sec-hpd3-ext-e3}
 
 Crea un agente con LangChain (`create_agent`) donde las tools no sean funciones Python decoradas con `@tool`, sino wrappers que invoquen las tools de tu servidor MCP. El agente debe responder preguntas sobre la base de datos corporativa usando exclusivamente las tools MCP.
 

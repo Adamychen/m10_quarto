@@ -7,7 +7,7 @@ engine: jupyter
 
 > **Duración:** 4h
 >
-> **Competencias:** [CE-4](../index.qmd#competencias-específicas)
+> **Competencias:** [CE-4](../index.qmd#sec-competencias-especificas)
 
 ::: {.callout-tip icon=false}
 ## Objetivos
@@ -157,7 +157,7 @@ Creamos un corpus corporativo con dos tipos de datos:
 - **3 PDFs** de informes trimestrales de ventas (generados con `fpdf2`)
 - **1 tabla SQLite** de productos con precios, márgenes y stock
 
-## 1.1 Generar los PDFs de informes trimestrales
+## 1.1 Generar los PDFs de informes trimestrales {#sec-hpd4-1-1-pdfs}
 
 ```{python}
 #| echo: true
@@ -255,7 +255,7 @@ for nombre in informes:
     print(f"   {nombre}: {size_kb:.0f} KB")
 ```
 
-## 1.2 Crear tabla SQLite de productos
+## 1.2 Crear tabla SQLite de productos {#sec-hpd4-1-2-sql}
 
 ```{python}
 #| echo: true
@@ -335,7 +335,7 @@ for t in df_productos["texto"].head(4):
 
 Indexamos ambas fuentes en collections separadas. Ya sabes hacer esto del HPD 1.
 
-## 2.1 Cargar y trocear los PDFs
+## 2.1 Cargar y trocear los PDFs {#sec-hpd4-2-1-cargar}
 
 ```{python}
 #| echo: true
@@ -373,7 +373,7 @@ if chunks_pdf:
         print(f"  [{i}] {os.path.basename(c.metadata['source'])}: {len(c.page_content)} chars")
 ```
 
-## 2.2 Indexar PDFs en Chroma
+## 2.2 Indexar PDFs en Chroma {#sec-hpd4-2-2-indexar-pdfs}
 
 ```{python}
 #| echo: true
@@ -387,7 +387,7 @@ collection_pdf = client.get_or_create_collection(
 # Por cada chunk en chunks_pdf:
 #   1. model.encode(chunk.page_content)
 #   2. collection_pdf.add() con id único, embedding, documento y metadata
-# Pista: mismo patrón que en HPD 1, sección 1.4
+# Pista: mismo patrón que en HPD 1, sección 1.4 (Embeddings e indexación en Chroma)
 
 if chunks_pdf:
     print(f"✅ Indexación completada: {collection_pdf.count()} vectores")
@@ -395,7 +395,7 @@ else:
     print("⚠️  Completa cargar_y_trocear_pdfs() primero.")
 ```
 
-## 2.3 Indexar productos SQL en Chroma
+## 2.3 Indexar productos SQL en Chroma {#sec-hpd4-2-3-indexar-sql}
 
 ```{python}
 #| echo: true
@@ -409,7 +409,7 @@ collection_sql = client.get_or_create_collection(
 # Por cada fila de df_productos:
 #   1. model.encode(df_productos["texto"][i])
 #   2. collection_sql.add() con id, embedding, documento y metadata (nombre, categoria)
-# Pista: mismo patrón que HPD 1, sección 1.6 (tabular)
+# Pista: mismo patrón que HPD 1, sección 1.6 (embeddings de datos tabulares)
 
 print(f"✅ Indexación completada: {collection_sql.count()} vectores")
 ```
@@ -420,7 +420,7 @@ print(f"✅ Indexación completada: {collection_sql.count()} vectores")
 
 Implementamos un retriever para cada fuente y los combinamos. El retriever busca los k chunks más similares a la pregunta del usuario.
 
-## 3.1 Función de búsqueda unificada
+## 3.1 Función de búsqueda unificada {#sec-hpd4-3-1-busqueda}
 
 ```{python}
 #| echo: true
@@ -475,9 +475,22 @@ El retriever semántico (embeddings) es rápido pero poco preciso con matices. E
 ```{python}
 #| echo: true
 
+import shutil
+from pathlib import Path
+
+from flashrank import Ranker
 from langchain_community.document_compressors import FlashrankRerank
 
-reranker = FlashrankRerank(top_n=3, model="ms-marco-TinyBERT-L-2-v2")
+cache_dir = Path("models/flashrank")
+model_name = "ms-marco-TinyBERT-L-2-v2"
+model_dir = cache_dir / model_name
+
+cache_dir.mkdir(parents=True, exist_ok=True)
+if model_dir.exists() and not any(model_dir.iterdir()):
+    shutil.rmtree(model_dir)
+
+reranker_client = Ranker(model_name=model_name, cache_dir=str(cache_dir))
+reranker = FlashrankRerank(client=reranker_client, top_n=3)
 
 def rerank(query, resultados, top_n=3):
     """Reordena los resultados usando FlashrankRerank.
@@ -603,7 +616,7 @@ RAGAS evalúa automáticamente la calidad del RAG sin necesidad de respuestas de
 - **Answer Relevancy:** ¿la respuesta es pertinente a la pregunta?
 - **Context Precision:** ¿los chunks recuperados son relevantes para la pregunta?
 
-## 6.1 Crear dataset de preguntas anotadas
+## 6.1 Crear dataset de preguntas anotadas {#sec-hpd4-6-1-dataset}
 
 ```{python}
 #| echo: true
@@ -636,7 +649,7 @@ for pregunta in preguntas_eval:
 print(f"Dataset de evaluación: {len(dataset_eval)} preguntas")
 ```
 
-## 6.2 Evaluar con RAGAS
+## 6.2 Evaluar con RAGAS {#sec-hpd4-6-2-ragas}
 
 ```{python}
 #| echo: true
@@ -735,7 +748,7 @@ else:
             print(f"ERROR: {e}")
 ```
 
-## Tabla de evaluación
+## Tabla de evaluación {#sec-hpd4-tabla-evaluacion}
 
 ```
 ┌────┬──────────────────────────────────────────┬─────────────────┬──────────┬─────────────────────────┐
@@ -749,6 +762,7 @@ else:
 └────┴──────────────────────────────────────────┴─────────────────┴──────────┴─────────────────────────┘
 ```
 
+::: {#fig-hpd4-arquitectura}
 ```{mermaid}
 graph TD
     subgraph "Ingesta"
@@ -788,14 +802,15 @@ graph TD
     style P fill:#2e7d32,color:#fff
     style Q fill:#e65100,color:#fff
 ```
+:::
 
 ---
 
-# Ejercicios
+# Ejercicios {#sec-hpd4-ejercicios}
 
 ::: {.callout-tip icon=false}
 
-### Para afianzar lo aprendido (~45 min)
+### Para afianzar lo aprendido (~45 min) {#sec-hpd4-ejercicios-afianzar}
 
 Estos ejercicios no se entregan, pero te preparan para las entregas HPD y el proyecto integrador.
 
@@ -831,7 +846,7 @@ Escribe 3 preguntas originales que no estén en la lista `preguntas_eval`. Para 
 
 ---
 
-### Para seguir explorando (opcional)
+### Para seguir explorando (opcional) {#sec-hpd4-ejercicios-explorando}
 
 **E1 — Query expansion con HyDE**
 

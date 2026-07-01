@@ -103,7 +103,7 @@ print("Librerías cargadas correctamente.")
 
 ---
 
-## Dataset de trabajo
+## Dataset de trabajo {#sec-hpd4-ds-dataset}
 
 Para todos los ejercicios usarás el dataset `Adult Census Income` (UCI), cargado directamente. Contiene ~32k filas con datos demográficos y laborales.
 
@@ -127,7 +127,7 @@ print(f"Columnas categóricas: {df_real.select_dtypes(include=['object']).column
 
 ---
 
-## Ejercicio 1 — Generar datos sintéticos con LLM (enfoque intuitivo)
+## Ejercicio 1 — Generar datos sintéticos con LLM (enfoque intuitivo) {#sec-hpd4-ds-ev1}
 
 Genera 20 filas sintéticas usando la API de Llamus.
 Pide el JSON en el prompt (como en `02a-prompt-engineering.qmd`) y extrae la respuesta
@@ -165,7 +165,7 @@ else:
 
 ---
 
-## Ejercicio 2 — KS test: datos reales vs. sintéticos
+## Ejercicio 2 — KS test: datos reales vs. sintéticos {#sec-hpd4-ds-ev2}
 
 Entrena un CTGAN con SDV sobre `df_real` (usa solo las columnas `["age", "education_num", "hours_per_week", "sex", "income"]` para que entrene más rápido, 50 epochs bastan).
 Genera 1000 filas sintéticas.
@@ -195,7 +195,7 @@ else:
 
 ---
 
-## Ejercicio 3 — Utilidad downstream: clasificador con datos sintéticos
+## Ejercicio 3 — Utilidad downstream: clasificador con datos sintéticos {#sec-hpd4-ds-ev3}
 
 Entrena un `RandomForestClassifier(n_estimators=50, random_state=42)` con los datos sintéticos generados en el Ejercicio 2 (usa `eval2_df_synth`).
 Evalúa sobre el 30 % de `df_real` como test set.
@@ -219,7 +219,7 @@ else:
 
 ---
 
-## Ejercicio 4 — Comparación CTGAN vs. TVAE
+## Ejercicio 4 — Comparación CTGAN vs. TVAE {#sec-hpd4-ds-ev4}
 
 Entrena un TVAE sobre las mismas 5 columnas y con los mismos 50 epochs que en el Ejercicio 2.
 Calcula para ambos modelos (CTGAN y TVAE):

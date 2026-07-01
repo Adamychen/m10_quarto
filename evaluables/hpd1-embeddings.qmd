@@ -8,7 +8,7 @@ jupyter: python3
 
 > **Duración:** 4h
 >
-> **Competencias:** [CE-1](../index.qmd#competencias-específicas)
+> **Competencias:** [CE-1](../index.qmd#sec-competencias-especificas)
 
 ::: {.callout-tip icon=false}
 ## Objetivos
@@ -104,7 +104,7 @@ generados con los abstracts reales de papers de ArXiv: *Attention Is All You Nee
 *Sentence-BERT* y *RAG*. Son los mismos papers que indexaremos completos en la Parte 2.
 
 
-## 1.1 Corpus: abstracts reales de ArXiv
+## 1.1 Corpus: abstracts reales de ArXiv {#sec-hpd1-1-1-corpus}
 
 Usamos `arxiv` para descargar los abstracts de 3 papers clave del módulo. Con `fpdf2` los convertimos en PDFs para que el pipeline de ingesta (carga → chunking → indexación) sea idéntico al que usarás con documentos reales.
 
@@ -149,7 +149,7 @@ for nombre, (titulo, contenido) in corpus.items():
 print(f"Corpus generado: {len(corpus)} PDFs en {CORPUS_SINTETICO}")
 ```
 
-## 1.2 Carga de PDFs con LangChain
+## 1.2 Carga de PDFs con LangChain {#sec-hpd1-1-2-carga}
 
 `PyPDFLoader` carga documentos PDF y devuelve una lista de objetos `Document` de LangChain. Cada `Document` tiene `.page_content` (texto) y `.metadata` (fuente, nº de página, etc.).
 
@@ -200,7 +200,7 @@ El modelo que usamos, `e5-small-v2`, tiene solo 33 millones de parámetros: lige
 
 :::
 
-## 1.3 Chunking con RecursiveCharacterTextSplitter
+## 1.3 Chunking con RecursiveCharacterTextSplitter {#sec-hpd1-1-3-chunking}
 
 En vez de partir a mano por palabras, usamos `RecursiveCharacterTextSplitter` de LangChain: intenta cortar por párrafos (`\n\n`), luego por saltos de línea, luego por frases (`. `) y por último por espacios. Así los chunks mantienen sentido y no se cortan a mitad de una frase.
 
@@ -224,7 +224,7 @@ for i, chunk in enumerate(chunks):
     print(f"  [{i}] {fuente}: {len(chunk.page_content)} caracteres")
 ```
 
-## 1.4 Embeddings e indexación en Chroma
+## 1.4 Embeddings e indexación en Chroma {#sec-hpd1-1-4-embeddings}
 
 Cada chunk se codifica con `model.encode()` y se inserta en la colección vectorial.
 
@@ -263,6 +263,8 @@ print(f"Indexación completada: {collection.count()} vectores en Chroma")
 | **Escala máxima** | ~500k vectores | Miles de millones | Miles de millones |
 | **Privacidad** | Total (local, sin servidor) | Total (librería embebible) | Depende del despliegue |
 | **Ideal para...** | Prototipos, HPDs, proyectos pequeños | Producción on-premise, búsqueda a gran escala | Cloud multi-tenant, API REST nativa |
+: Comparativa de Chroma, FAISS y Qdrant para almacenar embeddings {#tbl-vector-stores}
+
 | **Lo usamos en...** | HPD 1, HPD 4 (RAG) | — | — |
 
 **Regla práctica:** empieza con Chroma (es lo que usamos aquí). Si tu proyecto crece
@@ -270,7 +272,7 @@ a >100k documentos o necesitas servir consultas por API, migra a Qdrant. Si nece
 máxima velocidad en local con millones de vectores, FAISS.
 :::
 
-## 1.5 Búsqueda semántica
+## 1.5 Búsqueda semántica {#sec-hpd1-1-5-busqueda}
 
 La consulta se codifica y se recuperan los `k` chunks más similares por distancia coseno.
 
@@ -318,6 +320,8 @@ Chroma devuelve distancias, no similitudes. La relación es:
 
 $$\text{distancia} = 1 - \text{similitud}$$
 
+: Comparativa entre similitud coseno y distancia coseno {#tbl-similitud-distancia}
+
 | Métrica | Rango | Interpretación |
 |---|---|---|
 | **Similitud coseno** | $[-1, 1]$ | $1$ = idénticos, $0$ = ortogonales, $-1$ = opuestos |
@@ -327,7 +331,7 @@ Con embeddings normalizados (lo habitual), la similitud coseno equivale al produ
 
 :::
 
-## 1.6 Más allá del texto: embeddings de datos tabulares
+## 1.6 Más allá del texto: embeddings de datos tabulares {#sec-hpd1-1-6-tabular}
 
 Hasta ahora hemos hecho embeddings de PDFs. Pero, ¿y si tus datos están en un Excel?
 La buena noticia: el pipeline no cambia. Solo cambia cómo conviertes cada fila en texto.
@@ -393,6 +397,8 @@ for doc, dist in zip(res["documents"][0], res["distances"][0]):
 ::: {.callout-tip}
 ## ¿Qué modelo de embeddings uso según mi tipo de dato?
 
+: Modelos de embeddings recomendados por tipo de dato {#tbl-modelos-tipo-dato}
+
 | Tipo de dato | Modelo recomendado | ¿Requiere entrenamiento? |
 |---|---|---|
 | **Texto** (PDFs, webs, emails) | `e5-small-v2`, `text-embedding-3-small` | No, vienen pre-entrenados |
@@ -418,13 +424,15 @@ Para el 80% de los casos reales de búsqueda semántica sobre datos corporativos
 registros por descripción), el texto concatenado es suficiente.
 :::
 
-## 1.7 Evaluación con recall@k
+## 1.7 Evaluación con recall@k {#sec-hpd1-1-7-recall}
 
 ::: {.callout-note icon=false}
 
 ## ¿Qué mide recall@k?
 
 De todos los chunks que deberían aparecer para una consulta (los anotamos a mano como ground truth), ¿cuántos recupera el sistema entre los primeros *k* resultados?
+
+: Comparativa del comportamiento de recall@k según el valor de k {#tbl-recall-comparativa}
 
 | Ejemplo con k=1 | Ejemplo con k=5 |
 |---|---|
@@ -497,7 +505,7 @@ for k in [1, 3, 5]:
     print(f"    recall@{k} medio: {media:.3f}")
 ```
 
-## Limpieza parte 1
+## Limpieza parte 1 {#sec-hpd1-limpieza-p1}
 
 ```{python}
 #| echo: true
@@ -515,7 +523,7 @@ print("✅ Parte 1 limpiada (colecciones + corpus temporal eliminados)")
 
 En esta segunda parte repetimos el pipeline sobre un corpus real: 6 papers descargados de ArXiv. Además añadimos una evaluación profesional con MTEB para validar la calidad del modelo de embeddings.
 
-## 2.1 Corpus real — Descarga de ArXiv
+## 2.1 Corpus real — Descarga de ArXiv {#sec-hpd1-2-1-corpus-real}
 
 ```{python}
 #| echo: true
@@ -572,7 +580,7 @@ if len(pdfs_descargados) == 0:
     print("⚠️  No se descargó ningún PDF. ¿Hay conexión a internet?")
 ```
 
-## 2.2 Carga, chunking e indexación del corpus real
+## 2.2 Carga, chunking e indexación del corpus real {#sec-hpd1-2-2-carga-real}
 
 ```{python}
 #| echo: true
@@ -611,7 +619,7 @@ for chunk_idx, chunk in enumerate(chunks_real):
 print(f"Indexación completada: {collection_real.count()} vectores en Chroma")
 ```
 
-## 2.3 Búsqueda semántica sobre papers reales
+## 2.3 Búsqueda semántica sobre papers reales {#sec-hpd1-2-3-busqueda-real}
 
 ```{python}
 #| echo: true
@@ -638,7 +646,7 @@ for query in consultas:
     print(f"   {top_text}...")
 ```
 
-## 2.4 Recall@k sobre corpus real
+## 2.4 Recall@k sobre corpus real {#sec-hpd1-2-4-recall-real}
 
 ```{python}
 #| echo: true
@@ -679,7 +687,7 @@ for k in [1, 3, 5]:
     print(f"    recall@{k} medio: {media:.3f}")
 ```
 
-## 2.5 Evaluación MTEB — Validación profesional del modelo
+## 2.5 Evaluación MTEB — Validación profesional del modelo {#sec-mteb-hpd1}
 
 ::: {.callout-note icon=false}
 ## Tiempo estimado: 20-30 minutos
@@ -741,7 +749,7 @@ for task_result in results:
         print(f"    {model_ref} (leaderboard):    ~{score:.4f}")
 ```
 
-## Limpieza final
+## Limpieza final {#sec-hpd1-limpieza-final}
 
 ```{python}
 #| echo: true
@@ -755,11 +763,11 @@ print("✅ Limpieza completada (colecciones efímeras + corpus temporal eliminad
 
 ---
 
-## Ejercicios
+## Ejercicios {#sec-hpd1-ejercicios}
 
 ::: {.callout-tip icon=false}
 
-### Para afianzar lo aprendido (~40 min)
+### Para afianzar lo aprendido (~40 min) {#sec-hpd1-ejercicios-afianzar}
 
 Estos ejercicios no se entregan, pero te preparan para las entregas HPD y para el proyecto integrador. Recomendable hacerlos tras la sesión presencial.
 
@@ -807,7 +815,7 @@ Para el corpus real (ArXiv), lee el abstract de 2 papers de la lista y escribe 3
 
 ---
 
-### Para seguir explorando (opcional)
+### Para seguir explorando (opcional) {#sec-hpd1-ejercicios-explorando}
 
 **E1 — Pipeline multilingüe**
 
@@ -851,6 +859,7 @@ a la calidad de la búsqueda semántica? ¿Por qué?
 ---
 
 **Diagrama de arquitectura**
+::: {#fig-hpd1-arquitectura}
 ```{mermaid}
 graph TD
     subgraph "Ingesta"
@@ -871,4 +880,5 @@ graph TD
         D --> J[MTEB<br/>Similitud textual]
     end
 ```
+:::
 

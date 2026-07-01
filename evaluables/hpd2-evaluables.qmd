@@ -191,7 +191,7 @@ print("Herramientas y system prompt base listos.")
 
 ---
 
-## Ejercicio 1 — Añade una herramienta de correlación (2.5 puntos)
+## Ejercicio 1 — Añade una herramienta de correlación (2.5 puntos) {#sec-hpd2-ev1}
 
 Implementa una tercera herramienta `correlacion(col1: str, col2: str)` que calcule la correlación de Pearson entre dos columnas numéricas del DataFrame. La herramienta debe manejar columnas no numéricas o inexistentes con un mensaje de error descriptivo. Después, ejecuta el agente con las 3 herramientas y haz una pregunta que active específicamente esta nueva tool.
 
@@ -249,7 +249,7 @@ print("✅ Ejercicio 1: formato correcto")
 
 ---
 
-## Ejercicio 2 — Precisión del agente (2.5 puntos)
+## Ejercicio 2 — Precisión del agente (2.5 puntos) {#sec-hpd2-ev2}
 
 Ejecuta el agente base (con `consulta_pandas` + tools de visualización) sobre las siguientes 5 preguntas nuevas. Para cada una, evalúa si la respuesta es correcta (escala 0-5) y anota qué herramienta usó. Si no usó ninguna herramienta cuando debería, puntúa 0.
 
@@ -301,7 +301,7 @@ print("✅ Ejercicio 2: formato correcto")
 
 ---
 
-## Ejercicio 3 — Detección de preguntas fuera de ámbito (2.5 puntos)
+## Ejercicio 3 — Detección de preguntas fuera de ámbito (2.5 puntos) {#sec-hpd2-ev3}
 
 Modifica el `SYSTEM_PROMPT` para que el agente solo responda preguntas relacionadas con el dataset del Titanic. Si la pregunta es sobre otro tema, debe responder *"No tengo datos sobre eso. Solo puedo analizar el dataset del Titanic."* **sin llamar a ninguna herramienta**.
 
@@ -350,7 +350,7 @@ print("✅ Ejercicio 3: formato correcto")
 
 ---
 
-## Ejercicio 4 — Ground truth propio (2.5 puntos)
+## Ejercicio 4 — Ground truth propio (2.5 puntos) {#sec-hpd2-ev4}
 
 Escribe **3 preguntas originales** (que no estén en los ejercicios anteriores ni en el notebook de clase) y define manualmente la respuesta que esperas. Ejecuta el agente y compara la respuesta obtenida con tu ground truth. Evalúa cada una como correcta/parcialmente correcta/incorrecta.
 

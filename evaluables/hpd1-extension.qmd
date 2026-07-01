@@ -228,7 +228,7 @@ def buscar_en_chroma(collection, query, k=3):
 
 ---
 
-## Ejercicio E1 — Pipeline multilingüe (2.5 puntos)
+## Ejercicio E1 — Pipeline multilingüe (2.5 puntos) {#sec-hpd1-ext-e1}
 
 Carga el modelo `intfloat/multilingual-e5-small`. Traduce los textos de los 3 PDFs
 sintéticos al español usando `GoogleTranslator` de `deep-translator`. Indexa los
@@ -268,7 +268,7 @@ ext1_recall_mono = None   # ← float: recall@1 medio inglés → inglés
 
 ---
 
-## Ejercicio E2 — Comparativa de splitters (2.5 puntos)
+## Ejercicio E2 — Comparativa de splitters (2.5 puntos) {#sec-hpd1-ext-e2}
 
 Compara `RecursiveCharacterTextSplitter` (corta por párrafos → frases → espacios) con
 `CharacterTextSplitter` (corte fijo por caracteres, sin jerarquía semántica). Usa los
@@ -307,7 +307,7 @@ ext2_chunks = {}              # ← {"recursive": int, "character": int}
 
 ---
 
-## Ejercicio E3 — Chroma vs FAISS (2.5 puntos)
+## Ejercicio E3 — Chroma vs FAISS (2.5 puntos) {#sec-hpd1-ext-e3}
 
 Compara Chroma con FAISS (`IndexFlatIP`, búsqueda exacta por producto interno).
 Para que el producto interno equivalga a la similitud del coseno, **normaliza los
@@ -355,7 +355,7 @@ ext3_recall_faiss = None    # ← float
 
 ---
 
-## Ejercicio E4 — Mini-RAG con LLM (2.5 puntos)
+## Ejercicio E4 — Mini-RAG con LLM (2.5 puntos) {#sec-hpd1-ext-e4}
 
 Construye un sistema RAG mínimo: recupera los top-3 chunks para una consulta, inyéctalos
 en un prompt y pide al LLM que responda usando solo esa información.

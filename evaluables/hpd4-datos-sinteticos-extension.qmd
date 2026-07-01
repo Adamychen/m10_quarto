@@ -54,7 +54,7 @@ print("Librerías cargadas correctamente.")
 
 ---
 
-## Dataset de trabajo
+## Dataset de trabajo {#sec-hpd4-ds-ext-dataset}
 
 Igual que en `hpd4-datos-sinteticos.qmd`: Adult Census Income.
 
@@ -75,7 +75,7 @@ print(f"Dataset real: {df_real.shape[0]} filas, {df_real.shape[1]} columnas")
 
 ---
 
-## Ejercicio 1 — Privacidad diferencial con CTGAN
+## Ejercicio 1 — Privacidad diferencial con CTGAN {#sec-hpd4-ds-ext-e1}
 
 Entrena **dos** CTGAN con SDV sobre las columnas `["age", "education_num", "hours_per_week", "sex", "income"]` (100 epochs):
 
@@ -117,7 +117,7 @@ else:
 
 ---
 
-## Ejercicio 2 — Oversampling sintético para clase minoritaria
+## Ejercicio 2 — Oversampling sintético para clase minoritaria {#sec-hpd4-ds-ext-e2}
 
 Vas a simular un escenario de dataset desbalanceado y usar datos sintéticos para corregirlo.
 
@@ -155,7 +155,7 @@ else:
 
 ---
 
-## Ejercicio 3 — Evaluación con múltiples métricas de fidelidad
+## Ejercicio 3 — Evaluación con múltiples métricas de fidelidad {#sec-hpd4-ds-ext-e3}
 
 Entrena un CTGAN (100 epochs) sobre `df_real` con columnas `["age", "education_num", "hours_per_week", "sex", "income"]`.
 Genera 2000 filas sintéticas.

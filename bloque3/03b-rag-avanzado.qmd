@@ -696,7 +696,7 @@ graph TD
 | **Datos numéricos** | No distingue 55000 de 52000 | Sabe que 55000 > 52000 |
 | **Agregaciones** | No puede hacer SUM, AVG, GROUP BY | Sí |
 | **Riesgo** | Baja precisión en datos numéricos | SQL incorrecto o inyección |
-| **Ya lo viste en** | [HPD 1](../evaluables/hpd1-embeddings.qmd) sección 1.6 | [02c-llamaindex.qmd](../bloque2/02c-llamaindex.qmd) sección SQL |
+| **Ya lo viste en** | [HPD 1 — sección 1.6 (embeddings tabulares)](../evaluables/hpd1-embeddings.qmd#sec-hpd1-1-6-tabular) | [02c-llamaindex — sección NL→SQL](../bloque2/02c-llamaindex.qmd#sec-nlsql) |
 
 ::: {.callout-warning}
 ## Text-to-SQL: potente pero peligroso

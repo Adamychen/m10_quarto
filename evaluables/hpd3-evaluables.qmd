@@ -143,7 +143,7 @@ print(f"Dataset listo: {len(empleados)} empleados, {len(proyectos)} proyectos, {
 
 ---
 
-## Ejercicio 1 — Servidor MCP funcional (2.5 puntos)
+## Ejercicio 1 — Servidor MCP funcional (2.5 puntos) {#sec-hpd3-ev1}
 
 Implementa un servidor con FastMCP que exponga **al menos 3 tools** y **1 resource**. Guarda el código del servidor en la variable `eval1_server` como string (el contenido completo del archivo `.py` que ejecutarías).
 
@@ -189,7 +189,7 @@ print("✅ Ejercicio 1: formato correcto")
 
 ---
 
-## Ejercicio 2 — Cliente LLM con Tool Calling (2.5 puntos)
+## Ejercicio 2 — Cliente LLM con Tool Calling (2.5 puntos) {#sec-hpd3-ev2}
 
 Implementa la función `preguntar_al_llm(pregunta: str)` que conecte el LLM a las tools MCP. El LLM debe decidir qué tool usar sin que tú le digas cuál. Ejecútala con la pregunta *"¿Cuántos empleados de Finanzas hay y cuál es su salario medio?"* y guarda la respuesta en `eval2_respuesta`.
 
@@ -295,7 +295,7 @@ print("✅ Ejercicio 2: formato correcto")
 
 ---
 
-## Ejercicio 3 — Sanitización probada (2.5 puntos)
+## Ejercicio 3 — Sanitización probada (2.5 puntos) {#sec-hpd3-ev3}
 
 Modifica `consultar_sql` para que bloquee comandos peligrosos. Luego prueba **al menos 5 intentos de ataque** distintos y documenta cuáles fueron bloqueados y cuáles no. Guarda los resultados en `eval3_ataques`.
 
@@ -350,7 +350,7 @@ print("✅ Ejercicio 3: formato correcto")
 
 ---
 
-## Ejercicio 4 — Análisis de riesgos (2.5 puntos)
+## Ejercicio 4 — Análisis de riesgos (2.5 puntos) {#sec-hpd3-ev4}
 
 Documenta **2 riesgos de seguridad** de tu servidor MCP. Para cada uno: describe el vector de ataque, la mitigación que implementaste y una prueba concreta de que la mitigación funciona.
 
