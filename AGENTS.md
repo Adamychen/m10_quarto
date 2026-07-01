@@ -372,3 +372,55 @@ flowchart LR
 
     A --> B --> C
 ```
+
+## Convención de cross-refs nativa de Quarto
+
+Todos los `.qmd` usan cross-references nativas de Quarto en lugar de texto plano ("sección X", "tabla Y") o slugs auto-generados. Esto evita que las referencias se rompan al renombrar un heading.
+
+| Tipo | Prefijo | Cómo añadir el label | Cómo referenciarlo |
+|---|---|---|---|
+| Sección (heading) | `sec-` | `## 1.4 Embeddings e indexación {#sec-embeddings-chroma}` | `@sec-embeddings-chroma` |
+| Tabla | `tbl-` | Insertar `: Caption {#tbl-nombre}` **antes** de la tabla | `@tbl-nombre` |
+| Figura (imagen o Mermaid) | `fig-` | `![Caption](img.png){#fig-nombre}` o `::: {#fig-nombre} \`\`\`{mermaid}…\`\`\` :::` | `@fig-nombre` |
+
+**Reglas de naming (kebab-case, español, sin tildes):**
+
+- `## 1.4 Embeddings e indexación` → `{#sec-embeddings-chroma}` (NO `{#sec-1-4-embeddings}`)
+- `### ¿Qué es un prompt?` → `{#sec-que-es-prompt}` (sin tildes, sin signos de puntuación)
+- `## De JSON Schema a datos sintéticos` → `{#sec-json-schema-datos-sint}` (sin acentos, sin `:`)
+
+**Rangos de secciones** (cuando se quiere referenciar "sección X a Y"):
+
+```markdown
+@sec-inicio--@sec-fin
+```
+
+Genera automáticamente "Sección 1 — Sección 3".
+
+**Anclas inter-página:** en sitios Quarto (no libros), las cross-refs entre páginas distintas siguen siendo enlaces Markdown, no `@sec-…`. Usar **siempre labels estables** en lugar de slugs auto-generados:
+
+```markdown
+# ❌ Frágil (slug auto-generado)
+[Evaluación](../index.qmd#competencias-específicas)
+
+# ✅ Estable (label manual)
+[Evaluación](../index.qmd#sec-competencias-especificas)
+```
+
+**Mermaid en div etiquetado:** los bloques Mermaid necesitan envoltorio explícito para tener label:
+
+```markdown
+::: {#fig-flujo-evaluacion}
+```{mermaid}
+flowchart LR
+    A --> B
+```
+:::
+```
+
+(El `:::` alrededor es necesario porque los bloques de código no aceptan `#fig-…` en los cell options de Quarto.)
+
+**Excepciones a la convención:**
+
+- Los comentarios Python en celdas pueden seguir diciendo "sección 1.4" como orientación al alumno; no son markdown y no rompen nada.
+- Las referencias a secciones de papers externos (Vaswani 2017, LoRA 2022, etc.) se mantienen como texto plano: "Leer Vaswani et al. (2017) secciones 3-5" es una cita bibliográfica, no una cross-ref.
