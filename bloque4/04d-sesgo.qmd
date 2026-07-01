@@ -7,11 +7,13 @@ engine: jupyter
 
 > Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). Los riesgos tratados aquí complementan a los de [04b — Alucinaciones](04b-alucinaciones.qmd).
 
-## 4. Sesgo en LLMs
+## 4. Sesgo en LLMs {#sec-sesgo}
 
 Los sesgos sistemáticos de un modelo son riesgos de reputación y legales: en producción pueden traducirse en discriminaciones, pérdida de confianza y sanciones regulatorias. Auditar sesgo no es opcional.
 
-### 4.1 Tipos de sesgo
+### 4.1 Tipos de sesgo {#sec-sesgo-tipos}
+
+: Tipos de sesgo en LLMs con su ejemplo y origen {#tbl-sesgo-tipos}
 
 | Sesgo | Ejemplo | Origen |
 |---|---|---|
@@ -21,7 +23,7 @@ Los sesgos sistemáticos de un modelo son riesgos de reputación y legales: en p
 | **Recencia** | Sobrevalorar eventos recientes | Mayor frecuencia en corpus |
 | **Anclaje** | Mantenerse en la primera idea generada | Temperatura baja + sesgo del propio modelo |
 
-### 4.2 Auditoría simple: asociación de género y profesión
+### 4.2 Auditoría simple: asociación de género y profesión {#sec-sesgo-auditoria}
 
 ```python
 #| echo: true
@@ -132,7 +134,7 @@ else:
 ```
 
 ::: {.callout-note}
-## Más allá de regex: frameworks de auditoría
+## Más allá de regex: frameworks de auditoría {#sec-sesgo-frameworks}
 
 - **[Bias Benchmark for QA (BBQ)](https://github.com/nyu-mll/BBQ)**: 58k preguntas para 11 sesgos sociales.
 - **[StereoSet](https://github.com/McGill-NLP/stereoset)**: mide sesgo, toxicidad y preferencia de información válida.

@@ -7,11 +7,13 @@ engine: jupyter
 
 > Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). Se recomienda leer antes la subsección [04a — Evaluación de LLMs](04a-evaluacion.qmd), donde se introducen las métricas que permiten detectar los fenómenos descritos aquí.
 
-## 2. Alucinaciones
+## 2. Alucinaciones {#sec-alucinaciones}
 
 Las alucinaciones son el riesgo más visible de los LLMs en producción: el modelo afirma con total seguridad algo que es **falso, no respaldado o simplemente inexistente**. Distinguirlas bien es el primer paso para mitigarlas.
 
-### 2.1 Taxonomía
+### 2.1 Taxonomía {#sec-alucinaciones-taxonomia}
+
+: Taxonomía de los tipos de alucinaciones en LLMs {#tbl-alucinaciones-tipos}
 
 | Tipo | Descripción | Ejemplo |
 |---|---|---|
@@ -69,7 +71,7 @@ for p in pruebas:
         print(f"        → {ev['hecho'][:60]}...  (solape {ev['solapamiento']})")
 ```
 
-### 2.2 Mitigación: grounding + citation
+### 2.2 Mitigación: grounding + citation {#sec-alucinaciones-mitigacion}
 
 ```python
 #| echo: true

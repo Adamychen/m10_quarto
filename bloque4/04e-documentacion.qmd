@@ -7,9 +7,9 @@ engine: jupyter
 
 > Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). La documentación es el puente entre un sistema que funciona y un sistema que puede auditarse, replicarse y desplegarse con responsabilidad.
 
-## 5. Documentación
+## 5. Documentación {#sec-documentacion}
 
-### 5.1 Model Card
+### 5.1 Model Card {#sec-model-card}
 
 Una **Model Card** es un documento estructurado que describe un modelo: uso previsto, datos, métricas, limitaciones. Originalmente propuesta por [Mitchell et al. (2019)](https://arxiv.org/abs/1810.03993), es ahora estándar en Hugging Face, OpenAI, Anthropic, Google.
 
@@ -90,7 +90,7 @@ print(model_card_a_markdown(model_card)[:1200] + "\n[...]")
 Los valores numéricos de la Model Card anterior (`ragas_faithfulness: 0.82`, `"12/15 respuestas correctas"`, etc.) son **ilustrativos** y solo sirven para mostrar la forma del documento. En tu proyecto integrador debes sustituirlos por los resultados de tu **propia evaluación**, dejando siempre claro el protocolo con que se obtuvieron: tamaño de muestra, número de revisores, fecha y versión del modelo bajo test. Presentar cifras inventadas como si fueran una auditoría real es lo contrario de la transparencia algorítmica que promueve este bloque.
 :::
 
-### 5.2 System Card
+### 5.2 System Card {#sec-system-card}
 
 Una **System Card** va un paso más allá: documenta no solo el modelo, sino el **sistema completo** que lo envuelve (RAG, agentes, guardas, etc.). Los [System Cards de Anthropic](https://www.anthropic.com/system-cards) son los referentes.
 
@@ -102,7 +102,9 @@ A diferencia de la Model Card (centrada en el modelo), una System Card documenta
 - **Monitorización continua**: métricas en producción, alertas automáticas, revisión humana periódica, feedback de usuarios.
 - **Limitaciones y casos fuera de alcance**: lo que el sistema **no** debe usarse para hacer.
 
-### System Cards de referencia en la industria
+### System Cards de referencia en la industria {#sec-system-cards-referencia}
+
+: Ejemplos de System Cards publicadas por las principales organizaciones de IA {#tbl-system-cards-referencia}
 
 | Sistema | Organización | Año | Cubre |
 |---|---|---|---|
@@ -115,7 +117,7 @@ A diferencia de la Model Card (centrada en el modelo), una System Card documenta
 | [Índice de Google DeepMind](https://deepmind.google/models/model-cards/) | Google DeepMind | — | Model Cards de Gemini, Gemma, Veo, Imagen y modelos de robótica |
 
 ::: {.callout-tip}
-## Cómo escribir tu propia System Card
+## Cómo escribir tu propia System Card {#sec-escribir-system-card}
 
 1. **Describe el sistema, no solo el modelo.** Lista cada componente (retrieval, LLM, herramientas, guardas) y su versión concreta.
 2. **Audita antes de publicar.** Realiza un red team mínimo (10-20 ataques) y documenta qué funcionó y qué no. Si no hiciste auditoría, dilo explícitamente.

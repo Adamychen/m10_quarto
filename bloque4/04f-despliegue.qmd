@@ -7,9 +7,11 @@ engine: jupyter
 
 > Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). Esta última subsección cierra el bloque llevando los sistemas documentados en [04e — Documentación](04e-documentacion.qmd) a un entorno de producción observable y mantenible.
 
-## 6. Patrones de despliegue
+## 6. Patrones de despliegue {#sec-despliegue}
 
-### 6.1 On-premise vs. cloud
+### 6.1 On-premise vs. cloud {#sec-onprem-vs-cloud}
+
+: Comparativa de criterios entre despliegue on-premise y cloud {#tbl-onprem-vs-cloud}
 
 | Criterio | On-premise (Ollama / vLLM) | Cloud (OpenAI-compat) |
 |---|---|---|
@@ -22,14 +24,14 @@ engine: jupyter
 | **Caso de uso típico** | Datos sensibles, RGPD, costes predecibles | Picos de tráfico, prototipado rápido |
 
 ::: {.callout-tip}
-## Regla práctica
+## Regla práctica {#sec-regla-practica-despliegue}
 
 - **Datos sensibles (sanidad, legal, finanzas):** on-premise con Ollama o vLLM.
 - **Volumen variable o global:** cloud con API compatible con OpenAI.
 - **Híbrido:** cloud para prototipado, on-premise para producción.
 :::
 
-### 6.2 vLLM y Ollama (un comando cada uno)
+### 6.2 vLLM y Ollama (un comando cada uno) {#sec-vllm-ollama}
 
 ```python
 #| echo: true
@@ -54,7 +56,7 @@ engine: jupyter
 # ).choices[0].message.content)
 ```
 
-### 6.3 Observabilidad con Langfuse
+### 6.3 Observabilidad con Langfuse {#sec-observabilidad-langfuse}
 
 [Langfuse](https://langfuse.com) y [LangSmith](https://docs.smith.langchain.com) son las dos plataformas líderes para trazabilidad en producción. Permiten ver cada llamada, sus tokens, su latencia y el feedback de los usuarios.
 
@@ -141,7 +143,7 @@ trace.score(name="user_feedback", value=1)  # 1 = positivo
 ```
 
 ::: {.callout-tip}
-## Checklist de observabilidad mínima
+## Checklist de observabilidad mínima {#sec-checklist-observabilidad}
 
 - [ ] Cada llamada al LLM queda registrada con timestamp, modelo y tokens.
 - [ ] Latencia por etapa (retrieval, rerank, generación) medida por separado.
@@ -150,7 +152,7 @@ trace.score(name="user_feedback", value=1)  # 1 = positivo
 - [ ] Alertas si latencia p95 > N segundos o si error rate > X %.
 :::
 
-### 6.4 Caching semántico
+### 6.4 Caching semántico {#sec-caching-semantico}
 
 Cuando dos consultas son muy similares, no tiene sentido gastar tokens en una segunda llamada al LLM. El **caching semántico** compara embeddings y reutiliza respuestas anteriores.
 

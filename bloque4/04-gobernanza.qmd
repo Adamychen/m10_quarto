@@ -4,16 +4,17 @@ title: "Bloque 4 — Gobernanza: Evaluación, Riesgos, Privacidad y Despliegue"
 
 > **Carga:** Contenido integrado en proyecto | HPD: 0h — evaluado en proyecto final
 >
-> **Competencias asociadas:** [CE-6](../index.qmd#competencias-específicas)
+> **Competencias asociadas:** [CE-6](../index.qmd#sec-competencias-especificas)
 
-## Objetivos
+## Objetivos {#sec-b4-objetivos}
 
 Evaluar modelos generativos con métricas objetivas, detectar y mitigar alucinaciones y sesgos, anonimizar datos sensibles antes de usarlos en producción, y documentar sistemas siguiendo estándares de transparencia algorítmica (Model Card, System Card). Todo el contenido de este bloque se evalúa dentro del proyecto integrador (CE-6).
 
-## Mapa conceptual del bloque
+## Mapa conceptual del bloque {#sec-b4-mapa}
 
 ### 📊 Evaluación
 
+::: {#fig-b4-evaluacion}
 ```{mermaid}
 flowchart LR
     classDef metric fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
@@ -31,9 +32,11 @@ flowchart LR
     C --> E
     D --> E
 ```
+:::
 
 ### ⚠️ Riesgos
 
+::: {#fig-b4-riesgos}
 ```{mermaid}
 flowchart LR
     classDef risk fill:#c62828,stroke:#7f0000,color:#fff,stroke-width:1.5px
@@ -48,9 +51,11 @@ flowchart LR
     F --> H
     G --> H
 ```
+:::
 
 ### 📋 Documentación
 
+::: {#fig-b4-documentacion}
 ```{mermaid}
 flowchart LR
     classDef doc fill:#FFD43B,stroke:#b8860b,color:#1a1a1a,stroke-width:1.5px
@@ -65,9 +70,11 @@ flowchart LR
     L --> N
     M --> N
 ```
+:::
 
 ### 🚀 Despliegue
 
+::: {#fig-b4-despliegue}
 ```{mermaid}
 flowchart LR
     classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
@@ -86,10 +93,13 @@ flowchart LR
     Q --> R
     R ==> S
 ```
+:::
 
 Las cuatro áreas de este bloque son complementarias y se refuerzan mutuamente: no basta con que el sistema funcione (Bloques 1-3), debe ser medible, trazable, justo y privado. La gobernanza convierte un prototipo en un producto.
 
-## Contenido del bloque
+## Contenido del bloque {#sec-b4-contenido}
+
+: Itinerario del Bloque 4 con sus ficheros y duración estimada {#tbl-b4-itinerario}
 
 | Tema | Archivo | Duración estimada |
 |---|---|---|
@@ -104,8 +114,9 @@ Las cuatro áreas de este bloque son complementarias y se refuerzan mutuamente: 
 **Teoría integrada.** Este bloque no tiene HPD propio: todo su contenido se evalúa dentro del proyecto integrador (CE-6) junto con los conocimientos de los Bloques 1-3. La rúbrica del proyecto penaliza explícitamente la ausencia de análisis de gobernanza y ética.
 :::
 
-## Ruta de aprendizaje recomendada
+## Ruta de aprendizaje recomendada {#sec-b4-ruta}
 
+::: {#fig-b4-ruta}
 ```{mermaid}
 graph LR
     A["1. Evaluación<br/>(04a)"] --> B["2. Alucinaciones<br/>(04b)"]
@@ -124,6 +135,7 @@ graph LR
     style F fill:#306998,color:#fff
     style G fill:#2e7d32,color:#fff
 ```
+:::
 
 1. Comienza con **Evaluación de LLMs**: sin métricas no puedes saber si tu sistema mejora o empeora.
 2. Aborda los **riesgos del modelo** (alucinaciones, sesgo) antes de tocar datos: son los fallos más visibles en producción.
@@ -132,8 +144,9 @@ graph LR
 
 ---
 
-## Resumen del bloque
+## Resumen del bloque {#sec-b4-resumen}
 
+::: {#fig-b4-resumen}
 ```{mermaid}
 flowchart LR
     classDef skill fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
@@ -155,6 +168,7 @@ flowchart LR
     E --> F
     F ==> G
 ```
+:::
 
 Este bloque te da las herramientas para llevar tus sistemas IA a calidad de producción:
 
@@ -171,4 +185,4 @@ El proyecto integrador evaluado en [05-evaluacion](../05-evaluacion.qmd) combina
 
 ---
 
-> Has completado la teoría del **Módulo 10**. Para la evaluación final consulta la [rúbrica del proyecto integrador](../05-evaluacion.qmd#rúbrica-de-evaluación).
+> Has completado la teoría del **Módulo 10**. Para la evaluación final consulta la [rúbrica del proyecto integrador](../05-evaluacion.qmd#sec-rubrica-evaluacion).
