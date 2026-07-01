@@ -4,14 +4,15 @@ title: "Bloque 3 — Aplicaciones: RAG Avanzado, Datos Sintéticos y Fine-tuning
 
 > **Carga:** HT: 6h | HPD: 4h
 >
-> **Competencias asociadas:** [CE-4](../index.qmd#competencias-específicas), [CE-5](../index.qmd#competencias-específicas)
+> **Competencias asociadas:** [CE-4](../index.qmd#sec-competencias-especificas), [CE-5](../index.qmd#sec-competencias-especificas)
 
-## Objetivos del bloque
+## Objetivos del bloque {#sec-b3-objetivos}
 
 Implementar sistemas RAG de calidad producción con evaluación objetiva, generar datos sintéticos validados estadísticamente, y aplicar técnicas de ajuste fino eficientes (LoRA/QLoRA) para adaptar modelos a dominios específicos.
 
-## Mapa conceptual del bloque
+## Mapa conceptual del bloque {#sec-b3-mapa}
 
+::: {#fig-b3-mapa-conceptual}
 ```{mermaid}
 graph TD
     subgraph "Aplicaciones"
@@ -28,6 +29,7 @@ graph TD
     style E fill:#e65100,color:#fff
     style G fill:#2e7d32,color:#fff
 ```
+:::
 
 Los tres pilares de este bloque son **complementarios y se refuerzan mutuamente**:
 
@@ -35,7 +37,9 @@ Los tres pilares de este bloque son **complementarios y se refuerzan mutuamente*
 - **Datos Sintéticos** te permite generar datos de entrenamiento, testing o anonimización cuando los datos reales son insuficientes o sensibles.
 - **Fine-tuning** te permite adaptar modelos open-source a tu dominio específico cuando RAG y prompting no bastan.
 
-## Contenido del bloque
+## Contenido del bloque {#sec-b3-contenido}
+
+: Itinerario del Bloque 3 con sus ficheros y duración estimada {#tbl-b3-itinerario}
 
 | Tema | Archivo | Duración estimada |
 |---|---|---|
@@ -44,15 +48,16 @@ Los tres pilares de este bloque son **complementarios y se refuerzan mutuamente*
 | **Fine-tuning eficiente** — LoRA, QLoRA, PEFT, cuándo adaptar modelos | [03c-fine-tuning.qmd](03c-fine-tuning.qmd) | 1.5h |
 | **HPD 4 — Sistema RAG sobre datos mixtos** | [hpd4-rag-mixto.qmd](../evaluables/hpd4-rag-mixto.qmd) | 4h |
 
-## Ruta de aprendizaje recomendada
+## Ruta de aprendizaje recomendada {#sec-b3-ruta}
 
+::: {#fig-b3-ruta-aprendizaje}
 ```{mermaid}
 graph LR
     A["1. RAG Avanzado"] --> B["2. Datos Sintéticos"]
     A --> C["3. Fine-tuning"]
-    B --> D["HPD 4<br/>RAG Mixto"]
+    B --> D[HPD 4<br/>RAG Mixto]
     C --> D
-    D --> E["Proyecto integrador"]
+    D --> E[Proyecto integrador]
 
     style A fill:#4B8BBE,color:#fff
     style B fill:#FFD43B,color:#000
@@ -60,13 +65,16 @@ graph LR
     style D fill:#306998,color:#fff
     style E fill:#2e7d32,color:#fff
 ```
+:::
 
 1. Empieza con **RAG Avanzado**: es el tema central del bloque y la base del HPD 4. Aprenderás a mejorar la calidad de tus sistemas RAG con re-ranking, query expansion y evaluación objetiva con RAGAS.
 2. Continúa con **Datos Sintéticos**: aprenderás a generar datos verosímiles con LLMs (enfoque intuitivo) y con modelos especializados (CTGAN, TVAE).
 3. Cierra con **Fine-tuning**: entenderás cuándo y cómo adaptar modelos open-source a tu dominio con LoRA/QLoRA.
 4. Ponlo todo en práctica con el **HPD 4**: construirás un sistema RAG completo sobre datos mixtos (PDFs + SQL) con evaluación RAGAS.
 
-## Talleres prácticos
+## Talleres prácticos {#sec-b3-talleres}
+
+: Talleres prácticos del Bloque 3 {#tbl-b3-talleres}
 
 | HPD | Título | Enlace | Duración |
 |---|---|---|---|
@@ -78,8 +86,9 @@ graph LR
 - Hu, E. et al. (2022). **LoRA: Low-Rank Adaptation of Large Language Models**. ICLR. [arXiv:2106.09685](https://arxiv.org/abs/2106.09685) — secciones 1-4
 - Lewis, P. et al. (2020). **Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks**. NeurIPS. [arXiv:2005.11401](https://arxiv.org/abs/2005.11401)
 
-## Resumen del bloque
+## Resumen del bloque {#sec-b3-resumen}
 
+::: {#fig-b3-resumen}
 ```{mermaid}
 graph TD
     subgraph "Bloque 3 — Lo que has aprendido"
@@ -92,6 +101,7 @@ graph TD
     F --> G
     G --> H["Bloque 4: Gobernanza y despliegue"]
 ```
+:::
 
 Este bloque te da las herramientas para llevar tus sistemas IA a **calidad de producción**:
 

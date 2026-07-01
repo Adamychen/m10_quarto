@@ -88,9 +88,9 @@ else:
     print("✅ Cliente OpenAI configurado.")
 ```
 
-## RAG Avanzado
+## RAG Avanzado {#sec-rag-avanzado}
 
-### De RAG naive a RAG avanzado
+### De RAG naive a RAG avanzado {#sec-rag-naive-vs-avanzado}
 
 En el [HPD 1](../evaluables/hpd1-embeddings.qmd) construiste un pipeline RAG básico: cargar PDFs, trocearlos en chunks, generar embeddings, indexar en Chroma y buscar por similitud coseno. Funciona, pero tiene limitaciones:
 
@@ -100,6 +100,7 @@ En el [HPD 1](../evaluables/hpd1-embeddings.qmd) construiste un pipeline RAG bá
 
 **RAG es como buscar en una biblioteca con un índice alfabético. RAG avanzado es como tener un bibliotecario que primero busca los capítulos relevantes y luego los relee con lupa antes de responderte.**
 
+::: {#fig-rag-naive-vs-avanzado}
 ```{mermaid}
 graph LR
     subgraph "RAG Naive"
@@ -124,6 +125,9 @@ graph LR
     style D2 fill:#e65100,color:#fff
     style H2 fill:#2e7d32,color:#fff
 ```
+:::
+
+: Comparativa de problemas del RAG naive y sus soluciones avanzadas {#tbl-rag-naive-soluciones}
 
 | Problema del RAG naive | Solución avanzada |
 |---|---|
@@ -135,10 +139,11 @@ graph LR
 
 ---
 
-### Retrievers combinados y RAG multi-fuente
+### Retrievers combinados y RAG multi-fuente {#sec-rag-multifuente}
 
 Imagina que trabajas en una empresa y tu jefe pregunta: *"¿Qué productos del informe Q2 tienen margen inferior al 20%?"* La respuesta está en **dos sitios distintos**: el informe trimestral (PDF, texto narrativo) y la tabla de productos (SQL, datos numéricos). Un RAG multi-fuente busca en ambos y combina los resultados.
 
+::: {#fig-rag-multifuente}
 ```{mermaid}
 graph TD
     Q[Pregunta del usuario] --> R1[Retriever PDF]
@@ -160,8 +165,11 @@ graph TD
     style LLM fill:#306998,color:#fff
     style R fill:#2e7d32,color:#fff
 ```
+:::
 
 El patrón es siempre el mismo: cada fuente se convierte en "documentos buscables" y se indexa en una colección separada.
+
+: Cómo convertir cada fuente de datos en documentos buscables {#tbl-rag-fuentes}
 
 | Fuente | Cómo convertirla a documento | Ejemplo |
 |---|---|---|
@@ -263,7 +271,7 @@ Empieza con **una sola fuente**. Añade la segunda solo si las preguntas de tus 
 
 ---
 
-### Bi-encoder vs Cross-encoder
+### Bi-encoder vs Cross-encoder {#sec-bi-cross-encoder}
 
 Los modelos de embeddings que has usado hasta ahora (`e5-small-v2`, `all-MiniLM-L6-v2`) son **bi-encoders**: codifican cada texto por separado y comparan los vectores resultantes. Son rápidos porque los embeddings se pueden precomputar y almacenar.
 
@@ -271,6 +279,7 @@ Un **cross-encoder** funciona de forma distinta: recibe los dos textos juntos y 
 
 **Un bi-encoder es como comparar dos fotos de lejos: rápido pero impreciso. Un cross-encoder es como compararlas con lupa: lento pero preciso.**
 
+::: {#fig-bi-vs-cross-encoder}
 ```{mermaid}
 graph LR
     subgraph "Bi-encoder (retriever)"
@@ -290,6 +299,9 @@ graph LR
     style S1 fill:#FFD43B,color:#000
     style S2 fill:#2e7d32,color:#fff
 ```
+:::
+
+: Comparativa de bi-encoder vs cross-encoder {#tbl-bi-vs-cross}
 
 | | Bi-encoder | Cross-encoder |
 |---|---|---|
@@ -308,7 +320,7 @@ Porque es **O(n)** en latencia: para comparar tu query con 10.000 chunks necesit
 
 ---
 
-### Re-ranking: la segunda pasada
+### Re-ranking: la segunda pasada {#sec-reranking}
 
 El re-ranking es la técnica más impactante y sencilla de implementar. Funciona en dos fases:
 
@@ -317,6 +329,7 @@ El re-ranking es la técnica más impactante y sencilla de implementar. Funciona
 
 **El retriever es como un buscador que te da 20 resultados de Google. El re-ranker es como tú releyendo los 20 y reordenándolos por relevancia real.**
 
+::: {#fig-reranking-flujo}
 ```{mermaid}
 graph TD
     Q[Query del usuario] --> R[Retriever bi-encoder]
@@ -331,6 +344,9 @@ graph TD
     style RR fill:#e65100,color:#fff
     style LLM fill:#2e7d32,color:#fff
 ```
+:::
+
+: Modelos populares de re-ranking para RAG {#tbl-reranking-modelos}
 
 | Modelo de re-ranking | Tamaño | Velocidad | Calidad |
 |---|---|---|---|
@@ -342,10 +358,23 @@ graph TD
 ```{python}
 #| echo: true
 
+import shutil
+from pathlib import Path
+
+from flashrank import Ranker
 from langchain_community.document_compressors import FlashrankRerank
 from langchain_core.documents import Document
 
-reranker = FlashrankRerank(top_n=3, model="ms-marco-TinyBERT-L-2-v2")
+cache_dir = Path("models/flashrank")
+model_name = "ms-marco-TinyBERT-L-2-v2"
+model_dir = cache_dir / model_name
+
+cache_dir.mkdir(parents=True, exist_ok=True)
+if model_dir.exists() and not any(model_dir.iterdir()):
+    shutil.rmtree(model_dir)
+
+reranker_client = Ranker(model_name=model_name, cache_dir=str(cache_dir))
+reranker = FlashrankRerank(client=reranker_client, top_n=3)
 
 docs = [Document(page_content=r["texto"], metadata={"fuente": r["fuente"]}) for r in resultados]
 
@@ -375,16 +404,17 @@ El re-ranker añade latencia (100-500ms extra) y complejidad. Antes de añadirlo
 
 ---
 
-### Query expansion: HyDE y RAG-Fusion
+### Query expansion: HyDE y RAG-Fusion {#sec-query-expansion}
 
 A veces el problema no está en el retriever sino en la **query**. Una pregunta mal formulada produce embeddings que no coinciden con los documentos relevantes. Las técnicas de query expansion reformulan la pregunta para mejorar la recuperación.
 
-#### HyDE (Hypothetical Document Embeddings)
+#### HyDE (Hypothetical Document Embeddings) {#sec-hyde}
 
 En vez de buscar con tu pregunta tal cual, primero pides al LLM que **genere una respuesta hipotética** y buscas con el embedding de esa respuesta imaginaria.
 
 **Es como buscar un restaurante no por su nombre sino describiendo la comida que quieres comer.**
 
+::: {#fig-hyde-flujo}
 ```{mermaid}
 graph LR
     Q["Query: ¿Cuál es el margen del Monitor 4K?"] --> LLM["LLM genera documento hipotético"]
@@ -398,6 +428,7 @@ graph LR
     style HD fill:#FFD43B,color:#000
     style R fill:#2e7d32,color:#fff
 ```
+:::
 
 ```{python}
 #| echo: true
@@ -433,10 +464,11 @@ else:
         print(f"  {doc[:80]}...")
 ```
 
-#### RAG-Fusion
+#### RAG-Fusion {#sec-rag-fusion}
 
 En vez de buscar una vez, **reformulas la pregunta de 5 formas distintas**, buscas con cada una, y combinas los resultados con **Reciprocal Rank Fusion (RRF)**: los documentos que aparecen en varias búsquedas suben en el ranking.
 
+::: {#fig-rag-fusion}
 ```{mermaid}
 graph TD
     Q[Query original] --> LLM["LLM genera 5 variantes"]
@@ -465,6 +497,9 @@ graph TD
     style RRF fill:#e65100,color:#fff
     style TOP fill:#2e7d32,color:#fff
 ```
+:::
+
+: Comparativa de técnicas de query expansion {#tbl-query-expansion}
 
 | Técnica | Coste (llamadas LLM) | Mejora esperada | Cuándo usarla |
 |---|---|---|---|
@@ -482,7 +517,7 @@ graph TD
 
 ---
 
-### Evaluación de RAG con RAGAS
+### Evaluación de RAG con RAGAS {#sec-evaluacion-ragas}
 
 Evaluar un RAG "a ojo" no basta. Necesitas métricas objetivas que te digan **qué componente falla** cuando el sistema da una mala respuesta.
 
@@ -490,6 +525,7 @@ Evaluar un RAG "a ojo" no basta. Necesitas métricas objetivas que te digan **qu
 
 RAGAS evalúa 3 dimensiones independientes:
 
+::: {#fig-ragas-3-metricas}
 ```{mermaid}
 graph TD
     subgraph "RAGAS — 3 métricas"
@@ -506,6 +542,9 @@ graph TD
     style AR fill:#e65100,color:#fff
     style CP fill:#306998,color:#fff
 ```
+:::
+
+: Métricas principales de RAGAS para evaluar sistemas RAG {#tbl-ragas-metricas}
 
 | Métrica | Qué mide | Rango | Cómo se calcula (intuitivo) |
 |---|---|---|---|
@@ -523,9 +562,11 @@ graph TD
 **Context Precision** te dice si el retriever **encuentra lo correcto**: si los chunks relevantes están en la posición 8 de 10, precision baja.
 :::
 
-#### Ground truth: el criterio humano
+#### Ground truth: el criterio humano {#sec-ground-truth}
 
 El **ground truth** es la respuesta que tú consideras correcta para cada pregunta. Es el criterio humano contra el que se mide el sistema.
+
+: Ejemplo de preguntas con su ground truth y chunks relevantes {#tbl-ground-truth-ejemplo}
 
 | Pregunta | Ground truth (respuesta esperada) | Chunks relevantes |
 |---|---|---|
@@ -538,7 +579,7 @@ El **ground truth** es la respuesta que tú consideras correcta para cada pregun
 Dos personas pueden definir respuestas válidas distintas para la misma pregunta. Documenta siempre tus criterios: qué consideras "correcto", qué nivel de detalle exiges, qué fuentes usas como referencia.
 :::
 
-#### Evaluación con RAGAS — ejemplo
+#### Evaluación con RAGAS — ejemplo {#sec-evaluacion-ragas-ejemplo}
 
 ```{python}
 #| echo: true
@@ -611,6 +652,8 @@ else:
 ::: {.callout-tip}
 ## Umbrales orientativos
 
+: Umbrales orientativos de RAGAS para prototipo vs producción {#tbl-ragas-umbrales}
+
 | Métrica | Prototipo | Producción |
 |---|---|---|
 | **Faithfulness** | > 0.6 | > 0.8 |
@@ -622,10 +665,11 @@ Si faithfulness es bajo, el problema está en el **LLM** (alucina). Si context p
 
 ---
 
-### RAG sobre datos estructurados
+### RAG sobre datos estructurados {#sec-rag-datos-estructurados}
 
 Hasta ahora hemos buscado en texto libre (PDFs, informes). Pero muchos datos corporativos están en **tablas SQL** o **DataFrames**. Tienes dos caminos:
 
+::: {#fig-rag-datos-estructurados}
 ```{mermaid}
 graph TD
     Q[Pregunta en lenguaje natural] --> D{¿Qué tipo de datos?}
@@ -642,6 +686,9 @@ graph TD
     style T1 fill:#FFD43B,color:#000
     style T2 fill:#e65100,color:#fff
 ```
+:::
+
+: Comparativa de los dos caminos para RAG sobre datos estructurados {#tbl-rag-datos-comparativa}
 
 | Criterio | Camino 1: texto + embeddings | Camino 2: Text-to-SQL |
 |---|---|---|
@@ -666,8 +713,9 @@ En el [HPD 4](../evaluables/hpd4-rag-mixto.qmd) combinarás ambos caminos: búsq
 
 ---
 
-### Resumen: mapa completo de técnicas RAG
+### Resumen: mapa completo de técnicas RAG {#sec-resumen-tecnicas-rag}
 
+::: {#fig-mapa-tecnicas-rag}
 ```{mermaid}
 graph TD
     subgraph "Recuperación"
@@ -705,6 +753,9 @@ graph TD
     style K fill:#4B8BBE,color:#fff
     style M fill:#2e7d32,color:#fff
 ```
+:::
+
+: Resumen de técnicas RAG con su problema, coste y mejora esperada {#tbl-resumen-tecnicas-rag}
 
 | Técnica | Problema que resuelve | Coste adicional | Mejora esperada |
 |---|---|---|---|
@@ -717,7 +768,7 @@ graph TD
 
 ---
 
-## Referencias
+## Referencias {#sec-referencias-rag}
 
 - Lewis, P. et al. (2020). **Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks**. NeurIPS. [arXiv:2005.11401](https://arxiv.org/abs/2005.11401)
 - Gao, Y. et al. (2024). **RAGAS: Automated Evaluation of Retrieval Augmented Generation**. [arXiv:2309.15217](https://arxiv.org/abs/2309.15217)

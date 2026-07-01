@@ -73,14 +73,15 @@ plt.rcParams["figure.dpi"] = 100
 print("Librerías cargadas correctamente.")
 ```
 
-## Fine-tuning Eficiente
+## Fine-tuning Eficiente {#sec-fine-tuning}
 
-### ¿Qué es fine-tuning y por qué es difícil?
+### ¿Qué es fine-tuning y por qué es difícil? {#sec-que-es-fine-tuning}
 
 Un LLM preentrenado es como un **médico generalista**: sabe de todo un poco. Hacer fine-tuning es como enviarlo a una **especialización de 6 meses**: sale sabiendo mucho de un tema concreto sin olvidar lo general.
 
 El fine-tuning consiste en tomar un modelo base preentrenado y **entrenarlo adicionalmente** con datos de tu dominio para que adapte su comportamiento: nuevo tono, nuevo formato de salida, nuevo vocabulario técnico, o nuevo conocimiento específico.
 
+::: {#fig-fine-tuning-concepto}
 ```{mermaid}
 graph LR
     subgraph "Preentrenamiento"
@@ -98,8 +99,11 @@ graph LR
     style D fill:#FFD43B,color:#000
     style E fill:#2e7d32,color:#fff
 ```
+:::
 
 El problema es la **escala**. Los modelos modernos tienen miles de millones de parámetros, y entrenarlos completamente requiere una cantidad de memoria GPU prohibitiva:
+
+: Comparativa de modelos por parámetros, RAM y coste GPU para fine-tuning {#tbl-modelos-ft}
 
 | Modelo | Parámetros | RAM para fine-tuning completo | Coste GPU/hora |
 |---|---|---|---|
@@ -115,10 +119,11 @@ Fine-tuning completo de un modelo 7B requiere ~56 GB de RAM: 14 GB para los peso
 
 ---
 
-### La decisión clave: ¿Fine-tuning, RAG o Prompting?
+### La decisión clave: ¿Fine-tuning, RAG o Prompting? {#sec-decision-ft-rag-prompt}
 
 Antes de hacer fine-tuning, pregúntate si realmente lo necesitas. La mayoría de las veces, **RAG o prompting son suficientes**.
 
+::: {#fig-decision-ft-rag-prompt}
 ```{mermaid}
 graph TD
     Q["¿Qué necesitas cambiar?"] --> A{¿Nuevo conocimiento?}
@@ -141,6 +146,9 @@ graph TD
     style FT2 fill:#e65100,color:#fff
     style P fill:#2e7d32,color:#fff
 ```
+:::
+
+: Comparativa de criterios entre Prompting, RAG y Fine-tuning {#tbl-prompting-rag-ft}
 
 | Criterio | Prompting | RAG | Fine-tuning |
 |---|---|---|---|
@@ -163,12 +171,13 @@ graph TD
 
 ---
 
-### LoRA: Low-Rank Adaptation
+### LoRA: Low-Rank Adaptation {#sec-lora}
 
 **LoRA** es la técnica PEFT más popular. En vez de reescribir todos los pesos del modelo, añade pequeñas "notas adhesivas" (matrices de bajo rango) que modifican el comportamiento sin tocar el modelo original.
 
 **En vez de reescribir todo el libro (fine-tuning completo), LoRA añade notas adhesivas en las páginas clave. El libro original no cambia, pero las notas modifican cómo se lee.**
 
+::: {#fig-lora-arquitectura}
 ```{mermaid}
 graph TD
     subgraph "Modelo original (congelado)"
@@ -191,14 +200,17 @@ graph TD
     style B fill:#e65100,color:#fff
     style SUM fill:#2e7d32,color:#fff
 ```
+:::
 
 La idea es que los **cambios necesarios** para adaptar el modelo son de "bajo rango": no necesitas modificar los millones de pesos de W, solo unas pocas direcciones principales. Las matrices A y B capturan esas direcciones con una fracción de los parámetros.
 
-#### Intuición del rango bajo
+#### Intuición del rango bajo {#sec-rango-bajo}
 
 Imagina una imagen de 1000×1000 píxeles (1 millón de valores). Si la describes con 10 factores principales (rango 10), solo necesitas 1000×10 + 10×1000 = 20.000 valores. Has comprimido **50×** sin perder la esencia.
 
 Lo mismo aplica a las matrices de pesos del Transformer: los cambios necesarios para adaptar el modelo a un nuevo dominio ocupan pocas direcciones principales.
+
+: Parámetros clave de LoRA y su impacto en VRAM y capacidad {#tbl-lora-parametros}
 
 | Parámetro | Qué controla | Valor típico | Impacto |
 |---|---|---|---|
@@ -240,12 +252,13 @@ print(f"  Dropout: {config.lora_dropout}")
 
 ---
 
-### QLoRA: fine-tuning en GPU de consumidor
+### QLoRA: fine-tuning en GPU de consumidor {#sec-qlora}
 
 **QLoRA** combina LoRA con **cuantización a 4 bits**: el modelo base se comprime para que ocupe menos memoria, y solo los adaptadores LoRA se entrenan en precisión completa.
 
 **QLoRA es como hacer la mudanza en una furgoneta en vez de un camión: el modelo base viaja comprimido (4 bits) y solo las notas adhesivas (LoRA) ocupan espacio real.**
 
+::: {#fig-qlora-flujo}
 ```{mermaid}
 graph TD
     subgraph "QLoRA"
@@ -261,6 +274,9 @@ graph TD
     style E fill:#2e7d32,color:#fff
     style F fill:#2e7d32,color:#fff
 ```
+:::
+
+: Comparativa de VRAM necesaria para fine-tuning de un modelo 7B {#tbl-qlora-vram}
 
 | Enfoque | Modelo 7B en GPU | VRAM necesaria |
 |---|---|---|
@@ -302,9 +318,11 @@ QLoRA reduce la calidad ligeramente vs LoRA 16-bit. Para la mayoría de casos la
 
 ---
 
-### Otras técnicas PEFT
+### Otras técnicas PEFT {#sec-otras-peft}
 
 LoRA y QLoRA cubren el 95% de los casos prácticos. Las demás técnicas son relevantes si lees papers o trabajas en investigación:
+
+: Comparativa de técnicas PEFT más allá de LoRA/QLoRA {#tbl-otras-peft}
 
 | Técnica | Idea | Parámetros añadidos | Cuándo usarla |
 |---|---|---|---|
@@ -322,10 +340,11 @@ Si estás empezando, usa **LoRA** (o **QLoRA** si tienes poca VRAM). Las demás 
 
 ---
 
-### Infraestructura y ejemplo en Colab
+### Infraestructura y ejemplo en Colab {#sec-infraestructura-colab}
 
 El stack tecnológico para fine-tuning eficiente es:
 
+::: {#fig-stack-fine-tuning}
 ```{mermaid}
 graph TD
     subgraph "Stack de fine-tuning"
@@ -340,6 +359,7 @@ graph TD
     style C fill:#e65100,color:#fff
     style E fill:#2e7d32,color:#fff
 ```
+:::
 
 El siguiente ejemplo muestra un fine-tuning mínimo con TRL (Supervised Fine-Tuning) sobre un modelo pequeño. Está diseñado para ejecutarse en **Colab con GPU T4 gratuita**.
 
@@ -435,7 +455,9 @@ El fine-tuning con datos de baja calidad produce un modelo **peor** que el base.
 
 ---
 
-### Resumen
+### Resumen {#sec-resumen-ft}
+
+: Resumen de técnicas de fine-tuning por VRAM, calidad y caso de uso {#tbl-resumen-ft}
 
 | Técnica | VRAM (modelo 7B) | Calidad | Caso de uso |
 |---|---|---|---|
@@ -455,7 +477,7 @@ El fine-tuning con datos de baja calidad produce un modelo **peor** que el base.
 
 ---
 
-## Referencias
+## Referencias {#sec-referencias-ft}
 
 - Hu, E. et al. (2022). **LoRA: Low-Rank Adaptation of Large Language Models**. ICLR. [arXiv:2106.09685](https://arxiv.org/abs/2106.09685)
 - Dettmers, T. et al. (2023). **QLoRA: Efficient Finetuning of Quantized Language Models**. NeurIPS. [arXiv:2305.14314](https://arxiv.org/abs/2305.14314)

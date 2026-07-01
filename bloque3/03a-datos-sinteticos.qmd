@@ -90,9 +90,11 @@ else:
     print("✅ Cliente OpenAI configurado.")
 ```
 
-## ¿Por qué datos sintéticos?
+## ¿Por qué datos sintéticos? {#sec-porque-datos-sinteticos}
 
 Los datos sintéticos son datos generados artificialmente que imitan las propiedades estadísticas de datos reales **sin contener registros reales**. En Data Science resuelven problemas concretos:
+
+: Problemas que resuelven los datos sintéticos en proyectos de Data Science {#tbl-problemas-datos-sinteticos}
 
 | Problema | Solución con datos sintéticos |
 |---|---|
@@ -102,10 +104,11 @@ Los datos sintéticos son datos generados artificialmente que imitan las propied
 | **Necesitas testear un pipeline** sin acceso a producción | Generar datos sintéticos con el mismo schema |
 | **Simular escenarios** "what-if" que no existen en los datos históricos | Generar datos con distribuciones modificadas |
 
-## Taxonomía de modelos generativos para datos tabulares
+## Taxonomía de modelos generativos para datos tabulares {#sec-taxonomia-generativos}
 
 No todos los datos sintéticos se generan igual. Existe un espectro que va desde lo más simple (prompting a un LLM) hasta lo más riguroso (modelos generativos especializados):
 
+::: {#fig-taxonomia-generativos}
 ```{mermaid}
 graph TD
     A[Datos reales] --> B{¿Qué necesitas?}
@@ -127,12 +130,13 @@ graph TD
     style H fill:#2e7d32,color:#fff
     style I fill:#2e7d32,color:#fff
 ```
+:::
 
 ---
 
-## 1. Enfoque intuitivo: prompting a LLMs
+## 1. Enfoque intuitivo: prompting a LLMs {#sec-enfoque-intuitivo-llm}
 
-Ya lo viste en el [Bloque 2 — Prompt Engineering](../bloque2/02a-prompt-engineering.qmd#de-json-schema-a-datos-sintéticos-el-enfoque-intuitivo). Con `response_format` + few-shot + temperatura controlas estructura, dominio y diversidad.
+Ya lo viste en el [Bloque 2 — Prompt Engineering](../bloque2/02a-prompt-engineering.qmd#sec-json-schema-datos-sint). Con `response_format` + few-shot + temperatura controlas estructura, dominio y diversidad.
 
 **Fortalezas:**
 - Cero entrenamiento, sin GPU
@@ -146,9 +150,9 @@ Ya lo viste en el [Bloque 2 — Prompt Engineering](../bloque2/02a-prompt-engine
 
 ---
 
-## 2. GANs para datos tabulares (CTGAN)
+## 2. GANs para datos tabulares (CTGAN) {#sec-ctgan}
 
-### Intuición: el juego del falsificador y el detective
+### Intuición: el juego del falsificador y el detective {#sec-intuicion-gan}
 
 Imagina dos redes neuronales compitiendo:
 
@@ -157,6 +161,7 @@ Imagina dos redes neuronales compitiendo:
 
 Entrenan simultáneamente: G mejora sus falsificaciones, D afina su criterio. El equilibrio se alcanza cuando G produce datos indistinguibles de los reales.
 
+::: {#fig-gan-falsificador-detective}
 ```{mermaid}
 graph LR
     A[Ruido aleatorio z] --> G[Generador G]
@@ -170,8 +175,9 @@ graph LR
     style G fill:#e65100,color:#fff
     style D fill:#306998,color:#fff
 ```
+:::
 
-### CTGAN (Conditional Tabular GAN)
+### CTGAN (Conditional Tabular GAN) {#sec-ctgan-condicional}
 
 CTGAN adapta las GANs a datos tabulares resolviendo dos problemas específicos:
 
@@ -227,12 +233,13 @@ print(f"{df_sintetico_gan.head(8).to_string()}")
 
 ---
 
-## 3. VAEs para datos tabulares (TVAE)
+## 3. VAEs para datos tabulares (TVAE) {#sec-tvae}
 
-### Intuición: comprimir y reconstruir
+### Intuición: comprimir y reconstruir {#sec-intuicion-vae}
 
 Un **Variational Autoencoder (VAE)** aprende a comprimir cada fila de datos en un vector pequeño (espacio latente) y luego a reconstruirla. La magia está en que el espacio latente es **regular**: fuerzas a que siga una distribución normal, lo que te permite muestrear nuevos puntos y decodificarlos a datos sintéticos.
 
+::: {#fig-vae-comprimir-reconstruir}
 ```{mermaid}
 graph LR
     subgraph "Entrenamiento"
@@ -252,13 +259,14 @@ graph LR
     style D fill:#e65100,color:#fff
     style G fill:#e65100,color:#fff
 ```
+:::
 
 - **Encoder:** comprime `x` (fila de 10 columnas) a `z` (vector de 2-3 dimensiones) + una varianza
 - **Decoder:** reconstruye `x̂` a partir de `z`
 - **Pérdida:** error de reconstrucción + KL divergence (para que `z` sea $~N(0,I)$)
 - **Generar:** muestrea $z \sim N(0,I)$ y pásalo por el decoder
 
-### TVAE (Tabular VAE)
+### TVAE (Tabular VAE) {#sec-tvae-arquitectura}
 
 TVAE aplica la misma lógica que CTGAN al preprocesamiento de datos tabulares (mode-specific normalization para columnas continuas) pero usando la arquitectura VAE en lugar de la adversarial.
 
@@ -278,9 +286,9 @@ print(f"Datos sintéticos TVAE: {df_sintetico_vae.shape[0]} filas")
 
 ---
 
-## 4. Modelos de difusión para datos tabulares (TabDDPM)
+## 4. Modelos de difusión para datos tabulares (TabDDPM) {#sec-tabddpm}
 
-### Intuición: añadir ruido y aprender a limpiarlo
+### Intuición: añadir ruido y aprender a limpiarlo {#sec-intuicion-difusion}
 
 Los modelos de difusión funcionan en dos fases:
 
@@ -289,6 +297,7 @@ Los modelos de difusión funcionan en dos fases:
 
 Para generar datos sintéticos: partes de ruido puro y aplicas el proceso inverso aprendido.
 
+::: {#fig-difusion-forward-reverse}
 ```{mermaid}
 graph LR
     subgraph "Forward: añadir ruido (fijo)"
@@ -304,6 +313,7 @@ graph LR
     style YT fill:#c62828,color:#fff
     style Y0 fill:#2e7d32,color:#fff
 ```
+:::
 
 **TabDDPM** adapta este paradigma a datos tabulares combinando:
 - Un modelo de difusión para columnas numéricas
@@ -317,10 +327,11 @@ TabDDPM no está integrado en SDV (requiere implementación propia con PyTorch).
 
 ---
 
-## 5. SDV (Synthetic Data Vault): framework unificado
+## 5. SDV (Synthetic Data Vault): framework unificado {#sec-sdv}
 
 SDV unifica todo bajo una API común. El flujo es siempre el mismo:
 
+::: {#fig-sdv-flujo}
 ```{mermaid}
 graph LR
     A["1. Dataset real"] --> B["2. Metadata<br/>detecta tipos"]
@@ -337,14 +348,15 @@ graph LR
     style H fill:#2e7d32,color:#fff
     style I fill:#e65100,color:#fff
 ```
+:::
 
 ---
 
-## 6. Validación estadística
+## 6. Validación estadística {#sec-validacion-estadistica}
 
 Generar datos sintéticos no basta. Hay que **demostrar** que son útiles, fieles y seguros.
 
-### 6.1 Fidelidad: ¿se parecen a los datos reales?
+### 6.1 Fidelidad: ¿se parecen a los datos reales? {#sec-validacion-fidelidad}
 
 ```{python}
 #| echo: true
@@ -379,7 +391,7 @@ for col in ["producto", "provincia"]:
     print(f"  {col:20s} | χ²={chi2:.2f} | p={pval:.4f} | {conclusion}")
 ```
 
-### 6.2 Utilidad: ¿sirven para entrenar un modelo?
+### 6.2 Utilidad: ¿sirven para entrenar un modelo? {#sec-validacion-utilidad}
 
 La prueba definitiva: entrenar un clasificador con datos sintéticos y evaluarlo con datos reales.
 
@@ -414,7 +426,7 @@ print(f"F1 (modelo entrenado con datos SINTÉTICOS):  {f1_gan:.4f}")
 print(f"Diferencia:                                  {f1_real - f1_gan:.4f}")
 ```
 
-### 6.3 Visualización: PCA del espacio de features
+### 6.3 Visualización: PCA del espacio de features {#sec-validacion-pca}
 
 Proyectar datos reales y sintéticos a 2 dimensiones con PCA y visualizar el solapamiento.
 
@@ -454,7 +466,9 @@ plt.show()
 
 ---
 
-## 7. Criterios de decisión
+## 7. Criterios de decisión {#sec-criterios-decision}
+
+: Criterios para elegir entre prompting, SDV y modelos de difusión {#tbl-criterios-decision}
 
 | Criterio | Prompting LLM | SDV (CTGAN/TVAE) | TabDDPM |
 |---|---|---|---|
@@ -478,7 +492,7 @@ plt.show()
 
 ---
 
-## Referencias del tema
+## Referencias del tema {#sec-referencias-datos-sinteticos}
 
 - Xu, L. et al. (2019). *Modeling Tabular Data using Conditional GAN* (CTGAN). NeurIPS 2019. [arXiv:1907.00503](https://arxiv.org/abs/1907.00503)
 - Patki, N. et al. (2016). *The Synthetic Data Vault*. IEEE DSAA 2016. [PDF](https://dai.lids.mit.edu/wp-content/uploads/2018/03/SDV.pdf)
