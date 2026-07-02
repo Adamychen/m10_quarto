@@ -9,11 +9,12 @@ m10_quarto/
 ├── about.qmd                    # Acerca de
 ├── mod10.md                     # Guía docente pública del módulo
 ├── bloque1/                     # Fundamentos: Transformers, LLMs, embeddings, vector DB
-│   ├── 01-fundamentos.qmd       # Índice del bloque
+│   ├── 01-fundamentos.qmd      # Índice del bloque
 │   ├── 01a-transformer.qmd      # Arquitectura Transformer
 │   ├── 01b-llms.qmd             # LLMs e inferencia
 │   ├── 01c-embeddings.qmd       # Modelos de embeddings
-│   └── 01d-vectordb.qmd         # Bases de datos vectoriales
+│   ├── 01d-vectordb.qmd         # Bases de datos vectoriales
+│   └── hpd1-embeddings.qmd      # HPD 1 — Taller: Pipeline de embeddings
 ├── bloque2/                     # Orquestación: prompt, frameworks, MCP, agentes
 │   ├── 02-orquestacion.qmd      # Índice del bloque
 │   ├── 02a-prompt-engineering.qmd
@@ -36,17 +37,14 @@ m10_quarto/
 │   ├── 04d-sesgo.qmd            # Tipos + auditoría de sesgo
 │   ├── 04e-documentacion.qmd    # Model Card + System Card
 │   └── 04f-despliegue.qmd       # On-prem + observabilidad + caching
-├── evaluables/                  # Ejercicios evaluables (10 ficheros)
-│   ├── hpd1-embeddings.qmd           # Taller presencial HPD 1
-│   ├── hpd1-evaluables.qmd          # HPD 1 — entrega
-│   ├── hpd1-extension.qmd           # HPD 1 — extensión avanzada
-│   ├── hpd2-evaluables.qmd          # HPD 2 — entrega
-│   ├── hpd2-extension.qmd           # HPD 2 — extensión avanzada
-│   ├── hpd3-evaluables.qmd          # HPD 3 — entrega
-│   ├── hpd3-extension.qmd           # HPD 3 — extensión avanzada
-│   ├── hpd4-rag-mixto.qmd           # HPD 4 — RAG mixto
-│   ├── hpd4-datos-sinteticos.qmd    # HPD 4 — datos sintéticos
-│   └── hpd4-datos-sinteticos-extension.qmd
+├── evaluables/                  # Entregables y proyecto (6 ficheros + taller)
+│   ├── caminos.qmd                  # Elección de camino (A/B/C)
+│   ├── hpd1-entregable.qmd          # HPD 1 — Entregable: Pipeline de embeddings
+│   ├── hpd2-entregable.qmd          # HPD 2 — Entregable: Agente analítico con Tool Calling
+│   ├── hpd3-entregable.qmd          # HPD 3 — Entregable: Servidor MCP
+│   ├── hpd4-rag-mixto.qmd           # HPD 4 — Taller: RAG mixto (no evaluable)
+│   ├── hpd4-entregable.qmd          # HPD 4 — Entregable: RAG con evaluación
+│   └── proyecto-final.qmd           # Proyecto integrador final
 ├── 05-evaluacion.qmd            # Evaluación y proyecto integrador
 ├── 06-herramientas.qmd          # Herramientas y stack recomendado
 ├── 07-bibliografia.qmd          # Bibliografía y recursos
@@ -72,11 +70,11 @@ m10_quarto/
 | Sección | Páginas |
 |---|---|
 | **Inicio** | `index.qmd` (Presentación), `about.qmd` (Acerca de), `mod10.md` (Guía docente) |
-| **Bloque 1 — Fundamentos** | `bloque1/01-fundamentos.qmd`, `01a-transformer.qmd`, `01b-llms.qmd`, `01c-embeddings.qmd`, `01d-vectordb.qmd`, `evaluables/hpd1-embeddings.qmd`, `evaluables/hpd1-evaluables.qmd`, `evaluables/hpd1-extension.qmd` |
-| **Bloque 2 — Orquestación** | `bloque2/02-orquestacion.qmd`, `02a-prompt-engineering.qmd`, `02b-langchain.qmd`, `02c-llamaindex.qmd`, `02d-mcp.qmd`, `02e-agentes.qmd`, `hpd2-agente-tool-calling.qmd`, `evaluables/hpd2-evaluables.qmd`, `evaluables/hpd2-extension.qmd`, `hpd3-servidor-mcp.qmd`, `evaluables/hpd3-evaluables.qmd`, `evaluables/hpd3-extension.qmd` |
-| **Bloque 3 — Aplicaciones** | `bloque3/03-aplicaciones.qmd`, `03b-rag-avanzado.qmd`, `03a-datos-sinteticos.qmd`, `03c-fine-tuning.qmd`, `evaluables/hpd4-rag-mixto.qmd`, `evaluables/hpd4-datos-sinteticos.qmd`, `evaluables/hpd4-datos-sinteticos-extension.qmd` |
+| **Bloque 1 — Fundamentos** | `bloque1/01-fundamentos.qmd`, `01a-transformer.qmd`, `01b-llms.qmd`, `01c-embeddings.qmd`, `01d-vectordb.qmd`, `bloque1/hpd1-embeddings.qmd`, `evaluables/hpd1-entregable.qmd` |
+| **Bloque 2 — Orquestación** | `bloque2/02-orquestacion.qmd`, `02a-prompt-engineering.qmd`, `02b-langchain.qmd`, `02c-llamaindex.qmd`, `02d-mcp.qmd`, `02e-agentes.qmd`, `bloque2/hpd2-agente-tool-calling.qmd`, `evaluables/hpd2-entregable.qmd`, `bloque2/hpd3-servidor-mcp.qmd`, `evaluables/hpd3-entregable.qmd` |
+| **Bloque 3 — Aplicaciones** | `bloque3/03-aplicaciones.qmd`, `03b-rag-avanzado.qmd`, `03a-datos-sinteticos.qmd`, `03c-fine-tuning.qmd`, `evaluables/hpd4-rag-mixto.qmd`, `evaluables/hpd4-entregable.qmd` |
 | **Bloque 4 — Gobernanza** | `bloque4/04-gobernanza.qmd`, `04a-evaluacion.qmd`, `04b-alucinaciones.qmd`, `04c-privacidad.qmd`, `04d-sesgo.qmd`, `04e-documentacion.qmd`, `04f-despliegue.qmd` |
-| **Evaluación** | `05-evaluacion.qmd` |
+| **Evaluación** | `evaluables/caminos.qmd`, `05-evaluacion.qmd`, `evaluables/proyecto-final.qmd` |
 | **Recursos** | `06-herramientas.qmd`, `07-bibliografia.qmd` |
 
 > La fuente de verdad del sidebar es `_quarto.yml` (líneas 12-99). Si este fichero y `_quarto.yml` divergen, prioriza `_quarto.yml`.

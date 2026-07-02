@@ -1,0 +1,923 @@
+---
+title: "HPD 1 — Entregable: Pipeline de embeddings y búsqueda semántica"
+engine: jupyter
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/evaluables/hpd1-entregable.ipynb)
+
+> **Peso en la nota:** 7.5 %
+>
+> **Plazo:** 7 días tras la sesión presencial.
+>
+> **Entrega:** Notebook `.ipynb` ejecutado con todas las celdas completas.
+>   Cada ejercicio especifica qué variable debe contener el resultado para la corrección automática.
+
+::: {.callout-warning icon=false}
+## Cómo se corrige
+
+Cada ejercicio pide que asignes el resultado a una variable con un nombre concreto
+(`eval1_estrategia`, `eval2_recall`, `eval3_busqueda`, `eval4_justificacion`).
+El script de corrección ejecutará tu notebook e inspeccionará esas variables.
+
+Además, la variable `CAMINO` debe estar definida al inicio del notebook.
+:::
+
+```{python}
+#| echo: true
+#| eval: true
+
+CAMINO = "A"  # Cambiar a "B" o "C" según tu elección
+```
+
+## Setup
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q chromadb sentence-transformers fpdf2 matplotlib pandas langchain langchain-community langchain-text-splitters pypdf python-dotenv
+```
+
+```{python}
+#| echo: true
+
+import os, tempfile, shutil
+"""
+Setup compartido para la API key de Llamus en todos los notebooks.
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
+
+Orden de resolución:
+  1. .env local (python-dotenv)
+  2. os.environ ya configurado externamente
+  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
+
+Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+"""
+
+import os
+
+
+def _load_llm_api_key():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
+    if not os.getenv("LLM_API_KEY"):
+        try:
+            from google.colab import userdata
+            for name in ("LLAMUS_API_KEY", "LLM_API_KEY"):
+                try:
+                    value = userdata.get(name)
+                    if value:
+                        os.environ["LLM_API_KEY"] = value
+                        break
+                except Exception:
+                    continue
+        except ImportError:
+            pass
+
+
+_load_llm_api_key()
+
+if os.getenv("LLM_API_KEY"):
+    print("✓ LLM_API_KEY cargada.")
+else:
+    print("⚠️  LLM_API_KEY no encontrada.")
+    print("    • Local: crea un archivo .env con LLM_API_KEY=tu_clave")
+    print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
+
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+import warnings
+warnings.filterwarnings("ignore")
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from fpdf import FPDF
+from sentence_transformers import SentenceTransformer
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+import chromadb
+
+plt.rcParams["figure.figsize"] = (8, 5)
+plt.rcParams["figure.dpi"] = 100
+print("Librerías cargadas correctamente.")
+```
+
+```{python}
+#| echo: true
+
+# ------------------------------------------------------------------ Parámetros compartidos
+MODEL_NAME = "intfloat/e5-small-v2"
+CHUNK_SIZE = 300
+CHUNK_OVERLAP = 50
+
+BASE_DIR = tempfile.mkdtemp()
+CORPUS_DIR = os.path.join(BASE_DIR, "corpus")
+os.makedirs(CORPUS_DIR, exist_ok=True)
+print(f"Directorio temporal: {BASE_DIR}")
+
+# ------------------------------------------------------------------ Modelo de embeddings
+model = SentenceTransformer(MODEL_NAME)
+print(f"Modelo cargado: {MODEL_NAME} ({model.get_embedding_dimension()} dimensiones)")
+
+# ------------------------------------------------------------------ Chroma
+client = chromadb.EphemeralClient()
+```
+
+```{python}
+#| echo: true
+
+class PDF(FPDF):
+    pass
+
+def crear_pdf(nombre: str, titulo: str, contenido: str) -> None:
+    pdf = PDF()
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 16)
+    titulo_safe = titulo.replace("—", "-").replace("€", "EUR").replace("…", "...")
+    pdf.cell(0, 10, titulo_safe, new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(5)
+    pdf.set_font("Helvetica", "", 11)
+    contenido_safe = contenido.replace("—", "-").replace("€", "EUR").replace("…", "...")
+    pdf.multi_cell(0, 6, contenido_safe)
+    pdf.output(os.path.join(CORPUS_DIR, nombre))
+    print(f"  ✅ {nombre}")
+
+print("Helper PDF listo.")
+```
+
+::: {.panel-tabset}
+
+## Camino A — Finanzas
+
+**Contexto:** Trabajas como Data Scientist en una consultora financiera. Tu cliente te pide un sistema de búsqueda semántica sobre su documentación corporativa: informes anuales, balances y análisis de mercado. El sistema debe permitir a los analistas buscar información por concepto, no por palabra clave.
+
+### Corpus — 3 documentos financieros
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    documentos_a = {
+        "balance_anual_2025.pdf": (
+            "Balance Anual Consolidado 2025 — Grupo Financiero M10",
+            "El balance anual consolidado del Grupo Financiero M10 para el ejercicio 2025 "
+            "refleja unos activos totales de 12.450 millones de euros, un incremento del 8.3 % "
+            "respecto al año anterior. Los activos corrientes ascienden a 4.230 millones, "
+            "destacando las partidas de efectivo y equivalentes (1.890 M€) y las cuentas "
+            "a cobrar (1.450 M€). El activo no corriente se sitúa en 8.220 millones, con "
+            "una plusvalía latente de 2.100 M€ en la cartera de participaciones estratégicas.\n\n"
+            "En el pasivo, los fondos propios alcanzan los 5.780 millones (46.4 % del total), "
+            "con un resultado del ejercicio de 890 M€, un 12 % superior al de 2024. La deuda "
+            "financiera neta se reduce un 5.2 % hasta los 3.200 millones, mejorando el ratio "
+            "de apalancamiento del 58 % al 55 %. El fondo de maniobra se sitúa en 1.450 M€, "
+            "lo que proporciona un colchón de liquidez adecuado para afrontar los vencimientos "
+            "del próximo ejercicio.\n\n"
+            "Entre los riesgos identificados en la memoria, destacan la exposición al tipo "
+            "de cambio por operaciones en mercados emergentes (aproximadamente 800 M€ en "
+            "divisas no EUR), la sensibilidad del margen financiero a subidas de tipos de "
+            "interés, y la concentración de ingresos en los tres principales clientes "
+            "(45 % de la facturación total). El consejo recomienda mantener la política de "
+            "dividendos en el 40 % del beneficio neto."
+        ),
+        "analisis_mercado_2025.pdf": (
+            "Análisis de Mercado y Previsiones 2025-2026 — División de Corporate Banking",
+            "El informe de análisis de mercado para el periodo 2025-2026 del sector financiero "
+            "europeo revela un entorno de tipos de interés estabilizados entre el 3.5 % y el "
+            "4.0 %, tras el ciclo alcista de 2022-2024. Se espera que el BCE inicie recortes "
+            "graduales en el segundo semestre de 2026, lo que podría reducir el margen de "
+            "intermediación en aproximadamente 15 puntos básicos. Sin embargo, el aumento del "
+            "volumen de crédito previsto (estimado en un 6 % interanual) compensaría parcialmente "
+            "esta contracción.\n\n"
+            "El sector fintech sigue ganando cuota de mercado, especialmente en pagos digitales "
+            "(crecimiento del 22 % anual) y préstamos al consumo (14 % anual). Los bancos "
+            "tradicionales están respondiendo con alianzas estratégicas y programas de "
+            "transformación digital. Se identifican tres tendencias clave: banca como servicio "
+            "(BaaS), inteligencia artificial aplicada a scoring crediticio, y tokenización de "
+            "activos financieros mediante blockchain.\n\n"
+            "En el segmento de banca de inversión, los ingresos por comisiones crecieron un "
+            "9 % en 2025, impulsados por las operaciones de M&A (fusión y adquisición) en el "
+            "sector energético y tecnológico. Las previsiones para 2026 apuntan a un crecimiento "
+            "moderado del 4-6 %, condicionado a la evolución de los tipos y a la estabilidad "
+            "geopolítica. Se recomienda prestar especial atención al riesgo de crédito en el "
+            "sector inmobiliario comercial, donde los ratios de morosidad podrían incrementarse "
+            "hasta el 4.5 % en caso de recesión."
+        ),
+        "estados_financieros_2025.pdf": (
+            "Estados Financieros Intermedios — Q1-Q4 2025",
+            "Los estados financieros intermedios del ejercicio 2025 muestran una evolución "
+            "positiva en los cuatro trimestres. La cuenta de resultados consolidada arroja "
+            "un margen de intereses de 1.280 M€ (+7.4 % vs 2024), unos ingresos por comisiones "
+            "de 845 M€ (+5.2 %) y unos ingresos totales de explotación de 2.580 M€ (+9.1 %). "
+            "Los gastos de administración y personal se mantienen contenidos en 1.020 M€, "
+            "con un ratio de eficiencia del 39.5 %, mejorando en 2 puntos porcentuales "
+            "respecto al ejercicio anterior.\n\n"
+            "Las dotaciones por insolvencias ascienden a 210 M€, un 15 % más que en 2024, "
+            "reflejando un ligero deterioro de la cartera crediticia en el segmento de pymes. "
+            "La tasa de morosidad se sitúa en el 3.2 %, dentro de las previsiones del sector. "
+            "El beneficio neto atribuido alcanza los 890 M€, con un ROE del 15.4 % y un ROTE "
+            "del 16.2 %.\n\n"
+            "El balance de situación muestra una sólida posición de capital: CET1 phased-in "
+            "del 13.8 %, Tier 1 del 15.2 % y ratio de apalancamiento del 5.6 %, todos ellos "
+            "por encima de los requisitos regulatorios. La liquidez se mantiene holgada con "
+            "un LCR del 168 % y un NSFR del 124 %. La entidad no presenta posiciones "
+            "significativas en activos tóxicos ni exposición directa a criptoactivos."
+        ),
+    }
+    for nombre, (titulo, contenido) in documentos_a.items():
+        crear_pdf(nombre, titulo, contenido)
+    print(f"Corpus Finanzas generado: {len(documentos_a)} PDFs")
+else:
+    print("Camino A no seleccionado — saltando generación.")
+```
+
+#### Ejercicio 1 — Estrategia de chunking (2 ptos) {#sec-hpd1-e1-a}
+
+Describe qué estrategia de chunking eliges (chunk por párrafos vs. tamaño fijo con solapamiento) y por qué es adecuada para documentos financieros. Justifica tu respuesta en términos de:
+
+- Coherencia semántica de los chunks
+- Capacidad de recuperar información con consultas sobre magnitudes concretas (ej. "ratio de apalancamiento", "ROE", "morosidad")
+- Ventajas del solapamiento entre chunks en este dominio
+
+Asigna tu respuesta a `eval1_estrategia`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    eval1_estrategia = """Escribir aquí la justificación. Por ejemplo:
+
+    Elijo chunking por tamaño fijo con RecursiveCharacterTextSplitter (chunk_size=300, overlap=50)
+    porque los documentos financieros contienen párrafos largos con múltiples métricas. El
+    solapamiento asegura que magnitudes como "ratio de apalancamiento del 55 %" no se pierdan
+    en el corte. La estrategia por párrafos produciría chunks demasiado grandes y heterogéneos
+    para consultas específicas sobre ratios financieros."""
+    print("✅ eval1_estrategia asignada.")
+else:
+    eval1_estrategia = None
+```
+
+#### Ejercicio 2 — Indexación y recall@k (2.5 ptos) {#sec-hpd1-e2-a}
+
+Genera los embeddings del corpus financiero, constrúyela colección en Chroma y evalúa con recall@k usando el ground truth proporcionado.
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    # Cargar los PDFs
+    docs_a = []
+    for fname in sorted(os.listdir(CORPUS_DIR)):
+        if not fname.endswith(".pdf"):
+            continue
+        loader = PyPDFLoader(os.path.join(CORPUS_DIR, fname))
+        docs_a.extend(loader.load())
+    print(f"Documentos cargados: {len(docs_a)}")
+
+    # Chunking
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP,
+        separators=["\n\n", "\n", ". ", " ", ""]
+    )
+    chunks_a = splitter.split_documents(docs_a)
+    print(f"Chunks generados: {len(chunks_a)}")
+
+    # Indexar en Chroma
+    collection_a = client.get_or_create_collection(
+        name="hpd1_finanzas",
+        metadata={"hnsw:space": "cosine"}
+    )
+    for i, chunk in enumerate(chunks_a):
+        embedding = model.encode(chunk.page_content).tolist()
+        fuente = os.path.basename(chunk.metadata["source"])
+        cid = f"fin_{i:04d}"
+        collection_a.add(
+            ids=[cid],
+            embeddings=[embedding],
+            documents=[chunk.page_content],
+            metadatas=[{"fuente": fuente, "idx": i}]
+        )
+    print(f"Indexación completada: {collection_a.count()} vectores")
+
+    # Ground truth financiero
+    gt_a = {
+        "¿Cuál es el ratio de apalancamiento del grupo?": ["fin_0000", "fin_0001"],
+        "¿Qué riesgos se mencionan en la memoria?": ["fin_0002", "fin_0003"],
+        "¿Cómo ha evolucionado el margen de intereses?": ["fin_0005", "fin_0006"],
+        "¿Qué tendencias del sector fintech se identifican?": ["fin_0008"],
+        "¿Cuál es la previsión de crecimiento para 2026?": ["fin_0007", "fin_0009"],
+    }
+
+    # recall@k
+    def recall_at_k(retrieved_ids, relevant_ids, k):
+        if len(relevant_ids) == 0:
+            return 0.0
+        top_k = retrieved_ids[:k]
+        hits = sum(1 for rid in relevant_ids if rid in top_k)
+        return hits / len(relevant_ids)
+
+    def buscar(collection, query, k=5):
+        qe = model.encode(query).tolist()
+        return collection.query(query_embeddings=[qe], n_results=k)
+
+    eval2_recall = {}
+    for k in [1, 3, 5]:
+        recalls = []
+        for q, relevantes in gt_a.items():
+            res = buscar(collection_a, q, k=k)
+            retrieved = res["ids"][0]
+            r = recall_at_k(retrieved, relevantes, k)
+            recalls.append(r)
+        eval2_recall[f"recall@{k}"] = round(np.mean(recalls), 4)
+
+    print("📊 recall@k sobre corpus Finanzas:")
+    for k_str, v in eval2_recall.items():
+        print(f"   {k_str}: {v:.4f}")
+else:
+    eval2_recall = None
+```
+
+#### Ejercicio 3 — Búsqueda semántica (1.5 ptos) {#sec-hpd1-e3-a}
+
+Ejecuta 3 consultas de búsqueda semántica sobre el corpus financiero y muestra los resultados (top-3 chunks con su distancia coseno). Las consultas deben ser preguntas realistas que haría un analista financiero.
+
+Asigna los resultados (lista de diccionarios con query, top-3 chunks y distancias) a `eval3_busqueda`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    consultas_a = [
+        "¿Cómo ha evolucionado la deuda neta del grupo en 2025?",
+        "¿Qué impacto tendrán los recortes de tipos del BCE en el margen de intermediación?",
+        "¿Qué productos financieros del sector fintech están creciendo más rápido?",
+    ]
+
+    eval3_busqueda = []
+    for q in consultas_a:
+        res = buscar(collection_a, q, k=3)
+        resultados = []
+        for i in range(len(res["ids"][0])):
+            resultados.append({
+                "id": res["ids"][0][i],
+                "distancia": round(res["distances"][0][i], 4),
+                "texto": res["documents"][0][i][:200],
+                "fuente": res["metadatas"][0][i]["fuente"] if res["metadatas"] else None,
+            })
+        eval3_busqueda.append({"query": q, "resultados": resultados})
+
+    for r in eval3_busqueda:
+        print(f"\n🔍 {r['query']}")
+        for res in r["resultados"]:
+            print(f"   [{res['distancia']:.4f}] {res['texto'][:100]}...")
+    print("\n✅ eval3_busqueda asignada.")
+else:
+    eval3_busqueda = None
+```
+
+#### Ejercicio 4 — Justificación del modelo (1.5 ptos) {#sec-hpd1-e4-a}
+
+Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de **MTEB** para las tareas **BIOSSES** y **STS12**, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica financiera.
+
+Asigna tu respuesta a `eval4_justificacion`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    eval4_justificacion = """Escribir aquí la justificación. Por ejemplo:
+
+    e5-small-v2 obtiene un Spearman de 0.894 en BIOSSES (similitud semántica biomédica) y
+    0.774 en STS12 (dominio general). Aunque los benchmarks son de dominio general y biomédico,
+    no financiero, la alta correlación en STS12 indica que el modelo captura bien relaciones
+    semánticas en texto narrativo, que es el formato de los informes financieros. Con 33M de
+    parámetros, es eficiente para ejecutar en local sin GPU, lo que lo hace adecuado para
+    un pipeline de búsqueda semántica corporativa."""
+    print("✅ eval4_justificacion asignada.")
+else:
+    eval4_justificacion = None
+```
+
+## Camino B — Salud
+
+**Contexto:** Trabajas como Data Scientist en un laboratorio de investigación biomédica. Necesitas indexar literatura científica (ensayos clínicos, descubrimiento de fármacos, diagnóstico por imagen) para que los investigadores puedan buscar por concepto y no solo por palabras clave.
+
+### Corpus — 3 documentos biomédicos
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    documentos_b = {
+        "ensayo_clinico_oxford.pdf": (
+            "Ensayo Clínico Fase III — Oxford BioPharma: Eficacia del Compuesto M10-342",
+            "El ensayo clínico fase III del compuesto M10-342, desarrollado por Oxford BioPharma, "
+            "evalúa la eficacia y seguridad del fármaco en pacientes con fibrosis pulmonar "
+            "idiopática (FPI). El estudio, multicéntrico y aleatorizado, incluyó a 1.240 pacientes "
+            "en 35 centros de 12 países europeos, con un seguimiento medio de 18 meses.\n\n"
+            "Los resultados primarios muestran una reducción significativa del 32 % en la "
+            "progresión de la enfermedad medida por capacidad vital forzada (CVF) en el grupo "
+            "de tratamiento frente al placebo (p < 0.001). El 67 % de los pacientes tratados "
+            "con M10-342 no presentaron empeoramiento clínico a los 12 meses, frente al 41 % "
+            "del grupo control. Los efectos adversos más frecuentes fueron leves-moderados: "
+            "náuseas (12 %), fatiga (9 %) y cefalea (7 %). Se registraron 3 eventos adversos "
+            "graves relacionados con el fármaco (0.5 %), todos ellos reversibles.\n\n"
+            "Los análisis de subgrupos sugieren una eficacia superior en pacientes con fibrosis "
+            "leve-moderada (estadio GAP I-II) y en aquellos con antecedentes de tabaquismo. "
+            "La calidad de vida, medida mediante el cuestionario SGRQ, mejoró en 8.4 puntos "
+            "en el grupo tratado frente a 2.1 en el placebo (diferencia clínicamente "
+            "significativa). Estos resultados respaldan la solicitud de autorización de "
+            "comercialización a la EMA y la FDA prevista para el Q2 2026."
+        ),
+        "descubrimiento_farmacos.pdf": (
+            "Descubrimiento de Fármacos Asistido por IA — Revisión Sistemática 2025",
+            "Esta revisión sistemática analiza 87 estudios publicados entre 2020 y 2025 sobre "
+            "el uso de inteligencia artificial en el descubrimiento y desarrollo de fármacos. "
+            "Los resultados indican que la IA ha reducido el tiempo medio de la fase de "
+            "descubrimiento de 4.5 años a 1.8 años, y los costes asociados en un 45 %. Las "
+            "técnicas más utilizadas son redes neuronales gráficas (GNN) para predicción de "
+            "interacciones proteína-ligando, transformers para generación de moléculas "
+            "(de novo drug design), y aprendizaje por refuerzo para optimización de "
+            "propiedades ADMET (absorción, distribución, metabolismo, excreción, toxicidad).\n\n"
+            "Se identifican tres áreas de mayor impacto: identificación de nuevas dianas "
+            "terapéuticas (24 estudios), predicción de afinidad de binding (31 estudios) y "
+            "optimización de cabezas de serie (lead optimization, 22 estudios). Los modelos "
+            "más citados son AlphaFold (predicción de estructura de proteínas), DiffDock "
+            "(docking molecular generativo) y ChemBERTa (representaciones de moléculas).\n\n"
+            "Entre las limitaciones señaladas destacan la falta de datos de alta calidad "
+            "para entrenamiento (especialmente en enfermedades raras), la dificultad de "
+            "generalización entre dianas farmacológicas distintas, y la necesidad de validación "
+            "experimental de las predicciones (tasa de acierto real del 12-18 % en las "
+            "moléculas propuestas por IA que llegan a ensayos precínicos). La revisión "
+            "concluye que la IA es ya una herramienta indispensable, pero no sustitutiva, "
+            "del juicio experto en farmacología."
+        ),
+        "diagnostico_imagen.pdf": (
+            "Diagnóstico Asistido por IA en Imagen Médica — Aplicaciones y Métricas 2025",
+            "El presente artículo revisa el estado del arte del diagnóstico asistido por "
+            "inteligencia artificial en imagen médica, cubriendo radiología, patología digital "
+            "y oftalmología. Se analizan 45 sistemas comerciales y 112 prototipos académicos "
+            "publicados entre 2022 y 2025, evaluando su rendimiento mediante métricas "
+            "estandarizadas (AUC, sensibilidad, especificidad, F1-score).\n\n"
+            "En radiología torácica, los sistemas basados en deep learning alcanzan AUC "
+            "superiores a 0.92 en detección de nódulos pulmonares malignos, superando la "
+            "sensibilidad media del radiólogo general (0.85 vs 0.78). En mamografía, la "
+            "detección asistida por IA reduce los falsos negativos en un 21 % y los falsos "
+            "positivos en un 14 %. En patología digital, los modelos de atención múltiple "
+            "sobre whole-slide images logran una precisión del 94 % en clasificación de "
+            "cáncer de próstata (Gleason grading).\n\n"
+            "En oftalmología, los sistemas de clasificación de retinopatía diabética mediante "
+            "imágenes de fondo de ojo alcanzan sensibilidades del 96 % y especificidades del "
+            "93 %, comparables a oftalmólogos especialistas. Los desafíos actuales incluyen "
+            "la generalización entre poblaciones y equipos de imagen, la explicabilidad de "
+            "las decisiones (XAI), y la integración en flujos de trabajo clínicos reales. "
+            "Se estima que en 2027 el 30 % de los informes radiológicos incluirán hallazgos "
+            "generados o asistidos por IA."
+        ),
+    }
+    for nombre, (titulo, contenido) in documentos_b.items():
+        crear_pdf(nombre, titulo, contenido)
+    print(f"Corpus Salud generado: {len(documentos_b)} PDFs")
+else:
+    print("Camino B no seleccionado — saltando generación.")
+```
+
+#### Ejercicio 1 — Estrategia de chunking (2 ptos) {#sec-hpd1-e1-b}
+
+Describe qué estrategia de chunking eliges (chunk por párrafos vs. tamaño fijo con solapamiento) y por qué es adecuada para documentos biomédicos. Justifica tu respuesta en términos de:
+
+- Coherencia semántica de los chunks
+- Capacidad de recuperar información con consultas sobre conceptos específicos (ej. "AUC en detección de nódulos", "eficacia del compuesto", "efectos adversos")
+- Ventajas del solapamiento entre chunks en este dominio
+
+Asigna tu respuesta a `eval1_estrategia`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    eval1_estrategia = """Escribir aquí la justificación. Por ejemplo:
+
+    Elijo chunking por tamaño fijo con RecursiveCharacterTextSplitter (chunk_size=300, overlap=50)
+    porque los artículos biomédicos contienen párrafos densos con múltiples métricas (p-valores,
+    AUC, tamaños muestrales). El solapamiento evita que conceptos como "p < 0.001" o "sensibilidad
+    del 96 %" queden fuera del chunk. La estrategia por párrafos produciría chunks demasiado
+    heterogéneos para consultas específicas sobre resultados de ensayos clínicos."""
+    print("✅ eval1_estrategia asignada.")
+else:
+    eval1_estrategia = None
+```
+
+#### Ejercicio 2 — Indexación y recall@k (2.5 ptos) {#sec-hpd1-e2-b}
+
+Genera los embeddings del corpus biomédico, constrúyela colección en Chroma y evalúa con recall@k usando el ground truth proporcionado.
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    docs_b = []
+    for fname in sorted(os.listdir(CORPUS_DIR)):
+        if not fname.endswith(".pdf"):
+            continue
+        loader = PyPDFLoader(os.path.join(CORPUS_DIR, fname))
+        docs_b.extend(loader.load())
+    print(f"Documentos cargados: {len(docs_b)}")
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP,
+        separators=["\n\n", "\n", ". ", " ", ""]
+    )
+    chunks_b = splitter.split_documents(docs_b)
+    print(f"Chunks generados: {len(chunks_b)}")
+
+    collection_b = client.get_or_create_collection(
+        name="hpd1_salud",
+        metadata={"hnsw:space": "cosine"}
+    )
+    for i, chunk in enumerate(chunks_b):
+        embedding = model.encode(chunk.page_content).tolist()
+        fuente = os.path.basename(chunk.metadata["source"])
+        cid = f"sal_{i:04d}"
+        collection_b.add(
+            ids=[cid],
+            embeddings=[embedding],
+            documents=[chunk.page_content],
+            metadatas=[{"fuente": fuente, "idx": i}]
+        )
+    print(f"Indexación completada: {collection_b.count()} vectores")
+
+    # Ground truth biomédico
+    gt_b = {
+        "¿Cuál fue la reducción en la progresión de la fibrosis pulmonar?": ["sal_0000", "sal_0001"],
+        "¿Qué efectos adversos se registraron en el ensayo clínico?": ["sal_0001"],
+        "¿Qué técnicas de IA se usan en descubrimiento de fármacos?": ["sal_0004", "sal_0005"],
+        "¿Qué AUC alcanzan los sistemas de diagnóstico en radiología?": ["sal_0008", "sal_0009"],
+        "¿Cuáles son las limitaciones actuales del diagnóstico por IA?": ["sal_0010", "sal_0011"],
+    }
+
+    def recall_at_k(retrieved_ids, relevant_ids, k):
+        if len(relevant_ids) == 0:
+            return 0.0
+        top_k = retrieved_ids[:k]
+        hits = sum(1 for rid in relevant_ids if rid in top_k)
+        return hits / len(relevant_ids)
+
+    def buscar(collection, query, k=5):
+        qe = model.encode(query).tolist()
+        return collection.query(query_embeddings=[qe], n_results=k)
+
+    eval2_recall = {}
+    for k in [1, 3, 5]:
+        recalls = []
+        for q, relevantes in gt_b.items():
+            res = buscar(collection_b, q, k=k)
+            retrieved = res["ids"][0]
+            r = recall_at_k(retrieved, relevantes, k)
+            recalls.append(r)
+        eval2_recall[f"recall@{k}"] = round(np.mean(recalls), 4)
+
+    print("📊 recall@k sobre corpus Salud:")
+    for k_str, v in eval2_recall.items():
+        print(f"   {k_str}: {v:.4f}")
+else:
+    eval2_recall = None
+```
+
+#### Ejercicio 3 — Búsqueda semántica (1.5 ptos) {#sec-hpd1-e3-b}
+
+Ejecuta 3 consultas de búsqueda semántica sobre el corpus biomédico y muestra los resultados (top-3 chunks con su distancia coseno). Las consultas deben ser preguntas realistas que haría un investigador clínico.
+
+Asigna los resultados a `eval3_busqueda`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    consultas_b = [
+        "¿Qué eficacia mostró el compuesto M10-342 en la fibrosis pulmonar?",
+        "¿Cómo ha reducido la IA el tiempo de descubrimiento de fármacos?",
+        "¿Qué métricas de rendimiento tienen los sistemas de IA en radiología torácica?",
+    ]
+
+    eval3_busqueda = []
+    for q in consultas_b:
+        res = buscar(collection_b, q, k=3)
+        resultados = []
+        for i in range(len(res["ids"][0])):
+            resultados.append({
+                "id": res["ids"][0][i],
+                "distancia": round(res["distances"][0][i], 4),
+                "texto": res["documents"][0][i][:200],
+                "fuente": res["metadatas"][0][i]["fuente"] if res["metadatas"] else None,
+            })
+        eval3_busqueda.append({"query": q, "resultados": resultados})
+
+    for r in eval3_busqueda:
+        print(f"\n🔍 {r['query']}")
+        for res in r["resultados"]:
+            print(f"   [{res['distancia']:.4f}] {res['texto'][:100]}...")
+    print("\n✅ eval3_busqueda asignada.")
+else:
+    eval3_busqueda = None
+```
+
+#### Ejercicio 4 — Justificación del modelo (1.5 ptos) {#sec-hpd1-e4-b}
+
+Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de **MTEB** para las tareas **BIOSSES** y **STS12**, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica biomédica.
+
+Asigna tu respuesta a `eval4_justificacion`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    eval4_justificacion = """Escribir aquí la justificación. Por ejemplo:
+
+    e5-small-v2 obtiene un Spearman de 0.894 en BIOSSES, un benchmark de similitud textual
+    biomédica. Este resultado es directamente relevante para nuestro corpus de artículos de
+    investigación clínica: indica que el modelo alinea bien textos con terminología médica
+    y expresiones científicas. El 0.774 en STS12 (dominio general) confirma que mantiene
+    buena calidad en texto narrativo. Con 33M de parámetros, es lo suficientemente ligero
+    para ejecutarse en ordenadores de laboratorio sin GPU."""
+    print("✅ eval4_justificacion asignada.")
+else:
+    eval4_justificacion = None
+```
+
+## Camino C — E-commerce
+
+**Contexto:** Trabajas como Data Scientist en un marketplace digital. Tu equipo necesita un sistema de búsqueda semántica para que los compradores encuentren productos por concepto y necesidad, no solo por palabras clave del título.
+
+### Corpus — 3 documentos de e-commerce
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    documentos_c = {
+        "catalogo_productos_2025.pdf": (
+            "Catálogo de Productos — Primavera 2025 — MarketPlace M10",
+            "El catálogo de primavera 2025 de MarketPlace M10 incluye 1.240 productos nuevos "
+            "distribuidos en 12 categorías. Las categorías con mayor incremento de oferta son "
+            "Tecnología y Hogar (+22 % respecto a 2024), seguidas de Deportes y Moda (+15 %). "
+            "El precio medio del catálogo se sitúa en 47.50 €, con un incremento interanual "
+            "del 3.2 %, por debajo de la inflación general (4.1 %), lo que indica una "
+            "estrategia de contención de precios para mantener la competitividad.\n\n"
+            "En la categoría de Tecnología, los auriculares inalámbricos representan el 28 % "
+            "de las ventas, con el modelo NovaBuds Pro como líder del segmento (4.7 estrellas, "
+            "12.400 valoraciones). Los smartwatches crecen un 35 % en unidades vendidas, "
+            "impulsados por la nueva línea FitTrack con monitorización de glucosa no invasiva. "
+            "En Hogar, los robots aspiradores con navegación LiDAR son la subcategoría de "
+            "mayor crecimiento (+42 %), con un ticket medio de 349 €.\n\n"
+            "La categoría de Deportes destaca por el lanzamiento de la línea EcoSport, "
+            "fabricada con materiales reciclados, que ha generado 8.500 pedidos en su primer "
+            "mes. En Moda, las chaquetas técnicas con tejido transpirable son el producto "
+            "con mejor ratio de conversión (12.3 %). Los productos con mayor tasa de retorno "
+            "son los calzados de running (14 % de retornos), principalmente por talla "
+            "incorrecta, lo que ha motivado la implementación de un probador virtual con "
+            "realidad aumentada."
+        ),
+        "reviews_clientes_2025.pdf": (
+            "Análisis de Reviews de Clientes — Tendencias y Sentimiento 2025",
+            "El informe de análisis de reviews de clientes del primer semestre de 2025 procesa "
+            "245.000 valoraciones de productos en MarketPlace M10. El sentimiento global es "
+            "positivo (media de 4.1 sobre 5 estrellas), aunque varía significativamente por "
+            "categoría: Tecnología (4.3), Hogar (4.2), Deportes (4.0), Moda (3.8) y "
+            "Alimentación (4.4).\n\n"
+            "El análisis de opiniones mediante procesamiento de lenguaje natural revela los "
+            "principales factores de satisfacción: relación calidad-precio (mencionado en el "
+            "62 % de las reviews positivas), rapidez de entrega (45 %), y facilidad de uso "
+            "del producto (38 %). Los factores de insatisfacción más frecuentes son: talla "
+            "incorrecta en ropa y calzado (28 % de reviews negativas), diferencia entre la "
+            "foto y el producto real (22 %), y problemas de compatibilidad en productos "
+            "electrónicos (15 %).\n\n"
+            "Se identifican tres tendencias emergentes en las reviews: creciente demanda de "
+            "productos sostenibles (menciones +65 % respecto a 2024), preferencia por "
+            "envases sin plástico (+42 %) e interés en funcionalidades basadas en IA "
+            "(asistentes inteligentes, recomendaciones personalizadas, +38 %). Las reviews "
+            "que mencionan la palabra 'inteligente' o 'smart' tienen una valoración media "
+            "superior (4.5 vs 4.1), lo que sugiere que los productos con tecnología "
+            "incorporada generan mayor satisfacción."
+        ),
+        "tendencias_mercado_2025.pdf": (
+            "Tendencias de Mercado y Comportamiento del Consumidor 2025-2026",
+            "El estudio de tendencias de mercado para 2025-2026 del sector e-commerce revela "
+            "cambios significativos en el comportamiento del consumidor post-pandemia. Las "
+            "ventas online en Europa crecieron un 14 % en 2025, alcanzando los 890 mil "
+            "millones de euros. Se espera que el crecimiento se modere al 9-11 % en 2026, "
+            "con una penetración del comercio electrónico del 32 % sobre el total del "
+            "comercio minorista.\n\n"
+            "Tres tendencias clave dominan el mercado: la compra por voz (asistentes como "
+            "Alexa y Google Assistant generan ya el 8 % de las órdenes en electrónica), "
+            "las suscripciones recurrentes (el 23 % de los consumidores tiene al menos una "
+            "suscripción de productos, con crecimiento del 18 % anual), y la personalización "
+            "masiva mediante IA (recomendaciones, ofertas dinámicas y pricing adaptativo).\n\n"
+            "En el segmento de consumo responsable, el 41 % de los compradores declara "
+            "estar dispuesto a pagar más por productos sostenibles, aunque solo el 17 % lo "
+            "hace realmente (intention-action gap). Los marketplaces que ofrecen filtros de "
+            "sostenibilidad y calculadoras de huella de carbono aumentan su conversión en "
+            "un 12 %. Las redes sociales como canal de descubrimiento de productos (social "
+            "commerce) crecen un 34 %, con TikTok Shop e Instagram Checkout como principales "
+            "plataformas.\n\n"
+            "Los principales desafíos para 2026 incluyen la gestión de devoluciones (coste "
+            "estimado del 21 % sobre el valor del pedido), la logística de última milla en "
+            "zonas de baja densidad, y la detección de fraude con IA generativa (deepfakes "
+            "en reviews y suplantación de vendedores)."
+        ),
+    }
+    for nombre, (titulo, contenido) in documentos_c.items():
+        crear_pdf(nombre, titulo, contenido)
+    print(f"Corpus E-commerce generado: {len(documentos_c)} PDFs")
+else:
+    print("Camino C no seleccionado — saltando generación.")
+```
+
+#### Ejercicio 1 — Estrategia de chunking (2 ptos) {#sec-hpd1-e1-c}
+
+Describe qué estrategia de chunking eliges (chunk por párrafos vs. tamaño fijo con solapamiento) y por qué es adecuada para documentos de e-commerce. Justifica tu respuesta en términos de:
+
+- Coherencia semántica de los chunks
+- Capacidad de recuperar información con consultas sobre productos específicos (ej. "auriculares con cancelación de ruido", "tasa de retorno de calzado")
+- Ventajas del solapamiento entre chunks en este dominio
+
+Asigna tu respuesta a `eval1_estrategia`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    eval1_estrategia = """Escribir aquí la justificación. Por ejemplo:
+
+    Elijo chunking por tamaño fijo con RecursiveCharacterTextSplitter (chunk_size=300, overlap=50)
+    porque los documentos de e-commerce mezclan narrativa de mercado con datos concretos (precios,
+    porcentajes, valoraciones). El solapamiento evita que métricas como "tasa de retorno del 14 %"
+    o "crecimiento del 35 %" se pierdan en los cortes. La estrategia por párrafos no es adecuada
+    porque los párrafos suelen agrupar múltiples productos y métricas diferentes."""
+    print("✅ eval1_estrategia asignada.")
+else:
+    eval1_estrategia = None
+```
+
+#### Ejercicio 2 — Indexación y recall@k (2.5 ptos) {#sec-hpd1-e2-c}
+
+Genera los embeddings del corpus de e-commerce, constrúyela colección en Chroma y evalúa con recall@k usando el ground truth proporcionado.
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    docs_c = []
+    for fname in sorted(os.listdir(CORPUS_DIR)):
+        if not fname.endswith(".pdf"):
+            continue
+        loader = PyPDFLoader(os.path.join(CORPUS_DIR, fname))
+        docs_c.extend(loader.load())
+    print(f"Documentos cargados: {len(docs_c)}")
+
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=CHUNK_SIZE,
+        chunk_overlap=CHUNK_OVERLAP,
+        separators=["\n\n", "\n", ". ", " ", ""]
+    )
+    chunks_c = splitter.split_documents(docs_c)
+    print(f"Chunks generados: {len(chunks_c)}")
+
+    collection_c = client.get_or_create_collection(
+        name="hpd1_ecommerce",
+        metadata={"hnsw:space": "cosine"}
+    )
+    for i, chunk in enumerate(chunks_c):
+        embedding = model.encode(chunk.page_content).tolist()
+        fuente = os.path.basename(chunk.metadata["source"])
+        cid = f"eco_{i:04d}"
+        collection_c.add(
+            ids=[cid],
+            embeddings=[embedding],
+            documents=[chunk.page_content],
+            metadatas=[{"fuente": fuente, "idx": i}]
+        )
+    print(f"Indexación completada: {collection_c.count()} vectores")
+
+    # Ground truth e-commerce
+    gt_c = {
+        "¿Cuáles son las categorías con mayor crecimiento?": ["eco_0000", "eco_0001"],
+        "¿Qué productos tienen mayor tasa de retorno?": ["eco_0002"],
+        "¿Qué tendencias de consumo responsable se observan?": ["eco_0006", "eco_0007"],
+        "¿Qué factores de insatisfacción mencionan los clientes?": ["eco_0004", "eco_0005"],
+        "¿Cuáles son los desafíos del e-commerce para 2026?": ["eco_0010", "eco_0011"],
+    }
+
+    def recall_at_k(retrieved_ids, relevant_ids, k):
+        if len(relevant_ids) == 0:
+            return 0.0
+        top_k = retrieved_ids[:k]
+        hits = sum(1 for rid in relevant_ids if rid in top_k)
+        return hits / len(relevant_ids)
+
+    def buscar(collection, query, k=5):
+        qe = model.encode(query).tolist()
+        return collection.query(query_embeddings=[qe], n_results=k)
+
+    eval2_recall = {}
+    for k in [1, 3, 5]:
+        recalls = []
+        for q, relevantes in gt_c.items():
+            res = buscar(collection_c, q, k=k)
+            retrieved = res["ids"][0]
+            r = recall_at_k(retrieved, relevantes, k)
+            recalls.append(r)
+        eval2_recall[f"recall@{k}"] = round(np.mean(recalls), 4)
+
+    print("📊 recall@k sobre corpus E-commerce:")
+    for k_str, v in eval2_recall.items():
+        print(f"   {k_str}: {v:.4f}")
+else:
+    eval2_recall = None
+```
+
+#### Ejercicio 3 — Búsqueda semántica (1.5 ptos) {#sec-hpd1-e3-c}
+
+Ejecuta 3 consultas de búsqueda semántica sobre el corpus de e-commerce y muestra los resultados (top-3 chunks con su distancia coseno). Las consultas deben ser preguntas realistas que haría un analista de producto.
+
+Asigna los resultados a `eval3_busqueda`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    consultas_c = [
+        "¿Qué productos de tecnología tienen mejor valoración según las reviews?",
+        "¿Cómo está evolucionando el social commerce y qué plataformas lideran?",
+        "¿Qué factores mencionan los clientes como principales causas de insatisfacción?",
+    ]
+
+    eval3_busqueda = []
+    for q in consultas_c:
+        res = buscar(collection_c, q, k=3)
+        resultados = []
+        for i in range(len(res["ids"][0])):
+            resultados.append({
+                "id": res["ids"][0][i],
+                "distancia": round(res["distances"][0][i], 4),
+                "texto": res["documents"][0][i][:200],
+                "fuente": res["metadatas"][0][i]["fuente"] if res["metadatas"] else None,
+            })
+        eval3_busqueda.append({"query": q, "resultados": resultados})
+
+    for r in eval3_busqueda:
+        print(f"\n🔍 {r['query']}")
+        for res in r["resultados"]:
+            print(f"   [{res['distancia']:.4f}] {res['texto'][:100]}...")
+    print("\n✅ eval3_busqueda asignada.")
+else:
+    eval3_busqueda = None
+```
+
+#### Ejercicio 4 — Justificación del modelo (1.5 ptos) {#sec-hpd1-e4-c}
+
+Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de **MTEB** para las tareas **BIOSSES** y **STS12**, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica de productos.
+
+Asigna tu respuesta a `eval4_justificacion`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    eval4_justificacion = """Escribir aquí la justificación. Por ejemplo:
+
+    e5-small-v2 obtiene un Spearman de 0.774 en STS12 (similitud textual de dominio general),
+    lo que indica una buena capacidad para alinear textos narrativos como descripciones de
+    productos y reviews de clientes. Su rendimiento en BIOSSES (0.894) muestra robustez incluso
+    con vocabulario especializado. Con solo 33M de parámetros, el modelo es lo suficientemente
+    ligero para servir recomendaciones en tiempo real en un marketplace sin necesidad de GPU."""
+    print("✅ eval4_justificacion asignada.")
+else:
+    eval4_justificacion = None
+```
+
+:::
+
+## Resumen de entregables
+
+```{python}
+#| echo: true
+
+print(f"Camino seleccionado: {CAMINO}")
+print(f"\nVariables de corrección:")
+for var in ["eval1_estrategia", "eval2_recall", "eval3_busqueda", "eval4_justificacion"]:
+    val = globals().get(var, None)
+    status = "✅ definida" if val is not None else "⚠️ no definida"
+    print(f"  {var}: {status}")
+```
+
+# References
+
+::: {#refs}
+:::

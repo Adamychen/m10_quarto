@@ -639,7 +639,7 @@ print("✅ Función preguntar_al_llm definida.")
 Implementar el bucle de tool calling a mano requiere gestionar `tool_calls`, ejecutar
 las tools y reinyectar los resultados en el historial. El patrón es idéntico al que
 usaste en HPD 2 con LangChain, pero sin la abstracción. Si te atascas, consulta el
-código de referencia en `evaluables/hpd3-evaluables.qmd`.
+código de referencia en `evaluables/hpd3-entregable.qmd`.
 :::
 
 ```{python}

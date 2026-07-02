@@ -106,7 +106,7 @@ Gracias a esa combinación fija, dos equipos independientes pueden evaluar el mi
 ::: {.callout-tip}
 ## ¿Por qué MTEB aparece primero?
 
-Porque en este módulo ya lo usas: el [HPD 1 ejecuta MTEB](../evaluables/hpd1-embeddings.qmd#sec-mteb-hpd1) sobre BIOSSES y STS12, y el [entregable de HPD 1](../evaluables/hpd1-evaluables.qmd) te pide justificar la elección de un modelo de embeddings "teniendo en cuenta el benchmark MTEB". Esta sección te da el marco conceptual que da sentido a esa práctica.
+Porque en este módulo ya lo usas: el [HPD 1 ejecuta MTEB](../bloque1/hpd1-embeddings.qmd#sec-mteb-hpd1) sobre BIOSSES y STS12, y el [entregable de HPD 1](../evaluables/hpd1-entregable.qmd) te pide justificar la elección de un modelo de embeddings "teniendo en cuenta el benchmark MTEB". Esta sección te da el marco conceptual que da sentido a esa práctica.
 :::
 
 #### Cómo leer un leaderboard críticamente {#sec-leer-leaderboard}
@@ -203,7 +203,7 @@ BERTScore reemplaza la comparación palabra-por-palabra por una comparación de 
 : Comparativa de BERTScore frente a ROUGE-L en paráfrasis {#tbl-bertscore-vs-rouge}
 
 | "usa atención multi-cabeza" | "usa self-attention con varias cabezas" | ~0.5 | ~0.9 |
-| "aplica atención convolucional" | "usa auto-atención" | ~0.4 | ~0.7 |
+| "aplica atención convolucional" | "usa auto-atención" | ~0.4|~0.7 |
 
 La segunda fila muestra la limitación clave de BERTScore: si la respuesta dice algo *plausible pero incorrecto* (atención convolucional en lugar de auto-atención), los embeddings siguen siendo cercanos y BERTScore da un score engañosamente alto. Por eso BERTScore complementa, pero no sustituye, a LLM-as-judge o evaluación humana.
 

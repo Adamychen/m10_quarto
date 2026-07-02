@@ -1,0 +1,1130 @@
+---
+title: "HPD 4 — Entregable: Sistema RAG con evaluación"
+engine: jupyter
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/evaluables/hpd4-entregable.ipynb)
+
+> **Peso en la nota:** 7.5 %
+>
+> **Plazo:** 7 días tras la sesión presencial de HPD 4.
+>
+> **Prerrequisito:** Haber realizado [`evaluables/hpd4-rag-mixto.qmd`](hpd4-rag-mixto.qmd) (taller presencial).
+>
+> **Entrega:** Notebook `.ipynb` ejecutado con todas las celdas completas.
+>   Cada ejercicio especifica qué variable debe contener el resultado para la corrección automática.
+
+::: {.callout-warning icon=false}
+## Cómo se corrige
+
+Cada ejercicio pide que asignes el resultado a una variable con un nombre concreto
+(`eval1_dataset`, `eval2_ragas`, `eval3_iteracion`, `eval4_informe`).
+El script de corrección ejecutará tu notebook e inspeccionará esas variables.
+
+Además, la variable `CAMINO` debe estar definida al inicio del notebook.
+:::
+
+```{python}
+#| echo: true
+#| eval: true
+
+CAMINO = "A"  # Cambiar a "B" o "C" según tu elección
+```
+
+## Setup
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q chromadb sentence-transformers langchain langchain-community langchain-text-splitters pypdf ragas datasets fpdf2 pandas matplotlib scikit-learn python-dotenv openai
+```
+
+```{python}
+#| echo: true
+
+import os, tempfile, shutil, sqlite3
+"""
+Setup compartido para la API key de Llamus en todos los notebooks.
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
+
+Orden de resolución:
+  1. .env local (python-dotenv)
+  2. os.environ ya configurado externamente
+  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
+
+Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+"""
+
+import os
+
+
+def _load_llm_api_key():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
+    if not os.getenv("LLM_API_KEY"):
+        try:
+            from google.colab import userdata
+            for name in ("LLAMUS_API_KEY", "LLM_API_KEY"):
+                try:
+                    value = userdata.get(name)
+                    if value:
+                        os.environ["LLM_API_KEY"] = value
+                        break
+                except Exception:
+                    continue
+        except ImportError:
+            pass
+
+
+_load_llm_api_key()
+
+if os.getenv("LLM_API_KEY"):
+    print("✓ LLM_API_KEY cargada.")
+else:
+    print("⚠️  LLM_API_KEY no encontrada.")
+    print("    • Local: crea un archivo .env con LLM_API_KEY=tu_clave")
+    print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
+
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+import warnings
+warnings.filterwarnings("ignore")
+
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from fpdf import FPDF
+from sentence_transformers import SentenceTransformer
+from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
+import chromadb
+from langchain_openai import ChatOpenAI
+
+plt.rcParams["figure.dpi"] = 100
+print("Librerías cargadas correctamente.")
+```
+
+```{python}
+#| echo: true
+
+LLM_KEY = os.getenv("LLM_API_KEY")
+LLM_URL = "https://llamus.cs.us.es/api/v1"
+
+if not LLM_KEY:
+    print("⚠️  Crea un archivo .env con:\n    LLM_API_KEY=tu_api_key")
+else:
+    llm = ChatOpenAI(model="gemma4:e2b-mlx", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
+    print("✅ LLM configurado (gemma4:e2b-mlx).")
+```
+
+```{python}
+#| echo: true
+
+MODEL_NAME = "intfloat/e5-small-v2"
+CHUNK_SIZE = 400
+CHUNK_OVERLAP = 60
+
+model = SentenceTransformer(MODEL_NAME)
+client = chromadb.EphemeralClient()
+
+BASE_DIR = tempfile.mkdtemp()
+CORPUS_DIR = os.path.join(BASE_DIR, "corpus")
+os.makedirs(CORPUS_DIR, exist_ok=True)
+
+print(f"Modelo: {MODEL_NAME} ({model.get_embedding_dimension()} dims)")
+print(f"Directorio temporal: {CORPUS_DIR}")
+```
+
+### Funciones auxiliares
+
+```{python}
+#| echo: true
+
+class PDF(FPDF):
+    pass
+
+def crear_pdf(nombre, titulo, contenido):
+    pdf = PDF()
+    pdf.add_page()
+    pdf.set_font("Helvetica", "B", 16)
+    pdf.cell(0, 10, titulo.replace("—", "-").replace("€", "EUR"), new_x="LMARGIN", new_y="NEXT")
+    pdf.ln(5)
+    pdf.set_font("Helvetica", "", 11)
+    pdf.multi_cell(0, 6, contenido.replace("—", "-").replace("€", "EUR"))
+    pdf.output(os.path.join(CORPUS_DIR, nombre))
+
+def cargar_y_trocear_pdfs(dir_path, chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP):
+    documentos = []
+    for filename in sorted(os.listdir(dir_path)):
+        if not filename.endswith(".pdf"):
+            continue
+        loader = PyPDFLoader(os.path.join(dir_path, filename))
+        documentos.extend(loader.load())
+    splitter = RecursiveCharacterTextSplitter(
+        chunk_size=chunk_size,
+        chunk_overlap=chunk_overlap,
+        separators=["\n\n", "\n", ". ", " ", ""]
+    )
+    return splitter.split_documents(documentos)
+
+def indexar_chunks(collection, chunks, prefix=""):
+    for i, chunk in enumerate(chunks):
+        embedding = model.encode(chunk.page_content).tolist()
+        fuente = os.path.basename(chunk.metadata.get("source", ""))
+        cid = f"{prefix}{i:04d}"
+        collection.add(
+            ids=[cid],
+            embeddings=[embedding],
+            documents=[chunk.page_content],
+            metadatas=[{"fuente": fuente, "idx": i}]
+        )
+
+def indexar_textos(collection, textos, metadatas_list, prefix=""):
+    for i, texto in enumerate(textos):
+        embedding = model.encode(texto).tolist()
+        cid = f"{prefix}{i:04d}"
+        meta = metadatas_list[i] if metadatas_list else {}
+        collection.add(
+            ids=[cid],
+            embeddings=[embedding],
+            documents=[texto],
+            metadatas=[meta]
+        )
+
+def buscar(collection, query, k=5):
+    qe = model.encode(query).tolist()
+    res = collection.query(query_embeddings=[qe], n_results=k)
+    resultados = []
+    if res["ids"] and res["ids"][0]:
+        for i in range(len(res["ids"][0])):
+            resultados.append({
+                "id": res["ids"][0][i],
+                "texto": res["documents"][0][i],
+                "distancia": res["distances"][0][i],
+                "metadata": res["metadatas"][0][i] if res["metadatas"] else {},
+            })
+    return resultados
+
+def rag(pregunta, collection_pdf, collection_sql, k_pdf=3, k_sql=3):
+    if not LLM_KEY:
+        return {"respuesta": "⚠️ Configura LLM_API_KEY en .env", "fuentes": [], "pregunta": pregunta}
+    resultados_pdf = buscar(collection_pdf, pregunta, k=k_pdf)
+    resultados_sql = buscar(collection_sql, pregunta, k=k_sql)
+    combinados = sorted(resultados_pdf + resultados_sql, key=lambda r: r["distancia"])[:3]
+    contexto = "\n\n".join(r["texto"] for r in combinados)
+    prompt = f"""Eres un analista de negocio que responde preguntas basándote EXCLUSIVAMENTE en los fragmentos proporcionados.
+
+Contexto:
+{contexto}
+
+Pregunta: {pregunta}
+
+Responde de forma concisa en español. Si el contexto no contiene información suficiente, di exactamente "No tengo datos suficientes para responder a esta pregunta" y no inventes nada."""
+    respuesta = llm.invoke(prompt).content
+    return {"respuesta": respuesta, "fuentes": [r["texto"] for r in combinados], "pregunta": pregunta}
+
+print("✅ Funciones auxiliares cargadas.")
+```
+
+::: {.panel-tabset}
+
+## Camino A — Finanzas
+
+**Contexto:** Trabajas como Data Scientist en una consultora financiera. Tu cliente quiere un sistema RAG que responda preguntas sobre su cartera de activos financieros combinando informes narrativos en PDF con datos estructurados de una base de datos SQLite de activos.
+
+### Corpus — 3 informes financieros
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    informes_a = {
+        "informe_anual_2025.pdf": (
+            "Informe Anual 2025 — Cartera de Activos del Grupo Financiero M10",
+            "El ejercicio 2025 ha sido favorable para la cartera de activos del Grupo "
+            "Financiero M10, con una rentabilidad media ponderada del 7.2 %. Los activos "
+            "de renta variable lideraron el crecimiento con un rendimiento conjunto del "
+            "11.4 %, destacando la participación en el sector tecnológico (NASDAQ-100) "
+            "que aportó 3.2 puntos porcentuales al resultado global. El IBEX 35 ETF "
+            "cerró el año con una revalorización del 8.5 %, mientras que el S&P 500 "
+            "Acciones Crecimiento rindió un 12.3 %, impulsado por el sector de IA.\n\n"
+            "La renta fija mantuvo un comportamiento estable. Los Bonos Estatales a 10 "
+            "años ofrecieron un rendimiento del 3.2 %, mientras que los Bonos Corporativos "
+            "Grado de Inversión rindieron un 4.1 %, ligeramente por encima de la media "
+            "del sector (3.8 %). Los Bonos Verdes, emitidos por primera vez en 2025, "
+            "tuvieron una acogida excelente con una demanda 2.3 veces la oferta.\n\n"
+            "En el segmento de inversión alternativa, los activos en capital privado "
+            "(Private Equity Tech Fund) rindieron un 15.8 %, aunque con menor liquidez. "
+            "Los activos en oro físico (GBP 100) se revalorizaron un 9.2 % en un entorno "
+            "de incertidumbre geopolítica. El Fondo de Infraestructuras cumplió "
+            "expectativas con un 6.7 %, ligeramente por debajo del objetivo del 7 %.\n\n"
+            "El perfil de riesgo global de la cartera se mantiene en nivel moderado, con "
+            "una exposición a riesgo alto del 18 % (dentro del límite del 20 %). La "
+            "liquidez media de la cartera es alta, con un 65 % de los activos clasificados "
+            "como de alta liquidez. Se recomienda mantener la asignación actual y revisar "
+            "la exposición a renta fija soberana si el BCE confirma los recortes de tipos."
+        ),
+        "analisis_mercado_2026.pdf": (
+            "Análisis de Mercado y Previsiones 2026 — División de Asset Management",
+            "El panorama para 2026 se presenta con tipos de interés a la baja tras las "
+            "señales del BCE de iniciar recortes graduales en el segundo semestre. Se "
+            "espera que el tipo de referencia pase del 4.0 % al 3.25 % a cierre de 2026, "
+            "lo que podría comprimir los rendimientos de la renta fija de nueva emisión "
+            "pero impulsaría las valoraciones de la renta variable.\n\n"
+            "Los sectores más prometedores para el próximo ejercicio son tecnología "
+            "(especialmente IA y semiconductores), energías renovables y salud digital. "
+            "Por el contrario, se recomienda infraponderar el sector inmobiliario "
+            "comercial, donde los ratios de morosidad podrían alcanzar el 4.5 %, y el "
+            "sector automotriz europeo, afectado por la competencia china.\n\n"
+            "En el mercado de divisas, se espera un euro fortalecido frente al dólar "
+            "(objetivo EUR/USD 1.12) y estable frente al franco suizo. La exposición a "
+            "mercados emergentes (actualmente 800 M€ en divisas no EUR) requiere "
+            "cobertura adicional, especialmente en real brasileño y rupia india.\n\n"
+            "Las previsiones de crecimiento para la cartera modelo se sitúan en un rango "
+            "del 5.5 % al 7.5 % para 2026, con un escenario base del 6.3 %. Los "
+            "principales riesgos identificados son una posible recesión en EE.UU. "
+            "(probabilidad estimada del 25 %), tensiones geopolíticas en el Este de "
+            "Asia, y un repunte inflacionario que retrase los recortes del BCE."
+        ),
+        "informe_sostenibilidad_2025.pdf": (
+            "Informe de Sostenibilidad e Inversión Responsable 2025",
+            "El Grupo Financiero M10 ha integrado criterios ESG en el 78 % de su cartera "
+            "de activos gestionados, superando el objetivo del 75 % fijado para 2025. "
+            "Los activos clasificados como artículo 8 (SFDR) representan 3.200 M€ y los "
+            "de artículo 9 (impacto positivo) alcanzan los 890 M€.\n\n"
+            "Los Bonos Verdes emitidos en 2025 por valor de 500 M€ se destinaron "
+            "íntegramente a proyectos de energía renovable (parques eólicos marinos en "
+            "Galicia y plantas fotovoltaicas en Extremadura). La rentabilidad de estos "
+            "bonos ha sido del 3.8 %, competitiva frente a bonos convencionales "
+            "equivalentes. La demanda institucional superó en 2.3 veces la oferta.\n\n"
+            "En el ámbito de exclusión, se han desinvertido 120 M€ en empresas con "
+            "exposición a carbón térmico y 45 M€ en fabricantes de armamento controvertido. "
+            "El fondo de inversión sostenible M10 ESG Leaders rindió un 9.4 % en 2025, "
+            "superando en 1.2 puntos a su benchmark no ESG.\n\n"
+            "La huella de carbono de la cartera (alcance 1 y 2) se redujo un 14 % "
+            "respecto a 2024, hasta 85 tCO2e/M€ invertido. El objetivo para 2026 es "
+            "alcanzar 75 tCO2e/M€. Se ha iniciado el proceso de medición del alcance 3 "
+            "(cadena de valor) para reportar en el informe de 2026."
+        ),
+    }
+    for nombre, (titulo, contenido) in informes_a.items():
+        crear_pdf(nombre, titulo, contenido)
+    print(f"✅ {len(informes_a)} PDFs financieros generados.")
+```
+
+### Base de datos SQLite — Activos financieros
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    DB_PATH_A = os.path.join(tempfile.mkdtemp(), "activos.db")
+    conn_a = sqlite3.connect(DB_PATH_A)
+    conn_a.execute("""
+        CREATE TABLE activos_financieros (
+            id INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            tipo TEXT NOT NULL,
+            precio_actual REAL NOT NULL,
+            rendimiento_pct REAL NOT NULL,
+            riesgo TEXT NOT NULL,
+            liquidez TEXT NOT NULL
+        )
+    """)
+
+    activos_data = [
+        (1,  "IBEX 35 ETF",               "Renta Variable",        45.20,  8.5,  "Medio",   "Alta"),
+        (2,  "S&P 500 Acciones Crecim.",   "Renta Variable",       234.50, 12.3,  "Alto",    "Alta"),
+        (3,  "NASDAQ-100 Index Fund",      "Renta Variable",       567.80, 15.2,  "Alto",    "Alta"),
+        (4,  "Euro Stoxx 50 ETF",           "Renta Variable",       38.90,  7.1,  "Medio",   "Alta"),
+        (5,  "Bono Estatal 10y",           "Renta Fija",           98.50,  3.2,  "Bajo",    "Alta"),
+        (6,  "Bono Corporativo Grado Inv.","Renta Fija",          102.30,  4.1,  "Bajo",    "Media"),
+        (7,  "Bono Verde 2025-2035",       "Renta Fija",          101.00,  3.8,  "Bajo",    "Media"),
+        (8,  "Letras del Tesoro 6m",       "Renta Fija",           97.20,  2.5,  "Muy Bajo","Alta"),
+        (9,  "Bono Subordinado Financiero","Renta Fija",           89.40,  5.6,  "Medio",   "Baja"),
+        (10, "Private Equity Tech Fund",   "Inversión Alternativa",150.00, 15.8,  "Muy Alto","Baja"),
+        (11, "Fondo Infraestructuras",     "Inversión Alternativa",125.00,  6.7,  "Medio",   "Baja"),
+        (12, "Oro Físico GBP 100",         "Inversión Alternativa",189.20,  9.2,  "Medio",   "Alta"),
+        (13, "Fondo Inmobiliario Comercial","Inversión Alternativa",95.00,   4.3,  "Alto",    "Baja"),
+        (14, "M10 ESG Leaders Fund",       "Renta Variable",       112.40,  9.4,  "Medio",   "Media"),
+        (15, "Deuda Corporativa High Yield","Renta Fija",           78.60,  7.8,  "Alto",    "Baja"),
+        (16, "Fondo Monetario EUR",         "Renta Fija",          100.50,  2.1,  "Muy Bajo","Alta"),
+        (17, "Futuros S&P 500",            "Derivados",            445.00,  0.0,  "Muy Alto","Alta"),
+        (18, "ETF Energías Renovables",     "Renta Variable",       67.30, 11.2,  "Alto",    "Alta"),
+        (19, "Deuda Emergente USD",        "Renta Fija",           82.10,  6.5,  "Alto",    "Media"),
+        (20, "Cobertura Cambio EUR/USD",   "Derivados",            102.00,  0.0,  "Bajo",    "Alta"),
+        (21, "Bonos Municipales España",   "Renta Fija",           99.80,  2.8,  "Bajo",    "Media"),
+        (22, "Fondo Tecnología IA",        "Renta Variable",       178.30, 18.5,  "Muy Alto","Media"),
+    ]
+
+    conn_a.executemany(
+        "INSERT INTO activos_financieros VALUES (?, ?, ?, ?, ?, ?, ?)",
+        activos_data
+    )
+    conn_a.commit()
+
+    df_activos = pd.DataFrame(activos_data, columns=[
+        "id", "nombre", "tipo", "precio_actual", "rendimiento_pct", "riesgo", "liquidez"
+    ])
+    df_activos["texto"] = df_activos.apply(
+        lambda r: f"Activo: {r['nombre']}. Tipo: {r['tipo']}. Precio: {r['precio_actual']}€. "
+                  f"Rendimiento: {r['rendimiento_pct']}%. Riesgo: {r['riesgo']}. Liquidez: {r['liquidez']}.",
+        axis=1
+    )
+
+    print(f"✅ {len(activos_data)} activos financieros en SQLite")
+    print(f"   Tipos de activo: {df_activos['tipo'].nunique()}")
+    print(f"   Rendimiento medio: {df_activos['rendimiento_pct'].mean():.1f}%")
+```
+
+### Indexación dual
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    chunks_pdf_a = cargar_y_trocear_pdfs(CORPUS_DIR)
+    collection_pdf_a = client.get_or_create_collection(
+        name="hpd4_finanzas_pdf", metadata={"hnsw:space": "cosine"}
+    )
+    indexar_chunks(collection_pdf_a, chunks_pdf_a, prefix="fin_")
+
+    collection_sql_a = client.get_or_create_collection(
+        name="hpd4_finanzas_sql", metadata={"hnsw:space": "cosine"}
+    )
+    textos_sql_a = df_activos["texto"].tolist()
+    metas_sql_a = df_activos[["nombre", "tipo", "riesgo", "liquidez"]].to_dict("records")
+    indexar_textos(collection_sql_a, textos_sql_a, metas_sql_a, prefix="act_")
+
+    print(f"✅ PDFs indexados: {collection_pdf_a.count()} vectores")
+    print(f"✅ SQL indexados: {collection_sql_a.count()} vectores")
+```
+
+#### Ejercicio 1 — Dataset de ground truth (2.5 ptos) {#sec-hpd4-e1-a}
+
+Crea un dataset de al menos 10 preguntas de evaluación con sus respuestas ground truth (esperadas). Para cada pregunta, ejecuta tu RAG, guarda la respuesta generada y los contextos recuperados. Usa este dataset para evaluar la calidad de tu retrievals.
+
+Asigna el resultado (lista de diccionarios con `question`, `answer`, `contexts`, `ground_truth`) a la variable `eval1_dataset`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    preguntas_eval_a = [
+        "¿Qué activos de renta variable tienen un rendimiento superior al 10%?",
+        "¿Cuál es el rendimiento del Bono Estatal a 10 años?",
+        "¿Qué activos de inversión alternativa tienen riesgo Muy Alto?",
+        "¿Qué tipo de bono tuvo una demanda 2.3 veces la oferta en 2025?",
+        "¿Cuáles son los sectores más prometedores para 2026 según el análisis?",
+        "¿Qué activos tienen liquidez baja y riesgo alto o muy alto?",
+        "¿Cómo ha evolucionado la integración ESG en la cartera?",
+        "¿Qué activos de renta fija tienen un rendimiento superior al 4%?",
+        "¿Cuál es la rentabilidad del Fondo de Infraestructuras y cómo se compara con su objetivo?",
+        "¿Qué previsiones de crecimiento se esperan para la cartera en 2026?",
+        "¿Qué activos tienen un precio superior a 150€ y riesgo medio o inferior?",
+        "¿Qué se recomienda sobre la exposición a renta fija soberana?",
+    ]
+
+    eval1_dataset = []
+    for pregunta in preguntas_eval_a:
+        res = rag(pregunta, collection_pdf_a, collection_sql_a)
+        eval1_dataset.append({
+            "question": pregunta,
+            "answer": res["respuesta"],
+            "contexts": res["fuentes"],
+            "ground_truth": "",  # ← completar con la respuesta esperada
+        })
+
+    print(f"✅ eval1_dataset creado: {len(eval1_dataset)} preguntas")
+    for i, item in enumerate(eval1_dataset):
+        print(f"  [{i+1}] {item['question'][:70]}...")
+else:
+    eval1_dataset = None
+```
+
+#### Ejercicio 2 — Evaluación RAGAS (2.5 ptos) {#sec-hpd4-e2-a}
+
+Usa RAGAS para evaluar tu pipeline con las métricas `faithfulness`, `answer_relevancy` y `context_precision`. Genera un DataFrame con las puntuaciones por pregunta y las medias globales.
+
+Asigna el resultado (dict con `por_pregunta` y `medias`) a `eval2_ragas`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    import json
+    from ragas import evaluate as ragas_evaluate
+    from ragas.metrics import faithfulness, answer_relevancy, context_precision
+    from datasets import Dataset
+    from ragas.llms import LangchainLLMWrapper
+
+    if eval1_dataset and all(item["ground_truth"] for item in eval1_dataset):
+        dataset_hf = Dataset.from_dict({
+            "question": [item["question"] for item in eval1_dataset],
+            "answer": [item["answer"] for item in eval1_dataset],
+            "contexts": [item["contexts"] for item in eval1_dataset],
+            "ground_truth": [item["ground_truth"] for item in eval1_dataset],
+        })
+
+        evaluator_llm = LangchainLLMWrapper(llm)
+        result = ragas_evaluate(
+            dataset=dataset_hf,
+            metrics=[faithfulness, answer_relevancy, context_precision],
+            llm=evaluator_llm,
+        )
+
+        df_ragas = result.to_pandas()
+        eval2_ragas = {
+            "por_pregunta": df_ragas[["faithfulness", "answer_relevancy", "context_precision"]].to_dict("records"),
+            "medias": {
+                "faithfulness": float(df_ragas["faithfulness"].mean()),
+                "answer_relevancy": float(df_ragas["answer_relevancy"].mean()),
+                "context_precision": float(df_ragas["context_precision"].mean()),
+            }
+        }
+
+        print("📊 Resultados RAGAS (medias):")
+        for metrica, valor in eval2_ragas["medias"].items():
+            print(f"  {metrica}: {valor:.4f}")
+        print(f"\nPuntuaciones por pregunta:")
+        print(df_ragas[["faithfulness", "answer_relevancy", "context_precision"]])
+    else:
+        eval2_ragas = {"error": "Completa los ground_truth en eval1_dataset primero."}
+        print(eval2_ragas["error"])
+else:
+    eval2_ragas = None
+```
+
+#### Ejercicio 3 — Iteración y mejora (2.5 ptos) {#sec-hpd4-e3-a}
+
+Modifica UN componente del pipeline (chunk_size, número de chunks recuperados, prompt, modelo de embeddings, añade un re-ranker, etc.) y vuelve a evaluar con RAGAS. Compara los resultados con la versión base y explica por qué el cambio mejoró o empeoró las métricas.
+
+Asigna el resultado (lista de diccionarios con `version`, `cambio`, `faithfulness`, `answer_relevancy`, `context_precision`, `analisis`) a `eval3_iteracion`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    eval3_iteracion = [
+        # Completar con al menos 2 versiones (base + mejora)
+        # {
+        #     "version": "Base",
+        #     "cambio": "CHUNK_SIZE=400, k_pdf=3, k_sql=3, sin re-ranker",
+        #     "faithfulness": 0.0,
+        #     "answer_relevancy": 0.0,
+        #     "context_precision": 0.0,
+        #     "analisis": "Configuración inicial del pipeline."
+        # },
+    ]
+    print(f"⚠️  Completa eval3_iteracion con al menos 2 versiones comparadas.")
+else:
+    eval3_iteracion = None
+```
+
+#### Ejercicio 4 — Informe de evaluación (2.5 ptos) {#sec-hpd4-e4-a}
+
+Redacta un informe estructurado de evaluación que incluya: métricas obtenidas, fortalezas y debilidades del pipeline, análisis de errores (preguntas donde el RAG falló), impacto de la mejora implementada en E3, y propuestas de mejora adicionales.
+
+Asigna tu respuesta a `eval4_informe`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    eval4_informe = """Escribir aquí el informe estructurado. Por ejemplo:
+
+    ## Resultados de evaluación
+    - Faithfulness medio: X.XXXX
+    - Answer Relevancy medio: X.XXXX
+    - Context Precision medio: X.XXXX
+
+    ## Fortalezas
+    ...
+
+    ## Debilidades y errores identificados
+    ...
+
+    ## Impacto de la mejora
+    ...
+
+    ## Propuestas adicionales
+    ..."""
+    print("✅ eval4_informe asignada. Completa el contenido.")
+else:
+    eval4_informe = None
+```
+
+## Camino B — Salud
+
+**Contexto:** Trabajas como Data Scientist en un hospital de investigación. Necesitas un sistema RAG que combine artículos de investigación biomédica en PDF con datos estructurados de pacientes de una base de datos SQLite para responder preguntas clínicas.
+
+### Corpus — 3 documentos biomédicos
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    informes_b = {
+        "ensayo_clinico_M10-342.pdf": (
+            "Ensayo Clínico Fase III — Oxford BioPharma: Compuesto M10-342",
+            "El ensayo clínico fase III del compuesto M10-342 evalúa la eficacia y seguridad "
+            "en pacientes con fibrosis pulmonar idiopática (FPI). El estudio multicéntrico "
+            "incluyó 1.240 pacientes en 35 centros de 12 países, con seguimiento medio de "
+            "18 meses. Los resultados primarios muestran una reducción significativa del 32 % "
+            "en la progresión de la enfermedad medida por CVF (p < 0.001). El 67 % de los "
+            "pacientes tratados no presentaron empeoramiento clínico a los 12 meses, frente "
+            "al 41 % del grupo control.\n\n"
+            "Los efectos adversos más frecuentes fueron leves-moderados: náuseas (12 %), "
+            "fatiga (9 %) y cefalea (7 %). Se registraron 3 eventos adversos graves "
+            "relacionados con el fármaco (0.5 %), todos reversibles. Los análisis de "
+            "subgrupos sugieren eficacia superior en fibrosis leve-moderada (estadio GAP "
+            "I-II) y en pacientes con antecedentes de tabaquismo. La calidad de vida (SGRQ) "
+            "mejoró 8.4 puntos frente a 2.1 en placebo.\n\n"
+            "Los criterios de inclusión requerían pacientes entre 40 y 80 años, con "
+            "diagnóstico confirmado de FPI y CVF entre 50 % y 90 % del valor teórico. "
+            "Se excluyeron pacientes con enfermedad hepática severa, insuficiencia renal "
+            "crónica (eGFR < 30) o cáncer activo. El perfil de seguridad respalda la "
+            "solicitud de autorización a EMA y FDA prevista para Q2 2026."
+        ),
+        "diagnostico_IA_2025.pdf": (
+            "Diagnóstico Asistido por IA en Imagen Médica — Revisión 2025",
+            "Esta revisión analiza 45 sistemas comerciales y 112 prototipos académicos de IA "
+            "en diagnóstico por imagen (radiología, patología digital y oftalmología). En "
+            "radiología torácica, los sistemas basados en deep learning alcanzan AUC > 0.92 "
+            "en detección de nódulos pulmonares malignos, superando la sensibilidad media "
+            "del radiólogo general (0.85 vs 0.78). En mamografía, la detección asistida "
+            "reduce falsos negativos en un 21 % y falsos positivos en un 14 %.\n\n"
+            "En patología digital, los modelos de atención múltiple sobre whole-slide images "
+            "logran precisión del 94 % en clasificación de cáncer de próstata (Gleason "
+            "grading). En oftalmología, los sistemas de clasificación de retinopatía "
+            "diabética alcanzan sensibilidad del 96 % y especificidad del 93 %.\n\n"
+            "Los desafíos actuales incluyen generalización entre poblaciones y equipos, "
+            "explicabilidad (XAI) e integración en flujos clínicos reales. Se estima que "
+            "en 2027 el 30 % de los informes radiológicos incluirán hallazgos generados "
+            "por IA. La FDA ha aprobado 521 dispositivos médicos basados en IA a cierre "
+            "de 2025, un 67 % más que en 2024."
+        ),
+        "farmacos_IA_2025.pdf": (
+            "Descubrimiento de Fármacos Asistido por IA — Revisión Sistemática 2025",
+            "Esta revisión sistemática analiza 87 estudios (2020-2025) sobre IA en "
+            "descubrimiento de fármacos. La IA ha reducido el tiempo medio de la fase de "
+            "descubrimiento de 4.5 a 1.8 años y los costes en un 45 %. Las técnicas más "
+            "utilizadas son GNN para predicción de interacciones proteína-ligando, "
+            "transformers para generación de moléculas de novo, y aprendizaje por refuerzo "
+            "para optimización de propiedades ADMET.\n\n"
+            "Tres áreas de mayor impacto: identificación de nuevas dianas terapéuticas "
+            "(24 estudios), predicción de afinidad de binding (31 estudios) y optimización "
+            "de cabezas de serie (22 estudios). Los modelos más citados son AlphaFold "
+            "(predicción de estructura de proteínas), DiffDock (docking molecular) y "
+            "ChemBERTa (representaciones de moléculas).\n\n"
+            "Limitaciones señaladas: falta de datos de alta calidad en enfermedades raras, "
+            "dificultad de generalización entre dianas, y necesidad de validación "
+            "experimental (tasa de acierto real del 12-18 % en moléculas que llegan a "
+            "ensayos preclínicos). La IA es ya una herramienta indispensable pero no "
+            "sustitutiva del juicio experto en farmacología."
+        ),
+    }
+    for nombre, (titulo, contenido) in informes_b.items():
+        crear_pdf(nombre, titulo, contenido)
+    print(f"✅ {len(informes_b)} PDFs biomédicos generados.")
+```
+
+### Base de datos SQLite — Pacientes
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    DB_PATH_B = os.path.join(tempfile.mkdtemp(), "pacientes.db")
+    conn_b = sqlite3.connect(DB_PATH_B)
+    conn_b.execute("""
+        CREATE TABLE pacientes (
+            id INTEGER PRIMARY KEY,
+            edad INTEGER NOT NULL,
+            genero TEXT NOT NULL,
+            diagnostico TEXT NOT NULL,
+            tratamiento TEXT NOT NULL,
+            fecha_ingreso TEXT NOT NULL,
+            ultima_revision TEXT NOT NULL
+        )
+    """)
+
+    pacientes_data = [
+        (1,  67, "M", "Fibrosis Pulmonar Idiopática",     "Pirfenidona 600mg",       "2024-03-12", "2025-06-15"),
+        (2,  54, "F", "Diabetes Tipo 2",                  "Metformina 850mg",        "2023-11-05", "2025-05-20"),
+        (3,  72, "M", "EPOC Severo",                      "Tiotropio + Salmeterol",  "2024-01-18", "2025-04-10"),
+        (4,  45, "F", "Cáncer de Mama HER2+",             "Trastuzumab 6mg/kg",      "2025-02-01", "2025-07-01"),
+        (5,  61, "M", "Insuficiencia Cardíaca Crónica",   "Enalapril 10mg",          "2024-06-22", "2025-03-15"),
+        (6,  38, "F", "Artritis Reumatoide",              "Adalimumab 40mg",         "2023-09-14", "2025-06-22"),
+        (7,  59, "M", "Enfermedad Renal Crónica Estadio 3","Losartán 50mg",          "2024-04-30", "2025-02-28"),
+        (8,  78, "F", "Alzheimer Temprano",               "Donepezilo 10mg",         "2025-01-10", "2025-06-30"),
+        (9,  42, "M", "Colitis Ulcerosa",                 "Infliximab 5mg/kg",       "2024-08-19", "2025-05-05"),
+        (10, 50, "F", "Hipertensión Pulmonar",            "Bosentán 125mg",          "2025-03-03", "2025-07-10"),
+        (11, 66, "M", "Parkinson Estadio II",             "Levodopa/Carbidopa",      "2024-07-15", "2025-04-20"),
+        (12, 35, "F", "Lupus Eritematoso Sistémico",      "Hidroxicloroquina 400mg", "2023-12-01", "2025-06-12"),
+        (13, 71, "M", "Estenosis Aórtica Severa",         "TAVI programado",         "2025-05-20", "2025-07-05"),
+        (14, 48, "F", "Esclerosis Múltiple Remitente",    "Fingolimod 0.5mg",        "2024-10-08", "2025-06-18"),
+        (15, 63, "M", "Cirrosis Hepática Compensada",     "Espironolactona 100mg",   "2024-02-14", "2025-01-30"),
+        (16, 29, "F", "Asma Grave Eosinofílica",          "Mepolizumab 100mg",       "2025-04-07", "2025-07-12"),
+        (17, 55, "M", "Infarto Agudo de Miocardio (2024)", "Bisoprolol 5mg",        "2024-09-11", "2025-03-22"),
+        (18, 41, "F", "Migraña Crónica",                  "Onabotulinumtoxina 155U", "2023-07-25", "2025-05-30"),
+        (19, 77, "M", "DPOC Exacerbador Frecuente",       "Roflumilast 500µg",       "2025-01-28", "2025-07-08"),
+        (20, 33, "F", "Enfermedad de Crohn",              "Ustekinumab 90mg",       "2024-05-06", "2025-06-25"),
+        (21, 60, "M", "Mieloma Múltiple",                 "Lenalidomida 25mg",       "2025-02-20", "2025-07-15"),
+        (22, 46, "F", "Hipotiroidismo Autoimmune",         "Levotiroxina 125µg",     "2024-11-03", "2025-04-18"),
+    ]
+
+    conn_b.executemany(
+        "INSERT INTO pacientes VALUES (?, ?, ?, ?, ?, ?, ?)",
+        pacientes_data
+    )
+    conn_b.commit()
+
+    df_pacientes = pd.DataFrame(pacientes_data, columns=[
+        "id", "edad", "genero", "diagnostico", "tratamiento", "fecha_ingreso", "ultima_revision"
+    ])
+    df_pacientes["texto"] = df_pacientes.apply(
+        lambda r: f"Paciente {r['id']}: {r['edad']} años, {r['genero']}. Diagnóstico: {r['diagnostico']}. "
+                  f"Tratamiento: {r['tratamiento']}. Ingreso: {r['fecha_ingreso']}. Última revisión: {r['ultima_revision']}.",
+        axis=1
+    )
+
+    print(f"✅ {len(pacientes_data)} pacientes en SQLite")
+    print(f"   Edad media: {df_pacientes['edad'].mean():.0f} años")
+    print(f"   Diagnósticos únicos: {df_pacientes['diagnostico'].nunique()}")
+```
+
+### Indexación dual
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    chunks_pdf_b = cargar_y_trocear_pdfs(CORPUS_DIR)
+    collection_pdf_b = client.get_or_create_collection(
+        name="hpd4_salud_pdf", metadata={"hnsw:space": "cosine"}
+    )
+    indexar_chunks(collection_pdf_b, chunks_pdf_b, prefix="sal_")
+
+    collection_sql_b = client.get_or_create_collection(
+        name="hpd4_salud_sql", metadata={"hnsw:space": "cosine"}
+    )
+    textos_sql_b = df_pacientes["texto"].tolist()
+    metas_sql_b = df_pacientes[["diagnostico", "tratamiento", "edad", "genero"]].to_dict("records")
+    indexar_textos(collection_sql_b, textos_sql_b, metas_sql_b, prefix="pac_")
+
+    print(f"✅ PDFs indexados: {collection_pdf_b.count()} vectores")
+    print(f"✅ SQL indexados: {collection_sql_b.count()} vectores")
+```
+
+#### Ejercicio 1 — Dataset de ground truth (2.5 ptos) {#sec-hpd4-e1-b}
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    preguntas_eval_b = [
+        "¿Qué eficacia mostró el compuesto M10-342 en la fibrosis pulmonar?",
+        "¿Qué efectos adversos se registraron en el ensayo clínico?",
+        "¿Qué pacientes tienen más de 70 años y diagnóstico respiratorio?",
+        "¿Qué AUC alcanzan los sistemas de IA en radiología torácica?",
+        "¿Cuántos pacientes tienen diagnóstico oncológico en la base de datos?",
+        "¿Qué técnicas de IA se usan en descubrimiento de fármacos?",
+        "¿Qué pacientes están en tratamiento con fármacos biológicos?",
+        "¿Cuál es la tasa de acierto real de moléculas propuestas por IA que llegan a ensayos preclínicos?",
+        "¿Qué pacientes tienen entre 40 y 60 años y enfermedad autoinmune?",
+        "¿Cuáles son los desafíos actuales del diagnóstico por imagen con IA?",
+        "¿Qué paciente tiene el ingreso más reciente?",
+        "¿Qué porcentaje de reducción en tiempo de descubrimiento de fármacos se atribuye a la IA?",
+    ]
+
+    eval1_dataset = []
+    for pregunta in preguntas_eval_b:
+        res = rag(pregunta, collection_pdf_b, collection_sql_b)
+        eval1_dataset.append({
+            "question": pregunta,
+            "answer": res["respuesta"],
+            "contexts": res["fuentes"],
+            "ground_truth": "",  # ← completar
+        })
+
+    print(f"✅ eval1_dataset creado: {len(eval1_dataset)} preguntas")
+else:
+    eval1_dataset = None
+```
+
+#### Ejercicio 2 — Evaluación RAGAS (2.5 ptos) {#sec-hpd4-e2-b}
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    from ragas import evaluate as ragas_evaluate
+    from ragas.metrics import faithfulness, answer_relevancy, context_precision
+    from datasets import Dataset
+    from ragas.llms import LangchainLLMWrapper
+
+    if eval1_dataset and all(item["ground_truth"] for item in eval1_dataset):
+        dataset_hf = Dataset.from_dict({
+            "question": [item["question"] for item in eval1_dataset],
+            "answer": [item["answer"] for item in eval1_dataset],
+            "contexts": [item["contexts"] for item in eval1_dataset],
+            "ground_truth": [item["ground_truth"] for item in eval1_dataset],
+        })
+
+        evaluator_llm = LangchainLLMWrapper(llm)
+        result = ragas_evaluate(
+            dataset=dataset_hf,
+            metrics=[faithfulness, answer_relevancy, context_precision],
+            llm=evaluator_llm,
+        )
+
+        df_ragas = result.to_pandas()
+        eval2_ragas = {
+            "por_pregunta": df_ragas[["faithfulness", "answer_relevancy", "context_precision"]].to_dict("records"),
+            "medias": {
+                "faithfulness": float(df_ragas["faithfulness"].mean()),
+                "answer_relevancy": float(df_ragas["answer_relevancy"].mean()),
+                "context_precision": float(df_ragas["context_precision"].mean()),
+            }
+        }
+
+        print("📊 Resultados RAGAS (medias):")
+        for metrica, valor in eval2_ragas["medias"].items():
+            print(f"  {metrica}: {valor:.4f}")
+        print(f"\nPuntuaciones por pregunta:")
+        print(df_ragas[["faithfulness", "answer_relevancy", "context_precision"]])
+    else:
+        eval2_ragas = {"error": "Completa los ground_truth en eval1_dataset primero."}
+        print(eval2_ragas["error"])
+else:
+    eval2_ragas = None
+```
+
+#### Ejercicio 3 — Iteración y mejora (2.5 ptos) {#sec-hpd4-e3-b}
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    eval3_iteracion = [
+        # Completar con al menos 2 versiones (base + mejora)
+    ]
+    print(f"⚠️  Completa eval3_iteracion con al menos 2 versiones comparadas.")
+else:
+    eval3_iteracion = None
+```
+
+#### Ejercicio 4 — Informe de evaluación (2.5 ptos) {#sec-hpd4-e4-b}
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    eval4_informe = """Escribir aquí el informe estructurado. Incluir:
+    - Métricas RAGAS obtenidas
+    - Fortalezas y debilidades del pipeline
+    - Análisis de errores
+    - Impacto de la mejora implementada
+    - Propuestas de mejora adicionales"""
+    print("✅ eval4_informe asignada. Completa el contenido.")
+else:
+    eval4_informe = None
+```
+
+## Camino C — E-commerce
+
+**Contexto:** Trabajas como Data Scientist en un marketplace digital. Necesitas un sistema RAG que combine análisis de reviews y catálogos en PDF con datos estructurados de inventario en SQLite para responder preguntas sobre productos y tendencias.
+
+### Corpus — 3 documentos de e-commerce
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    informes_c = {
+        "catalogo_primavera_2025.pdf": (
+            "Catálogo de Productos — Primavera 2025 — MarketPlace M10",
+            "El catálogo de primavera 2025 incluye 1.240 productos nuevos en 12 categorías. "
+            "Las categorías con mayor incremento de oferta son Tecnología (+22 %) y Hogar "
+            "(+22 %), seguidas de Deportes (+15 %) y Moda (+15 %). El precio medio del "
+            "catálogo es 47.50 €, con un incremento interanual del 3.2 %, por debajo de "
+            "la inflación general (4.1 %).\n\n"
+            "En Tecnología, los auriculares inalámbricos representan el 28 % de las ventas, "
+            "con NovaBuds Pro como líder (4.7 estrellas, 12.400 valoraciones). Los "
+            "smartwatches crecen un 35 %, impulsados por la línea FitTrack con "
+            "monitorización de glucosa. En Hogar, los robots aspiradores con LiDAR crecen "
+            "un 42 % con un ticket medio de 349 €.\n\n"
+            "Deportes destaca por la línea EcoSport (materiales reciclados) con 8.500 "
+            "pedidos en su primer mes. En Moda, las chaquetas técnicas con tejido "
+            "transpirable tienen el mejor ratio de conversión (12.3 %). Los productos con "
+            "mayor tasa de retorno son los calzados de running (14 %), principalmente por "
+            "talla incorrecta. La colección Hogar Inteligente (domótica) ha duplicado su "
+            "facturación respecto a 2024."
+        ),
+        "analisis_reviews_2025.pdf": (
+            "Análisis de Reviews de Clientes — Tendencias y Sentimiento 2025",
+            "El informe procesa 245.000 valoraciones del primer semestre de 2025. El "
+            "sentimiento global es positivo (4.1/5 estrellas), con variación por categoría: "
+            "Tecnología (4.3), Hogar (4.2), Deportes (4.0), Moda (3.8) y Alimentación "
+            "(4.4). El análisis NLP revela los principales factores de satisfacción: "
+            "relación calidad-precio (62 % de reviews positivas), rapidez de entrega "
+            "(45 %) y facilidad de uso (38 %).\n\n"
+            "Factores de insatisfacción: talla incorrecta en ropa/calzado (28 % de "
+            "reviews negativas), diferencia entre foto y producto real (22 %), y problemas "
+            "de compatibilidad en electrónica (15 %). Las devoluciones por talla "
+            "representan el 35 % del total de retornos.\n\n"
+            "Tendencias emergentes: demanda de productos sostenibles (+65 % menciones vs "
+            "2024), envases sin plástico (+42 %) y funcionalidades IA (+38 %). Los "
+            "productos con tecnología incorporada tienen valoración media superior "
+            "(4.5 vs 4.1). El Net Promoter Score (NPS) del marketplace se sitúa en +42, "
+            "considerado excelente en el sector."
+        ),
+        "tendencias_consumo_2026.pdf": (
+            "Tendencias de Consumo y Perspectivas 2025-2026",
+            "Las ventas online en Europa crecieron un 14 % en 2025 (890 mil M€). Se espera "
+            "crecimiento moderado del 9-11 % en 2026, con penetración del e-commerce del "
+            "32 % sobre el comercio minorista total. La compra por voz representa ya el "
+            "8 % de las órdenes en electrónica y crece al 25 % anual.\n\n"
+            "Tres tendencias clave: suscripciones recurrentes (23 % de consumidores, +18 % "
+            "anual), personalización masiva mediante IA, y social commerce (TikTok Shop e "
+            "Instagram Checkout crecen un 34 %). El 41 % de compradores declara disposición "
+            "a pagar más por productos sostenibles, aunque solo el 17 % lo hace realmente "
+            "(intention-action gap).\n\n"
+            "Desafíos para 2026: gestión de devoluciones (coste del 21 % sobre valor del "
+            "pedido), logística de última milla en zonas de baja densidad, y detección de "
+            "fraude con IA generativa (deepfakes en reviews, suplantación de vendedores). "
+            "Se recomienda invertir en herramientas de verificación de identidad y "
+            "autenticación biométrica para vendedores."
+        ),
+    }
+    for nombre, (titulo, contenido) in informes_c.items():
+        crear_pdf(nombre, titulo, contenido)
+    print(f"✅ {len(informes_c)} PDFs de e-commerce generados.")
+```
+
+### Base de datos SQLite — Inventario
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    DB_PATH_C = os.path.join(tempfile.mkdtemp(), "inventario.db")
+    conn_c = sqlite3.connect(DB_PATH_C)
+    conn_c.execute("""
+        CREATE TABLE inventario (
+            id INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            categoria TEXT NOT NULL,
+            precio REAL NOT NULL,
+            stock INTEGER NOT NULL,
+            valoracion_media REAL NOT NULL,
+            vendidos INTEGER NOT NULL
+        )
+    """)
+
+    inventario_data = [
+        (1,  "NovaBuds Pro",                  "Tecnología",     89.00,  250, 4.7, 12400),
+        (2,  "Monitor 4K 27\"",               "Tecnología",    349.00,  120, 4.5,  3200),
+        (3,  "Teclado Mecánico RGB",          "Tecnología",     79.00,  180, 4.3,  5600),
+        (4,  "Smartwatch FitTrack Pro",       "Tecnología",    199.00,   95, 4.6,  2100),
+        (5,  "Robot Aspirador LiDAR X500",    "Hogar",         349.00,   45, 4.4,   980),
+        (6,  "Lámpara LED Smart",             "Hogar",          49.00,  200, 4.2,  4500),
+        (7,  "Silla Ergonómica Pro",          "Hogar",         249.00,   32, 4.1,  1800),
+        (8,  "Purificador Aire HEPA",         "Hogar",         129.00,   55, 4.5,  1200),
+        (9,  "Escritorio Ajustable Electrico","Hogar",         299.00,   18, 4.6,   650),
+        (10, "Chaqueta Técnica EcoSport",     "Moda",          129.00,  110, 4.3,  2800),
+        (11, "Zapatillas Trail Running",      "Deportes",       89.00,  140, 4.2,  3900),
+        (12, "Mochila Hidratación 10L",       "Deportes",       45.00,  200, 4.0,  2200),
+        (13, "Tienda Campaña Ultralight 2P",  "Deportes",      199.00,    0, 4.7,  1500),
+        (14, "Bicicleta Eléctrica Urbana",    "Deportes",      899.00,   25, 4.1,   420),
+        (15, "Cámara Seguridad Wi-Fi 2K",    "Tecnología",      59.00,  300, 4.0,  6700),
+        (16, "Altavoz Bluetooth Portátil",    "Tecnología",      39.00,  500, 4.4,  8900),
+        (17, "Set Jardinería Automatizado",   "Hogar",          79.00,   65, 4.3,   780),
+        (18, "Cafetera Superautomática",      "Hogar",         599.00,   12, 4.6,   340),
+        (19, "Auriculares Deportivos Bluetooth","Deportes",     59.00,  180, 4.5,  4200),
+        (20, "Camiseta Térmica Merino",       "Moda",           49.00,  220, 4.1,  3100),
+        (21, "Chaqueta Impermeable Trail",    "Deportes",      159.00,   85, 4.4,  1100),
+        (22, "Hub USB-C 7 Puertos",           "Tecnología",      34.00,  400, 4.2,  5200),
+    ]
+
+    conn_c.executemany(
+        "INSERT INTO inventario VALUES (?, ?, ?, ?, ?, ?, ?)",
+        inventario_data
+    )
+    conn_c.commit()
+
+    df_inventario = pd.DataFrame(inventario_data, columns=[
+        "id", "nombre", "categoria", "precio", "stock", "valoracion_media", "vendidos"
+    ])
+    df_inventario["texto"] = df_inventario.apply(
+        lambda r: f"Producto: {r['nombre']}. Categoría: {r['categoria']}. Precio: {r['precio']}€. "
+                  f"Stock: {r['stock']} uds. Valoración: {r['valoracion_media']}/5. Vendidos: {r['vendidos']}.",
+        axis=1
+    )
+
+    print(f"✅ {len(inventario_data)} productos en SQLite")
+    print(f"   Categorías: {df_inventario['categoria'].unique()}")
+    print(f"   Precio medio: {df_inventario['precio'].mean():.1f}€")
+```
+
+### Indexación dual
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    chunks_pdf_c = cargar_y_trocear_pdfs(CORPUS_DIR)
+    collection_pdf_c = client.get_or_create_collection(
+        name="hpd4_ecommerce_pdf", metadata={"hnsw:space": "cosine"}
+    )
+    indexar_chunks(collection_pdf_c, chunks_pdf_c, prefix="eco_")
+
+    collection_sql_c = client.get_or_create_collection(
+        name="hpd4_ecommerce_sql", metadata={"hnsw:space": "cosine"}
+    )
+    textos_sql_c = df_inventario["texto"].tolist()
+    metas_sql_c = df_inventario[["nombre", "categoria", "valoracion_media"]].to_dict("records")
+    indexar_textos(collection_sql_c, textos_sql_c, metas_sql_c, prefix="inv_")
+
+    print(f"✅ PDFs indexados: {collection_pdf_c.count()} vectores")
+    print(f"✅ SQL indexados: {collection_sql_c.count()} vectores")
+```
+
+#### Ejercicio 1 — Dataset de ground truth (2.5 ptos) {#sec-hpd4-e1-c}
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    preguntas_eval_c = [
+        "¿Qué productos de Tecnología tienen una valoración superior a 4.5?",
+        "¿Cuáles son los principales factores de satisfacción según las reviews?",
+        "¿Qué productos tienen stock inferior a 20 unidades y deberían reabastecerse?",
+        "¿Qué tendencias de consumo emergentes se identifican en las reviews de 2025?",
+        "¿Qué categoría tiene la valoración media más alta según el análisis de reviews?",
+        "¿Qué productos han vendido más de 5.000 unidades?",
+        "¿Cuáles son los principales desafíos del e-commerce para 2026?",
+        "¿Qué porcentaje de las órdenes en electrónica se generan por compra por voz?",
+        "¿Qué productos de Hogar tienen un precio superior a 250€?",
+        "¿Cuál es el Net Promoter Score del marketplace?",
+        "¿Qué producto tiene el mayor número de unidades vendidas?",
+        "¿Qué productos de Deportes tienen valoración superior a 4.3 y stock disponible?",
+    ]
+
+    eval1_dataset = []
+    for pregunta in preguntas_eval_c:
+        res = rag(pregunta, collection_pdf_c, collection_sql_c)
+        eval1_dataset.append({
+            "question": pregunta,
+            "answer": res["respuesta"],
+            "contexts": res["fuentes"],
+            "ground_truth": "",  # ← completar
+        })
+
+    print(f"✅ eval1_dataset creado: {len(eval1_dataset)} preguntas")
+else:
+    eval1_dataset = None
+```
+
+#### Ejercicio 2 — Evaluación RAGAS (2.5 ptos) {#sec-hpd4-e2-c}
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    from ragas import evaluate as ragas_evaluate
+    from ragas.metrics import faithfulness, answer_relevancy, context_precision
+    from datasets import Dataset
+    from ragas.llms import LangchainLLMWrapper
+
+    if eval1_dataset and all(item["ground_truth"] for item in eval1_dataset):
+        dataset_hf = Dataset.from_dict({
+            "question": [item["question"] for item in eval1_dataset],
+            "answer": [item["answer"] for item in eval1_dataset],
+            "contexts": [item["contexts"] for item in eval1_dataset],
+            "ground_truth": [item["ground_truth"] for item in eval1_dataset],
+        })
+
+        evaluator_llm = LangchainLLMWrapper(llm)
+        result = ragas_evaluate(
+            dataset=dataset_hf,
+            metrics=[faithfulness, answer_relevancy, context_precision],
+            llm=evaluator_llm,
+        )
+
+        df_ragas = result.to_pandas()
+        eval2_ragas = {
+            "por_pregunta": df_ragas[["faithfulness", "answer_relevancy", "context_precision"]].to_dict("records"),
+            "medias": {
+                "faithfulness": float(df_ragas["faithfulness"].mean()),
+                "answer_relevancy": float(df_ragas["answer_relevancy"].mean()),
+                "context_precision": float(df_ragas["context_precision"].mean()),
+            }
+        }
+
+        print("📊 Resultados RAGAS (medias):")
+        for metrica, valor in eval2_ragas["medias"].items():
+            print(f"  {metrica}: {valor:.4f}")
+    else:
+        eval2_ragas = {"error": "Completa los ground_truth en eval1_dataset primero."}
+        print(eval2_ragas["error"])
+else:
+    eval2_ragas = None
+```
+
+#### Ejercicio 3 — Iteración y mejora (2.5 ptos) {#sec-hpd4-e3-c}
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    eval3_iteracion = [
+        # Completar con al menos 2 versiones (base + mejora)
+    ]
+    print(f"⚠️  Completa eval3_iteracion con al menos 2 versiones comparadas.")
+else:
+    eval3_iteracion = None
+```
+
+#### Ejercicio 4 — Informe de evaluación (2.5 ptos) {#sec-hpd4-e4-c}
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    eval4_informe = """Escribir aquí el informe estructurado. Incluir:
+    - Métricas RAGAS obtenidas
+    - Fortalezas y debilidades del pipeline
+    - Análisis de errores
+    - Impacto de la mejora implementada
+    - Propuestas de mejora adicionales"""
+    print("✅ eval4_informe asignada. Completa el contenido.")
+else:
+    eval4_informe = None
+```
+
+:::
+
+## Resumen de entregables
+
+```{python}
+#| echo: true
+
+print(f"Camino seleccionado: {CAMINO}")
+print(f"\nVariables de corrección:")
+for var in ["eval1_dataset", "eval2_ragas", "eval3_iteracion", "eval4_informe"]:
+    val = globals().get(var, None)
+    status = "✅ definida" if val is not None else "⚠️ no definida"
+    print(f"  {var}: {status}")
+```
+
+# References
+
+:::{#refs}
+:::

@@ -846,45 +846,22 @@ Escribe 3 preguntas originales que no estén en la lista `preguntas_eval`. Para 
 
 ---
 
-### Para seguir explorando (opcional) {#sec-hpd4-ejercicios-explorando}
+<!--  -->
+<!-- Sección de ejercicios avanzados y entregable eliminada: pasan a ser el hpd4-entregable.qmd -->
 
-**E1 — Query expansion con HyDE**
+::: {.callout-note icon=false}
+## Trabajo posterior
 
-Implementa HyDE (Hypothetical Document Embeddings): antes de buscar, pide al LLM que genere un documento hipotético que respondería a la pregunta. Usa el embedding de ese documento como query en lugar del embedding de la pregunta original. Compara RAGAS con y sin HyDE.
-
-**E2 — RAG sobre DataFrames con pandas**
-
-Sustituye la collection SQL por consultas directas a pandas: en lugar de embeddings, convierte la pregunta a una query de pandas con el LLM. Combina este resultado con el retriever de PDFs. ¿Qué enfoque es más preciso para datos numéricos?
-
-**E3 — Comparativa de modelos de embeddings**
-
-Repite la evaluación RAGAS con `all-MiniLM-L6-v2` en lugar de `e5-small-v2`. ¿Cambian las métricas? ¿Merece la pena el cambio para este corpus en español?
-
-**E4 — Mide la latencia de cada componente**
-
-Usa `time.time()` para medir cuánto tarda cada etapa del pipeline: embedding de query, búsqueda en Chroma, re-ranker, generación del LLM. Identifica el cuello de botella y propón una optimización.
-
-:::
-
----
-
-::: {.callout-tip icon=false}
-## Entregable
-- Pipeline RAG completo y ejecutable (PDF + SQL → respuesta)
-- Dataset de preguntas anotadas (mínimo 10)
-- Informe de evaluación RAGAS con faithfulness > 0,6
-- Iteración documentada: al menos 2 versiones comparadas con sus métricas
-
-## Criterios de evaluación
-- RAG funcional con datos mixtos (PDFs de informes + tabla de productos)
-- Re-ranker implementado y su mejora cuantificada
-- RAGAS ejecutado sobre ≥ 10 preguntas
-- Análisis de componentes y propuestas de mejora basadas en datos
-
-## Tiempo estimado: 4h
+Este taller te ha proporcionado un pipeline RAG funcional sobre datos mixtos.
+El **[Entregable de HPD 4](../evaluables/hpd4-entregable.qmd)** te pide construir
+un pipeline similar pero adaptado a tu **camino elegido** (Finanzas, Salud o
+E-commerce), con tu propio corpus, tu base de datos y una evaluación completa
+con RAGAS.
 :::
 
 # References
 
 ::: {#refs}
 :::
+
+

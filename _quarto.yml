@@ -36,12 +36,10 @@ website:
             text: Embeddings
           - href: bloque1/01d-vectordb.qmd
             text: Bases de datos vectoriales
-          - href: evaluables/hpd1-embeddings.qmd
+          - href: bloque1/hpd1-embeddings.qmd
             text: "HPD 1 — Embeddings"
-          - href: evaluables/hpd1-evaluables.qmd
-            text: "Ejercicios evaluables HPD 1"
-          - href: evaluables/hpd1-extension.qmd
-            text: "Extensión HPD 1"
+          - href: evaluables/hpd1-entregable.qmd
+            text: "HPD 1 — Entregable: Pipeline de embeddings"
       - section: "Bloque 2 — Orquestación"
         contents:
           - href: bloque2/02-orquestacion.qmd
@@ -58,16 +56,12 @@ website:
             text: Agentes Inteligentes
           - href: bloque2/hpd2-agente-tool-calling.qmd
             text: "HPD 2 — Agente Tool Calling"
-          - href: evaluables/hpd2-evaluables.qmd
-            text: "Ejercicios evaluables HPD 2"
-          - href: evaluables/hpd2-extension.qmd
-            text: "Extensión HPD 2"
+          - href: evaluables/hpd2-entregable.qmd
+            text: "HPD 2 — Entregable: Agente analítico con Tool Calling"
           - href: bloque2/hpd3-servidor-mcp.qmd
             text: "HPD 3 — Servidor MCP"
-          - href: evaluables/hpd3-evaluables.qmd
-            text: "Ejercicios evaluables HPD 3"
-          - href: evaluables/hpd3-extension.qmd
-            text: "Extensión HPD 3"
+          - href: evaluables/hpd3-entregable.qmd
+            text: "HPD 3 — Entregable: Servidor MCP"
       - section: "Bloque 3 — Aplicaciones"
         contents:
           - href: bloque3/03-aplicaciones.qmd
@@ -80,10 +74,8 @@ website:
             text: Fine-tuning eficiente
           - href: evaluables/hpd4-rag-mixto.qmd
             text: "HPD 4 — RAG Mixto"
-          - href: evaluables/hpd4-datos-sinteticos.qmd
-            text: "Ejercicios — Datos Sintéticos"
-          - href: evaluables/hpd4-datos-sinteticos-extension.qmd
-            text: "Extensión — Datos Sintéticos"
+          - href: evaluables/hpd4-entregable.qmd
+            text: "HPD 4 — Entregable: RAG con evaluación"
       - section: "Bloque 4 — Gobernanza"
         contents:
           - href: bloque4/04-gobernanza.qmd
@@ -102,8 +94,12 @@ website:
             text: Patrones de despliegue
       - section: "Evaluación"
         contents:
+          - href: evaluables/caminos.qmd
+            text: Elegir tu camino
           - href: 05-evaluacion.qmd
-            text: Evaluación y Proyecto
+            text: Evaluación
+          - href: evaluables/proyecto-final.qmd
+            text: Proyecto integrador final
       - section: "Recursos"
         contents:
           - href: 06-herramientas.qmd

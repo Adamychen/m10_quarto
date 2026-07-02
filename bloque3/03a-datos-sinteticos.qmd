@@ -503,7 +503,7 @@ plt.show()
 
 ---
 
-> Continúa con la validación práctica en los **[ejercicios de datos sintéticos](../evaluables/hpd4-datos-sinteticos.qmd)**.
+> Continúa con la validación práctica en los **[ejercicios del entregable HPD 4](../evaluables/hpd4-entregable.qmd)**, donde aplicarás generación de datos sintéticos en tu camino elegido.
 
 # References
 

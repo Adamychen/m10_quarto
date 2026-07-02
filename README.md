@@ -19,16 +19,20 @@ Cada página tiene un badge **Open in Colab** en la parte superior. Si es la pri
 
 Como alternativa: **File → Open Notebook → GitHub**, busca `Adamychen/m10_quarto` y selecciona el notebook de la carpeta `notebooks/`.
 
-### Ejercicios evaluables
+### Entregables por caminos
 
-Hay 4 HPDs con sus ejercicios evaluables (entrega básica) y una extensión avanzada por cada uno. Todos se entregan como notebook `.ipynb` ejecutado con todas las celdas completas.
+Cada alumno elige al inicio un **camino de aplicación** (Finanzas, Salud o E-commerce).
+Todos los entregables (HPD 1-4) y el proyecto final se adaptan al camino elegido.
 
-| HPD | Ejercicios evaluables | Extensión avanzada |
+| HPD | Entregable | Peso |
 |---|---|---|
-| HPD 1 — Embeddings | `evaluables/hpd1-evaluables.qmd` | `evaluables/hpd1-extension.qmd` |
-| HPD 2 — Agente Tool Calling | `evaluables/hpd2-evaluables.qmd` | `evaluables/hpd2-extension.qmd` |
-| HPD 3 — Servidor MCP | `evaluables/hpd3-evaluables.qmd` | `evaluables/hpd3-extension.qmd` |
-| HPD 4 — RAG mixto + Datos sintéticos | `evaluables/hpd4-rag-mixto.qmd` y `evaluables/hpd4-datos-sinteticos.qmd` | `evaluables/hpd4-datos-sinteticos-extension.qmd` |
+| HPD 1 — Pipeline de embeddings | `evaluables/hpd1-entregable.qmd` | 7.5 % |
+| HPD 2 — Agente Tool Calling | `evaluables/hpd2-entregable.qmd` | 7.5 % |
+| HPD 3 — Servidor MCP | `evaluables/hpd3-entregable.qmd` | 7.5 % |
+| HPD 4 — RAG con evaluación | `evaluables/hpd4-entregable.qmd` | 7.5 % |
+| — | **Proyecto integrador final** (`evaluables/proyecto-final.qmd`) | 60 % |
+
+Los talleres presenciales (comunes para todos los caminos) están en `bloque1/`, `bloque2/` y `bloque3/`.
 
 Los talleres presenciales (con código parcialmente completado por el alumno) están en `bloque1/`, `bloque2/`, `bloque3/` y `bloque4/`.
 
@@ -93,17 +97,14 @@ m10_quarto/
 │   └── 03c-fine-tuning.qmd
 ├── bloque4/                     # Despliegue y gobernanza
 │   └── 04-gobernanza.qmd
-├── evaluables/                  # Ejercicios evaluables (10 ficheros)
-│   ├── hpd1-embeddings.qmd
-│   ├── hpd1-evaluables.qmd
-│   ├── hpd1-extension.qmd
-│   ├── hpd2-evaluables.qmd
-│   ├── hpd2-extension.qmd
-│   ├── hpd3-evaluables.qmd
-│   ├── hpd3-extension.qmd
+├── evaluables/                  # Entregables y proyecto (7 ficheros)
+│   ├── caminos.qmd
+│   ├── hpd1-entregable.qmd
+│   ├── hpd2-entregable.qmd
+│   ├── hpd3-entregable.qmd
 │   ├── hpd4-rag-mixto.qmd
-│   ├── hpd4-datos-sinteticos.qmd
-│   └── hpd4-datos-sinteticos-extension.qmd
+│   ├── hpd4-entregable.qmd
+│   └── proyecto-final.qmd
 ├── 05-evaluacion.qmd            # Evaluación y proyecto
 ├── 06-herramientas.qmd          # Herramientas y stack recomendado
 ├── 07-bibliografia.qmd          # Bibliografía y recursos

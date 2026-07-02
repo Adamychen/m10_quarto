@@ -1,0 +1,1548 @@
+---
+title: "HPD 3 — Entregable: Servidor MCP y conexión segura a datos"
+engine: jupyter
+---
+
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/evaluables/hpd3-entregable.ipynb)
+
+> **Peso en la nota:** 7.5 %
+>
+> **Plazo:** 7 días tras la sesión presencial.
+>
+> **Prerrequisito:** [HPD 3 — Servidor MCP](../bloque2/hpd3-servidor-mcp.qmd).
+>
+> **Entrega:** Notebook `.ipynb` ejecutado con todas las celdas completas.
+>   Cada ejercicio especifica qué variable debe contener el resultado para la corrección automática.
+
+::: {.callout-warning icon=false}
+## Cómo se corrige
+
+Cada ejercicio pide que asignes el resultado a una variable con un nombre concreto
+(`eval1_server`, `eval2_respuesta`, `eval3_ataques`, `eval4_riesgos`).
+El script de corrección ejecutará tu notebook e inspeccionará esas variables.
+
+Además, la variable `CAMINO` debe estar definida al inicio del notebook.
+:::
+
+```{python}
+#| echo: true
+#| eval: true
+
+CAMINO = "A"  # Cambiar a "B" o "C" según tu elección
+```
+
+## Setup
+
+```{python}
+#| echo: true
+#| eval: false
+
+!pip install -q fastmcp openai python-dotenv pandas
+```
+
+```{python}
+#| echo: true
+
+import os, sqlite3, tempfile, json
+"""
+Setup compartido para la API key de Llamus en todos los notebooks.
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
+
+Orden de resolución:
+  1. .env local (python-dotenv)
+  2. os.environ ya configurado externamente
+  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
+
+Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+"""
+
+import os
+
+
+def _load_llm_api_key():
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except ImportError:
+        pass
+
+    if not os.getenv("LLM_API_KEY"):
+        try:
+            from google.colab import userdata
+            for name in ("LLAMUS_API_KEY", "LLM_API_KEY"):
+                try:
+                    value = userdata.get(name)
+                    if value:
+                        os.environ["LLM_API_KEY"] = value
+                        break
+                except Exception:
+                    continue
+        except ImportError:
+            pass
+
+
+_load_llm_api_key()
+
+if os.getenv("LLM_API_KEY"):
+    print("✓ LLM_API_KEY cargada.")
+else:
+    print("⚠️  LLM_API_KEY no encontrada.")
+    print("    • Local: crea un archivo .env con LLM_API_KEY=tu_clave")
+    print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
+
+
+
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
+import warnings
+warnings.filterwarnings("ignore")
+
+import numpy as np
+np.random.seed(42)
+import pandas as pd
+
+print("Librerías cargadas correctamente.")
+```
+
+```{python}
+#| echo: true
+
+LLM_KEY = os.getenv("LLM_API_KEY")
+LLM_URL = "https://llamus.cs.us.es/api/v1"
+
+if LLM_KEY:
+    from openai import OpenAI
+    client = OpenAI(base_url=LLM_URL, api_key=LLM_KEY)
+    print("✅ Cliente OpenAI configurado.")
+else:
+    client = None
+    print("⚠️  LLM_API_KEY no encontrada. Los ejercicios E2 y E3 requieren la key.")
+```
+
+```{python}
+#| echo: true
+
+# Función helper compartida: ejecutar tool del servidor MCP (simulación en notebook)
+from fastmcp import FastMCP
+
+TOOLS_MCP = {}
+
+def registrar_tool(nombre, fn):
+    TOOLS_MCP[nombre] = fn
+
+def ejecutar_tool(nombre: str, args: dict) -> str:
+    if nombre not in TOOLS_MCP:
+        return f"Error: tool '{nombre}' no encontrada. Disponibles: {list(TOOLS_MCP.keys())}"
+    try:
+        return TOOLS_MCP[nombre](**args)
+    except Exception as e:
+        return f"Error ejecutando {nombre}: {e}"
+
+print("✅ Helper de ejecución de tools listo.")
+```
+
+::: {.panel-tabset}
+
+## Camino A — Finanzas
+
+**Contexto:** Trabajas como Data Scientist en una consultora financiera. Tu equipo necesita un servidor MCP que exponga datos corporativos de contabilidad: cuentas contables, transacciones y presupuestos. Los analistas financieros consultarán estos datos mediante un asistente conversacional.
+
+### Base de datos — Finanzas
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    db_a = sqlite3.connect(":memory:")
+
+    # Tabla cuentas contables
+    db_a.execute("""
+        CREATE TABLE cuentas (
+            id INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            tipo TEXT NOT NULL CHECK(tipo IN ('activo', 'pasivo', 'patrimonio', 'ingreso', 'gasto')),
+            saldo REAL NOT NULL,
+            divisa TEXT NOT NULL DEFAULT 'EUR',
+            departamento TEXT NOT NULL
+        )
+    """)
+
+    # Tabla transacciones
+    db_a.execute("""
+        CREATE TABLE transacciones (
+            id INTEGER PRIMARY KEY,
+            cuenta_id INTEGER NOT NULL,
+            tipo TEXT NOT NULL CHECK(tipo IN ('ingreso', 'gasto', 'transferencia')),
+            monto REAL NOT NULL,
+            fecha TEXT NOT NULL,
+            descripcion TEXT,
+            categoria TEXT NOT NULL,
+            FOREIGN KEY (cuenta_id) REFERENCES cuentas(id)
+        )
+    """)
+
+    # Tabla presupuestos
+    db_a.execute("""
+        CREATE TABLE presupuestos (
+            id INTEGER PRIMARY KEY,
+            departamento TEXT NOT NULL,
+            categoria TEXT NOT NULL,
+            presupuesto_anual REAL NOT NULL,
+            gastado REAL NOT NULL,
+            ejercicio INTEGER NOT NULL
+        )
+    """)
+
+    print("✅ Tablas creadas: cuentas, transacciones, presupuestos")
+```
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    cuentas_data = [
+        (1, "Caja y Bancos", "activo", 1250000, "EUR", "Tesorería"),
+        (2, "Inversiones Corto Plazo", "activo", 450000, "EUR", "Tesorería"),
+        (3, "Inversiones Largo Plazo", "activo", 3200000, "EUR", "Tesorería"),
+        (4, "Cuentas a Cobrar Clientes", "activo", 890000, "EUR", "Comercial"),
+        (5, "Existencias", "activo", 560000, "EUR", "Logística"),
+        (6, "Proveedores", "pasivo", -340000, "EUR", "Compras"),
+        (7, "Deuda Bancaria CP", "pasivo", -500000, "EUR", "Tesorería"),
+        (8, "Deuda Bancaria LP", "pasivo", -2100000, "EUR", "Tesorería"),
+        (9, "Capital Social", "patrimonio", -1500000, "EUR", "Jurídico"),
+        (10, "Reservas", "patrimonio", -800000, "EUR", "Jurídico"),
+        (11, "Resultado del Ejercicio", "patrimonio", -450000, "EUR", "Contabilidad"),
+        (12, "Ventas Nacionales", "ingreso", -5200000, "EUR", "Comercial"),
+        (13, "Ventas Internacionales", "ingreso", -2800000, "USD", "Comercial"),
+        (14, "Prestación Servicios", "ingreso", -950000, "EUR", "Consultoría"),
+        (15, "Gastos de Personal", "gasto", 2100000, "EUR", "RRHH"),
+        (16, "Gastos Operativos", "gasto", 890000, "EUR", "Operaciones"),
+        (17, "Gastos Financieros", "gasto", 320000, "EUR", "Tesorería"),
+        (18, "Amortizaciones", "gasto", 450000, "EUR", "Contabilidad"),
+        (19, "Impuestos", "gasto", 680000, "EUR", "Jurídico"),
+        (20, "Gastos Marketing", "gasto", 520000, "EUR", "Comercial"),
+    ]
+    db_a.executemany("INSERT INTO cuentas VALUES (?, ?, ?, ?, ?, ?)", cuentas_data)
+    print(f"✅ {len(cuentas_data)} cuentas insertadas")
+```
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    transacciones_data = [
+        (1, 12, "ingreso", 450000, "2026-01-15", "Venta trimestral cliente CorpA", "ventas"),
+        (2, 12, "ingreso", 320000, "2026-01-28", "Venta trimestral cliente CorpB", "ventas"),
+        (3, 13, "ingreso", 180000, "2026-02-03", "Venta internacional cliente GlobX", "ventas"),
+        (4, 14, "ingreso", 75000, "2026-02-10", "Consultoría fiscal Q1", "servicios"),
+        (5, 15, "gasto", 175000, "2026-02-15", "Nómina enero", "personal"),
+        (6, 16, "gasto", 42000, "2026-02-18", "Alquiler oficinas Madrid", "operaciones"),
+        (7, 16, "gasto", 18500, "2026-02-20", "Suministros eléctricos", "operaciones"),
+        (8, 17, "gasto", 12000, "2026-02-22", "Comisiones bancarias", "financiero"),
+        (9, 12, "ingreso", 510000, "2026-02-28", "Venta trimestral cliente CorpA", "ventas"),
+        (10, 20, "gasto", 38000, "2026-03-02", "Campaña Google Ads marzo", "marketing"),
+        (11, 20, "gasto", 22000, "2026-03-05", "Ferias y eventos sector", "marketing"),
+        (12, 15, "gasto", 175000, "2026-03-10", "Nómina febrero", "personal"),
+        (13, 16, "gasto", 31000, "2026-03-12", "Mantenimiento sistemas", "operaciones"),
+        (14, 13, "ingreso", 210000, "2026-03-15", "Venta internacional cliente GlobX", "ventas"),
+        (15, 18, "gasto", 37500, "2026-03-18", "Amortización equipos TI", "amortización"),
+        (16, 4, "ingreso", 95000, "2026-03-20", "Cobro facturas pendientes", "cobros"),
+        (17, 15, "gasto", 180000, "2026-04-01", "Nómina marzo + bonus", "personal"),
+        (18, 16, "gasto", 28000, "2026-04-03", "Seguros anuales", "operaciones"),
+        (19, 19, "gasto", 56000, "2026-04-05", "Pago fraccionado IS", "impuestos"),
+        (20, 12, "ingreso", 490000, "2026-04-15", "Venta trimestral cliente CorpA", "ventas"),
+        (21, 13, "ingreso", 165000, "2026-04-20", "Venta internacional cliente GlobX", "ventas"),
+        (22, 14, "ingreso", 82000, "2026-04-22", "Consultoría fiscal Q2", "servicios"),
+        (23, 15, "gasto", 175000, "2026-05-01", "Nómina abril", "personal"),
+        (24, 20, "gasto", 45000, "2026-05-05", "Campaña LinkedIn Ads", "marketing"),
+        (25, 17, "gasto", 14000, "2026-05-08", "Intereses deuda bancaria", "financiero"),
+        (26, 16, "gasto", 15000, "2026-05-10", "Servicios cloud AWS", "operaciones"),
+        (27, 12, "ingreso", 530000, "2026-05-15", "Venta trimestral cliente CorpA", "ventas"),
+        (28, 4, "ingreso", 120000, "2026-05-18", "Cobro facturas pendientes", "cobros"),
+        (29, 13, "ingreso", 195000, "2026-05-22", "Venta internacional cliente GlobX", "ventas"),
+        (30, 14, "ingreso", 68000, "2026-05-25", "Consultoría fiscal extraordinaria", "servicios"),
+        (31, 15, "gasto", 175000, "2026-06-01", "Nómina mayo", "personal"),
+        (32, 20, "gasto", 35000, "2026-06-04", "Campaña redes sociales", "marketing"),
+        (33, 18, "gasto", 37500, "2026-06-08", "Amortización mobiliario", "amortización"),
+        (34, 16, "gasto", 22000, "2026-06-12", "Material de oficina", "operaciones"),
+        (35, 12, "ingreso", 475000, "2026-06-15", "Venta trimestral cliente CorpA", "ventas"),
+    ]
+    db_a.executemany("INSERT INTO transacciones VALUES (?, ?, ?, ?, ?, ?, ?)", transacciones_data)
+    print(f"✅ {len(transacciones_data)} transacciones insertadas")
+```
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    presupuestos_data = [
+        (1, "Comercial", "ventas", 6000000, 2850000, 2026),
+        (2, "RRHH", "personal", 2200000, 880000, 2026),
+        (3, "Operaciones", "infraestructura", 300000, 158500, 2026),
+        (4, "Marketing", "publicidad", 600000, 140000, 2026),
+        (5, "Tesorería", "financiero", 400000, 26000, 2026),
+        (6, "Comercial", "internacional", 3000000, 750000, 2026),
+        (7, "Consultoría", "servicios", 1200000, 225000, 2026),
+        (8, "Contabilidad", "amortización", 500000, 75000, 2026),
+        (9, "Jurídico", "impuestos", 800000, 56000, 2026),
+        (10, "Compras", "logística", 400000, 0, 2026),
+    ]
+    db_a.executemany("INSERT INTO presupuestos VALUES (?, ?, ?, ?, ?, ?)", presupuestos_data)
+    print(f"✅ {len(presupuestos_data)} presupuestos insertados")
+```
+
+### Ejercicio 1 — Servidor MCP (3 ptos) {#sec-hpd3-e1-a}
+
+Construye un servidor FastMCP que exponga las siguientes herramientas SQL sobre la base de datos financiera:
+
+- `listar_tablas()` — devuelve la lista de tablas disponibles
+- `describir_tabla(tabla: str)` — devuelve el DDL de la tabla
+- `consultar_sql(query: str)` — ejecuta una consulta SELECT y devuelve resultados
+- Resource `resumen://finanzas` — devuelve un resumen de la situación financiera (total activos, pasivos, ingresos, gastos, ejecución presupuestaria)
+
+Asigna el servidor a `eval1_server` (como string con los logs de creación y verificación).
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    from fastmcp import FastMCP
+
+    mcp_a = FastMCP("Servidor Finanzas MCP")
+    TOOLS_MCP.clear()
+
+    @mcp_a.tool()
+    def listar_tablas() -> str:
+        """Devuelve la lista de tablas disponibles en la base de datos financiera."""
+        cursor = db_a.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+        tablas = [row[0] for row in cursor.fetchall()]
+        return "Tablas disponibles:\n" + "\n".join(f"  - {t}" for t in tablas)
+
+    @mcp_a.tool()
+    def describir_tabla(tabla: str) -> str:
+        """Devuelve el DDL (CREATE TABLE) de una tabla.
+
+        Args:
+            tabla: nombre de la tabla.
+        """
+        tabla = tabla.strip().lower()
+        cursor = db_a.execute("SELECT sql FROM sqlite_master WHERE type='table' AND LOWER(name)=?", (tabla,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        return f"Error: tabla '{tabla}' no encontrada."
+
+    @mcp_a.tool()
+    def consultar_sql(query: str) -> str:
+        """Ejecuta una consulta SQL SELECT en la base de datos financiera.
+
+        Args:
+            query: consulta SQL (solo SELECT).
+        """
+        query_stripped = query.strip().upper()
+        if not query_stripped.startswith("SELECT"):
+            return "Error: solo se permiten consultas SELECT."
+        palabras_prohibidas = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE"]
+        for p in palabras_prohibidas:
+            if p in query_stripped:
+                return f"Error: la consulta contiene '{p}' no permitido."
+        try:
+            cursor = db_a.execute(query)
+            columnas = [d[0] for d in cursor.description]
+            filas = cursor.fetchmany(30)
+            if not filas:
+                return "No se encontraron resultados."
+            ancho = max(len(str(c)) for c in columnas)
+            lines = [" | ".join(f"{str(c):{ancho}}" for c in columnas)]
+            lines.append("-" * len(lines[0]))
+            for fila in filas:
+                lines.append(" | ".join(f"{str(v):{ancho}}" for v in fila))
+            resultado = "\n".join(lines)
+            if len(cursor.fetchall()) > 0:
+                resultado += f"\n... y más filas (mostrando primeras {len(filas)})"
+            if len(resultado) > 2000:
+                resultado = resultado[:2000] + "\n... (resultado truncado a 2000 caracteres)"
+            return resultado
+        except Exception as e:
+            return f"Error ejecutando consulta: {e}"
+
+    @mcp_a.resource("resumen://finanzas")
+    def resumen_finanzas() -> str:
+        """Resumen agregado de la situación financiera."""
+        activo = db_a.execute("SELECT COALESCE(SUM(saldo), 0) FROM cuentas WHERE tipo='activo'").fetchone()[0]
+        pasivo = db_a.execute("SELECT COALESCE(SUM(ABS(saldo)), 0) FROM cuentas WHERE tipo='pasivo'").fetchone()[0]
+        ingreso = db_a.execute("SELECT COALESCE(SUM(ABS(saldo)), 0) FROM cuentas WHERE tipo='ingreso'").fetchone()[0]
+        gasto = db_a.execute("SELECT COALESCE(SUM(saldo), 0) FROM cuentas WHERE tipo='gasto'").fetchone()[0]
+        total_presupuesto = db_a.execute("SELECT COALESCE(SUM(presupuesto_anual), 0) FROM presupuestos").fetchone()[0]
+        total_gastado = db_a.execute("SELECT COALESCE(SUM(gastado), 0) FROM presupuestos").fetchone()[0]
+
+        lines = [
+            "=== RESUMEN FINANCIERO ===",
+            f"Total Activos: {activo:,.2f} EUR",
+            f"Total Pasivos: {pasivo:,.2f} EUR",
+            f"Patrimonio Neto: {activo - pasivo:,.2f} EUR",
+            f"Total Ingresos (anualizados): {ingreso:,.2f} EUR",
+            f"Total Gastos (anualizados): {gasto:,.2f} EUR",
+            f"Margen Neto: {ingreso - gasto:,.2f} EUR",
+            "",
+            "=== EJECUCIÓN PRESUPUESTARIA ===",
+            f"Presupuesto total: {total_presupuesto:,.2f} EUR",
+            f"Gastado: {total_gastado:,.2f} EUR",
+            f"Ejecución: {total_gastado / total_presupuesto * 100:.1f}%",
+        ]
+        return "\n".join(lines)
+
+    registrar_tool("listar_tablas", listar_tablas)
+    registrar_tool("describir_tabla", describir_tabla)
+    registrar_tool("consultar_sql", consultar_sql)
+
+    eval1_server = "✅ Servidor MCP Finanzas creado con 3 tools + 1 resource\n"
+    eval1_server += "  Tools: listar_tablas, describir_tabla, consultar_sql\n"
+    eval1_server += "  Resource: resumen://finanzas\n"
+    eval1_server += "\n--- Prueba: listar_tablas ---\n"
+    eval1_server += listar_tablas()
+    eval1_server += "\n\n--- Prueba: resource resumen://finanzas ---\n"
+    eval1_server += resumen_finanzas()
+    print(eval1_server)
+else:
+    eval1_server = None
+```
+
+### Ejercicio 2 — Consulta en lenguaje natural (2 ptos) {#sec-hpd3-e2-a}
+
+Conecta el cliente OpenAI al servidor MCP. Formula una pregunta de negocio en lenguaje natural, deja que el LLM decida qué tool usar y muestra la respuesta final.
+
+Asigna el resultado (pregunta + respuesta completa) a `eval2_respuesta`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    tools_definition_a = [
+        {
+            "type": "function",
+            "function": {
+                "name": "listar_tablas",
+                "description": "Devuelve la lista de tablas disponibles en la base de datos financiera.",
+                "parameters": {"type": "object", "properties": {}, "required": []}
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "describir_tabla",
+                "description": "Devuelve el DDL de una tabla específica.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"tabla": {"type": "string", "description": "Nombre de la tabla"}},
+                    "required": ["tabla"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "consultar_sql",
+                "description": "Ejecuta una consulta SQL SELECT. Tablas: cuentas(id, nombre, tipo, saldo, divisa, departamento), transacciones(id, cuenta_id, tipo, monto, fecha, descripcion, categoria), presupuestos(id, departamento, categoria, presupuesto_anual, gastado, ejercicio).",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"query": {"type": "string", "description": "Consulta SQL SELECT"}},
+                    "required": ["query"]
+                }
+            }
+        },
+    ]
+
+    def preguntar_al_llm(pregunta, tools_def, system_prompt=None):
+        if not client:
+            return "⚠️  Cliente OpenAI no disponible."
+
+        if system_prompt is None:
+            system_prompt = "Eres un asistente financiero. Tienes acceso a una base de datos con cuentas, transacciones y presupuestos. Usa las herramientas disponibles para responder preguntas. Responde en español, de forma concisa."
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": pregunta}
+        ]
+
+        response = client.chat.completions.create(
+            model="gemma4:e2b-mlx",
+            messages=messages,
+            tools=tools_def,
+            tool_choice="auto",
+            max_tokens=1024,
+        )
+
+        message = response.choices[0].message
+
+        if message.tool_calls:
+            messages.append(message)
+            for tc in message.tool_calls:
+                args = json.loads(tc.function.arguments)
+                result = ejecutar_tool(tc.function.name, args)
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "content": result
+                })
+
+            final = client.chat.completions.create(
+                model="gemma4:e2b-mlx",
+                messages=messages,
+                tools=tools_def,
+                tool_choice="none",
+                max_tokens=512,
+            )
+            return final.choices[0].message.content
+        else:
+            return message.content
+
+    pregunta_a = "¿Cuál es el total de ingresos por ventas nacionales y cuánto hemos gastado en personal este año?"
+
+    if client:
+        respuesta_a = preguntar_al_llm(pregunta_a, tools_definition_a)
+        eval2_respuesta = f"PREGUNTA: {pregunta_a}\n\nRESPUESTA: {respuesta_a}"
+    else:
+        eval2_respuesta = "⚠️  Cliente OpenAI no disponible. Pregunta: " + pregunta_a
+
+    print(eval2_respuesta)
+else:
+    eval2_respuesta = None
+```
+
+### Ejercicio 3 — Pruebas de inyección (1.5 ptos) {#sec-hpd3-e3-a}
+
+Prueba al menos 3 intentos de ataque (prompt injection o SQL injection) contra tu servidor MCP. Documenta qué intentaste, qué respuesta obtuvo y si la defensa funcionó.
+
+Asigna los resultados a `eval3_ataques` (lista de diccionarios con ataque, resultado, defendido).
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    ataques_a = [
+        {
+            "ataque": "DROP TABLE cuentas",
+            "tipo": "SQL Injection directo",
+            "query": "DROP TABLE cuentas"
+        },
+        {
+            "ataque": "DELETE FROM transacciones WHERE id = 1; SELECT * FROM transacciones",
+            "tipo": "SQL Injection con múltiples sentencias",
+            "query": "DELETE FROM transacciones WHERE id = 1; SELECT * FROM transacciones"
+        },
+        {
+            "ataque": "Inyección en consultap: 'SELECT * FROM cuentas; DROP TABLE presupuestos; --'",
+            "tipo": "SQL Injection con comentario",
+            "query": "SELECT * FROM cuentas; DROP TABLE presupuestos; --"
+        },
+    ]
+
+    eval3_ataques = []
+    for ataque in ataques_a:
+        resultado = consultar_sql(ataque["query"])
+        defendido = "Error" in resultado or "no permitido" in resultado
+        entry = {
+            "ataque": ataque["ataque"],
+            "tipo": ataque["tipo"],
+            "resultado": resultado[:200],
+            "defendido": defendido,
+            "defensa_efectiva": "✅ Bloqueado" if defendido else "❌ Vulnerable"
+        }
+        eval3_ataques.append(entry)
+
+    for e in eval3_ataques:
+        print(f"\n--- {e['tipo']} ---")
+        print(f"  Ataque: {e['ataque']}")
+        print(f"  Resultado: {e['defensa_efectiva']}")
+        print(f"  Detalle: {e['resultado']}")
+else:
+    eval3_ataques = None
+```
+
+### Ejercicio 4 — Análisis de riesgos (1.5 ptos) {#sec-hpd3-e4-a}
+
+Redacta un análisis de riesgos para el servidor MCP en un entorno financiero real. Debes cubrir al menos:
+
+- Riesgos de privacidad (datos financieros sensibles expuestos)
+- Inyección SQL y prompt injection
+- Data leakage (fuga de información por respuestas demasiado detalladas)
+- Mitigaciones específicas para cada riesgo
+
+Asigna tu respuesta a `eval4_riesgos`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    eval4_riesgos = """Escribir aquí el análisis de riesgos. Por ejemplo:
+
+    RIESGOS DE PRIVACIDAD:
+    - Los saldos de cuentas y transacciones son datos financieros sensibles.
+      Un usuario no autorizado podría consultar información confidencial de la empresa.
+    - Mitigación: implementar autenticación por API key en el servidor MCP,
+      logs de auditoría de todas las consultas, y cifrado en tránsito (TLS).
+
+    INYECCIÓN SQL / PROMPT INJECTION:
+    - Un atacante puede manipular el prompt del LLM para que ejecute consultas
+      destructivas (DROP, DELETE) o acceda a datos que no debería.
+    - Mitigación: sanitización de queries (solo SELECT, palabras prohibidas),
+      límite de filas (máx. 30), timeout de consultas, y system prompt restrictivo.
+
+    DATA LEAKAGE:
+    - El LLM podría exponer información sensible en su respuesta si la query
+      devuelve datos que no deberían compartirse (ej. salarios, reservas).
+    - Mitigación: filtrar columnas sensibles a nivel de tool, usar vistas SQL
+      que expongan solo los datos necesarios, policy de mínimo privilegio.
+
+    RIESGOS ADICIONALES:
+    - Denegación de servicio: queries sin límite podrían saturar la BD.
+    - Escalada de privilegios: asegurar que cada tool acceda solo a los datos
+      estrictamente necesarios para su función."""
+    print("✅ eval4_riesgos asignada.")
+else:
+    eval4_riesgos = None
+```
+
+## Camino B — Salud
+
+**Contexto:** Trabajas como Data Scientist en un hospital universitario. Tu equipo necesita un servidor MCP que exponga datos clínicos anonimizados para investigación: pacientes, diagnósticos y medicación. Los investigadores consultarán estos datos mediante un asistente conversacional.
+
+### Base de datos — Salud
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    db_b = sqlite3.connect(":memory:")
+
+    # Tabla pacientes
+    db_b.execute("""
+        CREATE TABLE pacientes (
+            id INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            edad INTEGER NOT NULL,
+            genero TEXT NOT NULL,
+            grupo_sanguineo TEXT NOT NULL,
+            historial TEXT
+        )
+    """)
+
+    # Tabla diagnósticos
+    db_b.execute("""
+        CREATE TABLE diagnosticos (
+            id INTEGER PRIMARY KEY,
+            paciente_id INTEGER NOT NULL,
+            diagnostico TEXT NOT NULL,
+            codigo_cie TEXT NOT NULL,
+            fecha TEXT NOT NULL,
+            medico TEXT NOT NULL,
+            estado TEXT NOT NULL CHECK(estado IN ('activo', 'resuelto', 'cronico')),
+            FOREIGN KEY (paciente_id) REFERENCES pacientes(id)
+        )
+    """)
+
+    # Tabla medicamentos
+    db_b.execute("""
+        CREATE TABLE medicamentos (
+            id INTEGER PRIMARY KEY,
+            paciente_id INTEGER NOT NULL,
+            medicamento TEXT NOT NULL,
+            dosis TEXT NOT NULL,
+            frecuencia TEXT NOT NULL,
+            fecha_inicio TEXT NOT NULL,
+            fecha_fin TEXT,
+            FOREIGN KEY (paciente_id) REFERENCES pacientes(id)
+        )
+    """)
+
+    print("✅ Tablas creadas: pacientes, diagnosticos, medicamentos")
+```
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    pacientes_data = [
+        (1, "Ana Martínez", 58, "F", "A+", "Hipertensión controlada. Alergia a penicilina"),
+        (2, "Carlos López", 72, "M", "O+", "Diabetes tipo 2. IAM 2023. Anticoagulado"),
+        (3, "Beatriz Jiménez", 34, "F", "B+", "Asma bronquial. Sin alergias conocidas"),
+        (4, "David Rodríguez", 45, "M", "A-", "Hipercolesterolemia. Celiaco"),
+        (5, "Elena Sánchez", 67, "F", "O-", "Artritis reumatoide. Osteoporosis"),
+        (6, "Fernando García", 29, "M", "AB+", "Sin patologías crónicas. Deportista"),
+        (7, "Gloria Fernández", 51, "F", "A+", "Fibromialgia. Migraña crónica"),
+        (8, "Héctor Díaz", 63, "M", "B-", "EPOC. Exfumador (35 paquetes/año)"),
+        (9, "Isabel Ruiz", 40, "F", "O+", "Hipotiroidismo. Síndrome de fatiga crónica"),
+        (10, "Javier Torres", 55, "M", "A+", "Cardiopatía isquémica. Stent 2024"),
+        (11, "Laura Moreno", 26, "F", "B+", "Trastorno ansiedad-depresivo. TDAH"),
+        (12, "Mariano Castro", 78, "M", "O+", "Parkinson. HBP. Insuficiencia renal crónica"),
+    ]
+    db_b.executemany("INSERT INTO pacientes VALUES (?, ?, ?, ?, ?, ?)", pacientes_data)
+    print(f"✅ {len(pacientes_data)} pacientes insertados")
+```
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    diagnosticos_data = [
+        (1, 1, "Hipertensión esencial", "I10", "2020-03-15", "Dra. Moreno", "cronico"),
+        (2, 2, "Diabetes mellitus tipo 2", "E11", "2018-06-20", "Dr. Alonso", "cronico"),
+        (3, 2, "Infarto agudo de miocardio", "I21", "2023-11-05", "Dr. Vega", "resuelto"),
+        (4, 3, "Asma bronquial persistente", "J45", "2019-09-12", "Dra. Puig", "cronico"),
+        (5, 4, "Hipercolesterolemia familiar", "E78", "2021-01-25", "Dr. Romero", "activo"),
+        (6, 5, "Artritis reumatoide seropositiva", "M05", "2017-04-08", "Dra. Soria", "cronico"),
+        (7, 5, "Osteoporosis postmenopáusica", "M81", "2022-10-14", "Dra. Soria", "activo"),
+        (8, 7, "Fibromialgia", "M79", "2020-07-22", "Dr. Pastor", "cronico"),
+        (9, 7, "Migraña sin aura", "G43", "2019-12-01", "Dr. Pastor", "cronico"),
+        (10, 8, "Enfermedad pulmonar obstructiva crónica", "J44", "2016-03-30", "Dra. Molina", "cronico"),
+        (11, 9, "Hipotiroidismo primario", "E03", "2021-05-11", "Dra. Rivas", "activo"),
+        (12, 10, "Cardiopatía isquémica crónica", "I25", "2024-02-19", "Dr. Vega", "activo"),
+        (13, 10, "Angina de pecho estable", "I20", "2024-02-19", "Dr. Vega", "activo"),
+        (14, 11, "Trastorno depresivo mayor", "F32", "2023-08-05", "Dra. Campos", "activo"),
+        (15, 11, "Trastorno por déficit de atención", "F90", "2023-08-05", "Dra. Campos", "activo"),
+        (16, 12, "Enfermedad de Parkinson", "G20", "2019-06-17", "Dr. Pastor", "cronico"),
+        (17, 12, "Hiperplasia prostática benigna", "N40", "2020-11-09", "Dr. Rojas", "activo"),
+        (18, 12, "Insuficiencia renal crónica estadio 3", "N18", "2021-09-28", "Dr. Rojas", "cronico"),
+        (19, 4, "Enfermedad celiaca", "K90", "2010-06-15", "Dra. Sáez", "cronico"),
+        (20, 6, "Fractura de clavícula derecha", "S42", "2025-02-03", "Dr. Marco", "resuelto"),
+        (21, 3, "Rinitis alérgica estacional", "J30", "2020-04-20", "Dra. Puig", "activo"),
+    ]
+    db_b.executemany("INSERT INTO diagnosticos VALUES (?, ?, ?, ?, ?, ?, ?)", diagnosticos_data)
+    print(f"✅ {len(diagnosticos_data)} diagnósticos insertados")
+```
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    medicamentos_data = [
+        (1, 1, "Enalapril", "10 mg", "1 comprimido al día", "2020-03-15", None),
+        (2, 2, "Metformina", "850 mg", "2 comprimidos al día", "2018-06-20", None),
+        (3, 2, "AAS", "100 mg", "1 comprimido al día", "2023-11-05", None),
+        (4, 2, "Atorvastatina", "20 mg", "1 comprimido al día", "2023-11-05", None),
+        (5, 3, "Salbutamol inhalador", "200 mcg", "2 inhalaciones cada 8h", "2019-09-12", None),
+        (6, 3, "Budesonida inhalador", "400 mcg", "1 inhalación cada 12h", "2020-03-01", None),
+        (7, 4, "Rosuvastatina", "10 mg", "1 comprimido al día", "2021-01-25", None),
+        (8, 5, "Metotrexato", "15 mg semanal", "1 dosis semanal", "2017-04-08", None),
+        (9, 5, "Ácido fólico", "5 mg", "1 comprimido al día", "2017-04-08", None),
+        (10, 5, "Alendronato", "70 mg semanal", "1 comprimido semanal", "2022-10-14", None),
+        (11, 7, "Amitriptilina", "25 mg", "1 comprimido al acostarse", "2020-07-22", None),
+        (12, 7, "Sumatriptán", "50 mg", "1 comprimido en crisis (máx 2/día)", "2019-12-01", None),
+        (13, 8, "Tiotropio inhalador", "18 mcg", "1 inhalación al día", "2016-03-30", None),
+        (14, 8, "Salbutamol inhalador", "200 mcg", "2 inhalaciones a demanda", "2016-03-30", None),
+        (15, 9, "Levotiroxina", "75 mcg", "1 comprimido al día", "2021-05-11", None),
+        (16, 10, "Bisoprolol", "5 mg", "1 comprimido al día", "2024-02-19", None),
+        (17, 10, "Clopidogrel", "75 mg", "1 comprimido al día", "2024-02-19", None),
+        (18, 11, "Sertralina", "100 mg", "1 comprimido al día", "2023-08-05", None),
+        (19, 11, "Metilfenidato", "18 mg", "1 comprimido por la mañana", "2023-08-05", None),
+        (20, 12, "Levodopa/Carbidopa", "250/25 mg", "1 comprimido cada 6h", "2019-06-17", None),
+        (21, 12, "Tamsulosina", "0.4 mg", "1 comprimido al día", "2020-11-09", None),
+        (22, 6, "Ibuprofeno", "600 mg", "1 comprimido cada 8h (7 días)", "2025-02-03", "2025-02-10"),
+    ]
+    db_b.executemany("INSERT INTO medicamentos VALUES (?, ?, ?, ?, ?, ?, ?)", medicamentos_data)
+    print(f"✅ {len(medicamentos_data)} registros de medicación insertados")
+```
+
+### Ejercicio 1 — Servidor MCP (3 ptos) {#sec-hpd3-e1-b}
+
+Construye un servidor FastMCP que exponga las siguientes herramientas SQL sobre la base de datos clínica:
+
+- `listar_tablas()` — devuelve la lista de tablas disponibles
+- `describir_tabla(tabla: str)` — devuelve el DDL de la tabla
+- `consultar_sql(query: str)` — ejecuta una consulta SELECT y devuelve resultados
+- Resource `resumen://clinica` — devuelve estadísticas agregadas (total pacientes, diagnósticos activos, medicamentos prescritos, distribución por grupo sanguíneo)
+
+Asigna el servidor a `eval1_server` (como string con los logs de creación y verificación).
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    from fastmcp import FastMCP
+
+    mcp_b = FastMCP("Servidor Clínico MCP")
+    TOOLS_MCP.clear()
+
+    @mcp_b.tool()
+    def listar_tablas() -> str:
+        """Devuelve la lista de tablas disponibles en la base de datos clínica."""
+        cursor = db_b.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+        tablas = [row[0] for row in cursor.fetchall()]
+        return "Tablas disponibles:\n" + "\n".join(f"  - {t}" for t in tablas)
+
+    @mcp_b.tool()
+    def describir_tabla(tabla: str) -> str:
+        """Devuelve el DDL (CREATE TABLE) de una tabla.
+
+        Args:
+            tabla: nombre de la tabla.
+        """
+        tabla = tabla.strip().lower()
+        cursor = db_b.execute("SELECT sql FROM sqlite_master WHERE type='table' AND LOWER(name)=?", (tabla,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        return f"Error: tabla '{tabla}' no encontrada."
+
+    @mcp_b.tool()
+    def consultar_sql(query: str) -> str:
+        """Ejecuta una consulta SQL SELECT en la base de datos clínica.
+
+        Args:
+            query: consulta SQL (solo SELECT).
+        """
+        query_stripped = query.strip().upper()
+        if not query_stripped.startswith("SELECT"):
+            return "Error: solo se permiten consultas SELECT."
+        palabras_prohibidas = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE"]
+        for p in palabras_prohibidas:
+            if p in query_stripped:
+                return f"Error: la consulta contiene '{p}' no permitido."
+        try:
+            cursor = db_b.execute(query)
+            columnas = [d[0] for d in cursor.description]
+            filas = cursor.fetchmany(30)
+            if not filas:
+                return "No se encontraron resultados."
+            ancho = max(len(str(c)) for c in columnas)
+            lines = [" | ".join(f"{str(c):{ancho}}" for c in columnas)]
+            lines.append("-" * len(lines[0]))
+            for fila in filas:
+                lines.append(" | ".join(f"{str(v):{ancho}}" for v in fila))
+            resultado = "\n".join(lines)
+            if len(cursor.fetchall()) > 0:
+                resultado += f"\n... y más filas (mostrando primeras {len(filas)})"
+            if len(resultado) > 2000:
+                resultado = resultado[:2000] + "\n... (resultado truncado a 2000 caracteres)"
+            return resultado
+        except Exception as e:
+            return f"Error ejecutando consulta: {e}"
+
+    @mcp_b.resource("resumen://clinica")
+    def resumen_clinico() -> str:
+        """Resumen agregado de la base de datos clínica."""
+        total_pac = db_b.execute("SELECT COUNT(*) FROM pacientes").fetchone()[0]
+        edad_media = db_b.execute("SELECT AVG(edad) FROM pacientes").fetchone()[0]
+        diag_activos = db_b.execute("SELECT COUNT(*) FROM diagnosticos WHERE estado='activo'").fetchone()[0]
+        diag_cronicos = db_b.execute("SELECT COUNT(*) FROM diagnosticos WHERE estado='cronico'").fetchone()[0]
+        total_meds = db_b.execute("SELECT COUNT(*) FROM medicamentos").fetchone()[0]
+        meds_activos = db_b.execute("SELECT COUNT(*) FROM medicamentos WHERE fecha_fin IS NULL").fetchone()[0]
+
+        grupos = db_b.execute("SELECT grupo_sanguineo, COUNT(*) FROM pacientes GROUP BY grupo_sanguineo ORDER BY grupo_sanguineo").fetchall()
+        grupo_str = "\n".join(f"  - {g}: {c} pacientes" for g, c in grupos)
+
+        lines = [
+            "=== RESUMEN CLÍNICO ===",
+            f"Pacientes totales: {total_pac}",
+            f"Edad media: {edad_media:.1f} años",
+            f"Diagnósticos activos: {diag_activos}",
+            f"Diagnósticos crónicos: {diag_cronicos}",
+            f"Medicamentos totales: {total_meds}",
+            f"Medicamentos activos: {meds_activos}",
+            "",
+            "Distribución grupo sanguíneo:",
+            grupo_str,
+        ]
+        return "\n".join(lines)
+
+    registrar_tool("listar_tablas", listar_tablas)
+    registrar_tool("describir_tabla", describir_tabla)
+    registrar_tool("consultar_sql", consultar_sql)
+
+    eval1_server = "✅ Servidor MCP Clínico creado con 3 tools + 1 resource\n"
+    eval1_server += "  Tools: listar_tablas, describir_tabla, consultar_sql\n"
+    eval1_server += "  Resource: resumen://clinica\n"
+    eval1_server += "\n--- Prueba: listar_tablas ---\n"
+    eval1_server += listar_tablas()
+    eval1_server += "\n\n--- Prueba: resource resumen://clinica ---\n"
+    eval1_server += resumen_clinico()
+    print(eval1_server)
+else:
+    eval1_server = None
+```
+
+### Ejercicio 2 — Consulta en lenguaje natural (2 ptos) {#sec-hpd3-e2-b}
+
+Conecta el cliente OpenAI al servidor MCP. Formula una pregunta clínica en lenguaje natural, deja que el LLM decida qué tool usar y muestra la respuesta final.
+
+Asigna el resultado (pregunta + respuesta completa) a `eval2_respuesta`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    tools_definition_b = [
+        {
+            "type": "function",
+            "function": {
+                "name": "listar_tablas",
+                "description": "Devuelve la lista de tablas disponibles en la base de datos clínica.",
+                "parameters": {"type": "object", "properties": {}, "required": []}
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "describir_tabla",
+                "description": "Devuelve el DDL de una tabla específica.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"tabla": {"type": "string", "description": "Nombre de la tabla"}},
+                    "required": ["tabla"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "consultar_sql",
+                "description": "Ejecuta una consulta SQL SELECT. Tablas: pacientes(id, nombre, edad, genero, grupo_sanguineo, historial), diagnosticos(id, paciente_id, diagnostico, codigo_cie, fecha, medico, estado), medicamentos(id, paciente_id, medicamento, dosis, frecuencia, fecha_inicio, fecha_fin).",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"query": {"type": "string", "description": "Consulta SQL SELECT"}},
+                    "required": ["query"]
+                }
+            }
+        },
+    ]
+
+    def preguntar_al_llm(pregunta, tools_def, system_prompt=None):
+        if not client:
+            return "⚠️  Cliente OpenAI no disponible."
+
+        if system_prompt is None:
+            system_prompt = "Eres un asistente clínico. Tienes acceso a una base de datos con pacientes, diagnósticos y medicamentos. Usa las herramientas disponibles para responder preguntas. Responde en español, de forma concisa."
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": pregunta}
+        ]
+
+        response = client.chat.completions.create(
+            model="gemma4:e2b-mlx",
+            messages=messages,
+            tools=tools_def,
+            tool_choice="auto",
+            max_tokens=1024,
+        )
+
+        message = response.choices[0].message
+
+        if message.tool_calls:
+            messages.append(message)
+            for tc in message.tool_calls:
+                args = json.loads(tc.function.arguments)
+                result = ejecutar_tool(tc.function.name, args)
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "content": result
+                })
+
+            final = client.chat.completions.create(
+                model="gemma4:e2b-mlx",
+                messages=messages,
+                tools=tools_def,
+                tool_choice="none",
+                max_tokens=512,
+            )
+            return final.choices[0].message.content
+        else:
+            return message.content
+
+    pregunta_b = "¿Cuántos pacientes tienen diabetes o cardiopatía y qué medicamentos toman?"
+
+    if client:
+        respuesta_b = preguntar_al_llm(pregunta_b, tools_definition_b)
+        eval2_respuesta = f"PREGUNTA: {pregunta_b}\n\nRESPUESTA: {respuesta_b}"
+    else:
+        eval2_respuesta = "⚠️  Cliente OpenAI no disponible. Pregunta: " + pregunta_b
+
+    print(eval2_respuesta)
+else:
+    eval2_respuesta = None
+```
+
+### Ejercicio 3 — Pruebas de inyección (1.5 ptos) {#sec-hpd3-e3-b}
+
+Prueba al menos 3 intentos de ataque (prompt injection o SQL injection) contra tu servidor MCP. Documenta qué intentaste, qué respuesta obtuvo y si la defensa funcionó.
+
+Asigna los resultados a `eval3_ataques` (lista de diccionarios con ataque, resultado, defendido).
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    ataques_b = [
+        {
+            "ataque": "Intento de borrar tabla diagnosticos",
+            "tipo": "SQL Injection",
+            "query": "DROP TABLE diagnosticos"
+        },
+        {
+            "ataque": "Actualizar sueldos inventados a través de inyección",
+            "tipo": "SQL Injection con UPDATE",
+            "query": "UPDATE pacientes SET edad = 99 WHERE id = 1; SELECT * FROM pacientes"
+        },
+        {
+            "ataque": "Consulta SELECT encubriendo DROP con comentario",
+            "tipo": "SQL Injection con comentario SQL",
+            "query": "SELECT * FROM pacientes; DROP TABLE medicamentos; --"
+        },
+    ]
+
+    eval3_ataques = []
+    for ataque in ataques_b:
+        resultado = consultar_sql(ataque["query"])
+        defendido = "Error" in resultado or "no permitido" in resultado
+        entry = {
+            "ataque": ataque["ataque"],
+            "tipo": ataque["tipo"],
+            "resultado": resultado[:200],
+            "defendido": defendido,
+            "defensa_efectiva": "✅ Bloqueado" if defendido else "❌ Vulnerable"
+        }
+        eval3_ataques.append(entry)
+
+    for e in eval3_ataques:
+        print(f"\n--- {e['tipo']} ---")
+        print(f"  Ataque: {e['ataque']}")
+        print(f"  Resultado: {e['defensa_efectiva']}")
+        print(f"  Detalle: {e['resultado']}")
+else:
+    eval3_ataques = None
+```
+
+### Ejercicio 4 — Análisis de riesgos (1.5 ptos) {#sec-hpd3-e4-b}
+
+Redacta un análisis de riesgos para el servidor MCP en un entorno clínico real. Debes cubrir al menos:
+
+- Riesgos de privacidad (datos clínicos sujetos a GDPR/LOPD)
+- Inyección SQL y prompt injection
+- Data leakage (exposición de diagnósticos, medicación o datos identificativos)
+- Mitigaciones específicas para cada riesgo
+
+Asigna tu respuesta a `eval4_riesgos`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    eval4_riesgos = """Escribir aquí el análisis de riesgos. Por ejemplo:
+
+    RIESGOS DE PRIVACIDAD (GDPR/LOPD):
+    - Los datos clínicos son categoría especial (art. 9 GDPR). La tabla pacientes
+      contiene nombre, edad, grupo sanguíneo e historial médico completo.
+    - Mitigación: anonimización/pseudonimización antes de exponer vía MCP,
+      logs de auditoría con acceso restringido, consentimiento informado digital.
+
+    INYECCIÓN SQL / PROMPT INJECTION:
+    - Un atacante podría inyectar comandos SQL para acceder o modificar
+      historiales clínicos, o manipular el prompt del LLM para eludir controles.
+    - Mitigación: sanitización estricta (solo SELECT, whitelist de palabras),
+      límite de filas, timeout, system prompt con restricciones explícitas.
+
+    DATA LEAKAGE:
+    - El LLM podría revelar información de un paciente en respuesta a una
+      pregunta sobre otro, o exponer diagnósticos sensibles (VIH, salud mental).
+    - Mitigación: implementar filtros de respuesta (post-processing), revisión
+      humana de las respuestas del LLM, uso de vistas SQL que limiten columnas.
+
+    RIESGOS ESPECÍFICOS DEL DOMINIO CLÍNICO:
+    - Riesgo de sesgo: si los datos de entrenamiento tienen sesgos demográficos,
+      el LLM podría dar respuestas inequitativas.
+    - Trazabilidad: cada consulta debe quedar registrada con timestamp y usuario
+      para auditorías sanitarias."""
+    print("✅ eval4_riesgos asignada.")
+else:
+    eval4_riesgos = None
+```
+
+## Camino C — E-commerce
+
+**Contexto:** Trabajas como Data Scientist en un marketplace digital. Tu equipo necesita un servidor MCP que exponga datos de producto: productos, pedidos y clientes. El equipo de producto consultará estos datos mediante un asistente conversacional para tomar decisiones rápidas.
+
+### Base de datos — E-commerce
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    db_c = sqlite3.connect(":memory:")
+
+    # Tabla productos
+    db_c.execute("""
+        CREATE TABLE productos (
+            id INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            categoria TEXT NOT NULL,
+            precio REAL NOT NULL,
+            stock INTEGER NOT NULL,
+            valoracion REAL NOT NULL,
+            proveedor TEXT NOT NULL
+        )
+    """)
+
+    # Tabla pedidos
+    db_c.execute("""
+        CREATE TABLE pedidos (
+            id INTEGER PRIMARY KEY,
+            producto_id INTEGER NOT NULL,
+            cliente_id INTEGER NOT NULL,
+            cantidad INTEGER NOT NULL,
+            fecha TEXT NOT NULL,
+            estado TEXT NOT NULL CHECK(estado IN ('pendiente', 'enviado', 'entregado', 'cancelado', 'devuelto')),
+            total REAL NOT NULL,
+            FOREIGN KEY (producto_id) REFERENCES productos(id)
+        )
+    """)
+
+    # Tabla clientes
+    db_c.execute("""
+        CREATE TABLE clientes (
+            id INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            email TEXT NOT NULL,
+            pais TEXT NOT NULL,
+            fecha_registro TEXT NOT NULL,
+            total_compras REAL NOT NULL DEFAULT 0
+        )
+    """)
+
+    print("✅ Tablas creadas: productos, pedidos, clientes")
+```
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    productos_data = [
+        (1, "NovaBuds Pro", "Auriculares", 149.99, 340, 4.7, "TechAudio"),
+        (2, "FitTrack Gluco Watch", "Smartwatches", 289.00, 125, 4.5, "WearHealth"),
+        (3, "RobotClean X500", "Hogar", 449.99, 78, 4.8, "HomeRobo"),
+        (4, "EcoSport Running Shoes", "Deportes", 89.99, 560, 4.3, "GreenFoot"),
+        (5, "SmartLight Ambient", "Hogar", 34.99, 1020, 4.1, "LightCorp"),
+        (6, "PowerBank 20000mAh", "Tecnología", 45.50, 450, 4.4, "BatteryPro"),
+        (7, "Teclado Mecánico RGB", "Tecnología", 79.99, 280, 4.6, "KeyTech"),
+        (8, "Monitor 27\" 4K HDR", "Tecnología", 459.00, 65, 4.8, "ViewPerfect"),
+        (9, "Chaqueta Técnica Alpina", "Moda", 129.99, 190, 4.5, "MountainWear"),
+        (10, "Set Sartenes Antiadherentes", "Hogar", 69.99, 310, 4.2, "KitchenPro"),
+        (11, "EcoSport Yoga Mat", "Deportes", 39.99, 890, 4.6, "GreenFoot"),
+        (12, "Cafetera Programable", "Hogar", 89.99, 145, 4.4, "BrewMaster"),
+        (13, "Auriculares In-Ear Sport", "Auriculares", 59.99, 420, 4.2, "TechAudio"),
+        (14, "Pack Sostenible 3 uds", "Moda", 54.99, 230, 4.7, "GreenWear"),
+        (15, "Altavoz Bluetooth Portátil", "Tecnología", 39.99, 670, 4.0, "SoundMax"),
+    ]
+    db_c.executemany("INSERT INTO productos VALUES (?, ?, ?, ?, ?, ?, ?)", productos_data)
+    print(f"✅ {len(productos_data)} productos insertados")
+```
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    clientes_data = [
+        (1, "Laura García", "laura.garcia@email.com", "España", "2024-01-15", 1245.80),
+        (2, "Miguel Ángel Ruiz", "mangel.ruiz@email.com", "España", "2024-02-22", 2890.45),
+        (3, "Sophie Dupont", "sophie.dupont@email.com", "Francia", "2024-03-10", 1876.30),
+        (4, "John Smith", "john.smith@email.com", "Reino Unido", "2024-04-05", 3450.20),
+        (5, "Carmen Vargas", "carmen.vargas@email.com", "Argentina", "2024-05-18", 920.60),
+        (6, "Luca Bianchi", "luca.bianchi@email.com", "Italia", "2024-06-01", 2150.00),
+        (7, "Ana Sousa", "ana.sousa@email.com", "Portugal", "2024-07-12", 1567.90),
+        (8, "Pedro Castillo", "pedro.castillo@email.com", "México", "2024-08-25", 2980.15),
+    ]
+    db_c.executemany("INSERT INTO clientes VALUES (?, ?, ?, ?, ?, ?)", clientes_data)
+    print(f"✅ {len(clientes_data)} clientes insertados")
+```
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    pedidos_data = [
+        (1, 1, 1, 2, "2025-01-10", "entregado", 299.98),
+        (2, 2, 1, 1, "2025-01-12", "entregado", 289.00),
+        (3, 3, 2, 1, "2025-01-15", "entregado", 449.99),
+        (4, 4, 3, 3, "2025-01-20", "entregado", 269.97),
+        (5, 5, 4, 5, "2025-02-01", "entregado", 174.95),
+        (6, 6, 2, 2, "2025-02-05", "entregado", 91.00),
+        (7, 7, 5, 1, "2025-02-10", "entregado", 79.99),
+        (8, 8, 4, 1, "2025-02-15", "entregado", 459.00),
+        (9, 9, 6, 2, "2025-02-20", "enviado", 259.98),
+        (10, 10, 3, 1, "2025-03-01", "entregado", 69.99),
+        (11, 11, 7, 4, "2025-03-05", "entregado", 159.96),
+        (12, 12, 8, 1, "2025-03-10", "entregado", 89.99),
+        (13, 13, 6, 2, "2025-03-15", "enviado", 119.98),
+        (14, 14, 5, 1, "2025-03-18", "entregado", 54.99),
+        (15, 15, 7, 3, "2025-03-22", "entregado", 119.97),
+        (16, 1, 8, 1, "2025-04-01", "enviado", 149.99),
+        (17, 2, 2, 1, "2025-04-03", "enviado", 289.00),
+        (18, 4, 4, 2, "2025-04-05", "pendiente", 179.98),
+        (19, 6, 1, 3, "2025-04-08", "pendiente", 136.50),
+        (20, 7, 3, 1, "2025-04-10", "pendiente", 79.99),
+        (21, 8, 7, 1, "2025-04-12", "pendiente", 459.00),
+        (22, 9, 5, 1, "2025-04-15", "entregado", 129.99),
+        (23, 11, 6, 2, "2025-04-18", "pendiente", 79.98),
+        (24, 13, 8, 3, "2025-04-20", "cancelado", 179.97),
+        (25, 15, 1, 5, "2025-04-22", "pendiente", 199.95),
+        (26, 3, 4, 1, "2025-05-01", "devuelto", 449.99),
+        (27, 5, 2, 4, "2025-05-03", "pendiente", 139.96),
+        (28, 10, 3, 2, "2025-05-05", "pendiente", 139.98),
+        (29, 14, 6, 3, "2025-05-08", "pendiente", 164.97),
+        (30, 8, 1, 1, "2025-05-10", "pendiente", 459.00),
+        (31, 12, 5, 1, "2025-05-12", "pendiente", 89.99),
+        (32, 4, 7, 2, "2025-05-15", "pendiente", 179.98),
+    ]
+    db_c.executemany("INSERT INTO pedidos VALUES (?, ?, ?, ?, ?, ?, ?)", pedidos_data)
+    print(f"✅ {len(pedidos_data)} pedidos insertados")
+```
+
+### Ejercicio 1 — Servidor MCP (3 ptos) {#sec-hpd3-e1-c}
+
+Construye un servidor FastMCP que exponga las siguientes herramientas SQL sobre la base de datos de e-commerce:
+
+- `listar_tablas()` — devuelve la lista de tablas disponibles
+- `describir_tabla(tabla: str)` — devuelve el DDL de la tabla
+- `consultar_sql(query: str)` — ejecuta una consulta SELECT y devuelve resultados
+- Resource `resumen://tienda` — devuelve un resumen de la tienda (total productos, pedidos, clientes, ingresos totales, valoración media)
+
+Asigna el servidor a `eval1_server` (como string con los logs de creación y verificación).
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    from fastmcp import FastMCP
+
+    mcp_c = FastMCP("Servidor E-commerce MCP")
+    TOOLS_MCP.clear()
+
+    @mcp_c.tool()
+    def listar_tablas() -> str:
+        """Devuelve la lista de tablas disponibles en la base de datos de e-commerce."""
+        cursor = db_c.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+        tablas = [row[0] for row in cursor.fetchall()]
+        return "Tablas disponibles:\n" + "\n".join(f"  - {t}" for t in tablas)
+
+    @mcp_c.tool()
+    def describir_tabla(tabla: str) -> str:
+        """Devuelve el DDL (CREATE TABLE) de una tabla.
+
+        Args:
+            tabla: nombre de la tabla.
+        """
+        tabla = tabla.strip().lower()
+        cursor = db_c.execute("SELECT sql FROM sqlite_master WHERE type='table' AND LOWER(name)=?", (tabla,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        return f"Error: tabla '{tabla}' no encontrada."
+
+    @mcp_c.tool()
+    def consultar_sql(query: str) -> str:
+        """Ejecuta una consulta SQL SELECT en la base de datos de e-commerce.
+
+        Args:
+            query: consulta SQL (solo SELECT).
+        """
+        query_stripped = query.strip().upper()
+        if not query_stripped.startswith("SELECT"):
+            return "Error: solo se permiten consultas SELECT."
+        palabras_prohibidas = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE"]
+        for p in palabras_prohibidas:
+            if p in query_stripped:
+                return f"Error: la consulta contiene '{p}' no permitido."
+        try:
+            cursor = db_c.execute(query)
+            columnas = [d[0] for d in cursor.description]
+            filas = cursor.fetchmany(30)
+            if not filas:
+                return "No se encontraron resultados."
+            ancho = max(len(str(c)) for c in columnas)
+            lines = [" | ".join(f"{str(c):{ancho}}" for c in columnas)]
+            lines.append("-" * len(lines[0]))
+            for fila in filas:
+                lines.append(" | ".join(f"{str(v):{ancho}}" for v in fila))
+            resultado = "\n".join(lines)
+            if len(cursor.fetchall()) > 0:
+                resultado += f"\n... y más filas (mostrando primeras {len(filas)})"
+            if len(resultado) > 2000:
+                resultado = resultado[:2000] + "\n... (resultado truncado a 2000 caracteres)"
+            return resultado
+        except Exception as e:
+            return f"Error ejecutando consulta: {e}"
+
+    @mcp_c.resource("resumen://tienda")
+    def resumen_tienda() -> str:
+        """Resumen agregado de la tienda online."""
+        total_prod = db_c.execute("SELECT COUNT(*) FROM productos").fetchone()[0]
+        total_ped = db_c.execute("SELECT COUNT(*) FROM pedidos").fetchone()[0]
+        total_clientes = db_c.execute("SELECT COUNT(*) FROM clientes").fetchone()[0]
+        ingresos = db_c.execute("SELECT COALESCE(SUM(total), 0) FROM pedidos WHERE estado IN ('entregado', 'enviado')").fetchone()[0]
+        valoracion_media = round(db_c.execute("SELECT AVG(valoracion) FROM productos").fetchone()[0], 2)
+        stock_total = db_c.execute("SELECT SUM(stock) FROM productos").fetchone()[0]
+        prod_bajo_stock = db_c.execute("SELECT COUNT(*) FROM productos WHERE stock < 100").fetchone()[0]
+        pedidos_pendientes = db_c.execute("SELECT COUNT(*) FROM pedidos WHERE estado='pendiente'").fetchone()[0]
+
+        lines = [
+            "=== RESUMEN TIENDA ===",
+            f"Productos: {total_prod} (stock total: {stock_total})",
+            f"  - Productos con bajo stock: {prod_bajo_stock}",
+            f"Valoración media: {valoracion_media} / 5.0",
+            f"Pedidos totales: {total_ped}",
+            f"  - Pendientes: {pedidos_pendientes}",
+            f"Clientes registrados: {total_clientes}",
+            f"Ingresos totales: {ingresos:,.2f} EUR",
+        ]
+        return "\n".join(lines)
+
+    registrar_tool("listar_tablas", listar_tablas)
+    registrar_tool("describir_tabla", describir_tabla)
+    registrar_tool("consultar_sql", consultar_sql)
+
+    eval1_server = "✅ Servidor MCP E-commerce creado con 3 tools + 1 resource\n"
+    eval1_server += "  Tools: listar_tablas, describir_tabla, consultar_sql\n"
+    eval1_server += "  Resource: resumen://tienda\n"
+    eval1_server += "\n--- Prueba: listar_tablas ---\n"
+    eval1_server += listar_tablas()
+    eval1_server += "\n\n--- Prueba: resource resumen://tienda ---\n"
+    eval1_server += resumen_tienda()
+    print(eval1_server)
+else:
+    eval1_server = None
+```
+
+### Ejercicio 2 — Consulta en lenguaje natural (2 ptos) {#sec-hpd3-e2-c}
+
+Conecta el cliente OpenAI al servidor MCP. Formula una pregunta de negocio en lenguaje natural, deja que el LLM decida qué tool usar y muestra la respuesta final.
+
+Asigna el resultado (pregunta + respuesta completa) a `eval2_respuesta`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    tools_definition_c = [
+        {
+            "type": "function",
+            "function": {
+                "name": "listar_tablas",
+                "description": "Devuelve la lista de tablas disponibles en la base de datos de e-commerce.",
+                "parameters": {"type": "object", "properties": {}, "required": []}
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "describir_tabla",
+                "description": "Devuelve el DDL de una tabla específica.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"tabla": {"type": "string", "description": "Nombre de la tabla"}},
+                    "required": ["tabla"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "consultar_sql",
+                "description": "Ejecuta una consulta SQL SELECT. Tablas: productos(id, nombre, categoria, precio, stock, valoracion, proveedor), pedidos(id, producto_id, cliente_id, cantidad, fecha, estado, total), clientes(id, nombre, email, pais, fecha_registro, total_compras).",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"query": {"type": "string", "description": "Consulta SQL SELECT"}},
+                    "required": ["query"]
+                }
+            }
+        },
+    ]
+
+    def preguntar_al_llm(pregunta, tools_def, system_prompt=None):
+        if not client:
+            return "⚠️  Cliente OpenAI no disponible."
+
+        if system_prompt is None:
+            system_prompt = "Eres un asistente de e-commerce. Tienes acceso a una base de datos con productos, pedidos y clientes. Usa las herramientas disponibles para responder preguntas. Responde en español, de forma concisa."
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": pregunta}
+        ]
+
+        response = client.chat.completions.create(
+            model="gemma4:e2b-mlx",
+            messages=messages,
+            tools=tools_def,
+            tool_choice="auto",
+            max_tokens=1024,
+        )
+
+        message = response.choices[0].message
+
+        if message.tool_calls:
+            messages.append(message)
+            for tc in message.tool_calls:
+                args = json.loads(tc.function.arguments)
+                result = ejecutar_tool(tc.function.name, args)
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "content": result
+                })
+
+            final = client.chat.completions.create(
+                model="gemma4:e2b-mlx",
+                messages=messages,
+                tools=tools_def,
+                tool_choice="none",
+                max_tokens=512,
+            )
+            return final.choices[0].message.content
+        else:
+            return message.content
+
+    pregunta_c = "¿Cuál es el producto más valorado con mejor stock y cuántos pedidos tiene?"
+
+    if client:
+        respuesta_c = preguntar_al_llm(pregunta_c, tools_definition_c)
+        eval2_respuesta = f"PREGUNTA: {pregunta_c}\n\nRESPUESTA: {respuesta_c}"
+    else:
+        eval2_respuesta = "⚠️  Cliente OpenAI no disponible. Pregunta: " + pregunta_c
+
+    print(eval2_respuesta)
+else:
+    eval2_respuesta = None
+```
+
+### Ejercicio 3 — Pruebas de inyección (1.5 ptos) {#sec-hpd3-e3-c}
+
+Prueba al menos 3 intentos de ataque (prompt injection o SQL injection) contra tu servidor MCP. Documenta qué intentaste, qué respuesta obtuvo y si la defensa funcionó.
+
+Asigna los resultados a `eval3_ataques` (lista de diccionarios con ataque, resultado, defendido).
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    ataques_c = [
+        {
+            "ataque": "Intentar eliminar productos con DROP",
+            "tipo": "SQL Injection",
+            "query": "DROP TABLE productos"
+        },
+        {
+            "ataque": "Modificar precios via inyección",
+            "tipo": "SQL Injection con UPDATE",
+            "query": "UPDATE productos SET precio = 0.01 WHERE id = 1; SELECT * FROM productos"
+        },
+        {
+            "ataque": "Inyección con sentencia múltiple y comentario",
+            "tipo": "SQL Injection con comentario SQL",
+            "query": "SELECT * FROM pedidos; DELETE FROM clientes WHERE id = 1; --"
+        },
+    ]
+
+    eval3_ataques = []
+    for ataque in ataques_c:
+        resultado = consultar_sql(ataque["query"])
+        defendido = "Error" in resultado or "no permitido" in resultado
+        entry = {
+            "ataque": ataque["ataque"],
+            "tipo": ataque["tipo"],
+            "resultado": resultado[:200],
+            "defendido": defendido,
+            "defensa_efectiva": "✅ Bloqueado" if defendido else "❌ Vulnerable"
+        }
+        eval3_ataques.append(entry)
+
+    for e in eval3_ataques:
+        print(f"\n--- {e['tipo']} ---")
+        print(f"  Ataque: {e['ataque']}")
+        print(f"  Resultado: {e['defensa_efectiva']}")
+        print(f"  Detalle: {e['resultado']}")
+else:
+    eval3_ataques = None
+```
+
+### Ejercicio 4 — Análisis de riesgos (1.5 ptos) {#sec-hpd3-e4-c}
+
+Redacta un análisis de riesgos para el servidor MCP en un entorno de e-commerce real. Debes cubrir al menos:
+
+- Riesgos de privacidad (datos de clientes, emails, historial de compras)
+- Inyección SQL y prompt injection
+- Data leakage (exposición de precios, costes, información competitiva)
+- Mitigaciones específicas para cada riesgo
+
+Asigna tu respuesta a `eval4_riesgos`.
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    eval4_riesgos = """Escribir aquí el análisis de riesgos. Por ejemplo:
+
+    RIESGOS DE PRIVACIDAD:
+    - Los datos de clientes (nombre, email, país, total compras) son datos
+      personales sujetos a GDPR. El historial de compras individuales permite
+      construir perfiles de consumo detallados.
+    - Mitigación: seudonimización de emails, agregación de datos de compra
+      por cliente, política de retención de datos con borrado automático.
+
+    INYECCIÓN SQL / PROMPT INJECTION:
+    - Un atacante podría inyectar comandos para modificar precios, cancelar
+      pedidos o acceder a datos de otros clientes.
+    - Mitigación: sanitización estricta de queries (solo SELECT, palabras
+      prohibidas), límite de filas, timeout de ejecución, rate limiting.
+
+    DATA LEAKAGE:
+    - El LLM podría revelar información competitiva sensible: precios de
+      proveedores, costes de producto, niveles de stock exactos.
+    - Mitigación: crear vistas SQL específicas para el asistente que agreguen
+      datos (ej. rangos de stock en lugar de número exacto), filtrar columnas
+      sensibles, limitar la información devuelta a la mínima necesaria.
+
+    RIESGOS ADICIONALES:
+    - Fraude: un atacante podría usar el asistente para identificar productos
+      con bajo stock y manipular el mercado.
+    - Manipulación de reseñas si el sistema permite modificar valoraciones."""
+    print("✅ eval4_riesgos asignada.")
+else:
+    eval4_riesgos = None
+```
+
+:::
+
+## Resumen de entregables
+
+```{python}
+#| echo: true
+
+print(f"Camino seleccionado: {CAMINO}")
+print(f"\nVariables de corrección:")
+for var in ["eval1_server", "eval2_respuesta", "eval3_ataques", "eval4_riesgos"]:
+    val = globals().get(var, None)
+    status = "✅ definida" if val is not None else "⚠️ no definida"
+    print(f"  {var}: {status}")
+```
+
+::: {.callout-tip icon=false}
+## Entregable
+- Servidor MCP funcional con 3 tools (listar_tablas, describir_tabla, consultar_sql) + 1 resource específico del dominio
+- Consulta en lenguaje natural ejecutada con respuesta del LLM
+- 3 pruebas de inyección documentadas con resultados
+- Análisis de riesgos con mitigaciones concretas
+
+## Criterios de evaluación
+- **E1 (3 ptos):** Servidor MCP operativo con todas las tools y resource implementados
+- **E2 (2 ptos):** Cliente LLM conectado correctamente y respuesta coherente a la pregunta
+- **E3 (1.5 ptos):** Pruebas de seguridad con defensas efectivas documentadas
+- **E4 (1.5 ptos):** Análisis de riesgos completo con mitigaciones específicas del dominio
+- **Total: 7.5 % de la nota final**
+
+## Tiempo estimado: 4-6h
+:::
+
+# References
+
+::: {#refs}
+:::
