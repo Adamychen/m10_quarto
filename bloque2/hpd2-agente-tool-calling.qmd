@@ -552,3 +552,8 @@ Compara la precisión del agente **con herramientas** vs el mismo LLM **sin herr
 
 ## Tiempo estimado: 4h
 :::
+
+# References
+
+::: {#refs}
+:::

@@ -978,3 +978,8 @@ Sustituye una de las tools de LangChain de tu agente del HPD 2 por una tool que 
 
 ## Tiempo estimado: 4h
 :::
+
+# References
+
+::: {#refs}
+:::

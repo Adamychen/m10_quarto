@@ -1,3 +1,8 @@
+---
+title: "Guía docente — Módulo 10: IA Generativa para Data Science"
+toc: false
+---
+
 MÁSTER EN DATA SCIENCE & BIG DATA
 
 **Módulo 10**
@@ -191,3 +196,5 @@ El módulo está diseñado para ser completado íntegramente con herramientas gr
 - Bommasani, R. et al. (2021). On the Opportunities and Risks of Foundation Models. Stanford CRFM. \[arXiv:2108.07258\]
 
 _Nota: el ecosistema de IA Generativa evoluciona con rapidez. Las herramientas y versiones indicadas son las estables en el momento de redacción de este documento. El profesorado actualizará los notebooks y referencias al inicio de cada edición del módulo._
+
+La **bibliografía completa** de papers y fuentes citadas en el módulo se genera automáticamente desde `references.bib` y está disponible en la página [Bibliografía y recursos de referencia](07-bibliografia.html).

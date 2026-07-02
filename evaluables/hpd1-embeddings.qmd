@@ -530,12 +530,12 @@ En esta segunda parte repetimos el pipeline sobre un corpus real: 6 papers desca
 #| eval: false
 
 PAPERS = {
-    "1706.03762": "Attention Is All You Need (Vaswani et al., 2017)",
-    "1810.04805": "BERT: Pre-training of Deep Bidirectional Transformers (Devlin et al., 2019)",
-    "1908.10084": "Sentence-BERT (Reimers & Gurevych, 2019)",
-    "2005.11401": "RAG: Retrieval-Augmented Generation (Lewis et al., 2020)",
-    "2106.09685": "LoRA: Low-Rank Adaptation (Hu et al., 2022)",
-    "2309.15217": "RAGAS: Automated Evaluation (Es et al., 2023)",
+    "1706.03762": "Attention Is All You Need (@vaswani2017attention)",
+    "1810.04805": "BERT: Pre-training of Deep Bidirectional Transformers (@devlin2019bert)",
+    "1908.10084": "Sentence-BERT (@reimers2019sbert)",
+    "2005.11401": "RAG: Retrieval-Augmented Generation (@lewis2020rag)",
+    "2106.09685": "LoRA: Low-Rank Adaptation (@hu2022lora)",
+    "2309.15217": "RAGAS: Automated Evaluation (@es2024ragas)",
 }
 
 def descargar_paper(arxiv_id: str, dir_path: str) -> str:
@@ -880,5 +880,10 @@ graph TD
         D --> J[MTEB<br/>Similitud textual]
     end
 ```
+:::
+
+# References
+
+::: {#refs}
 :::
 

@@ -1,0 +1,693 @@
+% =============================================================
+% Referencias del Módulo 10 — IA Generativa para Data Science
+% Universidad de Sevilla · CFP
+% =============================================================
+% Convención de claves: kebab-case descriptivo, `apellidoYYYYprimeraPalabra`.
+% Las preprints arXiv usan eprint + archivePrefix para generar el enlace.
+% Los Model/System Cards se modelan como @misc con howpublished + urldate.
+% =============================================================
+
+
+% -------------------------------------------------------------
+% Bloque 1 — Fundamentos (Transformer, LLMs, embeddings, vector DB)
+% -------------------------------------------------------------
+
+@article{vaswani2017attention,
+  author    = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N. and Kaiser, {Lukasz} and Polosukhin, Illia},
+  title     = {Attention is All You Need},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2017},
+  volume    = {30},
+  publisher = {Curran Associates, Inc.},
+  eprint    = {1706.03762},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1706.03762}
+}
+
+@inproceedings{devlin2019bert,
+  author    = {Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
+  title     = {{BERT}: Pre-training of Deep Bidirectional Transformers for Language Understanding},
+  booktitle = {Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)},
+  year      = {2019},
+  pages     = {4171--4186},
+  publisher = {Association for Computational Linguistics},
+  address   = {Minneapolis, Minnesota},
+  doi       = {10.18653/v1/N19-1423},
+  eprint    = {1810.04805},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1810.04805}
+}
+
+@article{kaplan2020scaling,
+  author    = {Kaplan, Jared and McCandlish, Sam and Henighan, Tom and Brown, Tom B. and Chess, Benjamin and Child, Rewon and Gray, Scott and Radford, Alec and Wu, Jeffrey and Amodei, Dario},
+  title     = {Scaling Laws for Neural Language Models},
+  journal   = {arXiv preprint arXiv:2001.08361},
+  year      = {2020},
+  eprint    = {2001.08361},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2001.08361}
+}
+
+@article{hoffmann2022chinchilla,
+  author    = {Hoffmann, Jordan and Borgeaud, Sebastian and Mensch, Arthur and Buchatskaya, Elena and Cai, Trevor and Rutherford, Eliza and {de las Casas}, Diego and {Hendricks}, Lisa Anne and {Welbl}, Johannes and {Clark}, Aidan and {Lehman}, Eric and {Sifre}, Laurent and {Graves}, Malcolm and Simonyan, Karen and {Penedo}, Guilherme and {Lin}, Zhijing and {Gokay}, Devendra and {Mellor}, Jacob and {Helly}, John and {Cui}, Yin and {Gleave}, Adam and Wieting, John and Brown, Tom B.},
+  title     = {Training Compute-Optimal Large Language Models},
+  journal   = {arXiv preprint arXiv:2203.15556},
+  year      = {2022},
+  eprint    = {2203.15556},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2203.15556}
+}
+
+@article{su2021roformer,
+  author    = {Su, Jianlin and Lu, Yu and Pan, Shengfeng and Wen, Bo and Liu, Yunfeng},
+  title     = {{RoFormer}: Enhanced Transformer with Rotary Position Embedding},
+  journal   = {arXiv preprint arXiv:2104.09864},
+  year      = {2021},
+  eprint    = {2104.09864},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2104.09864}
+}
+
+@article{dao2022flashattention,
+  author    = {Dao, Tri and Fu, Daniel Y. and Ermon, Stefano and Rudra, Atri and R{\'e}, Christopher},
+  title     = {{FlashAttention}: Fast and Memory-Efficient Exact Attention with {IO}-Awareness},
+  journal   = {Advances in Neural Information Processing Systems},
+  year      = {2022},
+  eprint    = {2205.14135},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2205.14135}
+}
+
+@inproceedings{reimers2019sbert,
+  author    = {Reimers, Nils and Gurevych, Iryna},
+  title     = {Sentence-{BERT}: Sentence Embeddings using Siamese {BERT}-Networks},
+  booktitle = {Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)},
+  year      = {2019},
+  pages     = {3982--3992},
+  publisher = {Association for Computational Linguistics},
+  address   = {Hong Kong, China},
+  doi       = {10.18653/v1/D19-1410},
+  eprint    = {1908.10084},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1908.10084}
+}
+
+@article{wang2022e5,
+  author    = {Wang, Liang and Yang, Nan and Huang, Xiaolong and Jiao, Binxing and Yang, Linjun and Jiang, Daxin and Majumder, Radu and Wei, Furu},
+  title     = {Text Embeddings by Weakly-Supervised Contrastive Pre-training ({E5})},
+  journal   = {arXiv preprint arXiv:2212.03533},
+  year      = {2022},
+  eprint    = {2212.03533},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2212.03533}
+}
+
+@article{radford2021clip,
+  author    = {Radford, Alec and Kim, Jong Wook and Hallacy, Chris and Ramesh, Aditya and Goh, Gabriel and Agarwal, Sandhini and Sastry, Girish and Askell, Amanda and Mishkin, Pamela and Clark, Jack and Krueger, Gretchen and Sutskever, Ilya},
+  title     = {Learning Transferable Visual Models From Natural Language Supervision ({CLIP})},
+  journal   = {arXiv preprint arXiv:2103.00020},
+  year      = {2021},
+  eprint    = {2103.00020},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2103.00020}
+}
+
+@article{malkov2018hnsw,
+  author    = {Malkov, Yu A. and Yashunin, Dmitry A.},
+  title     = {Efficient and Robust Approximate Nearest Neighbor Search Using Hierarchical Navigable Small World Graphs},
+  journal   = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  volume    = {42},
+  number    = {4},
+  pages     = {824--836},
+  year      = {2020},
+  publisher = {IEEE},
+  doi       = {10.1109/TPAMI.2018.2889473},
+  eprint    = {1603.09320},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1603.09320}
+}
+
+@article{johnson2019faiss,
+  author    = {Johnson, Jeff and Douze, Matthijs and J{\'e}gou, Herv{\'e}},
+  title     = {Billion-Scale Similarity Search with {GPUs}},
+  journal   = {IEEE Transactions on Big Data},
+  volume    = {7},
+  number    = {3},
+  pages     = {535--547},
+  year      = {2021},
+  publisher = {IEEE},
+  doi       = {10.1109/TBDATA.2019.2921572},
+  eprint    = {1702.08734},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1702.08734}
+}
+
+@article{mikolov2013word2vec,
+  author    = {Mikolov, Tomas and Chen, Kai and Corrado, Greg and Dean, Jeffrey},
+  title     = {Efficient Estimation of Word Representations in Vector Space},
+  journal   = {arXiv preprint arXiv:1301.3781},
+  year      = {2013},
+  eprint    = {1301.3781},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1301.3781}
+}
+
+@inproceedings{pennington2014glove,
+  author    = {Pennington, Jeffrey and Socher, Richard and Manning, Christopher D.},
+  title     = {{GloVe}: Global Vectors for Word Representation},
+  booktitle = {Proceedings of the 2014 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  year      = {2014},
+  pages     = {1532--1543},
+  publisher = {Association for Computational Linguistics},
+  address   = {Doha, Qatar},
+  doi       = {10.3115/v1/D14-1162}
+}
+
+@article{wei2022cot,
+  author    = {Wei, Jason and Wang, Xuezhi and Schuurmans, Dale and Bosma, Maarten and Ichter, Brian and Xia, Fei and Chi, Ed H. and Le, Quoc V. and Zhou, Denny},
+  title     = {Chain-of-Thought Prompting Elicits Reasoning in Large Language Models},
+  journal   = {Advances in Neural Information Processing Systems},
+  volume    = {35},
+  pages     = {24824--24837},
+  year      = {2022},
+  eprint    = {2201.11903},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2201.11903}
+}
+
+@article{yao2023react,
+  author    = {Yao, Shunyu and Zhao, Jeffrey and Yu, Dian and Du, Nan and Shafran, Izhak and Narasimhan, Karthik R. and Cao, Yuan},
+  title     = {{ReAct}: Synergizing Reasoning and Acting in Language Models},
+  journal   = {International Conference on Learning Representations (ICLR)},
+  year      = {2023},
+  eprint    = {2210.03629},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2210.03629}
+}
+
+@misc{firth1957synopsis,
+  author       = {Firth, John R.},
+  title        = {A Synopsis of Linguistic Theory, 1930--1955},
+  year         = {1957},
+  howpublished = {Studies in Linguistic Analysis (Special Volume of the Philological Society)},
+  note         = {Origen de la cita "You shall know a word by the company it keeps"}
+}
+
+
+% -------------------------------------------------------------
+% Bloque 2 — RAG, orquestación, agentes
+% -------------------------------------------------------------
+
+@article{lewis2020rag,
+  author    = {Lewis, Patrick and Perez, Ethan and Piktus, Aleksandra and Petroni, Fabio and Karpukhin, Vladimir and Goyal, Naman and K{\"u}ttler, Heinrich and Lewis, Mike and Yih, Wen-tau and Rockt{\"a}schel, Tim and Riedel, Sebastian and Kiela, Douwe},
+  title     = {Retrieval-Augmented Generation for Knowledge-Intensive {NLP} Tasks},
+  journal   = {Advances in Neural Information Processing Systems},
+  volume    = {33},
+  pages     = {9459--9474},
+  year      = {2020},
+  eprint    = {2005.11401},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2005.11401}
+}
+
+@inproceedings{karpukhin2020dpr,
+  author    = {Karpukhin, Vladimir and Oguz, Barlas and Min, Sewon and Lewis, Patrick and Wu, Ledell and Edunov, Sergey and Chen, Danqi and Yih, Wen-tau},
+  title     = {Dense Passage Retrieval for Open-Domain Question Answering},
+  booktitle = {Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  year      = {2020},
+  pages     = {6769--6781},
+  publisher = {Association for Computational Linguistics},
+  address   = {Online},
+  doi       = {10.18653/v1/2020.emnlp-main.550},
+  eprint    = {2004.04906},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2004.04906}
+}
+
+@inproceedings{gao2024hyde,
+  author    = {Gao, Luyu and Callan, Jamie},
+  title     = {Precise Zero-Shot Dense Retrieval without Relevance Labels},
+  booktitle = {Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  year      = {2023},
+  pages     = {1762--1777},
+  publisher = {Association for Computational Linguistics},
+  address   = {Toronto, Canada},
+  eprint    = {2212.10496},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2212.10496}
+}
+
+@article{es2024ragas,
+  author    = {Es, Shahul and James, Jithin and Espinosa-Anke, Luis and Schockaert, Steven},
+  title     = {{RAGAS}: Automated Evaluation of Retrieval Augmented Generation},
+  journal   = {arXiv preprint arXiv:2309.15217},
+  year      = {2023},
+  eprint    = {2309.15217},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2309.15217}
+}
+
+@article{gao2023ragsurvey,
+  author    = {Gao, Yunfan and Xiong, Yun and Gao, Xiangyu and Jia, Kangxiang and Pan, Jinliu and Bi, Yuxi and Dai, Yi and Sun, Jiawei and Wang, Haofen and Wang, Haofen},
+  title     = {Retrieval-Augmented Generation for Large Language Models: A Survey},
+  journal   = {arXiv preprint arXiv:2312.10997},
+  year      = {2023},
+  eprint    = {2312.10997},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2312.10997}
+}
+
+@misc{luan2023flashrank,
+  author       = {Luan, Yi and Eisenstein, Jacob and Toutanova, Kristina and Collins, Michael},
+  title        = {{FlashRank}: Efficient and Accurate Reranking for Information Retrieval},
+  year         = {2023},
+  howpublished = {GitHub repository},
+  url          = {https://github.com/PrithivirajDamodaran/FlashRank},
+  urldate      = {2025-07-01}
+}
+
+@article{bommasani2021foundation,
+  author    = {Bommasani, Rishi and Hudson, Drew A. and Adeli, Ehsan and Altman, Russ and Arora, Simran and von Arx, Sydney and Bernstein, Michael S. and Bohg, Jeannette and Bosselut, Antoine and Brunskill, Emma and Brynjolfsson, Erik and Buch, Shyamal and Card, Dallas and Castellon, Rodrigo and Chatterji, Niladri and Chen, Annie and Creel, Kathleen and Davis, Jared Quincy and Demszky, Dora and Donahue, Chris and Dombrowski, Moussa and Dylon, Elys and Dumouchel, Pamela and Ehsan, Daniel and Engelhardt, Natalia and Ethayarajh, Kawin and Fei-Fei, Li and Finn, Chelsea and Gale, Trevor and Gillespie, Lauren and Goel, Karan and Goodman, Noah and Grossman, Shelby and Guha, Natasha and Hashimoto, Tatsunori and Henderson, Peter and Hewitt, John and Ho, Daniel E. and Hong, Jenny and Hsu, Kyle and Huang, Jiaming and Icard, Thomas and Jain, Saahil and Jurafsky, Dan and Kalluri, Pratyusha and Karamcheti, Siddharth and Keeling, Geoff and Khani, Fereshte and Khattab, Omar and Koh, Pang Wei and Krass, Mark and Krishna, Rohith and Kuditipudi, Rohith and Kumar, Ananya and Ladhak, Faisal and Lee, Mina and Lee, Tony and Leskovec, Jure and Levent, Isabelle and Li, Xiang Lisa and Li, Xuechen and Ma, Tengyu and Malik, Aman and Manning, Christopher D. and Mirchandani, Suvir and Mitchell, Eric and Munyikwa, Zanele and Nair, Suraj and Narayan, Avanika and Narayanan, Deepak and Newman, Ben and Nie, Allen and Niebles, Juan Carlos and Nilforoshan, Hamed and Nyarko, Julian and Ogut, Giray and Orr, Laurel and Papadimitriou, Isabella and Park, Joon Sung and Piech, Christopher and Portelance, Eva and Potts, Christopher and Raghunathan, Aditi and Reich, Rob and Ren, Hongyu and Rong, Frieda and Roohani, Yusuf and Ruiz, Cameron and Ryan, Jack and R{\'e}, Christopher and Sadigh, Dorsa and Sagawa, Shiori and Santhanam, Keshav and Shih, Andy and Srinivasan, Krishnan and Tamkin, Alex and Taori, Rohan and Thomas, Armin W. and Tram{\`e}r, Florian and Wang, Rose E. and Wang, William and Wu, Bohan and Wu, Jiajun and Wu, Yuhuai and Xie, Sang Michael and Yasunaga, Michihiro and You, Jiaxuan and Zaharia, Matei and Zhang, Michael and Zhang, Tianyi and Zhang, Xikun and Zhang, Yuhui and Zheng, Lucia and Zhou, Kaitlyn and Liang, Percy},
+  title     = {On the Opportunities and Risks of Foundation Models},
+  journal   = {arXiv preprint arXiv:2108.07258},
+  year      = {2021},
+  eprint    = {2108.07258},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2108.07258}
+}
+
+
+% -------------------------------------------------------------
+% Bloque 3 — Fine-tuning (LoRA / QLoRA / PEFT)
+% -------------------------------------------------------------
+
+@inproceedings{hu2022lora,
+  author    = {Hu, Edward J. and Shen, Yelong and Wallis, Phillip and Allen-Zhu, Zeyuan and Li, Yuanzhi and Wang, Shean and Wang, Lu and Chen, Weizhu},
+  title     = {{LoRA}: Low-Rank Adaptation of Large Language Models},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2022},
+  eprint    = {2106.09685},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2106.09685}
+}
+
+@article{dettmers2023qlora,
+  author    = {Dettmers, Tim and Pagnoni, Artidoro and Holtzman, Ari and Zettlemoyer, Luke},
+  title     = {{QLoRA}: Efficient Finetuning of Quantized {LLM}s},
+  journal   = {Advances in Neural Information Processing Systems},
+  volume    = {36},
+  year      = {2023},
+  eprint    = {2305.14314},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2305.14314}
+}
+
+@inproceedings{he2022peft,
+  author    = {He, Junxian and Zhou, Chunting and Ma, Xuezhi and Berg-Kirkpatrick, Taylor and Neubig, Graham},
+  title     = {Towards a Unified View of Parameter-Efficient Transfer Learning},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2022},
+  eprint    = {2110.04366},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2110.04366}
+}
+
+@inproceedings{lester2021prompttuning,
+  author    = {Lester, Brian and Al-Rfou, Rami and Constant, Noah},
+  title     = {The Power of Scale for Parameter-Efficient Prompt Tuning},
+  booktitle = {Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  year      = {2021},
+  pages     = {3045--3059},
+  publisher = {Association for Computational Linguistics},
+  address   = {Online and Punta Cana, Dominican Republic},
+  doi       = {10.18653/v1/2021.emnlp-main.243},
+  eprint    = {2104.08691},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2104.08691}
+}
+
+
+% -------------------------------------------------------------
+% Bloque 3 — Datos sintéticos (GAN, VAE, difusión, SDV)
+% -------------------------------------------------------------
+
+@article{goodfellow2014gan,
+  author    = {Goodfellow, Ian and Pouget-Abadie, Jean and Mirza, Mehdi and Xu, Bing and Warde-Farley, David and Ozair, Sherjil and Courville, Aaron and Bengio, Yoshua},
+  title     = {Generative Adversarial Nets},
+  journal   = {Advances in Neural Information Processing Systems},
+  volume    = {27},
+  year      = {2014},
+  eprint    = {1406.2661},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1406.2661}
+}
+
+@inproceedings{kingma2014vae,
+  author    = {Kingma, Diederik P. and Welling, Max},
+  title     = {Auto-Encoding Variational {B}ayes},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2014},
+  eprint    = {1312.6114},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1312.6114}
+}
+
+@article{xu2019ctgan,
+  author    = {Xu, Lei and Skoularidou, Maria and Cuesta-Infante, Alfredo and Veeramachaneni, Kalyan},
+  title     = {Modeling Tabular Data using Conditional {GAN}},
+  journal   = {Advances in Neural Information Processing Systems},
+  volume    = {32},
+  year      = {2019},
+  eprint    = {1907.00503},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1907.00503}
+}
+
+@article{xu2018tabular,
+  author    = {Xu, Lei and Veeramachaneni, Kalyan},
+  title     = {Synthesizing Tabular Data using Generative Adversarial Networks},
+  journal   = {arXiv preprint arXiv:1811.11264},
+  year      = {2018},
+  eprint    = {1811.11264},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1811.11264}
+}
+
+@inproceedings{patki2016sdv,
+  author    = {Patki, Neha and Wedge, Roy and Veeramachaneni, Kalyan},
+  title     = {The Synthetic Data Vault},
+  booktitle = {Proceedings of the 2016 IEEE International Conference on Data Science and Advanced Analytics (DSAA)},
+  year      = {2016},
+  pages     = {399--410},
+  publisher = {IEEE},
+  doi       = {10.1109/DSAA.2016.49},
+  url       = {https://dai.lids.mit.edu/wp-content/uploads/2018/03/SDV.pdf}
+}
+
+@inproceedings{kotelnikov2023tabddpm,
+  author    = {Kotelnikov, Akim and Baranchuk, Dmitry and Tutubalina, Elena and Kadurin, Artem},
+  title     = {{TabDDPM}: Modelling Tabular Data with Diffusion Models},
+  booktitle = {Proceedings of the 40th International Conference on Machine Learning (ICML)},
+  year      = {2023},
+  eprint    = {2209.15421},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/2209.15421}
+}
+
+
+% -------------------------------------------------------------
+% Bloque 4 — Gobernanza (Model Cards, privacidad, sesgo, despliegue)
+% -------------------------------------------------------------
+
+@inproceedings{mitchell2019modelcards,
+  author    = {Mitchell, Margaret and Wu, Simone and Zaldivar, Andrew and Barnes, Parker and Vasserman, Lucy and Hutchinson, Ben and Spitzer, Elena and Raji, Inioluwa Deborah and Gebru, Timnit},
+  title     = {Model Cards for Model Reporting},
+  booktitle = {Proceedings of the 2019 Conference on Fairness, Accountability, and Transparency (FAT*)},
+  year      = {2019},
+  pages     = {220--229},
+  publisher = {Association for Computing Machinery},
+  address   = {Atlanta, GA, USA},
+  doi       = {10.1145/3287560.3287596},
+  eprint    = {1810.03993},
+  archivePrefix = {arXiv},
+  url       = {https://arxiv.org/abs/1810.03993}
+}
+
+@book{dwork2014dp,
+  author    = {Dwork, Cynthia and Roth, Aaron},
+  title     = {The Algorithmic Foundations of Differential Privacy},
+  publisher = {Foundations and Trends{\textregistered} in Theoretical Computer Science},
+  year      = {2014},
+  volume    = {9},
+  number    = {3--4},
+  pages     = {211--407},
+  doi       = {10.1561/0400000042},
+  url       = {https://www.cis.upenn.edu/~aaroth/Papers/privbook.pdf}
+}
+
+@misc{anthropic2023claude3mc,
+  author       = {{Anthropic}},
+  title        = {The {Claude 3} Model Family: {Opus}, {Sonnet}, {Haiku}},
+  year         = {2024},
+  howpublished = {Model card},
+  url          = {https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf},
+  urldate      = {2025-07-01}
+}
+
+@misc{anthropic2024claude3addendum,
+  author       = {{Anthropic}},
+  title        = {{Claude 3.5 Sonnet} Model Card Addendum},
+  year         = {2024},
+  howpublished = {Model card addendum},
+  url          = {https://www-cdn.anthropic.com/fed9cc193a14b84131812372d8d5857f8f304c52/Model_Card_Claude_3_Addendum.pdf},
+  urldate      = {2025-07-01}
+}
+
+@misc{anthropic2025claude37sc,
+  author       = {{Anthropic}},
+  title        = {{Claude 3.7 Sonnet} System Card},
+  year         = {2025},
+  howpublished = {System card},
+  url          = {https://www.anthropic.com/claude-3-7-sonnet-system-card},
+  urldate      = {2025-07-01}
+}
+
+@misc{openai2024gpt4osc,
+  author       = {{OpenAI}},
+  title        = {{GPT-4o} System Card},
+  year         = {2024},
+  howpublished = {System card},
+  url          = {https://openai.com/index/gpt-4o-system-card/},
+  urldate      = {2025-07-01}
+}
+
+@misc{openai2024o1sc,
+  author       = {{OpenAI}},
+  title        = {{OpenAI o1} System Card},
+  year         = {2024},
+  howpublished = {System card},
+  url          = {https://openai.com/index/openai-o1-system-card/},
+  urldate      = {2025-07-01}
+}
+
+@misc{googledeepmind2024gemini15,
+  author       = {{Google DeepMind}},
+  title        = {{Gemini 1.5: Unlocking Multimodal Understanding Across Millions of Tokens of Context}},
+  year         = {2024},
+  howpublished = {Technical report},
+  url          = {https://storage.googleapis.com/deepmind-media/gemini/gemini_v1_5_report.pdf},
+  urldate      = {2025-07-01}
+}
+
+@misc{alibaba2025qwen,
+  author       = {{Qwen Team, Alibaba Cloud}},
+  title        = {{Qwen 3.6} Model Card},
+  year         = {2025},
+  howpublished = {Model card},
+  url          = {https://huggingface.co/Qwen},
+  urldate      = {2025-07-01}
+}
+
+@misc{google2025gemma4,
+  author       = {{Google}},
+  title        = {{Gemma 4} Model Card},
+  year         = {2025},
+  howpublished = {Model card},
+  url          = {https://huggingface.co/models?search=gemma4},
+  urldate      = {2025-07-01}
+}
+
+@misc{meta2024llama3,
+  author       = {{Meta}},
+  title        = {{Llama 3.3} Model Card},
+  year         = {2024},
+  howpublished = {Model card},
+  url          = {https://huggingface.co/meta-llama},
+  urldate      = {2025-07-01}
+}
+
+@misc{deepseek2025r1,
+  author       = {{DeepSeek-AI}},
+  title        = {{DeepSeek R1} Model Card},
+  year         = {2025},
+  howpublished = {Model card},
+  url          = {https://huggingface.co/deepseek-ai},
+  urldate      = {2025-07-01}
+}
+
+@misc{parrish2022bbq,
+  author       = {Parrish, Alicia and Chen, Angelica and Nangia, Nikita and Padmakumar, Vishakh and Phang, Jason and Thompson, Jana and Htut, Phu Mon and Bowman, Samuel R.},
+  title        = {{BBQ}: A Hand-Built Bias Benchmark for Question Answering},
+  year         = {2022},
+  howpublished = {GitHub repository / Findings of ACL 2022},
+  url          = {https://github.com/nyu-mll/BBQ},
+  urldate      = {2025-07-01}
+}
+
+@misc{nadeem2021stereoset,
+  author       = {Nadeem, Moin and Bethke, Anna and Reddy, Siva},
+  title        = {{StereoSet}: Measuring Stereotypical Bias in Pretrained Language Models},
+  year         = {2021},
+  howpublished = {Proceedings of the 59th Annual Meeting of the ACL and the 11th IJCNLP},
+  url          = {https://github.com/McGill-NLP/stereoset},
+  urldate      = {2025-07-01}
+}
+
+@misc{smith2022holisticbias,
+  author       = {Smith, Eric Michael and Hall, Melissa and Kambadur, Melanie and Conquero, Divya and Mosquera, Manuel and {Villalpando}, Juan Carlos and Puryear, Shayne},
+  title        = {{HolisticBias}: 600+ Demographic Terms for Bias Measurement},
+  year         = {2022},
+  howpublished = {GitHub repository},
+  url          = {https://github.com/facebookresearch/holistic-bias},
+  urldate      = {2025-07-01}
+}
+
+
+% -------------------------------------------------------------
+% Documentación técnica y herramientas
+% -------------------------------------------------------------
+
+@misc{huggingface_hub,
+  author       = {{Hugging Face}},
+  title        = {Hugging Face Hub -- Models},
+  year         = {2025},
+  howpublished = {Sitio web},
+  url          = {https://huggingface.co/models},
+  urldate      = {2025-07-01}
+}
+
+@misc{langchain,
+  author       = {{LangChain}},
+  title        = {LangChain Expression Language (LCEL) and Core Components},
+  year         = {2025},
+  howpublished = {Documentación oficial},
+  url          = {https://python.langchain.com/docs/expression_language/},
+  urldate      = {2025-07-01}
+}
+
+@misc{llamaindex,
+  author       = {{LlamaIndex}},
+  title        = {LlamaIndex Documentation},
+  year         = {2025},
+  howpublished = {Documentación oficial},
+  url          = {https://docs.llamaindex.ai},
+  urldate      = {2025-07-01}
+}
+
+@misc{mcp,
+  author       = {{Anthropic}},
+  title        = {Model Context Protocol Specification},
+  year         = {2024},
+  howpublished = {Especificación abierta},
+  url          = {https://spec.modelcontextprotocol.io},
+  urldate      = {2025-07-01}
+}
+
+@misc{ragas_docs,
+  author       = {{RAGAS}},
+  title        = {RAGAS Documentation},
+  year         = {2025},
+  howpublished = {Documentación oficial},
+  url          = {https://docs.ragas.io},
+  urldate      = {2025-07-01}
+}
+
+@misc{trl,
+  author       = {{Hugging Face}},
+  title        = {Transformer Reinforcement Learning ({TRL})},
+  year         = {2025},
+  howpublished = {Documentación oficial},
+  url          = {https://huggingface.co/docs/trl},
+  urldate      = {2025-07-01}
+}
+
+@misc{deepeval,
+  author       = {{Confident AI}},
+  title        = {DeepEval: {LLM} Evaluation Framework},
+  year         = {2025},
+  howpublished = {Repositorio de c{\'o}digo},
+  url          = {https://github.com/confident-ai/deepeval},
+  urldate      = {2025-07-01}
+}
+
+@misc{langsmith,
+  author       = {{LangChain}},
+  title        = {LangSmith -- Production {LLM} Observability},
+  year         = {2025},
+  howpublished = {Plataforma comercial},
+  url          = {https://docs.smith.langchain.com},
+  urldate      = {2025-07-01}
+}
+
+@misc{langfuse,
+  author       = {{Langfuse}},
+  title        = {Langfuse -- Open Source {LLM} Engineering Platform},
+  year         = {2025},
+  howpublished = {Plataforma open source},
+  url          = {https://langfuse.com},
+  urldate      = {2025-07-01}
+}
+
+@misc{presidio,
+  author       = {{Microsoft}},
+  title        = {Presidio -- {PII} Detection and Anonymization},
+  year         = {2025},
+  howpublished = {Repositorio de c{\'o}digo},
+  url          = {https://github.com/microsoft/presidio},
+  urldate      = {2025-07-01}
+}
+
+@misc{vllm,
+  author       = {{vLLM Project}},
+  title        = {v{LLM}: Efficient Memory Management for Large Language Model Serving},
+  year         = {2025},
+  howpublished = {Repositorio de c{\'o}digo},
+  url          = {https://github.com/vllm-project/vllm},
+  urldate      = {2025-07-01}
+}
+
+@misc{ollama,
+  author       = {{Ollama}},
+  title        = {Ollama -- Get Up and Running with Large Language Models Locally},
+  year         = {2025},
+  howpublished = {Sitio web},
+  url          = {https://ollama.com},
+  urldate      = {2025-07-01}
+}
+
+@misc{promptingguide,
+  author       = {{DAIR.AI}},
+  title        = {Prompt Engineering Guide},
+  year         = {2025},
+  howpublished = {Gu{\'\i}a en l{\'\i}nea},
+  url          = {https://www.promptingguide.ai/},
+  urldate      = {2025-07-01}
+}
+
+@misc{anthropic_systemcards,
+  author       = {{Anthropic}},
+  title        = {Anthropic System Cards -- {\'I}ndice completo de la familia {Claude}},
+  year         = {2025},
+  howpublished = {Sitio web},
+  url          = {https://www.anthropic.com/system-cards},
+  urldate      = {2025-07-01}
+}
+
+@misc{googledeepmind_modelcards,
+  author       = {{Google DeepMind}},
+  title        = {Google DeepMind Model Cards},
+  year         = {2025},
+  howpublished = {Sitio web},
+  url          = {https://deepmind.google/models/model-cards/},
+  urldate      = {2025-07-01}
+}
+
+@misc{zheng2023judgingllmasajudgemtbenchchatbot,
+      title={Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena}, 
+      author={Lianmin Zheng and Wei-Lin Chiang and Ying Sheng and Siyuan Zhuang and Zhanghao Wu and Yonghao Zhuang and Zi Lin and Zhuohan Li and Dacheng Li and Eric P. Xing and Hao Zhang and Joseph E. Gonzalez and Ion Stoica},
+      year={2023},
+      eprint={2306.05685},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      url={https://arxiv.org/abs/2306.05685}, 
+}

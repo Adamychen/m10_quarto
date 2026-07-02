@@ -11,7 +11,7 @@ engine: jupyter
 
 ### 5.1 Model Card {#sec-model-card}
 
-Una **Model Card** es un documento estructurado que describe un modelo: uso previsto, datos, métricas, limitaciones. Originalmente propuesta por [Mitchell et al. (2019)](https://arxiv.org/abs/1810.03993), es ahora estándar en Hugging Face, OpenAI, Anthropic, Google.
+Una **Model Card** es un documento estructurado que describe un modelo: uso previsto, datos, métricas, limitaciones. Originalmente propuesta por @mitchell2019modelcards, es ahora estándar en Hugging Face [@huggingface_hub], OpenAI, Anthropic [@anthropic2023claude3mc], Google [@googledeepmind_modelcards].
 
 ```python
 #| echo: true
@@ -92,7 +92,7 @@ Los valores numéricos de la Model Card anterior (`ragas_faithfulness: 0.82`, `"
 
 ### 5.2 System Card {#sec-system-card}
 
-Una **System Card** va un paso más allá: documenta no solo el modelo, sino el **sistema completo** que lo envuelve (RAG, agentes, guardas, etc.). Los [System Cards de Anthropic](https://www.anthropic.com/system-cards) son los referentes.
+Una **System Card** va un paso más allá: documenta no solo el modelo, sino el **sistema completo** que lo envuelve (RAG, agentes, guardas, etc.). Los [System Cards de Anthropic](https://www.anthropic.com/system-cards) [@anthropic_systemcards] son los referentes.
 
 A diferencia de la Model Card (centrada en el modelo), una System Card documenta el **pipeline de extremo a extremo** y debe responder: ¿qué falla cuando el sistema falla? ¿qué se hace para que no falle? Las System Cards públicas más completas comparten cinco bloques:
 
@@ -116,6 +116,8 @@ A diferencia de la Model Card (centrada en el modelo), una System Card documenta
 | [Índice completo de Anthropic](https://www.anthropic.com/system-cards) | Anthropic | — | Acceso a todas las System Cards de la familia Claude |
 | [Índice de Google DeepMind](https://deepmind.google/models/model-cards/) | Google DeepMind | — | Model Cards de Gemini, Gemma, Veo, Imagen y modelos de robótica |
 
+Las entradas formales de cada System/Model Card están recogidas en la bibliografía unificada: @anthropic2025claude37sc, @anthropic2024claude3addendum, @openai2024gpt4osc, @openai2024o1sc y @googledeepmind2024gemini15.
+
 ::: {.callout-tip}
 ## Cómo escribir tu propia System Card {#sec-escribir-system-card}
 
@@ -124,4 +126,9 @@ A diferencia de la Model Card (centrada en el modelo), una System Card documenta
 3. **Mide en producción.** Latencia p95, tasa de error, faithfulness, feedback de usuarios. Define umbrales de alerta.
 4. **Declara lo que NO hace.** Out-of-scope claro (asistencia médica/legal, datos reales, decisiones automatizadas sin supervisión).
 5. **Versiona y fecha.** Una System Card sin fecha ni versión no sirve para auditoría posterior.
+:::
+
+# References
+
+::: {#refs}
 :::

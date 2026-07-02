@@ -883,3 +883,8 @@ Usa `time.time()` para medir cuánto tarda cada etapa del pipeline: embedding de
 
 ## Tiempo estimado: 4h
 :::
+
+# References
+
+::: {#refs}
+:::

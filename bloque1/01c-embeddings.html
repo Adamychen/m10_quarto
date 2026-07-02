@@ -58,7 +58,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -77,7 +97,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-f97a59afa23c78b76dca51217b896fc0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-98abfb5de123bd3eb994533863133005.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -473,15 +493,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#modelos-de-embeddings" id="toc-modelos-de-embeddings" class="nav-link active" data-scroll-target="#modelos-de-embeddings">Modelos de Embeddings</a>
+  <li><a href="#sec-modelos-embeddings" id="toc-sec-modelos-embeddings" class="nav-link active" data-scroll-target="#sec-modelos-embeddings">Modelos de Embeddings</a>
   <ul class="collapse">
-  <li><a href="#de-word2vec-a-sentence-embeddings" id="toc-de-word2vec-a-sentence-embeddings" class="nav-link" data-scroll-target="#de-word2vec-a-sentence-embeddings">De word2vec a sentence embeddings</a></li>
-  <li><a href="#semántica-distribucional" id="toc-semántica-distribucional" class="nav-link" data-scroll-target="#semántica-distribucional">Semántica distribucional</a></li>
-  <li><a href="#sentence-bert" id="toc-sentence-bert" class="nav-link" data-scroll-target="#sentence-bert">Sentence-BERT</a></li>
-  <li><a href="#comparativa-de-modelos-de-embeddings" id="toc-comparativa-de-modelos-de-embeddings" class="nav-link" data-scroll-target="#comparativa-de-modelos-de-embeddings">Comparativa de modelos de embeddings</a></li>
-  <li><a href="#embeddings-multimodales-y-tabulares" id="toc-embeddings-multimodales-y-tabulares" class="nav-link" data-scroll-target="#embeddings-multimodales-y-tabulares">Embeddings multimodales y tabulares</a></li>
+  <li><a href="#sec-word2vec-sentence" id="toc-sec-word2vec-sentence" class="nav-link" data-scroll-target="#sec-word2vec-sentence">De word2vec a sentence embeddings</a></li>
+  <li><a href="#sec-semantica-distribucional" id="toc-sec-semantica-distribucional" class="nav-link" data-scroll-target="#sec-semantica-distribucional">Semántica distribucional</a></li>
+  <li><a href="#sec-sbert" id="toc-sec-sbert" class="nav-link" data-scroll-target="#sec-sbert">Sentence-BERT</a></li>
+  <li><a href="#sec-comparativa-embeddings" id="toc-sec-comparativa-embeddings" class="nav-link" data-scroll-target="#sec-comparativa-embeddings">Comparativa de modelos de embeddings</a></li>
+  <li><a href="#sec-multimodales-tabulares" id="toc-sec-multimodales-tabulares" class="nav-link" data-scroll-target="#sec-multimodales-tabulares">Embeddings multimodales y tabulares</a></li>
   </ul></li>
   <li><a href="#cuándo-usar-cada-uno" id="toc-cuándo-usar-cada-uno" class="nav-link" data-scroll-target="#cuándo-usar-cada-uno">¿Cuándo usar cada uno?</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="01c-embeddings.ipynb" download="01c-embeddings.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
@@ -511,10 +532,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 1 — Fundamentos</strong>. Se recomienda haber visto <a href="../bloque1/01b-llms.html">01b-llms.qmd</a> primero.</p>
 </blockquote>
-<div id="878707e8" class="cell" data-execution_count="1">
+<div id="09f42ef6" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q sentence<span class="op">-</span>transformers matplotlib scikit<span class="op">-</span>learn</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="fb35ce5e" class="cell" data-execution_count="2">
+<div id="5bcf15bc" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
@@ -527,11 +548,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<section id="modelos-de-embeddings" class="level2">
-<h2 class="anchored" data-anchor-id="modelos-de-embeddings">Modelos de Embeddings</h2>
-<section id="de-word2vec-a-sentence-embeddings" class="level3">
-<h3 class="anchored" data-anchor-id="de-word2vec-a-sentence-embeddings">De word2vec a sentence embeddings</h3>
+<section id="sec-modelos-embeddings" class="level2">
+<h2 class="anchored" data-anchor-id="sec-modelos-embeddings">Modelos de Embeddings</h2>
+<section id="sec-word2vec-sentence" class="level3">
+<h3 class="anchored" data-anchor-id="sec-word2vec-sentence">De word2vec a sentence embeddings</h3>
 <p>La evolución de la representación vectorial del lenguaje:</p>
+<div id="fig-timeline-embeddings" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-timeline-embeddings-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -553,6 +577,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-timeline-embeddings-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -568,10 +598,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="semántica-distribucional" class="level3">
-<h3 class="anchored" data-anchor-id="semántica-distribucional">Semántica distribucional</h3>
-<p>El principio fundamental: <strong>“You shall know a word by the company it keeps”</strong> (Firth, 1957). Palabras con contextos similares tienen significados similares, y por tanto vectores cercanos en el espacio semántico.</p>
-<div id="b37e4310" class="cell" data-execution_count="3">
+<section id="sec-semantica-distribucional" class="level3">
+<h3 class="anchored" data-anchor-id="sec-semantica-distribucional">Semántica distribucional</h3>
+<p>El principio fundamental: <strong>“You shall know a word by the company it keeps”</strong> (<span class="citation" data-cites="firth1957synopsis">Firth (<a href="#ref-firth1957synopsis" role="doc-biblioref">1957</a>)</span>). Palabras con contextos similares tienen significados similares, y por tanto vectores cercanos en el espacio semántico.</p>
+<div id="5bca794b" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SentenceTransformer(<span class="st">"all-MiniLM-L6-v2"</span>)</span>
@@ -592,7 +622,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"7e54d6a956bd46a2820f54376bf39300","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"7c90bfd46215476688d709f4c9665999","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
@@ -601,7 +631,7 @@ Dimensión: 384
 Número de frases: 4</code></pre>
 </div>
 </div>
-<div id="5f55fc46" class="cell" data-execution_count="4">
+<div id="d1a0ebc5" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> cosine_similarity</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>sim_matrix <span class="op">=</span> cosine_similarity(embeddings)</span>
@@ -637,22 +667,28 @@ while the weather phrase (3) is different from the rest.</code></pre>
 </div>
 </div>
 </section>
-<section id="sentence-bert" class="level3">
-<h3 class="anchored" data-anchor-id="sentence-bert">Sentence-BERT</h3>
+<section id="sec-sbert" class="level3">
+<h3 class="anchored" data-anchor-id="sec-sbert">Sentence-BERT</h3>
 <p>Sentence-BERT (SBERT) modifica BERT con una arquitectura <strong>siamese</strong> que permite generar embeddings de frases comparables directamente. Usa funciones de pérdida contrastiva (triplet loss, cosine similarity loss) para que frases semánticamente cercanas tengan vectores cercanos.</p>
-<div id="fig-sbert-arch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-cap="Arquitectura siamese de SBERT para inferencia: dos torres BERT con pesos compartidos producen embeddings u y v que se comparan con cosine similarity. Adaptada de Reimers &amp; Gurevych (2019), [Figure 2](https://aclanthology.org/D19-1410/), distribuida bajo CC-BY 4.0.">
+<div id="fig-sbert-arch" class="quarto-float quarto-figure quarto-figure-center anchored" data-fig-cap="Arquitectura siamesa de SBERT para inferencia: dos torres BERT con pesos compartidos producen embeddings u y v que se comparan con cosine similarity. Adaptada de @reimers2019sbert, Figure 2 (https://aclanthology.org/D19-1410/), distribuida bajo CC-BY 4.0.">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-sbert-arch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="../images/sbert_figure_2.png" class="img-fluid figure-img" data-fig-cap="Arquitectura siamese de SBERT para inferencia: dos torres BERT con pesos compartidos producen embeddings u y v que se comparan con cosine similarity. Adaptada de Reimers &amp; Gurevych (2019), [Figure 2](https://aclanthology.org/D19-1410/), distribuida bajo CC-BY 4.0.">
+<img src="../images/sbert_figure_2.png" class="img-fluid figure-img" data-fig-cap="Arquitectura siamesa de SBERT para inferencia: dos torres BERT con pesos compartidos producen embeddings u y v que se comparan con cosine similarity. Adaptada de @reimers2019sbert, Figure 2 (https://aclanthology.org/D19-1410/), distribuida bajo CC-BY 4.0.">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sbert-arch-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Arquitectura siamese de SBERT para inferencia.
+Figure&nbsp;2: Arquitectura siamese de SBERT para inferencia.
 </figcaption>
 </figure>
 </div>
 </section>
-<section id="comparativa-de-modelos-de-embeddings" class="level3">
-<h3 class="anchored" data-anchor-id="comparativa-de-modelos-de-embeddings">Comparativa de modelos de embeddings</h3>
+<section id="sec-comparativa-embeddings" class="level3">
+<h3 class="anchored" data-anchor-id="sec-comparativa-embeddings">Comparativa de modelos de embeddings</h3>
+<div id="tbl-modelos-embeddings" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-modelos-embeddings-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Comparativa de modelos de embeddings por dimensiones, tamaño y caso de uso
+</figcaption>
+<div aria-describedby="tbl-modelos-embeddings-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
 <col style="width: 25%">
@@ -719,9 +755,12 @@ Figure&nbsp;1: Arquitectura siamese de SBERT para inferencia.
 </tr>
 </tbody>
 </table>
+</div>
+</figure>
+</div>
 </section>
-<section id="embeddings-multimodales-y-tabulares" class="level3">
-<h3 class="anchored" data-anchor-id="embeddings-multimodales-y-tabulares">Embeddings multimodales y tabulares</h3>
+<section id="sec-multimodales-tabulares" class="level3">
+<h3 class="anchored" data-anchor-id="sec-multimodales-tabulares">Embeddings multimodales y tabulares</h3>
 <ul>
 <li><strong>Multimodales (CLIP):</strong> proyectan texto e imágenes en un mismo espacio vectorial, permitiendo búsqueda cross-modal (ej. “un perro jugando en la nieve” → imágenes correspondientes).</li>
 <li><strong>Tabulares (TabNet, SCARF):</strong> generan embeddings de filas de datos tabulares usando atención, útiles para búsqueda semántica sobre datos estructurados (ej. encontrar clientes similares por perfil de compra).</li>
@@ -741,10 +780,18 @@ Figure&nbsp;1: Arquitectura siamese de SBERT para inferencia.
 <blockquote class="blockquote">
 <p>Continúa con <strong><a href="../bloque1/01d-vectordb.html">01d-vectordb.qmd</a></strong> — Bases de datos vectoriales.</p>
 </blockquote>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-firth1957synopsis" class="csl-entry" role="listitem">
+Firth, J. R. (1957). <em>A synopsis of linguistic theory, 1930–1955</em>. Studies in Linguistic Analysis (Special Volume of the Philological Society).
+</div>
+</div>
 
 
 <!-- -->
 
+</section>
 
 </main> <!-- /main -->
 <footer class="footer-custom">
@@ -754,7 +801,7 @@ Figure&nbsp;1: Arquitectura siamese de SBERT para inferencia.
   <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
 </footer>
 <script type="application/vnd.jupyter.widget-state+json">
-{"state":{"485617bd2bbb43db9099e84a109624d9":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"48e49a1140904327bfa386a05b93bc6f":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"4f53842855b447ca91b5f0ba3e6195cf":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_57b29cf4fd784ac68e31a3fc9c4833bd","placeholder":"​","style":"IPY_MODEL_485617bd2bbb43db9099e84a109624d9","tabbable":null,"tooltip":null,"value":" 103/103 [00:00&lt;00:00, 11404.18it/s]"}},"57b29cf4fd784ac68e31a3fc9c4833bd":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"6f5196d25c2b4bc9876fa74ff0d4a291":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_cd9f7100d1e0402fb36a47b0bc384b9f","max":103,"min":0,"orientation":"horizontal","style":"IPY_MODEL_df8c63487c594f27b882f0f3cfe8aa7b","tabbable":null,"tooltip":null,"value":103}},"7e54d6a956bd46a2820f54376bf39300":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_debdc01da6a541d3b37da64282eedeba","IPY_MODEL_6f5196d25c2b4bc9876fa74ff0d4a291","IPY_MODEL_4f53842855b447ca91b5f0ba3e6195cf"],"layout":"IPY_MODEL_d7f1da2fd66e46f983d1d4f1733489de","tabbable":null,"tooltip":null}},"c34911aa0ad4496987263aa4101697ae":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"cd9f7100d1e0402fb36a47b0bc384b9f":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"d7f1da2fd66e46f983d1d4f1733489de":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"debdc01da6a541d3b37da64282eedeba":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_48e49a1140904327bfa386a05b93bc6f","placeholder":"​","style":"IPY_MODEL_c34911aa0ad4496987263aa4101697ae","tabbable":null,"tooltip":null,"value":"Loading weights: 100%"}},"df8c63487c594f27b882f0f3cfe8aa7b":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}}},"version_major":2,"version_minor":0}
+{"state":{"2a54582e0cb04efd8be7427cd01b458b":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_70fb86e3f5d345c6b8ce88be3fcc4e18","placeholder":"​","style":"IPY_MODEL_c953ffed1cdb41c2987b18f9f7ba71ca","tabbable":null,"tooltip":null,"value":"Loading weights: 100%"}},"316d6fe0c8ab45d2af9f061d4321a801":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"3f34c285296b4b32a666a86dc82d6abb":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_75e504837a344fe2b2ca73e9abb36ec9","max":103,"min":0,"orientation":"horizontal","style":"IPY_MODEL_a307ed9535b6495285b8d9374cf5e7cc","tabbable":null,"tooltip":null,"value":103}},"70fb86e3f5d345c6b8ce88be3fcc4e18":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"75e504837a344fe2b2ca73e9abb36ec9":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"7c90bfd46215476688d709f4c9665999":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_2a54582e0cb04efd8be7427cd01b458b","IPY_MODEL_3f34c285296b4b32a666a86dc82d6abb","IPY_MODEL_962279556c604e13be63a390ea38569d"],"layout":"IPY_MODEL_b22d7b0af95b452abb0da1b1d2e9eebf","tabbable":null,"tooltip":null}},"962279556c604e13be63a390ea38569d":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_b124ed18e4b44992b129f8fa1692e1e1","placeholder":"​","style":"IPY_MODEL_316d6fe0c8ab45d2af9f061d4321a801","tabbable":null,"tooltip":null,"value":" 103/103 [00:00&lt;00:00, 4464.65it/s]"}},"a307ed9535b6495285b8d9374cf5e7cc":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"b124ed18e4b44992b129f8fa1692e1e1":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"b22d7b0af95b452abb0da1b1d2e9eebf":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"c953ffed1cdb41c2987b18f9f7ba71ca":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}}},"version_major":2,"version_minor":0}
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1238,122 +1285,131 @@ Figure&nbsp;1: Arquitectura siamese de SBERT para inferencia.
 <span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## Modelos de Embeddings</span></span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a><span class="fu">## Modelos de Embeddings {#sec-modelos-embeddings}</span></span>
 <span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### De word2vec a sentence embeddings</span></span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a><span class="fu">### De word2vec a sentence embeddings {#sec-word2vec-sentence}</span></span>
 <span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>La evolución de la representación vectorial del lenguaje:</span>
 <span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>timeline</span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>    title Evolución de los embeddings</span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2013</span> : word2vec (Mikolov) : Vectores por palabra</span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2014</span> : GloVe (Pennington) : Vectores por palabra</span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2018</span> : BERT (Devlin) : Embeddings contextuales</span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2019</span> : Sentence-BERT (Reimers) : Embeddings de frases</span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2022</span> : text-embedding<span class="dv">-3</span> (OpenAI) : Embeddings comerciales</span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2023</span> : E5 (Microsoft) : Embeddings <span class="fu">open</span>-source</span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2024</span> : BGE-M3 (BAAI) : Multilingüe + multimodal</span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>     <span class="dv">2025</span> : Qwen3-Embedding : Embeddings nativos Qwen</span>
-<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
-<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a><span class="fu">## Idioma de los textos de ejemplo</span></span>
-<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>Los modelos de embeddings que usamos en este bloque (<span class="in">`all-MiniLM-L6-v2`</span>) están entrenados principalmente en **inglés**. Por eso los ejemplos de código utilizan texto en inglés. Cada modelo lleva asociado un **tokenizador** entrenado en su idioma: usar un tokenizador inglés sobre texto español produce más subtokens por palabra y embeddings de menor calidad, porque el espacio semántico aprendido está calibrado para relaciones del inglés.</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>::: {#fig-timeline-embeddings}</span>
+<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>timeline</span>
+<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>    title Evolución de los embeddings</span>
+<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2013</span> : word2vec (Mikolov) : Vectores por palabra</span>
+<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2014</span> : GloVe (Pennington) : Vectores por palabra</span>
+<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2018</span> : BERT (Devlin) : Embeddings contextuales</span>
+<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2019</span> : Sentence-BERT (Reimers) : Embeddings de frases</span>
+<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2022</span> : text-embedding<span class="dv">-3</span> (OpenAI) : Embeddings comerciales</span>
+<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2023</span> : E5 (Microsoft) : Embeddings <span class="fu">open</span>-source</span>
+<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>    <span class="dv">2024</span> : BGE-M3 (BAAI) : Multilingüe + multimodal</span>
+<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>     <span class="dv">2025</span> : Qwen3-Embedding : Embeddings nativos Qwen</span>
+<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## Idioma de los textos de ejemplo</span></span>
 <span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>Si necesitas trabajar con español, usa modelos multilingües como <span class="in">`intfloat/multilingual-e5-small`</span> o <span class="in">`BAAI/bge-m3`</span>. La API es la misma; solo cambia el nombre del modelo.</span>
-<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a><span class="fu">### Semántica distribucional</span></span>
+<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>Los modelos de embeddings que usamos en este bloque (<span class="in">`all-MiniLM-L6-v2`</span>) están entrenados principalmente en **inglés**. Por eso los ejemplos de código utilizan texto en inglés. Cada modelo lleva asociado un **tokenizador** entrenado en su idioma: usar un tokenizador inglés sobre texto español produce más subtokens por palabra y embeddings de menor calidad, porque el espacio semántico aprendido está calibrado para relaciones del inglés.</span>
+<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>Si necesitas trabajar con español, usa modelos multilingües como <span class="in">`intfloat/multilingual-e5-small`</span> o <span class="in">`BAAI/bge-m3`</span>. La API es la misma; solo cambia el nombre del modelo.</span>
+<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a>El principio fundamental: **"You shall know a word by the company it keeps"** (Firth, 1957). Palabras con contextos similares tienen significados similares, y por tanto vectores cercanos en el espacio semántico.</span>
+<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a><span class="fu">### Semántica distribucional {#sec-semantica-distribucional}</span></span>
 <span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
+<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>El principio fundamental: **"You shall know a word by the company it keeps"** (@firth1957synopsis). Palabras con contextos similares tienen significados similares, y por tanto vectores cercanos en el espacio semántico.</span>
+<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
 <span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SentenceTransformer(<span class="st">"all-MiniLM-L6-v2"</span>)</span>
+<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
 <span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>frases <span class="op">=</span> [</span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>    <span class="st">"A cat plays in the garden"</span>,</span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>    <span class="st">"A feline chases a butterfly"</span>,</span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The dog sleeps on the rug"</span>,</span>
-<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Tomorrow will be a sunny day"</span></span>
-<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>embeddings <span class="op">=</span> model.encode(frases)</span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Forma de los embeddings: </span><span class="sc">{</span>embeddings<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dimensión: </span><span class="sc">{</span>embeddings<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Número de frases: </span><span class="sc">{</span>embeddings<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SentenceTransformer(<span class="st">"all-MiniLM-L6-v2"</span>)</span>
+<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>frases <span class="op">=</span> [</span>
+<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>    <span class="st">"A cat plays in the garden"</span>,</span>
+<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>    <span class="st">"A feline chases a butterfly"</span>,</span>
+<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>    <span class="st">"The dog sleeps on the rug"</span>,</span>
+<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Tomorrow will be a sunny day"</span></span>
+<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>embeddings <span class="op">=</span> model.encode(frases)</span>
+<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Forma de los embeddings: </span><span class="sc">{</span>embeddings<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Dimensión: </span><span class="sc">{</span>embeddings<span class="sc">.</span>shape[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Número de frases: </span><span class="sc">{</span>embeddings<span class="sc">.</span>shape[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> cosine_similarity</span>
+<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
 <span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>sim_matrix <span class="op">=</span> cosine_similarity(embeddings)</span>
+<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> cosine_similarity</span>
 <span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">4</span>))</span>
-<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> ax.imshow(sim_matrix, cmap<span class="op">=</span><span class="st">"Blues"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
-<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(frases)))</span>
-<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(<span class="bu">range</span>(<span class="bu">len</span>(frases)))</span>
-<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels([<span class="ss">f"F</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(frases))])</span>
-<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels([<span class="ss">f"F</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(frases))])</span>
-<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Similitud coseno entre frases"</span>)</span>
-<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(frases)):</span>
-<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(frases)):</span>
-<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>        ax.text(j, i, <span class="ss">f"</span><span class="sc">{</span>sim_matrix[i, j]<span class="sc">:.2f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"center"</span>)</span>
-<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>plt.colorbar(im, ax<span class="op">=</span>ax)</span>
-<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
-<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
-<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Notice how animal-related phrases (0, 1) have high similarity"</span>)</span>
-<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"while the weather phrase (3) is different from the rest."</span>)</span>
-<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>sim_matrix <span class="op">=</span> cosine_similarity(embeddings)</span>
+<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>fig, ax <span class="op">=</span> plt.subplots(figsize<span class="op">=</span>(<span class="dv">5</span>, <span class="dv">4</span>))</span>
+<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>im <span class="op">=</span> ax.imshow(sim_matrix, cmap<span class="op">=</span><span class="st">"Blues"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
+<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>ax.set_xticks(<span class="bu">range</span>(<span class="bu">len</span>(frases)))</span>
+<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>ax.set_yticks(<span class="bu">range</span>(<span class="bu">len</span>(frases)))</span>
+<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>ax.set_xticklabels([<span class="ss">f"F</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(frases))])</span>
+<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>ax.set_yticklabels([<span class="ss">f"F</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(frases))])</span>
+<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>ax.set_title(<span class="st">"Similitud coseno entre frases"</span>)</span>
+<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(frases)):</span>
+<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(frases)):</span>
+<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>        ax.text(j, i, <span class="ss">f"</span><span class="sc">{</span>sim_matrix[i, j]<span class="sc">:.2f}</span><span class="ss">"</span>, ha<span class="op">=</span><span class="st">"center"</span>, va<span class="op">=</span><span class="st">"center"</span>)</span>
+<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>plt.colorbar(im, ax<span class="op">=</span>ax)</span>
+<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>plt.tight_layout()</span>
+<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Notice how animal-related phrases (0, 1) have high similarity"</span>)</span>
+<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"while the weather phrase (3) is different from the rest."</span>)</span>
 <span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a><span class="fu">### Sentence-BERT</span></span>
+<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>Sentence-BERT (SBERT) modifica BERT con una arquitectura **siamese** que permite generar embeddings de frases comparables directamente. Usa funciones de pérdida contrastiva (triplet loss, cosine similarity loss) para que frases semánticamente cercanas tengan vectores cercanos.</span>
+<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a><span class="fu">### Sentence-BERT {#sec-sbert}</span></span>
 <span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a><span class="al">![Arquitectura siamese de SBERT para inferencia.](../images/sbert_figure_2.png)</span>{#fig-sbert-arch fig-cap="Arquitectura siamese de SBERT para inferencia: dos torres BERT con pesos compartidos producen embeddings u y v que se comparan con cosine similarity. Adaptada de Reimers &amp; Gurevych (2019), <span class="co">[</span><span class="ot">Figure 2</span><span class="co">](https://aclanthology.org/D19-1410/)</span>, distribuida bajo CC-BY 4.0."}</span>
+<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>Sentence-BERT (SBERT) modifica BERT con una arquitectura **siamese** que permite generar embeddings de frases comparables directamente. Usa funciones de pérdida contrastiva (triplet loss, cosine similarity loss) para que frases semánticamente cercanas tengan vectores cercanos.</span>
 <span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a><span class="fu">### Comparativa de modelos de embeddings</span></span>
+<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a><span class="al">![Arquitectura siamese de SBERT para inferencia.](../images/sbert_figure_2.png)</span>{#fig-sbert-arch fig-cap="Arquitectura siamesa de SBERT para inferencia: dos torres BERT con pesos compartidos producen embeddings u y v que se comparan con cosine similarity. Adaptada de @reimers2019sbert, Figure 2 (https://aclanthology.org/D19-1410/), distribuida bajo CC-BY 4.0."}</span>
 <span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Modelo <span class="pp">|</span> Dimensiones <span class="pp">|</span> Tamaño <span class="pp">|</span> Uso <span class="pp">|</span></span>
-<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
-<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`all-MiniLM-L6-v2`</span> <span class="pp">|</span> 384 <span class="pp">|</span> ~80 MB <span class="pp">|</span> Prototipado rápido <span class="pp">|</span></span>
-<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`intfloat/e5-small-v2`</span> <span class="pp">|</span> 384 <span class="pp">|</span> ~120 MB <span class="pp">|</span> Propósito general open-source <span class="pp">|</span></span>
-<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`intfloat/e5-base-v2`</span> <span class="pp">|</span> 768 <span class="pp">|</span> ~440 MB <span class="pp">|</span> Mayor precisión <span class="pp">|</span></span>
-<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`qwen3-embedding:0.6b`</span> <span class="pp">|</span> 768 <span class="pp">|</span> ~640 MB <span class="pp">|</span> Embeddings nativos Qwen (disponible en Llamus) <span class="pp">|</span></span>
-<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nomic-embed-text-v2-moe`</span> <span class="pp">|</span> 768 <span class="pp">|</span> ~475 MB <span class="pp">|</span> Alta precisión, MoE eficiente <span class="pp">|</span></span>
-<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`mxbai-embed-large:v1`</span> <span class="pp">|</span> 1024 <span class="pp">|</span> ~334 MB <span class="pp">|</span> Embeddings densos generales <span class="pp">|</span></span>
-<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`text-embedding-3-small`</span> <span class="pp">|</span> 512 o 1536 <span class="pp">|</span> API <span class="pp">|</span> Comercial (OpenAI) <span class="pp">|</span></span>
-<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`text-embedding-3-large`</span> <span class="pp">|</span> 256 o 3072 <span class="pp">|</span> API <span class="pp">|</span> Alta precisión (OpenAI) <span class="pp">|</span></span>
-<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a><span class="fu">### Embeddings multimodales y tabulares</span></span>
-<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Multimodales (CLIP):** proyectan texto e imágenes en un mismo espacio vectorial, permitiendo búsqueda cross-modal (ej. "un perro jugando en la nieve" → imágenes correspondientes).</span>
-<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Tabulares (TabNet, SCARF):** generan embeddings de filas de datos tabulares usando atención, útiles para búsqueda semántica sobre datos estructurados (ej. encontrar clientes similares por perfil de compra).</span>
-<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a>::: {.callout-info}</span>
-<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a><span class="fu">## ¿Cuándo usar cada uno?</span></span>
-<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Texto:** Sentence-BERT / E5 → **Vector DB**</span>
-<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Texto + imágenes:** CLIP → **Búsqueda multimodal**</span>
-<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Datos tabulares:** TabNet / SCARF → **Búsqueda por perfil**</span>
-<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Código:** CodeBERT / GraphCodeBERT → **Búsqueda semántica de código**</span>
-<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Continúa con **[01d-vectordb.qmd](01d-vectordb.qmd)** — Bases de datos vectoriales.</span></span>
+<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a><span class="fu">### Comparativa de modelos de embeddings {#sec-comparativa-embeddings}</span></span>
+<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>: Comparativa de modelos de embeddings por dimensiones, tamaño y caso de uso {#tbl-modelos-embeddings}</span>
+<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Modelo <span class="pp">|</span> Dimensiones <span class="pp">|</span> Tamaño <span class="pp">|</span> Uso <span class="pp">|</span></span>
+<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`all-MiniLM-L6-v2`</span> <span class="pp">|</span> 384 <span class="pp">|</span> ~80 MB <span class="pp">|</span> Prototipado rápido <span class="pp">|</span></span>
+<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`intfloat/e5-small-v2`</span> <span class="pp">|</span> 384 <span class="pp">|</span> ~120 MB <span class="pp">|</span> Propósito general open-source <span class="pp">|</span></span>
+<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`intfloat/e5-base-v2`</span> <span class="pp">|</span> 768 <span class="pp">|</span> ~440 MB <span class="pp">|</span> Mayor precisión <span class="pp">|</span></span>
+<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`qwen3-embedding:0.6b`</span> <span class="pp">|</span> 768 <span class="pp">|</span> ~640 MB <span class="pp">|</span> Embeddings nativos Qwen (disponible en Llamus) <span class="pp">|</span></span>
+<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`nomic-embed-text-v2-moe`</span> <span class="pp">|</span> 768 <span class="pp">|</span> ~475 MB <span class="pp">|</span> Alta precisión, MoE eficiente <span class="pp">|</span></span>
+<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`mxbai-embed-large:v1`</span> <span class="pp">|</span> 1024 <span class="pp">|</span> ~334 MB <span class="pp">|</span> Embeddings densos generales <span class="pp">|</span></span>
+<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`text-embedding-3-small`</span> <span class="pp">|</span> 512 o 1536 <span class="pp">|</span> API <span class="pp">|</span> Comercial (OpenAI) <span class="pp">|</span></span>
+<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`text-embedding-3-large`</span> <span class="pp">|</span> 256 o 3072 <span class="pp">|</span> API <span class="pp">|</span> Alta precisión (OpenAI) <span class="pp">|</span></span>
+<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a><span class="fu">### Embeddings multimodales y tabulares {#sec-multimodales-tabulares}</span></span>
+<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Multimodales (CLIP):** proyectan texto e imágenes en un mismo espacio vectorial, permitiendo búsqueda cross-modal (ej. "un perro jugando en la nieve" → imágenes correspondientes).</span>
+<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Tabulares (TabNet, SCARF):** generan embeddings de filas de datos tabulares usando atención, útiles para búsqueda semántica sobre datos estructurados (ej. encontrar clientes similares por perfil de compra).</span>
+<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a>::: {.callout-info}</span>
+<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a><span class="fu">## ¿Cuándo usar cada uno?</span></span>
+<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Texto:** Sentence-BERT / E5 → **Vector DB**</span>
+<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Texto + imágenes:** CLIP → **Búsqueda multimodal**</span>
+<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Datos tabulares:** TabNet / SCARF → **Búsqueda por perfil**</span>
+<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Código:** CodeBERT / GraphCodeBERT → **Búsqueda semántica de código**</span>
+<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Continúa con **[01d-vectordb.qmd](01d-vectordb.qmd)** — Bases de datos vectoriales.</span></span>
+<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-163"><a href="#cb9-163" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

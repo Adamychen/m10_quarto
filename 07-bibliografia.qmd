@@ -1,37 +1,51 @@
 ---
 title: "Bibliografía y recursos de referencia"
+nocite: |
+  @*
 ---
 
-## Artículos técnicos fundamentales
-
-- Vaswani, A. et al. (2017). *Attention is All You Need*. NeurIPS. [arXiv:1706.03762]
-- Hu, E. et al. (2022). *LoRA: Low-Rank Adaptation of Large Language Models*. ICLR 2022. [arXiv:2106.09685]
-- Es, S. et al. (2023). *RAGAS: Automated Evaluation of Retrieval Augmented Generation*. [arXiv:2309.15217]
-- Lewis, P. et al. (2020). *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks*. NeurIPS 2020. [arXiv:2005.11401]
-- Dettmers, T. et al. (2023). *QLoRA: Efficient Finetuning of Quantized LLMs*. NeurIPS 2023. [arXiv:2305.14314]
-- Goodfellow, I. et al. (2014). *Generative Adversarial Nets*. NeurIPS 2014. [arXiv:1406.2661]
-- Kingma, D. & Welling, M. (2013). *Auto-Encoding Variational Bayes*. ICLR 2014. [arXiv:1312.6114]
-- Xu, L. et al. (2019). *Modeling Tabular Data using Conditional GAN* (CTGAN). NeurIPS 2019. [arXiv:1907.00503]
-- Patki, N. et al. (2016). *The Synthetic Data Vault*. IEEE DSAA 2016.
-- Kotelnikov, A. et al. (2023). *TabDDPM: Modelling Tabular Data with Diffusion Models*. ICML 2023. [arXiv:2209.15421]
+Esta página agrupa los **recursos externos** que complementan los materiales del módulo: documentación de herramientas, lecturas de contexto y un índice curado de Model/System Cards. La **bibliografía completa** de los papers y fuentes citadas en el sitio se genera automáticamente al final de esta página desde el archivo `references.bib`.
 
 ## Documentación técnica
 
-- Hugging Face Hub — <https://huggingface.co/models>
-- LangChain Expression Language (LCEL) — <https://python.langchain.com/docs/expression_language>
-- LlamaIndex — <https://docs.llamaindex.ai>
-- Model Context Protocol Specification — <https://spec.modelcontextprotocol.io>
-- RAGAS Documentation — <https://docs.ragas.io>
-- Hugging Face TRL — <https://huggingface.co/docs/trl>
+- [Hugging Face Hub](https://huggingface.co/models) — repositorio de modelos open-weight y open-source.
+- [LangChain Expression Language (LCEL)](https://python.langchain.com/docs/expression_language/) — guía oficial de orquestación con LCEL.
+- [LlamaIndex](https://docs.llamaindex.ai) — documentación de LlamaIndex para indexación documental.
+- [Model Context Protocol Specification](https://spec.modelcontextprotocol.io) — especificación abierta de Anthropic para MCP.
+- [RAGAS](https://docs.ragas.io) — framework de evaluación de RAG.
+- [Hugging Face TRL](https://huggingface.co/docs/trl) — librería de SFT/RLHF/DPO.
+- [DeepEval](https://github.com/confident-ai/deepeval) — framework de evaluación como *unit testing*.
+- [LangSmith](https://docs.smith.langchain.com) — trazabilidad y evaluación online (LangChain).
+- [Langfuse](https://langfuse.com) — plataforma open source de observabilidad LLM.
+- [Microsoft Presidio](https://github.com/microsoft/presidio) — detección y anonimización de PII.
+- [vLLM](https://github.com/vllm-project/vllm) — servidor de inferencia LLM de alto rendimiento.
+- [Ollama](https://ollama.com) — runtime local para modelos open-weight.
+- [DAIR.AI Prompt Engineering Guide](https://www.promptingguide.ai/) — guía canónica de prompting.
 
-## Lecturas de contexto (recomendadas)
+## Model Cards y System Cards de referencia
 
-- Anthropic (2023). *Model Card: Claude 3* — análisis de riesgos y mitigaciones en un LLM de producción.
-- Alibaba Cloud (2025). *Qwen 3.6 Model Card* — <https://huggingface.co/Qwen>
-- Google (2025). *Gemma 4 Model Card* — <https://huggingface.co/models?search=gemma4>
-- Meta (2024). *Llama 3.3 Model Card* — <https://huggingface.co/meta-llama>
-- DeepSeek (2025). *DeepSeek R1 Model Card* — <https://huggingface.co/deepseek-ai>
-- Gao, Y. et al. (2023). *Retrieval-Augmented Generation for Large Language Models: A Survey*. [arXiv:2312.10997]
-- Bommasani, R. et al. (2021). *On the Opportunities and Risks of Foundation Models*. Stanford CRFM. [arXiv:2108.07258]
+- [Claude 3 (Opus, Sonnet, Haiku) — Model Card](https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf)
+- [Claude 3.5 Sonnet — Model Card Addendum](https://www-cdn.anthropic.com/fed9cc193a14b84131812372d8d5857f8f304c52/Model_Card_Claude_3_Addendum.pdf)
+- [Claude 3.7 Sonnet — System Card](https://www.anthropic.com/claude-3-7-sonnet-system-card)
+- [GPT-4o — System Card](https://openai.com/index/gpt-4o-system-card/)
+- [OpenAI o1 — System Card](https://openai.com/index/openai-o1-system-card/)
+- [Gemini 1.5 — Technical Report](https://storage.googleapis.com/deepmind-media/gemini/gemini_v1_5_report.pdf)
+- [Qwen 3.6 — Model Card](https://huggingface.co/Qwen)
+- [Gemma 4 — Model Card](https://huggingface.co/models?search=gemma4)
+- [Llama 3.3 — Model Card](https://huggingface.co/meta-llama)
+- [DeepSeek R1 — Model Card](https://huggingface.co/deepseek-ai)
+- [Índice de System Cards de Anthropic](https://www.anthropic.com/system-cards)
+- [Índice de Model Cards de Google DeepMind](https://deepmind.google/models/model-cards/)
+
+## Lecturas de contexto recomendadas
+
+Estas lecturas aparecen citadas en los temas del módulo; se listan aquí como punto de partida:
+
+- [Gao et al. (2023). *Retrieval-Augmented Generation for Large Language Models: A Survey*](https://arxiv.org/abs/2312.10997) — visión panorámica del estado del arte en RAG.
+- [Bommasani et al. (2021). *On the Opportunities and Risks of Foundation Models*](https://arxiv.org/abs/2108.07258) — manifiesto del Stanford CRFM sobre modelos foundation.
+- [Dwork & Roth (2014). *The Algorithmic Foundations of Differential Privacy*](https://www.cis.upenn.edu/~aaroth/Papers/privbook.pdf) — texto de referencia en privacidad diferencial.
+- [Mitchell et al. (2019). *Model Cards for Model Reporting*](https://arxiv.org/abs/1810.03993) — propuesta original de las Model Cards.
 
 > **Nota:** el ecosistema de IA Generativa evoluciona con rapidez. Las herramientas y versiones indicadas son las estables en el momento de redacción de este documento. El profesorado actualizará los notebooks y referencias al inicio de cada edición del módulo.
+
+# References

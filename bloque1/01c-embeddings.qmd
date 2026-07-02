@@ -60,7 +60,7 @@ Si necesitas trabajar con español, usa modelos multilingües como `intfloat/mul
 
 ### Semántica distribucional {#sec-semantica-distribucional}
 
-El principio fundamental: **"You shall know a word by the company it keeps"** (Firth, 1957). Palabras con contextos similares tienen significados similares, y por tanto vectores cercanos en el espacio semántico.
+El principio fundamental: **"You shall know a word by the company it keeps"** (@firth1957synopsis). Palabras con contextos similares tienen significados similares, y por tanto vectores cercanos en el espacio semántico.
 
 ```{python}
 #| echo: true
@@ -115,7 +115,7 @@ print("while the weather phrase (3) is different from the rest.")
 
 Sentence-BERT (SBERT) modifica BERT con una arquitectura **siamese** que permite generar embeddings de frases comparables directamente. Usa funciones de pérdida contrastiva (triplet loss, cosine similarity loss) para que frases semánticamente cercanas tengan vectores cercanos.
 
-![Arquitectura siamese de SBERT para inferencia.](../images/sbert_figure_2.png){#fig-sbert-arch fig-cap="Arquitectura siamese de SBERT para inferencia: dos torres BERT con pesos compartidos producen embeddings u y v que se comparan con cosine similarity. Adaptada de Reimers & Gurevych (2019), [Figure 2](https://aclanthology.org/D19-1410/), distribuida bajo CC-BY 4.0."}
+![Arquitectura siamese de SBERT para inferencia.](../images/sbert_figure_2.png){#fig-sbert-arch fig-cap="Arquitectura siamesa de SBERT para inferencia: dos torres BERT con pesos compartidos producen embeddings u y v que se comparan con cosine similarity. Adaptada de @reimers2019sbert, Figure 2 (https://aclanthology.org/D19-1410/), distribuida bajo CC-BY 4.0."}
 
 ### Comparativa de modelos de embeddings {#sec-comparativa-embeddings}
 
@@ -149,3 +149,8 @@ Sentence-BERT (SBERT) modifica BERT con una arquitectura **siamese** que permite
 ---
 
 > Continúa con **[01d-vectordb.qmd](01d-vectordb.qmd)** — Bases de datos vectoriales.
+
+# References
+
+::: {#refs}
+:::

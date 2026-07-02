@@ -298,3 +298,9 @@ assert any(p in eval3_integracion.lower() for p in ["i+d", "empleado", "presupue
     "❌ La respuesta no parece referirse a I+D o presupuesto"
 print("✅ Ejercicio 3: formato correcto")
 ```
+
+# References
+
+::: {#refs}
+:::
+```

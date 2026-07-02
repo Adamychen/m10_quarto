@@ -479,11 +479,16 @@ El fine-tuning con datos de baja calidad produce un modelo **peor** que el base.
 
 ## Referencias {#sec-referencias-ft}
 
-- Hu, E. et al. (2022). **LoRA: Low-Rank Adaptation of Large Language Models**. ICLR. [arXiv:2106.09685](https://arxiv.org/abs/2106.09685)
-- Dettmers, T. et al. (2023). **QLoRA: Efficient Finetuning of Quantized Language Models**. NeurIPS. [arXiv:2305.14314](https://arxiv.org/abs/2305.14314)
-- He, J. et al. (2022). **Towards a Unified View of Parameter-Efficient Transfer Learning**. ICLR. [arXiv:2110.04366](https://arxiv.org/abs/2110.04366)
-- Lester, B. et al. (2021). **The Power of Scale for Parameter-Efficient Prompt Tuning**. EMNLP. [arXiv:2104.08691](https://arxiv.org/abs/2104.08691)
+- @hu2022lora
+- @dettmers2023qlora
+- @he2022peft
+- @lester2021prompttuning
 
 ---
 
 > Has completado la teoría del **Bloque 3**. Ahora pasa al taller práctico: **[HPD 4 — Sistema RAG sobre datos mixtos](../evaluables/hpd4-rag-mixto.qmd)**.
+
+# References
+
+::: {#refs}
+:::

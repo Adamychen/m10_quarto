@@ -164,5 +164,10 @@ def responder_con_citation(pregunta, contexto, llm_client):
 - [ ] Prompt obliga a decir "no sé" cuando el contexto no alcanza
 - [ ] El sistema cita las fuentes (fragments) en la respuesta
 - [ ] Post-procesado: verificar que las citas referencian chunks reales
-- [ ] RAGAS `faithfulness` > 0.7 antes de producción
+- [ ] RAGAS `faithfulness` > 0.7 antes de producción [@es2024ragas]
+:::
+
+# References
+
+::: {#refs}
 :::

@@ -42,9 +42,9 @@ Antes de la aparición del modelo Transformer, los modelos secuenciales dominaba
 - Sufre desvanecimiento de gradiente en secuencias largas.
 - Dificulta capturar dependencias de largo alcance.
 
-La arquitectura **Transformer** (Vaswani et al., 2017) resolvió estos problemas introduciendo el **mecanismo de atención** para reemplazar el **mecanisno de recurrencia** (limitada) usado hasta el momento, algo que permitió procesar un conjunto de tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones de ese conjunto de tokens.
+La arquitectura **Transformer** (@vaswani2017attention) resolvió estos problemas introduciendo el **mecanismo de atención** para reemplazar el **mecanisno de recurrencia** (limitada) usado hasta el momento, algo que permitió procesar un conjunto de tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones de ese conjunto de tokens.
 
-![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)](../images/diagrama_transformer_original.webp){#fig-arquitectura-transformer}
+![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (@vaswani2017attention, Figure 1)](../images/diagrama_transformer_original.webp){#fig-arquitectura-transformer}
 
 ```{python}
 #| echo: true
@@ -102,7 +102,7 @@ $$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)
 
 donde el producto $Q·K^T$ mide la similitud entre cada par de tokens; el factor $\sqrt{d_k}$ sirve como escala normalizadora para evitar que los valores crezcan demasiado en módulo; la **multi-cabeza** ejecuta este proceso en paralelo con pesos distintos, permitiendo al modelo *atender* a diferentes relaciones simultáneamente (sintaxis, semántica, coreferencias, etc.).
 
-![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (Vaswani et al., 2017, Figure 2)](../images/multi-head-attention.webp){#fig-sdpa-vs-mha}
+![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (@vaswani2017attention, Figure 2)](../images/multi-head-attention.webp){#fig-sdpa-vs-mha}
 
 #### Scaled Dot-Product Attention — Low Level (numpy) {#sec-sdpa-numpy}
 
@@ -357,13 +357,16 @@ graph LR
 ::: {.callout-important}
 ## Lectura obligatoria
 
-Vaswani, A. et al. (2017). **Attention is All You Need**. NeurIPS.
+@vaswani2017attention
 
 Leer secciones 3-5: Scaled Dot-Product Attention, Multi-Head Attention, Positional Encoding y el resumen de la arquitectura completa.
-
-[arXiv:1706.03762](https://arxiv.org/abs/1706.03762)
 :::
 
 ---
 
 > Continúa con **[01b-llms.qmd](01b-llms.qmd)** — Grandes Modelos de Lenguaje e inferencia.
+
+# References
+
+::: {#refs}
+:::

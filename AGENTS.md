@@ -99,6 +99,48 @@ QUARTO_PYTHON=.venv/bin/python3 quarto render
 QUARTO_PYTHON=.venv/bin/python3 quarto preview
 ```
 
+## Bibliografía (`references.bib`)
+
+Todas las referencias del módulo (papers, Model/System Cards, documentación de herramientas) se centralizan en **`references.bib`** (raíz del proyecto), en formato BibTeX. La página [07-bibliografia.qmd](07-bibliografia.qmd) los muestra todos con `nocite: | @*`; cada `.qmd` adicional muestra solo las entradas que cita, gracias al heading `# References` que Quarto auto-rellena.
+
+### Configuración global (`_quarto.yml`)
+
+```yaml
+project:
+  type: website
+  bibliography: references.bib
+  csl: apa
+  ...
+```
+
+`csl: apa` aprovecha el estilo APA 7th edition empaquetado con Pandoc; no requiere descargar el CSL.
+
+### Convención de claves
+
+- **kebab-case** descriptivo, sin tildes: `vaswani2017attention`, `lewis2020rag`, `mitchell2019modelcards`.
+- Patrón general: `apellidoYYYYprimeraPalabra` para papers; `proveedorYYYYproducto` para Model/System Cards; nombre-del-framework para software (`huggingface_hub`, `langchain`, `mcp`).
+- Para preprints arXiv, incluir `eprint = {XXXX.XXXXX}` y `archivePrefix = {arXiv}` para que Pandoc genere el enlace.
+- Para Model/System Cards y docs web, usar `@misc` con `howpublished`, `url` y `urldate = {YYYY-MM-DD}` (formato ISO).
+
+### Citar en `.qmd`
+
+| Forma | Resultado en APA |
+|---|---|
+| `[@vaswani2017attention]` | (Vaswani et al., 2017) |
+| `@vaswani2017attention` | Vaswani et al. (2017) |
+| `[-@vaswani2017attention]` | 2017 (sin autor) — útil en "sección X (Smith, -@smith2020)" |
+| `[@karpukhin2020dpr; @lewis2020rag]` | (Karpukhin et al., 2020; Lewis et al., 2020) |
+
+En las **listas de "Lecturas recomendadas"** usar la forma con guión para que Pandoc renderice la entrada bibliográfica completa: `- @vaswani2017attention` (sin paréntesis).
+
+### Añadir una nueva referencia
+
+1. Editar `references.bib` y añadir la entrada con la clave apropiada.
+2. Citarla en el `.qmd` con `@clave` o `[@clave]`.
+3. Verificar con `quarto render` que la entrada aparece al final de la página.
+
+Para una página que necesite mostrar **todas** las entradas (como la página principal de bibliografía), añadir `nocite: | @*` al frontmatter y un `# References` al final.
+
 ## Generar notebooks para Colab
 
 Los `.ipynb` que se enlazan desde los badges "Open in Colab" se generan desde los `.qmd` con `engine: jupyter`:

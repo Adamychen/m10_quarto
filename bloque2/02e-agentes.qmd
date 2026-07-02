@@ -552,4 +552,9 @@ Los agentes son potentes pero más caros (múltiples llamadas al LLM), más lent
 - ❌ La tarea es **determinista** (una función Python clásica es más barata y fiable)
 :::
 
-> **Lectura recomendada:** [LangChain Agents](https://python.langchain.com/docs/concepts/agents/)
+> **Lectura recomendada:** [LangChain Agents](https://python.langchain.com/docs/concepts/agents/) [@langchain]. Para el patrón de razonamiento + acción que implementan estos agentes, ver @yao2023react.
+
+# References
+
+::: {#refs}
+:::

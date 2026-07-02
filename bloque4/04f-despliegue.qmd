@@ -58,7 +58,7 @@ engine: jupyter
 
 ### 6.3 Observabilidad con Langfuse {#sec-observabilidad-langfuse}
 
-[Langfuse](https://langfuse.com) y [LangSmith](https://docs.smith.langchain.com) son las dos plataformas líderes para trazabilidad en producción. Permiten ver cada llamada, sus tokens, su latencia y el feedback de los usuarios.
+[Langfuse](https://langfuse.com) [@langfuse] y [LangSmith](https://docs.smith.langchain.com) [@langsmith] son las dos plataformas líderes para trazabilidad en producción. Permiten ver cada llamada, sus tokens, su latencia y el feedback de los usuarios.
 
 ```python
 #| echo: true
@@ -197,3 +197,8 @@ cache.guardar(emb_1, "Respuesta a la primera consulta.")
 print(cache.buscar(emb_2))  # debería ser CACHE HIT
 print(cache.buscar(emb_3))  # debería ser None
 ```
+
+# References
+
+::: {#refs}
+:::

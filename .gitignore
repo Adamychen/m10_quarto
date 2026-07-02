@@ -24,5 +24,8 @@ auth/pins_generated.txt
 solutions/
 guias/
 
+# Cachés de modelos descargados en runtime
+models/
+
 # Documentos internos del módulo
 Modulo10_IA_Generativa_DataScience.*

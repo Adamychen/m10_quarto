@@ -58,7 +58,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -77,7 +96,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-f97a59afa23c78b76dca51217b896fc0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-98abfb5de123bd3eb994533863133005.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -473,16 +492,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#bases-de-datos-vectoriales" id="toc-bases-de-datos-vectoriales" class="nav-link active" data-scroll-target="#bases-de-datos-vectoriales">Bases de Datos Vectoriales</a>
+  <li><a href="#sec-bases-datos-vectoriales" id="toc-sec-bases-datos-vectoriales" class="nav-link active" data-scroll-target="#sec-bases-datos-vectoriales">Bases de Datos Vectoriales</a>
   <ul class="collapse">
-  <li><a href="#búsqueda-exacta-knn-vs.-aproximada-ann" id="toc-búsqueda-exacta-knn-vs.-aproximada-ann" class="nav-link" data-scroll-target="#búsqueda-exacta-knn-vs.-aproximada-ann">Búsqueda exacta (KNN) vs.&nbsp;aproximada (ANN)</a></li>
-  <li><a href="#hnsw-hierarchical-navigable-small-world" id="toc-hnsw-hierarchical-navigable-small-world" class="nav-link" data-scroll-target="#hnsw-hierarchical-navigable-small-world">HNSW (Hierarchical Navigable Small World)</a></li>
-  <li><a href="#métricas-de-similitud" id="toc-métricas-de-similitud" class="nav-link" data-scroll-target="#métricas-de-similitud">Métricas de similitud</a></li>
-  <li><a href="#chroma-base-de-datos-vectorial-local" id="toc-chroma-base-de-datos-vectorial-local" class="nav-link" data-scroll-target="#chroma-base-de-datos-vectorial-local">Chroma — Base de datos vectorial local</a></li>
-  <li><a href="#faiss-indexación-en-memoria" id="toc-faiss-indexación-en-memoria" class="nav-link" data-scroll-target="#faiss-indexación-en-memoria">FAISS — Indexación en memoria</a></li>
-  <li><a href="#comparativa-operacional" id="toc-comparativa-operacional" class="nav-link" data-scroll-target="#comparativa-operacional">Comparativa operacional</a></li>
-  <li><a href="#árbol-de-decisión-para-elegir" id="toc-árbol-de-decisión-para-elegir" class="nav-link" data-scroll-target="#árbol-de-decisión-para-elegir">Árbol de decisión para elegir</a></li>
+  <li><a href="#sec-knn-vs-ann" id="toc-sec-knn-vs-ann" class="nav-link" data-scroll-target="#sec-knn-vs-ann">Búsqueda exacta (KNN) vs.&nbsp;aproximada (ANN)</a></li>
+  <li><a href="#sec-hnsw" id="toc-sec-hnsw" class="nav-link" data-scroll-target="#sec-hnsw">HNSW (Hierarchical Navigable Small World)</a></li>
+  <li><a href="#sec-metricas-similitud" id="toc-sec-metricas-similitud" class="nav-link" data-scroll-target="#sec-metricas-similitud">Métricas de similitud</a></li>
+  <li><a href="#sec-chroma" id="toc-sec-chroma" class="nav-link" data-scroll-target="#sec-chroma">Chroma — Base de datos vectorial local</a></li>
+  <li><a href="#sec-faiss" id="toc-sec-faiss" class="nav-link" data-scroll-target="#sec-faiss">FAISS — Indexación en memoria</a></li>
+  <li><a href="#sec-comparativa-vdb" id="toc-sec-comparativa-vdb" class="nav-link" data-scroll-target="#sec-comparativa-vdb">Comparativa operacional</a></li>
+  <li><a href="#sec-arbol-decision" id="toc-sec-arbol-decision" class="nav-link" data-scroll-target="#sec-arbol-decision">Árbol de decisión para elegir</a></li>
   </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="01d-vectordb.ipynb" download="01d-vectordb.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
@@ -512,10 +532,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 1 — Fundamentos</strong>. Se recomienda haber visto <a href="../bloque1/01c-embeddings.html">01c-embeddings.qmd</a> primero.</p>
 </blockquote>
-<div id="7fbb3052" class="cell" data-execution_count="1">
+<div id="36bdb2fe" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q chromadb faiss<span class="op">-</span>cpu sentence<span class="op">-</span>transformers matplotlib</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="9d5b6dfb" class="cell" data-execution_count="2">
+<div id="2c94b190" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Workaround para conflicto de OpenMP en macOS ARM64 (PyTorch + sklearn + FAISS</span></span>
@@ -536,8 +556,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<section id="bases-de-datos-vectoriales" class="level2">
-<h2 class="anchored" data-anchor-id="bases-de-datos-vectoriales">Bases de Datos Vectoriales</h2>
+<section id="sec-bases-datos-vectoriales" class="level2">
+<h2 class="anchored" data-anchor-id="sec-bases-datos-vectoriales">Bases de Datos Vectoriales</h2>
 <p>Una vez que tenemos embeddings, necesitamos almacenarlos y buscarlos eficientemente. Aquí entran las <strong>bases de datos vectoriales</strong>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -552,8 +572,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Los modelos de embeddings que usamos (<code>all-MiniLM-L6-v2</code>) están entrenados en inglés, por lo que los ejemplos usan texto en inglés. Usar un tokenizador inglés sobre texto español produce más subtokens por palabra y embeddings de menor calidad. Para trabajar con español, cambia a un modelo multilingüe como <code>intfloat/multilingual-e5-small</code>.</p>
 </div>
 </div>
-<section id="búsqueda-exacta-knn-vs.-aproximada-ann" class="level3">
-<h3 class="anchored" data-anchor-id="búsqueda-exacta-knn-vs.-aproximada-ann">Búsqueda exacta (KNN) vs.&nbsp;aproximada (ANN)</h3>
+<section id="sec-knn-vs-ann" class="level3">
+<h3 class="anchored" data-anchor-id="sec-knn-vs-ann">Búsqueda exacta (KNN) vs.&nbsp;aproximada (ANN)</h3>
+<div id="fig-knn-vs-ann" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-knn-vs-ann-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -576,6 +599,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-knn-vs-ann-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
+<div id="tbl-knn-ann" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-knn-ann-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Comparativa de métodos de búsqueda exacta vs.&nbsp;aproximada
+</figcaption>
+<div aria-describedby="tbl-knn-ann-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -606,15 +641,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+</div>
+</figure>
+</div>
 </section>
-<section id="hnsw-hierarchical-navigable-small-world" class="level3">
-<h3 class="anchored" data-anchor-id="hnsw-hierarchical-navigable-small-world">HNSW (Hierarchical Navigable Small World)</h3>
+<section id="sec-hnsw" class="level3">
+<h3 class="anchored" data-anchor-id="sec-hnsw">HNSW (Hierarchical Navigable Small World)</h3>
 <p>El algoritmo más popular en producción (usado por Chroma, Qdrant, Pinecone). Construye un grafo multi-capa donde:</p>
 <ul>
 <li>Las capas superiores tienen pocos nodos (conexiones largas)</li>
 <li>Las capas inferiores tienen todos los nodos (conexiones cortas)</li>
 <li>La búsqueda comienza en la capa superior y desciende, recorriendo el grafo greedy</li>
 </ul>
+<div id="fig-hnsw-grafo" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hnsw-grafo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -650,9 +691,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-hnsw-grafo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2
+</figcaption>
+</figure>
+</div>
 </section>
-<section id="métricas-de-similitud" class="level3">
-<h3 class="anchored" data-anchor-id="métricas-de-similitud">Métricas de similitud</h3>
+<section id="sec-metricas-similitud" class="level3">
+<h3 class="anchored" data-anchor-id="sec-metricas-similitud">Métricas de similitud</h3>
+<div id="tbl-metricas-similitud" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-metricas-similitud-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Métricas de distancia y similitud entre vectores
+</figcaption>
+<div aria-describedby="tbl-metricas-similitud-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -684,6 +737,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+</div>
+</figure>
+</div>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -697,7 +753,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Siempre <strong>normaliza los embeddings</strong> (||v|| = 1). Con embeddings normalizados, coseno y producto escalar son equivalentes, y la búsqueda es más estable.</p>
 </div>
 </div>
-<div id="b246a8c9" class="cell" data-execution_count="3">
+<div id="2884f641" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cosine_sim(a, b):</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.dot(a, b) <span class="op">/</span> (np.linalg.norm(a) <span class="op">*</span> np.linalg.norm(b))</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -726,10 +782,10 @@ L2(b, c): 0.894</code></pre>
 </div>
 </div>
 </section>
-<section id="chroma-base-de-datos-vectorial-local" class="level3">
-<h3 class="anchored" data-anchor-id="chroma-base-de-datos-vectorial-local">Chroma — Base de datos vectorial local</h3>
+<section id="sec-chroma" class="level3">
+<h3 class="anchored" data-anchor-id="sec-chroma">Chroma — Base de datos vectorial local</h3>
 <p>Chroma es una base de datos vectorial embebida que funciona en local sin servidor. Ideal para prototipado y proyectos pequeños/medios.</p>
-<div id="85586d70" class="cell" data-execution_count="4">
+<div id="7897ebd2" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> chromadb</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> chromadb.config <span class="im">import</span> Settings</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -752,7 +808,7 @@ L2(b, c): 0.894</code></pre>
 Total de documentos hasta ahora: 0</code></pre>
 </div>
 </div>
-<div id="3b295a1c" class="cell" data-execution_count="5">
+<div id="0106481d" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar modelo de embeddings</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SentenceTransformer(<span class="st">"all-MiniLM-L6-v2"</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -780,14 +836,14 @@ Total de documentos hasta ahora: 0</code></pre>
 </div>
 <div class="cell-output cell-output-display">
 <script type="application/vnd.jupyter.widget-view+json">
-{"model_id":"d0832396ebc246da89ded464afa49fa7","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+{"model_id":"00243e3927d24b86bdf736293f8f22c0","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
 </script>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Documentos insertados: 5</code></pre>
 </div>
 </div>
-<div id="6fe48196" class="cell" data-execution_count="6">
+<div id="e9b383de" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Búsqueda semántica</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"How do current models process sequences?"</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>query_embedding <span class="op">=</span> model.encode([query]).tolist()</span>
@@ -810,10 +866,10 @@ Total de documentos hasta ahora: 0</code></pre>
 </div>
 </div>
 </section>
-<section id="faiss-indexación-en-memoria" class="level3">
-<h3 class="anchored" data-anchor-id="faiss-indexación-en-memoria">FAISS — Indexación en memoria</h3>
+<section id="sec-faiss" class="level3">
+<h3 class="anchored" data-anchor-id="sec-faiss">FAISS — Indexación en memoria</h3>
 <p>FAISS (Facebook AI Similarity Search) es una librería de indexación ANN embebible, ideal para integración en pipelines de Python sin necesidad de un servidor de base de datos.</p>
-<div id="9c8fd970" class="cell" data-execution_count="7">
+<div id="4ea33e50" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> faiss</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convertir embeddings a matriz numpy</span></span>
@@ -867,8 +923,14 @@ Total de documentos hasta ahora: 0</code></pre>
 </div>
 </div>
 </section>
-<section id="comparativa-operacional" class="level3">
-<h3 class="anchored" data-anchor-id="comparativa-operacional">Comparativa operacional</h3>
+<section id="sec-comparativa-vdb" class="level3">
+<h3 class="anchored" data-anchor-id="sec-comparativa-vdb">Comparativa operacional</h3>
+<div id="tbl-comparativa-vdb" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-comparativa-vdb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;3: Comparativa operacional entre Chroma, FAISS, Qdrant y Pinecone
+</figcaption>
+<div aria-describedby="tbl-comparativa-vdb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
 <col style="width: 20%">
@@ -938,9 +1000,15 @@ Total de documentos hasta ahora: 0</code></pre>
 </tr>
 </tbody>
 </table>
+</div>
+</figure>
+</div>
 </section>
-<section id="árbol-de-decisión-para-elegir" class="level3">
-<h3 class="anchored" data-anchor-id="árbol-de-decisión-para-elegir">Árbol de decisión para elegir</h3>
+<section id="sec-arbol-decision" class="level3">
+<h3 class="anchored" data-anchor-id="sec-arbol-decision">Árbol de decisión para elegir</h3>
+<div id="fig-arbol-decision-vdb" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-arbol-decision-vdb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -959,6 +1027,12 @@ Total de documentos hasta ahora: 0</code></pre>
 </div>
 </div>
 </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-arbol-decision-vdb-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3
+</figcaption>
+</figure>
+</div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -976,11 +1050,17 @@ Total de documentos hasta ahora: 0</code></pre>
 <blockquote class="blockquote">
 <p>Has completado la teoría del <strong>Bloque 1</strong>. Ahora pasa al taller práctico: <strong><a href="../evaluables/hpd1-embeddings.html">HPD 1 — Pipeline de embeddings y búsqueda semántica</a></strong>.</p>
 </blockquote>
+</section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" role="list">
+
+</div>
 
 
 <!-- -->
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -991,7 +1071,7 @@ Total de documentos hasta ahora: 0</code></pre>
   <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
 </footer>
 <script type="application/vnd.jupyter.widget-state+json">
-{"state":{"11733417dc8a49ecb9f526f5ce11a1d9":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"2e4ae1c10b2a4756a0ff56fe93162d30":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"369aa6a8e76b4a6e8fbb01e0134033be":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"38613968e35141bea6acf6fbabe2edf3":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"386a3cd2ad8041cf81481e21c1347167":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_38613968e35141bea6acf6fbabe2edf3","max":103,"min":0,"orientation":"horizontal","style":"IPY_MODEL_442ecacbf7a046189a9e41d27a2e3218","tabbable":null,"tooltip":null,"value":103}},"442ecacbf7a046189a9e41d27a2e3218":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"4d57289b36be4442a5a50d8a70ccf5a7":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_ebc00881b75a4793b491c307f35d265e","placeholder":"​","style":"IPY_MODEL_369aa6a8e76b4a6e8fbb01e0134033be","tabbable":null,"tooltip":null,"value":" 103/103 [00:00&lt;00:00, 12690.22it/s]"}},"547755531f00444a96d1ff000823c8c2":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_2e4ae1c10b2a4756a0ff56fe93162d30","placeholder":"​","style":"IPY_MODEL_6b1807d5931e4063a425e37b75d39174","tabbable":null,"tooltip":null,"value":"Loading weights: 100%"}},"6b1807d5931e4063a425e37b75d39174":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"d0832396ebc246da89ded464afa49fa7":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_547755531f00444a96d1ff000823c8c2","IPY_MODEL_386a3cd2ad8041cf81481e21c1347167","IPY_MODEL_4d57289b36be4442a5a50d8a70ccf5a7"],"layout":"IPY_MODEL_11733417dc8a49ecb9f526f5ce11a1d9","tabbable":null,"tooltip":null}},"ebc00881b75a4793b491c307f35d265e":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}}},"version_major":2,"version_minor":0}
+{"state":{"00243e3927d24b86bdf736293f8f22c0":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_b01bd2531db544e9b3b93a654ee9294e","IPY_MODEL_169f198a2e7544f193637b4b42db8388","IPY_MODEL_27cb34f6462e46829964ba1e1f66c1ae"],"layout":"IPY_MODEL_2ba5cc7bcdbb44ad80347a75671e6979","tabbable":null,"tooltip":null}},"169f198a2e7544f193637b4b42db8388":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_5562ac54dacd4c34ae9dece389335a42","max":103,"min":0,"orientation":"horizontal","style":"IPY_MODEL_c6492c31f7054553a37e075da68d0e98","tabbable":null,"tooltip":null,"value":103}},"27cb34f6462e46829964ba1e1f66c1ae":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_81c1cda878b8407f8b61ee63707b1242","placeholder":"​","style":"IPY_MODEL_df4257b3cef040e78a32b23e34eab4ee","tabbable":null,"tooltip":null,"value":" 103/103 [00:00&lt;00:00, 6838.90it/s]"}},"2ba5cc7bcdbb44ad80347a75671e6979":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"5562ac54dacd4c34ae9dece389335a42":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"75a3628ce73f4757b7fc5ce950c9060e":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"81c1cda878b8407f8b61ee63707b1242":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"b01bd2531db544e9b3b93a654ee9294e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_75a3628ce73f4757b7fc5ce950c9060e","placeholder":"​","style":"IPY_MODEL_e706b966cc1d41e783f180ba68b54b15","tabbable":null,"tooltip":null,"value":"Loading weights: 100%"}},"c6492c31f7054553a37e075da68d0e98":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"df4257b3cef040e78a32b23e34eab4ee":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"e706b966cc1d41e783f180ba68b54b15":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}}},"version_major":2,"version_minor":0}
 </script>
 <script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
@@ -1486,7 +1566,7 @@ Total de documentos hasta ahora: 0</code></pre>
 <span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-45"><a href="#cb16-45" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb16-46"><a href="#cb16-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bases de Datos Vectoriales</span></span>
+<span id="cb16-47"><a href="#cb16-47" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bases de Datos Vectoriales {#sec-bases-datos-vectoriales}</span></span>
 <span id="cb16-48"><a href="#cb16-48" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-49"><a href="#cb16-49" aria-hidden="true" tabindex="-1"></a>Una vez que tenemos embeddings, necesitamos almacenarlos y buscarlos eficientemente. Aquí entran las **bases de datos vectoriales**.</span>
 <span id="cb16-50"><a href="#cb16-50" aria-hidden="true" tabindex="-1"></a></span>
@@ -1496,260 +1576,277 @@ Total de documentos hasta ahora: 0</code></pre>
 <span id="cb16-54"><a href="#cb16-54" aria-hidden="true" tabindex="-1"></a>Los modelos de embeddings que usamos (<span class="in">`all-MiniLM-L6-v2`</span>) están entrenados en inglés, por lo que los ejemplos usan texto en inglés. Usar un tokenizador inglés sobre texto español produce más subtokens por palabra y embeddings de menor calidad. Para trabajar con español, cambia a un modelo multilingüe como <span class="in">`intfloat/multilingual-e5-small`</span>.</span>
 <span id="cb16-55"><a href="#cb16-55" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb16-56"><a href="#cb16-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a><span class="fu">### Búsqueda exacta (KNN) vs. aproximada (ANN)</span></span>
+<span id="cb16-57"><a href="#cb16-57" aria-hidden="true" tabindex="-1"></a><span class="fu">### Búsqueda exacta (KNN) vs. aproximada (ANN) {#sec-knn-vs-ann}</span></span>
 <span id="cb16-58"><a href="#cb16-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-61"><a href="#cb16-61" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb16-62"><a href="#cb16-62" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb16-63"><a href="#cb16-63" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Exact KNN</span><span class="ot">"</span></span>
-<span id="cb16-64"><a href="#cb16-64" aria-hidden="true" tabindex="-1"></a>        A[Vector query] --&gt; B[<span class="ot">"</span><span class="st">Comparar con todos los vectores</span><span class="ot">"</span>]</span>
-<span id="cb16-65"><a href="#cb16-65" aria-hidden="true" tabindex="-1"></a>        B --&gt; C[<span class="ot">"</span><span class="st">O(n) distancia</span><span class="ot">"</span>]</span>
-<span id="cb16-66"><a href="#cb16-66" aria-hidden="true" tabindex="-1"></a>        C --&gt; D[Top<span class="ot">-k</span> exacto]</span>
-<span id="cb16-67"><a href="#cb16-67" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb16-68"><a href="#cb16-68" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">ANN (HNSW / IVF)</span><span class="ot">"</span></span>
-<span id="cb16-69"><a href="#cb16-69" aria-hidden="true" tabindex="-1"></a>        A --&gt; E[Índice jerárquico&lt;br/&gt;o clustering]</span>
-<span id="cb16-70"><a href="#cb16-70" aria-hidden="true" tabindex="-1"></a>        E --&gt; F[<span class="ot">"</span><span class="st">O(log n) aprox.</span><span class="ot">"</span>]</span>
-<span id="cb16-71"><a href="#cb16-71" aria-hidden="true" tabindex="-1"></a>        F --&gt; G[Top<span class="ot">-k</span> aproximado&lt;br/&gt;con alta recall]</span>
-<span id="cb16-72"><a href="#cb16-72" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb16-73"><a href="#cb16-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb16-74"><a href="#cb16-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-75"><a href="#cb16-75" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Método <span class="pp">|</span> Precisión <span class="pp">|</span> Velocidad <span class="pp">|</span> Memoria <span class="pp">|</span></span>
-<span id="cb16-76"><a href="#cb16-76" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
-<span id="cb16-77"><a href="#cb16-77" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> KNN exacto <span class="pp">|</span> 100 % <span class="pp">|</span> O(n) <span class="pp">|</span> — <span class="pp">|</span></span>
-<span id="cb16-78"><a href="#cb16-78" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> HNSW <span class="pp">|</span> 99 %+ <span class="pp">|</span> O(log n) <span class="pp">|</span> Alta <span class="pp">|</span></span>
-<span id="cb16-79"><a href="#cb16-79" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> IVF <span class="pp">|</span> 95-99 % <span class="pp">|</span> O(√n) <span class="pp">|</span> Media <span class="pp">|</span></span>
-<span id="cb16-80"><a href="#cb16-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-81"><a href="#cb16-81" aria-hidden="true" tabindex="-1"></a><span class="fu">### HNSW (Hierarchical Navigable Small World)</span></span>
-<span id="cb16-82"><a href="#cb16-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-83"><a href="#cb16-83" aria-hidden="true" tabindex="-1"></a>El algoritmo más popular en producción (usado por Chroma, Qdrant, Pinecone). Construye un grafo multi-capa donde:</span>
+<span id="cb16-59"><a href="#cb16-59" aria-hidden="true" tabindex="-1"></a>::: {#fig-knn-vs-ann}</span>
+<span id="cb16-62"><a href="#cb16-62" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb16-63"><a href="#cb16-63" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb16-64"><a href="#cb16-64" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Exact KNN</span><span class="ot">"</span></span>
+<span id="cb16-65"><a href="#cb16-65" aria-hidden="true" tabindex="-1"></a>        A[Vector query] --&gt; B[<span class="ot">"</span><span class="st">Comparar con todos los vectores</span><span class="ot">"</span>]</span>
+<span id="cb16-66"><a href="#cb16-66" aria-hidden="true" tabindex="-1"></a>        B --&gt; C[<span class="ot">"</span><span class="st">O(n) distancia</span><span class="ot">"</span>]</span>
+<span id="cb16-67"><a href="#cb16-67" aria-hidden="true" tabindex="-1"></a>        C --&gt; D[Top<span class="ot">-k</span> exacto]</span>
+<span id="cb16-68"><a href="#cb16-68" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb16-69"><a href="#cb16-69" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">ANN (HNSW / IVF)</span><span class="ot">"</span></span>
+<span id="cb16-70"><a href="#cb16-70" aria-hidden="true" tabindex="-1"></a>        A --&gt; E[Índice jerárquico&lt;br/&gt;o clustering]</span>
+<span id="cb16-71"><a href="#cb16-71" aria-hidden="true" tabindex="-1"></a>        E --&gt; F[<span class="ot">"</span><span class="st">O(log n) aprox.</span><span class="ot">"</span>]</span>
+<span id="cb16-72"><a href="#cb16-72" aria-hidden="true" tabindex="-1"></a>        F --&gt; G[Top<span class="ot">-k</span> aproximado&lt;br/&gt;con alta recall]</span>
+<span id="cb16-73"><a href="#cb16-73" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb16-74"><a href="#cb16-74" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb16-75"><a href="#cb16-75" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb16-76"><a href="#cb16-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-77"><a href="#cb16-77" aria-hidden="true" tabindex="-1"></a>: Comparativa de métodos de búsqueda exacta vs. aproximada {#tbl-knn-ann}</span>
+<span id="cb16-78"><a href="#cb16-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-79"><a href="#cb16-79" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Método <span class="pp">|</span> Precisión <span class="pp">|</span> Velocidad <span class="pp">|</span> Memoria <span class="pp">|</span></span>
+<span id="cb16-80"><a href="#cb16-80" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb16-81"><a href="#cb16-81" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> KNN exacto <span class="pp">|</span> 100 % <span class="pp">|</span> O(n) <span class="pp">|</span> — <span class="pp">|</span></span>
+<span id="cb16-82"><a href="#cb16-82" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> HNSW <span class="pp">|</span> 99 %+ <span class="pp">|</span> O(log n) <span class="pp">|</span> Alta <span class="pp">|</span></span>
+<span id="cb16-83"><a href="#cb16-83" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> IVF <span class="pp">|</span> 95-99 % <span class="pp">|</span> O(√n) <span class="pp">|</span> Media <span class="pp">|</span></span>
 <span id="cb16-84"><a href="#cb16-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-85"><a href="#cb16-85" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Las capas superiores tienen pocos nodos (conexiones largas)</span>
-<span id="cb16-86"><a href="#cb16-86" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Las capas inferiores tienen todos los nodos (conexiones cortas)</span>
-<span id="cb16-87"><a href="#cb16-87" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>La búsqueda comienza en la capa superior y desciende, recorriendo el grafo greedy</span>
+<span id="cb16-85"><a href="#cb16-85" aria-hidden="true" tabindex="-1"></a><span class="fu">### HNSW (Hierarchical Navigable Small World) {#sec-hnsw}</span></span>
+<span id="cb16-86"><a href="#cb16-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-87"><a href="#cb16-87" aria-hidden="true" tabindex="-1"></a>El algoritmo más popular en producción (usado por Chroma, Qdrant, Pinecone). Construye un grafo multi-capa donde:</span>
 <span id="cb16-88"><a href="#cb16-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-91"><a href="#cb16-91" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb16-92"><a href="#cb16-92" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb16-93"><a href="#cb16-93" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">HNSW — Capas</span><span class="ot">"</span></span>
-<span id="cb16-94"><a href="#cb16-94" aria-hidden="true" tabindex="-1"></a>        L2(( )) --- L2A(( )) --- L2B(( ))</span>
-<span id="cb16-95"><a href="#cb16-95" aria-hidden="true" tabindex="-1"></a>        L2 --- L1A(( )) --- L1B(( )) --- L1C(( )) --- L1D(( ))</span>
-<span id="cb16-96"><a href="#cb16-96" aria-hidden="true" tabindex="-1"></a>        L2A --- L1C</span>
-<span id="cb16-97"><a href="#cb16-97" aria-hidden="true" tabindex="-1"></a>        L2B --- L1D</span>
-<span id="cb16-98"><a href="#cb16-98" aria-hidden="true" tabindex="-1"></a>        L1A --- L0A(( )) --- L0B(( )) --- L0C(( ))</span>
-<span id="cb16-99"><a href="#cb16-99" aria-hidden="true" tabindex="-1"></a>        L1B --- L0D(( )) --- L0E(( )) --- L0F(( ))</span>
-<span id="cb16-100"><a href="#cb16-100" aria-hidden="true" tabindex="-1"></a>        L1C --- L0E</span>
-<span id="cb16-101"><a href="#cb16-101" aria-hidden="true" tabindex="-1"></a>        L1D --- L0F</span>
-<span id="cb16-102"><a href="#cb16-102" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb16-103"><a href="#cb16-103" aria-hidden="true" tabindex="-1"></a>    style L2 fill:<span class="co">#c62828,color:#fff</span></span>
-<span id="cb16-104"><a href="#cb16-104" aria-hidden="true" tabindex="-1"></a>    style L2A fill:<span class="co">#c62828,color:#fff</span></span>
-<span id="cb16-105"><a href="#cb16-105" aria-hidden="true" tabindex="-1"></a>    style L2B fill:<span class="co">#c62828,color:#fff</span></span>
-<span id="cb16-106"><a href="#cb16-106" aria-hidden="true" tabindex="-1"></a>    style L1A fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb16-107"><a href="#cb16-107" aria-hidden="true" tabindex="-1"></a>    style L1B fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb16-108"><a href="#cb16-108" aria-hidden="true" tabindex="-1"></a>    style L1C fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb16-109"><a href="#cb16-109" aria-hidden="true" tabindex="-1"></a>    style L1D fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb16-110"><a href="#cb16-110" aria-hidden="true" tabindex="-1"></a>    style L0A fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb16-111"><a href="#cb16-111" aria-hidden="true" tabindex="-1"></a>    style L0B fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb16-112"><a href="#cb16-112" aria-hidden="true" tabindex="-1"></a>    style L0C fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb16-113"><a href="#cb16-113" aria-hidden="true" tabindex="-1"></a>    style L0D fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb16-114"><a href="#cb16-114" aria-hidden="true" tabindex="-1"></a>    style L0E fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb16-115"><a href="#cb16-115" aria-hidden="true" tabindex="-1"></a>    style L0F fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb16-116"><a href="#cb16-116" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb16-117"><a href="#cb16-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-118"><a href="#cb16-118" aria-hidden="true" tabindex="-1"></a><span class="fu">### Métricas de similitud</span></span>
-<span id="cb16-119"><a href="#cb16-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-120"><a href="#cb16-120" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Métrica <span class="pp">|</span> Fórmula <span class="pp">|</span> Cuándo usarla <span class="pp">|</span></span>
-<span id="cb16-121"><a href="#cb16-121" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb16-122"><a href="#cb16-122" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Coseno** <span class="pp">|</span> cos(\vec{a}, \vec{b}) = \frac{\vec{a} \cdot \vec{b}}{<span class="sc">\|</span>\vec{a}<span class="sc">\|</span> <span class="sc">\|</span>\vec{b}<span class="sc">\|</span>} <span class="pp">|</span> Embeddings normalizados (recomendada) <span class="pp">|</span></span>
-<span id="cb16-123"><a href="#cb16-123" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Producto escalar** <span class="pp">|</span> \vec{a} \cdot \vec{b} <span class="pp">|</span> Embeddings normalizados (equivalente al coseno) <span class="pp">|</span></span>
-<span id="cb16-124"><a href="#cb16-124" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **L2 (Euclídea)** <span class="pp">|</span> <span class="sc">\|</span>\vec{a} - \vec{b}<span class="sc">\|</span>_2 <span class="pp">|</span> Embeddings no normalizados, búsqueda por cercanía absoluta <span class="pp">|</span></span>
+<span id="cb16-89"><a href="#cb16-89" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Las capas superiores tienen pocos nodos (conexiones largas)</span>
+<span id="cb16-90"><a href="#cb16-90" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Las capas inferiores tienen todos los nodos (conexiones cortas)</span>
+<span id="cb16-91"><a href="#cb16-91" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>La búsqueda comienza en la capa superior y desciende, recorriendo el grafo greedy</span>
+<span id="cb16-92"><a href="#cb16-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-93"><a href="#cb16-93" aria-hidden="true" tabindex="-1"></a>::: {#fig-hnsw-grafo}</span>
+<span id="cb16-96"><a href="#cb16-96" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb16-97"><a href="#cb16-97" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb16-98"><a href="#cb16-98" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">HNSW — Capas</span><span class="ot">"</span></span>
+<span id="cb16-99"><a href="#cb16-99" aria-hidden="true" tabindex="-1"></a>        L2(( )) --- L2A(( )) --- L2B(( ))</span>
+<span id="cb16-100"><a href="#cb16-100" aria-hidden="true" tabindex="-1"></a>        L2 --- L1A(( )) --- L1B(( )) --- L1C(( )) --- L1D(( ))</span>
+<span id="cb16-101"><a href="#cb16-101" aria-hidden="true" tabindex="-1"></a>        L2A --- L1C</span>
+<span id="cb16-102"><a href="#cb16-102" aria-hidden="true" tabindex="-1"></a>        L2B --- L1D</span>
+<span id="cb16-103"><a href="#cb16-103" aria-hidden="true" tabindex="-1"></a>        L1A --- L0A(( )) --- L0B(( )) --- L0C(( ))</span>
+<span id="cb16-104"><a href="#cb16-104" aria-hidden="true" tabindex="-1"></a>        L1B --- L0D(( )) --- L0E(( )) --- L0F(( ))</span>
+<span id="cb16-105"><a href="#cb16-105" aria-hidden="true" tabindex="-1"></a>        L1C --- L0E</span>
+<span id="cb16-106"><a href="#cb16-106" aria-hidden="true" tabindex="-1"></a>        L1D --- L0F</span>
+<span id="cb16-107"><a href="#cb16-107" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb16-108"><a href="#cb16-108" aria-hidden="true" tabindex="-1"></a>    style L2 fill:<span class="co">#c62828,color:#fff</span></span>
+<span id="cb16-109"><a href="#cb16-109" aria-hidden="true" tabindex="-1"></a>    style L2A fill:<span class="co">#c62828,color:#fff</span></span>
+<span id="cb16-110"><a href="#cb16-110" aria-hidden="true" tabindex="-1"></a>    style L2B fill:<span class="co">#c62828,color:#fff</span></span>
+<span id="cb16-111"><a href="#cb16-111" aria-hidden="true" tabindex="-1"></a>    style L1A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb16-112"><a href="#cb16-112" aria-hidden="true" tabindex="-1"></a>    style L1B fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb16-113"><a href="#cb16-113" aria-hidden="true" tabindex="-1"></a>    style L1C fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb16-114"><a href="#cb16-114" aria-hidden="true" tabindex="-1"></a>    style L1D fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb16-115"><a href="#cb16-115" aria-hidden="true" tabindex="-1"></a>    style L0A fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb16-116"><a href="#cb16-116" aria-hidden="true" tabindex="-1"></a>    style L0B fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb16-117"><a href="#cb16-117" aria-hidden="true" tabindex="-1"></a>    style L0C fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb16-118"><a href="#cb16-118" aria-hidden="true" tabindex="-1"></a>    style L0D fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb16-119"><a href="#cb16-119" aria-hidden="true" tabindex="-1"></a>    style L0E fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb16-120"><a href="#cb16-120" aria-hidden="true" tabindex="-1"></a>    style L0F fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb16-121"><a href="#cb16-121" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb16-122"><a href="#cb16-122" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb16-123"><a href="#cb16-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-124"><a href="#cb16-124" aria-hidden="true" tabindex="-1"></a><span class="fu">### Métricas de similitud {#sec-metricas-similitud}</span></span>
 <span id="cb16-125"><a href="#cb16-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-126"><a href="#cb16-126" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
-<span id="cb16-127"><a href="#cb16-127" aria-hidden="true" tabindex="-1"></a><span class="fu">## Regla práctica</span></span>
-<span id="cb16-128"><a href="#cb16-128" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-129"><a href="#cb16-129" aria-hidden="true" tabindex="-1"></a>Siempre **normaliza los embeddings** (||v|| = 1). Con embeddings normalizados, coseno y producto escalar son equivalentes, y la búsqueda es más estable.</span>
-<span id="cb16-130"><a href="#cb16-130" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb16-131"><a href="#cb16-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-134"><a href="#cb16-134" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb16-135"><a href="#cb16-135" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb16-136"><a href="#cb16-136" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
-<span id="cb16-137"><a href="#cb16-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-138"><a href="#cb16-138" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cosine_sim(a, b):</span>
-<span id="cb16-139"><a href="#cb16-139" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.dot(a, b) <span class="op">/</span> (np.linalg.norm(a) <span class="op">*</span> np.linalg.norm(b))</span>
-<span id="cb16-140"><a href="#cb16-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-141"><a href="#cb16-141" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> euclidean_dist(a, b):</span>
-<span id="cb16-142"><a href="#cb16-142" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.linalg.norm(a <span class="op">-</span> b)</span>
-<span id="cb16-143"><a href="#cb16-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-144"><a href="#cb16-144" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>])</span>
-<span id="cb16-145"><a href="#cb16-145" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.array([<span class="fl">0.8</span>, <span class="fl">0.6</span>, <span class="fl">0.0</span>])</span>
-<span id="cb16-146"><a href="#cb16-146" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span>])</span>
-<span id="cb16-147"><a href="#cb16-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-148"><a href="#cb16-148" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"coseno(a, b): </span><span class="sc">{</span>cosine_sim(a, b)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb16-149"><a href="#cb16-149" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"coseno(a, c): </span><span class="sc">{</span>cosine_sim(a, c)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb16-150"><a href="#cb16-150" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"coseno(b, c): </span><span class="sc">{</span>cosine_sim(b, c)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb16-151"><a href="#cb16-151" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb16-152"><a href="#cb16-152" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"L2(a, b): </span><span class="sc">{</span>euclidean_dist(a, b)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb16-153"><a href="#cb16-153" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"L2(a, c): </span><span class="sc">{</span>euclidean_dist(a, c)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
-<span id="cb16-154"><a href="#cb16-154" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"L2(b, c): </span><span class="sc">{</span>euclidean_dist(b, c)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb16-126"><a href="#cb16-126" aria-hidden="true" tabindex="-1"></a>: Métricas de distancia y similitud entre vectores {#tbl-metricas-similitud}</span>
+<span id="cb16-127"><a href="#cb16-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-128"><a href="#cb16-128" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Métrica <span class="pp">|</span> Fórmula <span class="pp">|</span> Cuándo usarla <span class="pp">|</span></span>
+<span id="cb16-129"><a href="#cb16-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb16-130"><a href="#cb16-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Coseno** <span class="pp">|</span> cos(\vec{a}, \vec{b}) = \frac{\vec{a} \cdot \vec{b}}{<span class="sc">\|</span>\vec{a}<span class="sc">\|</span> <span class="sc">\|</span>\vec{b}<span class="sc">\|</span>} <span class="pp">|</span> Embeddings normalizados (recomendada) <span class="pp">|</span></span>
+<span id="cb16-131"><a href="#cb16-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Producto escalar** <span class="pp">|</span> \vec{a} \cdot \vec{b} <span class="pp">|</span> Embeddings normalizados (equivalente al coseno) <span class="pp">|</span></span>
+<span id="cb16-132"><a href="#cb16-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **L2 (Euclídea)** <span class="pp">|</span> <span class="sc">\|</span>\vec{a} - \vec{b}<span class="sc">\|</span>_2 <span class="pp">|</span> Embeddings no normalizados, búsqueda por cercanía absoluta <span class="pp">|</span></span>
+<span id="cb16-133"><a href="#cb16-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-134"><a href="#cb16-134" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb16-135"><a href="#cb16-135" aria-hidden="true" tabindex="-1"></a><span class="fu">## Regla práctica</span></span>
+<span id="cb16-136"><a href="#cb16-136" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-137"><a href="#cb16-137" aria-hidden="true" tabindex="-1"></a>Siempre **normaliza los embeddings** (||v|| = 1). Con embeddings normalizados, coseno y producto escalar son equivalentes, y la búsqueda es más estable.</span>
+<span id="cb16-138"><a href="#cb16-138" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb16-139"><a href="#cb16-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-142"><a href="#cb16-142" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb16-143"><a href="#cb16-143" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb16-144"><a href="#cb16-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb16-145"><a href="#cb16-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-146"><a href="#cb16-146" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cosine_sim(a, b):</span>
+<span id="cb16-147"><a href="#cb16-147" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.dot(a, b) <span class="op">/</span> (np.linalg.norm(a) <span class="op">*</span> np.linalg.norm(b))</span>
+<span id="cb16-148"><a href="#cb16-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-149"><a href="#cb16-149" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> euclidean_dist(a, b):</span>
+<span id="cb16-150"><a href="#cb16-150" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> np.linalg.norm(a <span class="op">-</span> b)</span>
+<span id="cb16-151"><a href="#cb16-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-152"><a href="#cb16-152" aria-hidden="true" tabindex="-1"></a>a <span class="op">=</span> np.array([<span class="fl">1.0</span>, <span class="fl">0.0</span>, <span class="fl">0.0</span>])</span>
+<span id="cb16-153"><a href="#cb16-153" aria-hidden="true" tabindex="-1"></a>b <span class="op">=</span> np.array([<span class="fl">0.8</span>, <span class="fl">0.6</span>, <span class="fl">0.0</span>])</span>
+<span id="cb16-154"><a href="#cb16-154" aria-hidden="true" tabindex="-1"></a>c <span class="op">=</span> np.array([<span class="fl">0.0</span>, <span class="fl">1.0</span>, <span class="fl">0.0</span>])</span>
 <span id="cb16-155"><a href="#cb16-155" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-156"><a href="#cb16-156" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-157"><a href="#cb16-157" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb16-158"><a href="#cb16-158" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-159"><a href="#cb16-159" aria-hidden="true" tabindex="-1"></a><span class="fu">### Chroma — Base de datos vectorial local</span></span>
-<span id="cb16-160"><a href="#cb16-160" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-161"><a href="#cb16-161" aria-hidden="true" tabindex="-1"></a>Chroma es una base de datos vectorial embebida que funciona en local sin servidor. Ideal para prototipado y proyectos pequeños/medios.</span>
-<span id="cb16-162"><a href="#cb16-162" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-165"><a href="#cb16-165" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb16-166"><a href="#cb16-166" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb16-167"><a href="#cb16-167" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb16-156"><a href="#cb16-156" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"coseno(a, b): </span><span class="sc">{</span>cosine_sim(a, b)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb16-157"><a href="#cb16-157" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"coseno(a, c): </span><span class="sc">{</span>cosine_sim(a, c)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb16-158"><a href="#cb16-158" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"coseno(b, c): </span><span class="sc">{</span>cosine_sim(b, c)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb16-159"><a href="#cb16-159" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb16-160"><a href="#cb16-160" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"L2(a, b): </span><span class="sc">{</span>euclidean_dist(a, b)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb16-161"><a href="#cb16-161" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"L2(a, c): </span><span class="sc">{</span>euclidean_dist(a, c)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb16-162"><a href="#cb16-162" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"L2(b, c): </span><span class="sc">{</span>euclidean_dist(b, c)<span class="sc">:.3f}</span><span class="ss">"</span>)</span>
+<span id="cb16-163"><a href="#cb16-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-164"><a href="#cb16-164" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-165"><a href="#cb16-165" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb16-166"><a href="#cb16-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-167"><a href="#cb16-167" aria-hidden="true" tabindex="-1"></a><span class="fu">### Chroma — Base de datos vectorial local {#sec-chroma}</span></span>
 <span id="cb16-168"><a href="#cb16-168" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-169"><a href="#cb16-169" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> chromadb</span>
-<span id="cb16-170"><a href="#cb16-170" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> chromadb.config <span class="im">import</span> Settings</span>
-<span id="cb16-171"><a href="#cb16-171" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-172"><a href="#cb16-172" aria-hidden="true" tabindex="-1"></a><span class="co"># Cliente persistente (los datos se guardan en disco)</span></span>
-<span id="cb16-173"><a href="#cb16-173" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> chromadb.Client(Settings(</span>
-<span id="cb16-174"><a href="#cb16-174" aria-hidden="true" tabindex="-1"></a>    persist_directory<span class="op">=</span><span class="st">".chroma_db"</span>,</span>
-<span id="cb16-175"><a href="#cb16-175" aria-hidden="true" tabindex="-1"></a>    anonymized_telemetry<span class="op">=</span><span class="va">False</span></span>
-<span id="cb16-176"><a href="#cb16-176" aria-hidden="true" tabindex="-1"></a>))</span>
-<span id="cb16-177"><a href="#cb16-177" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-178"><a href="#cb16-178" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear o recuperar colección</span></span>
-<span id="cb16-179"><a href="#cb16-179" aria-hidden="true" tabindex="-1"></a>collection <span class="op">=</span> client.get_or_create_collection(</span>
-<span id="cb16-180"><a href="#cb16-180" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"ejemplo_embeddings"</span>,</span>
-<span id="cb16-181"><a href="#cb16-181" aria-hidden="true" tabindex="-1"></a>    metadata<span class="op">=</span>{<span class="st">"hnsw:space"</span>: <span class="st">"cosine"</span>}</span>
-<span id="cb16-182"><a href="#cb16-182" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-183"><a href="#cb16-183" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-184"><a href="#cb16-184" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Colección '</span><span class="sc">{</span>collection<span class="sc">.</span>name<span class="sc">}</span><span class="ss">' lista."</span>)</span>
-<span id="cb16-185"><a href="#cb16-185" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total de documentos hasta ahora: </span><span class="sc">{</span>collection<span class="sc">.</span>count()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-186"><a href="#cb16-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-187"><a href="#cb16-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-188"><a href="#cb16-188" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb16-189"><a href="#cb16-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-192"><a href="#cb16-192" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb16-193"><a href="#cb16-193" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb16-194"><a href="#cb16-194" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb16-169"><a href="#cb16-169" aria-hidden="true" tabindex="-1"></a>Chroma es una base de datos vectorial embebida que funciona en local sin servidor. Ideal para prototipado y proyectos pequeños/medios.</span>
+<span id="cb16-170"><a href="#cb16-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-173"><a href="#cb16-173" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb16-174"><a href="#cb16-174" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb16-175"><a href="#cb16-175" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb16-176"><a href="#cb16-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-177"><a href="#cb16-177" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> chromadb</span>
+<span id="cb16-178"><a href="#cb16-178" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> chromadb.config <span class="im">import</span> Settings</span>
+<span id="cb16-179"><a href="#cb16-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-180"><a href="#cb16-180" aria-hidden="true" tabindex="-1"></a><span class="co"># Cliente persistente (los datos se guardan en disco)</span></span>
+<span id="cb16-181"><a href="#cb16-181" aria-hidden="true" tabindex="-1"></a>client <span class="op">=</span> chromadb.Client(Settings(</span>
+<span id="cb16-182"><a href="#cb16-182" aria-hidden="true" tabindex="-1"></a>    persist_directory<span class="op">=</span><span class="st">".chroma_db"</span>,</span>
+<span id="cb16-183"><a href="#cb16-183" aria-hidden="true" tabindex="-1"></a>    anonymized_telemetry<span class="op">=</span><span class="va">False</span></span>
+<span id="cb16-184"><a href="#cb16-184" aria-hidden="true" tabindex="-1"></a>))</span>
+<span id="cb16-185"><a href="#cb16-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-186"><a href="#cb16-186" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear o recuperar colección</span></span>
+<span id="cb16-187"><a href="#cb16-187" aria-hidden="true" tabindex="-1"></a>collection <span class="op">=</span> client.get_or_create_collection(</span>
+<span id="cb16-188"><a href="#cb16-188" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"ejemplo_embeddings"</span>,</span>
+<span id="cb16-189"><a href="#cb16-189" aria-hidden="true" tabindex="-1"></a>    metadata<span class="op">=</span>{<span class="st">"hnsw:space"</span>: <span class="st">"cosine"</span>}</span>
+<span id="cb16-190"><a href="#cb16-190" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-191"><a href="#cb16-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-192"><a href="#cb16-192" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Colección '</span><span class="sc">{</span>collection<span class="sc">.</span>name<span class="sc">}</span><span class="ss">' lista."</span>)</span>
+<span id="cb16-193"><a href="#cb16-193" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total de documentos hasta ahora: </span><span class="sc">{</span>collection<span class="sc">.</span>count()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-194"><a href="#cb16-194" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-195"><a href="#cb16-195" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-196"><a href="#cb16-196" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar modelo de embeddings</span></span>
-<span id="cb16-197"><a href="#cb16-197" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SentenceTransformer(<span class="st">"all-MiniLM-L6-v2"</span>)</span>
-<span id="cb16-198"><a href="#cb16-198" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-199"><a href="#cb16-199" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadir documentos con sus embeddings</span></span>
-<span id="cb16-200"><a href="#cb16-200" aria-hidden="true" tabindex="-1"></a>documentos <span class="op">=</span> [</span>
-<span id="cb16-201"><a href="#cb16-201" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Artificial intelligence is revolutionizing medicine"</span>,</span>
-<span id="cb16-202"><a href="#cb16-202" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Transformers can process sequences in parallel"</span>,</span>
-<span id="cb16-203"><a href="#cb16-203" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Vector databases optimize semantic search"</span>,</span>
-<span id="cb16-204"><a href="#cb16-204" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Fine-tuning with LoRA reduces training cost"</span>,</span>
-<span id="cb16-205"><a href="#cb16-205" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Supervised machine learning requires labeled data"</span></span>
-<span id="cb16-206"><a href="#cb16-206" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb16-207"><a href="#cb16-207" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-208"><a href="#cb16-208" aria-hidden="true" tabindex="-1"></a>ids <span class="op">=</span> [<span class="ss">f"doc_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(documentos))]</span>
-<span id="cb16-209"><a href="#cb16-209" aria-hidden="true" tabindex="-1"></a>embeddings_docs <span class="op">=</span> model.encode(documentos).tolist()</span>
-<span id="cb16-210"><a href="#cb16-210" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-211"><a href="#cb16-211" aria-hidden="true" tabindex="-1"></a>collection.add(</span>
-<span id="cb16-212"><a href="#cb16-212" aria-hidden="true" tabindex="-1"></a>    ids<span class="op">=</span>ids,</span>
-<span id="cb16-213"><a href="#cb16-213" aria-hidden="true" tabindex="-1"></a>    documents<span class="op">=</span>documentos,</span>
-<span id="cb16-214"><a href="#cb16-214" aria-hidden="true" tabindex="-1"></a>    embeddings<span class="op">=</span>embeddings_docs</span>
-<span id="cb16-215"><a href="#cb16-215" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-216"><a href="#cb16-216" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-217"><a href="#cb16-217" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Documentos insertados: </span><span class="sc">{</span>collection<span class="sc">.</span>count()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-196"><a href="#cb16-196" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb16-197"><a href="#cb16-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-200"><a href="#cb16-200" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb16-201"><a href="#cb16-201" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb16-202"><a href="#cb16-202" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb16-203"><a href="#cb16-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-204"><a href="#cb16-204" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar modelo de embeddings</span></span>
+<span id="cb16-205"><a href="#cb16-205" aria-hidden="true" tabindex="-1"></a>model <span class="op">=</span> SentenceTransformer(<span class="st">"all-MiniLM-L6-v2"</span>)</span>
+<span id="cb16-206"><a href="#cb16-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-207"><a href="#cb16-207" aria-hidden="true" tabindex="-1"></a><span class="co"># Añadir documentos con sus embeddings</span></span>
+<span id="cb16-208"><a href="#cb16-208" aria-hidden="true" tabindex="-1"></a>documentos <span class="op">=</span> [</span>
+<span id="cb16-209"><a href="#cb16-209" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Artificial intelligence is revolutionizing medicine"</span>,</span>
+<span id="cb16-210"><a href="#cb16-210" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Transformers can process sequences in parallel"</span>,</span>
+<span id="cb16-211"><a href="#cb16-211" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Vector databases optimize semantic search"</span>,</span>
+<span id="cb16-212"><a href="#cb16-212" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Fine-tuning with LoRA reduces training cost"</span>,</span>
+<span id="cb16-213"><a href="#cb16-213" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Supervised machine learning requires labeled data"</span></span>
+<span id="cb16-214"><a href="#cb16-214" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb16-215"><a href="#cb16-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-216"><a href="#cb16-216" aria-hidden="true" tabindex="-1"></a>ids <span class="op">=</span> [<span class="ss">f"doc_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(documentos))]</span>
+<span id="cb16-217"><a href="#cb16-217" aria-hidden="true" tabindex="-1"></a>embeddings_docs <span class="op">=</span> model.encode(documentos).tolist()</span>
 <span id="cb16-218"><a href="#cb16-218" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-219"><a href="#cb16-219" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-220"><a href="#cb16-220" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb16-221"><a href="#cb16-221" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-224"><a href="#cb16-224" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb16-225"><a href="#cb16-225" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb16-226"><a href="#cb16-226" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb16-219"><a href="#cb16-219" aria-hidden="true" tabindex="-1"></a>collection.add(</span>
+<span id="cb16-220"><a href="#cb16-220" aria-hidden="true" tabindex="-1"></a>    ids<span class="op">=</span>ids,</span>
+<span id="cb16-221"><a href="#cb16-221" aria-hidden="true" tabindex="-1"></a>    documents<span class="op">=</span>documentos,</span>
+<span id="cb16-222"><a href="#cb16-222" aria-hidden="true" tabindex="-1"></a>    embeddings<span class="op">=</span>embeddings_docs</span>
+<span id="cb16-223"><a href="#cb16-223" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-224"><a href="#cb16-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-225"><a href="#cb16-225" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Documentos insertados: </span><span class="sc">{</span>collection<span class="sc">.</span>count()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-226"><a href="#cb16-226" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-227"><a href="#cb16-227" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-228"><a href="#cb16-228" aria-hidden="true" tabindex="-1"></a><span class="co"># Búsqueda semántica</span></span>
-<span id="cb16-229"><a href="#cb16-229" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"How do current models process sequences?"</span></span>
-<span id="cb16-230"><a href="#cb16-230" aria-hidden="true" tabindex="-1"></a>query_embedding <span class="op">=</span> model.encode([query]).tolist()</span>
-<span id="cb16-231"><a href="#cb16-231" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-232"><a href="#cb16-232" aria-hidden="true" tabindex="-1"></a>resultados <span class="op">=</span> collection.query(</span>
-<span id="cb16-233"><a href="#cb16-233" aria-hidden="true" tabindex="-1"></a>    query_embeddings<span class="op">=</span>query_embedding,</span>
-<span id="cb16-234"><a href="#cb16-234" aria-hidden="true" tabindex="-1"></a>    n_results<span class="op">=</span><span class="dv">3</span></span>
-<span id="cb16-235"><a href="#cb16-235" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-236"><a href="#cb16-236" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-237"><a href="#cb16-237" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Consulta: </span><span class="sc">{</span>query<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
-<span id="cb16-238"><a href="#cb16-238" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (doc, dist) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(resultados[<span class="st">"documents"</span>][<span class="dv">0</span>], resultados[<span class="st">"distances"</span>][<span class="dv">0</span>])):</span>
-<span id="cb16-239"><a href="#cb16-239" aria-hidden="true" tabindex="-1"></a>    sim <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> dist</span>
-<span id="cb16-240"><a href="#cb16-240" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. [sim=</span><span class="sc">{</span>sim<span class="sc">:.4f}</span><span class="ss">] </span><span class="sc">{</span>doc<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-241"><a href="#cb16-241" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-242"><a href="#cb16-242" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-243"><a href="#cb16-243" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb16-228"><a href="#cb16-228" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb16-229"><a href="#cb16-229" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-232"><a href="#cb16-232" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb16-233"><a href="#cb16-233" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb16-234"><a href="#cb16-234" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb16-235"><a href="#cb16-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-236"><a href="#cb16-236" aria-hidden="true" tabindex="-1"></a><span class="co"># Búsqueda semántica</span></span>
+<span id="cb16-237"><a href="#cb16-237" aria-hidden="true" tabindex="-1"></a>query <span class="op">=</span> <span class="st">"How do current models process sequences?"</span></span>
+<span id="cb16-238"><a href="#cb16-238" aria-hidden="true" tabindex="-1"></a>query_embedding <span class="op">=</span> model.encode([query]).tolist()</span>
+<span id="cb16-239"><a href="#cb16-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-240"><a href="#cb16-240" aria-hidden="true" tabindex="-1"></a>resultados <span class="op">=</span> collection.query(</span>
+<span id="cb16-241"><a href="#cb16-241" aria-hidden="true" tabindex="-1"></a>    query_embeddings<span class="op">=</span>query_embedding,</span>
+<span id="cb16-242"><a href="#cb16-242" aria-hidden="true" tabindex="-1"></a>    n_results<span class="op">=</span><span class="dv">3</span></span>
+<span id="cb16-243"><a href="#cb16-243" aria-hidden="true" tabindex="-1"></a>)</span>
 <span id="cb16-244"><a href="#cb16-244" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-245"><a href="#cb16-245" aria-hidden="true" tabindex="-1"></a><span class="fu">### FAISS — Indexación en memoria</span></span>
-<span id="cb16-246"><a href="#cb16-246" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-247"><a href="#cb16-247" aria-hidden="true" tabindex="-1"></a>FAISS (Facebook AI Similarity Search) es una librería de indexación ANN embebible, ideal para integración en pipelines de Python sin necesidad de un servidor de base de datos.</span>
-<span id="cb16-248"><a href="#cb16-248" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-251"><a href="#cb16-251" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb16-252"><a href="#cb16-252" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb16-253"><a href="#cb16-253" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb16-245"><a href="#cb16-245" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Consulta: </span><span class="sc">{</span>query<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span>)</span>
+<span id="cb16-246"><a href="#cb16-246" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, (doc, dist) <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="bu">zip</span>(resultados[<span class="st">"documents"</span>][<span class="dv">0</span>], resultados[<span class="st">"distances"</span>][<span class="dv">0</span>])):</span>
+<span id="cb16-247"><a href="#cb16-247" aria-hidden="true" tabindex="-1"></a>    sim <span class="op">=</span> <span class="dv">1</span> <span class="op">-</span> dist</span>
+<span id="cb16-248"><a href="#cb16-248" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. [sim=</span><span class="sc">{</span>sim<span class="sc">:.4f}</span><span class="ss">] </span><span class="sc">{</span>doc<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-249"><a href="#cb16-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-250"><a href="#cb16-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-251"><a href="#cb16-251" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb16-252"><a href="#cb16-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-253"><a href="#cb16-253" aria-hidden="true" tabindex="-1"></a><span class="fu">### FAISS — Indexación en memoria {#sec-faiss}</span></span>
 <span id="cb16-254"><a href="#cb16-254" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-255"><a href="#cb16-255" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> faiss</span>
+<span id="cb16-255"><a href="#cb16-255" aria-hidden="true" tabindex="-1"></a>FAISS (Facebook AI Similarity Search) es una librería de indexación ANN embebible, ideal para integración en pipelines de Python sin necesidad de un servidor de base de datos.</span>
 <span id="cb16-256"><a href="#cb16-256" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-257"><a href="#cb16-257" aria-hidden="true" tabindex="-1"></a><span class="co"># Convertir embeddings a matriz numpy</span></span>
-<span id="cb16-258"><a href="#cb16-258" aria-hidden="true" tabindex="-1"></a>emb_matrix <span class="op">=</span> np.array(embeddings_docs).astype(<span class="st">"float32"</span>)</span>
-<span id="cb16-259"><a href="#cb16-259" aria-hidden="true" tabindex="-1"></a>dimension <span class="op">=</span> emb_matrix.shape[<span class="dv">1</span>]</span>
-<span id="cb16-260"><a href="#cb16-260" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-261"><a href="#cb16-261" aria-hidden="true" tabindex="-1"></a><span class="co"># Índice plano (exacto) - solo para comparación</span></span>
-<span id="cb16-262"><a href="#cb16-262" aria-hidden="true" tabindex="-1"></a>index_exact <span class="op">=</span> faiss.IndexFlatL2(dimension)</span>
-<span id="cb16-263"><a href="#cb16-263" aria-hidden="true" tabindex="-1"></a>index_exact.add(emb_matrix)</span>
+<span id="cb16-259"><a href="#cb16-259" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb16-260"><a href="#cb16-260" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb16-261"><a href="#cb16-261" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb16-262"><a href="#cb16-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-263"><a href="#cb16-263" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> faiss</span>
 <span id="cb16-264"><a href="#cb16-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-265"><a href="#cb16-265" aria-hidden="true" tabindex="-1"></a><span class="co"># Índice IVF con cuantización (aproximado)</span></span>
-<span id="cb16-266"><a href="#cb16-266" aria-hidden="true" tabindex="-1"></a>nlist <span class="op">=</span> <span class="dv">2</span>  <span class="co"># número de clusters</span></span>
-<span id="cb16-267"><a href="#cb16-267" aria-hidden="true" tabindex="-1"></a>quantizer <span class="op">=</span> faiss.IndexFlatL2(dimension)</span>
-<span id="cb16-268"><a href="#cb16-268" aria-hidden="true" tabindex="-1"></a>index_ivf <span class="op">=</span> faiss.IndexIVFFlat(quantizer, dimension, nlist, faiss.METRIC_L2)</span>
-<span id="cb16-269"><a href="#cb16-269" aria-hidden="true" tabindex="-1"></a>index_ivf.train(emb_matrix)</span>
-<span id="cb16-270"><a href="#cb16-270" aria-hidden="true" tabindex="-1"></a>index_ivf.add(emb_matrix)</span>
-<span id="cb16-271"><a href="#cb16-271" aria-hidden="true" tabindex="-1"></a>index_ivf.nprobe <span class="op">=</span> <span class="dv">2</span>  <span class="co"># número de clusters a explorar</span></span>
+<span id="cb16-265"><a href="#cb16-265" aria-hidden="true" tabindex="-1"></a><span class="co"># Convertir embeddings a matriz numpy</span></span>
+<span id="cb16-266"><a href="#cb16-266" aria-hidden="true" tabindex="-1"></a>emb_matrix <span class="op">=</span> np.array(embeddings_docs).astype(<span class="st">"float32"</span>)</span>
+<span id="cb16-267"><a href="#cb16-267" aria-hidden="true" tabindex="-1"></a>dimension <span class="op">=</span> emb_matrix.shape[<span class="dv">1</span>]</span>
+<span id="cb16-268"><a href="#cb16-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-269"><a href="#cb16-269" aria-hidden="true" tabindex="-1"></a><span class="co"># Índice plano (exacto) - solo para comparación</span></span>
+<span id="cb16-270"><a href="#cb16-270" aria-hidden="true" tabindex="-1"></a>index_exact <span class="op">=</span> faiss.IndexFlatL2(dimension)</span>
+<span id="cb16-271"><a href="#cb16-271" aria-hidden="true" tabindex="-1"></a>index_exact.add(emb_matrix)</span>
 <span id="cb16-272"><a href="#cb16-272" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-273"><a href="#cb16-273" aria-hidden="true" tabindex="-1"></a><span class="co"># Búsqueda en ambos índices</span></span>
-<span id="cb16-274"><a href="#cb16-274" aria-hidden="true" tabindex="-1"></a>query_vec <span class="op">=</span> np.array(query_embedding).astype(<span class="st">"float32"</span>)</span>
-<span id="cb16-275"><a href="#cb16-275" aria-hidden="true" tabindex="-1"></a>dist_exact, idx_exact <span class="op">=</span> index_exact.search(query_vec, <span class="dv">3</span>)</span>
-<span id="cb16-276"><a href="#cb16-276" aria-hidden="true" tabindex="-1"></a>dist_ivf, idx_ivf <span class="op">=</span> index_ivf.search(query_vec, <span class="dv">3</span>)</span>
-<span id="cb16-277"><a href="#cb16-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-278"><a href="#cb16-278" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"FAISS — Comparación exacto vs. aproximado:</span><span class="ch">\n</span><span class="st">"</span>)</span>
-<span id="cb16-279"><a href="#cb16-279" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Índice exacto (FlatL2):"</span>)</span>
-<span id="cb16-280"><a href="#cb16-280" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, idx <span class="kw">in</span> <span class="bu">enumerate</span>(idx_exact[<span class="dv">0</span>]):</span>
-<span id="cb16-281"><a href="#cb16-281" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>documentos[idx]<span class="sc">}</span><span class="ss"> (dist: </span><span class="sc">{</span>dist_exact[<span class="dv">0</span>][i]<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
-<span id="cb16-282"><a href="#cb16-282" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-283"><a href="#cb16-283" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Índice aproximado (IVF):"</span>)</span>
-<span id="cb16-284"><a href="#cb16-284" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, idx <span class="kw">in</span> <span class="bu">enumerate</span>(idx_ivf[<span class="dv">0</span>]):</span>
-<span id="cb16-285"><a href="#cb16-285" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>documentos[idx]<span class="sc">}</span><span class="ss"> (dist: </span><span class="sc">{</span>dist_ivf[<span class="dv">0</span>][i]<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
-<span id="cb16-286"><a href="#cb16-286" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-287"><a href="#cb16-287" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">¿Mismos resultados? </span><span class="sc">{</span><span class="bu">set</span>(idx_exact[<span class="dv">0</span>]) <span class="op">==</span> <span class="bu">set</span>(idx_ivf[<span class="dv">0</span>])<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb16-288"><a href="#cb16-288" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-289"><a href="#cb16-289" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-290"><a href="#cb16-290" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb16-291"><a href="#cb16-291" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-292"><a href="#cb16-292" aria-hidden="true" tabindex="-1"></a><span class="fu">### Comparativa operacional</span></span>
-<span id="cb16-293"><a href="#cb16-293" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-294"><a href="#cb16-294" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Característica <span class="pp">|</span> Chroma <span class="pp">|</span> FAISS <span class="pp">|</span> Qdrant <span class="pp">|</span> Pinecone <span class="pp">|</span></span>
-<span id="cb16-295"><a href="#cb16-295" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|---|</span></span>
-<span id="cb16-296"><a href="#cb16-296" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Tipo** <span class="pp">|</span> Base de datos <span class="pp">|</span> Librería <span class="pp">|</span> Base de datos <span class="pp">|</span> SaaS <span class="pp">|</span></span>
-<span id="cb16-297"><a href="#cb16-297" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Infraestructura** <span class="pp">|</span> Local (sin servidor) <span class="pp">|</span> Embebible <span class="pp">|</span> Servidor Docker <span class="pp">|</span> Cloud <span class="pp">|</span></span>
-<span id="cb16-298"><a href="#cb16-298" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Persistencia** <span class="pp">|</span> Disco (SQLite + vectores) <span class="pp">|</span> Memoria / disco <span class="pp">|</span> Disco <span class="pp">|</span> Cloud <span class="pp">|</span></span>
-<span id="cb16-299"><a href="#cb16-299" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Privacidad** <span class="pp">|</span> Total (local) <span class="pp">|</span> Total (local) <span class="pp">|</span> Según deploy <span class="pp">|</span> Datos en cloud <span class="pp">|</span></span>
-<span id="cb16-300"><a href="#cb16-300" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Escala** <span class="pp">|</span> &lt; 1M vectores <span class="pp">|</span> &gt; 1M vectores <span class="pp">|</span> 1M+ vectores <span class="pp">|</span> Ilimitado <span class="pp">|</span></span>
-<span id="cb16-301"><a href="#cb16-301" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Coste** <span class="pp">|</span> Gratuito <span class="pp">|</span> Gratuito <span class="pp">|</span> Self-hosted gratis <span class="pp">|</span> Por uso <span class="pp">|</span></span>
-<span id="cb16-302"><a href="#cb16-302" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **API** <span class="pp">|</span> Python nativa <span class="pp">|</span> Python/C++ <span class="pp">|</span> REST + gRPC <span class="pp">|</span> REST <span class="pp">|</span></span>
+<span id="cb16-273"><a href="#cb16-273" aria-hidden="true" tabindex="-1"></a><span class="co"># Índice IVF con cuantización (aproximado)</span></span>
+<span id="cb16-274"><a href="#cb16-274" aria-hidden="true" tabindex="-1"></a>nlist <span class="op">=</span> <span class="dv">2</span>  <span class="co"># número de clusters</span></span>
+<span id="cb16-275"><a href="#cb16-275" aria-hidden="true" tabindex="-1"></a>quantizer <span class="op">=</span> faiss.IndexFlatL2(dimension)</span>
+<span id="cb16-276"><a href="#cb16-276" aria-hidden="true" tabindex="-1"></a>index_ivf <span class="op">=</span> faiss.IndexIVFFlat(quantizer, dimension, nlist, faiss.METRIC_L2)</span>
+<span id="cb16-277"><a href="#cb16-277" aria-hidden="true" tabindex="-1"></a>index_ivf.train(emb_matrix)</span>
+<span id="cb16-278"><a href="#cb16-278" aria-hidden="true" tabindex="-1"></a>index_ivf.add(emb_matrix)</span>
+<span id="cb16-279"><a href="#cb16-279" aria-hidden="true" tabindex="-1"></a>index_ivf.nprobe <span class="op">=</span> <span class="dv">2</span>  <span class="co"># número de clusters a explorar</span></span>
+<span id="cb16-280"><a href="#cb16-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-281"><a href="#cb16-281" aria-hidden="true" tabindex="-1"></a><span class="co"># Búsqueda en ambos índices</span></span>
+<span id="cb16-282"><a href="#cb16-282" aria-hidden="true" tabindex="-1"></a>query_vec <span class="op">=</span> np.array(query_embedding).astype(<span class="st">"float32"</span>)</span>
+<span id="cb16-283"><a href="#cb16-283" aria-hidden="true" tabindex="-1"></a>dist_exact, idx_exact <span class="op">=</span> index_exact.search(query_vec, <span class="dv">3</span>)</span>
+<span id="cb16-284"><a href="#cb16-284" aria-hidden="true" tabindex="-1"></a>dist_ivf, idx_ivf <span class="op">=</span> index_ivf.search(query_vec, <span class="dv">3</span>)</span>
+<span id="cb16-285"><a href="#cb16-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-286"><a href="#cb16-286" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"FAISS — Comparación exacto vs. aproximado:</span><span class="ch">\n</span><span class="st">"</span>)</span>
+<span id="cb16-287"><a href="#cb16-287" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Índice exacto (FlatL2):"</span>)</span>
+<span id="cb16-288"><a href="#cb16-288" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, idx <span class="kw">in</span> <span class="bu">enumerate</span>(idx_exact[<span class="dv">0</span>]):</span>
+<span id="cb16-289"><a href="#cb16-289" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>documentos[idx]<span class="sc">}</span><span class="ss"> (dist: </span><span class="sc">{</span>dist_exact[<span class="dv">0</span>][i]<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
+<span id="cb16-290"><a href="#cb16-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-291"><a href="#cb16-291" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Índice aproximado (IVF):"</span>)</span>
+<span id="cb16-292"><a href="#cb16-292" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, idx <span class="kw">in</span> <span class="bu">enumerate</span>(idx_ivf[<span class="dv">0</span>]):</span>
+<span id="cb16-293"><a href="#cb16-293" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>documentos[idx]<span class="sc">}</span><span class="ss"> (dist: </span><span class="sc">{</span>dist_ivf[<span class="dv">0</span>][i]<span class="sc">:.4f}</span><span class="ss">)"</span>)</span>
+<span id="cb16-294"><a href="#cb16-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-295"><a href="#cb16-295" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">¿Mismos resultados? </span><span class="sc">{</span><span class="bu">set</span>(idx_exact[<span class="dv">0</span>]) <span class="op">==</span> <span class="bu">set</span>(idx_ivf[<span class="dv">0</span>])<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb16-296"><a href="#cb16-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-297"><a href="#cb16-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-298"><a href="#cb16-298" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb16-299"><a href="#cb16-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-300"><a href="#cb16-300" aria-hidden="true" tabindex="-1"></a><span class="fu">### Comparativa operacional {#sec-comparativa-vdb}</span></span>
+<span id="cb16-301"><a href="#cb16-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-302"><a href="#cb16-302" aria-hidden="true" tabindex="-1"></a>: Comparativa operacional entre Chroma, FAISS, Qdrant y Pinecone {#tbl-comparativa-vdb}</span>
 <span id="cb16-303"><a href="#cb16-303" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-304"><a href="#cb16-304" aria-hidden="true" tabindex="-1"></a><span class="fu">### Árbol de decisión para elegir</span></span>
-<span id="cb16-305"><a href="#cb16-305" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-308"><a href="#cb16-308" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb16-309"><a href="#cb16-309" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb16-310"><a href="#cb16-310" aria-hidden="true" tabindex="-1"></a>    A[¿Proyecto pequeño&lt;br/&gt;&amp;<span class="ot">lt</span>; <span class="dv">100</span>K vectores?] --&gt;|Sí| B[Chroma&lt;br/&gt;FAISS]</span>
-<span id="cb16-311"><a href="#cb16-311" aria-hidden="true" tabindex="-1"></a>    A --&gt;|No| C[¿Privacidad total?]</span>
-<span id="cb16-312"><a href="#cb16-312" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Sí| D[FAISS + gestión propia]</span>
-<span id="cb16-313"><a href="#cb16-313" aria-hidden="true" tabindex="-1"></a>    C --&gt;|No| E[¿Infraestructura propia?]</span>
-<span id="cb16-314"><a href="#cb16-314" aria-hidden="true" tabindex="-1"></a>    E --&gt;|Sí| F[Qdrant]</span>
-<span id="cb16-315"><a href="#cb16-315" aria-hidden="true" tabindex="-1"></a>    E --&gt;|No| G[Pinecone]</span>
-<span id="cb16-316"><a href="#cb16-316" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb16-317"><a href="#cb16-317" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-318"><a href="#cb16-318" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
-<span id="cb16-319"><a href="#cb16-319" aria-hidden="true" tabindex="-1"></a><span class="fu">## Consejo práctico</span></span>
-<span id="cb16-320"><a href="#cb16-320" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-321"><a href="#cb16-321" aria-hidden="true" tabindex="-1"></a>Para el **proyecto del módulo** empieza con **Chroma**: es local, no requiere servidor, y escala bien para el alcance del curso. Si luego necesitas más rendimiento, migrar a FAISS o Qdrant es directo porque la API de búsqueda semántica es equivalente.</span>
-<span id="cb16-322"><a href="#cb16-322" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb16-323"><a href="#cb16-323" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-324"><a href="#cb16-324" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb16-325"><a href="#cb16-325" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-326"><a href="#cb16-326" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Has completado la teoría del **Bloque 1**. Ahora pasa al taller práctico: **[HPD 1 — Pipeline de embeddings y búsqueda semántica](../evaluables/hpd1-embeddings.qmd)**.</span></span>
+<span id="cb16-304"><a href="#cb16-304" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Característica <span class="pp">|</span> Chroma <span class="pp">|</span> FAISS <span class="pp">|</span> Qdrant <span class="pp">|</span> Pinecone <span class="pp">|</span></span>
+<span id="cb16-305"><a href="#cb16-305" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|---|</span></span>
+<span id="cb16-306"><a href="#cb16-306" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Tipo** <span class="pp">|</span> Base de datos <span class="pp">|</span> Librería <span class="pp">|</span> Base de datos <span class="pp">|</span> SaaS <span class="pp">|</span></span>
+<span id="cb16-307"><a href="#cb16-307" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Infraestructura** <span class="pp">|</span> Local (sin servidor) <span class="pp">|</span> Embebible <span class="pp">|</span> Servidor Docker <span class="pp">|</span> Cloud <span class="pp">|</span></span>
+<span id="cb16-308"><a href="#cb16-308" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Persistencia** <span class="pp">|</span> Disco (SQLite + vectores) <span class="pp">|</span> Memoria / disco <span class="pp">|</span> Disco <span class="pp">|</span> Cloud <span class="pp">|</span></span>
+<span id="cb16-309"><a href="#cb16-309" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Privacidad** <span class="pp">|</span> Total (local) <span class="pp">|</span> Total (local) <span class="pp">|</span> Según deploy <span class="pp">|</span> Datos en cloud <span class="pp">|</span></span>
+<span id="cb16-310"><a href="#cb16-310" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Escala** <span class="pp">|</span> &lt; 1M vectores <span class="pp">|</span> &gt; 1M vectores <span class="pp">|</span> 1M+ vectores <span class="pp">|</span> Ilimitado <span class="pp">|</span></span>
+<span id="cb16-311"><a href="#cb16-311" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Coste** <span class="pp">|</span> Gratuito <span class="pp">|</span> Gratuito <span class="pp">|</span> Self-hosted gratis <span class="pp">|</span> Por uso <span class="pp">|</span></span>
+<span id="cb16-312"><a href="#cb16-312" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **API** <span class="pp">|</span> Python nativa <span class="pp">|</span> Python/C++ <span class="pp">|</span> REST + gRPC <span class="pp">|</span> REST <span class="pp">|</span></span>
+<span id="cb16-313"><a href="#cb16-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-314"><a href="#cb16-314" aria-hidden="true" tabindex="-1"></a><span class="fu">### Árbol de decisión para elegir {#sec-arbol-decision}</span></span>
+<span id="cb16-315"><a href="#cb16-315" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-316"><a href="#cb16-316" aria-hidden="true" tabindex="-1"></a>::: {#fig-arbol-decision-vdb}</span>
+<span id="cb16-319"><a href="#cb16-319" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb16-320"><a href="#cb16-320" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb16-321"><a href="#cb16-321" aria-hidden="true" tabindex="-1"></a>    A[¿Proyecto pequeño&lt;br/&gt;&amp;<span class="ot">lt</span>; <span class="dv">100</span>K vectores?] --&gt;|Sí| B[Chroma&lt;br/&gt;FAISS]</span>
+<span id="cb16-322"><a href="#cb16-322" aria-hidden="true" tabindex="-1"></a>    A --&gt;|No| C[¿Privacidad total?]</span>
+<span id="cb16-323"><a href="#cb16-323" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Sí| D[FAISS + gestión propia]</span>
+<span id="cb16-324"><a href="#cb16-324" aria-hidden="true" tabindex="-1"></a>    C --&gt;|No| E[¿Infraestructura propia?]</span>
+<span id="cb16-325"><a href="#cb16-325" aria-hidden="true" tabindex="-1"></a>    E --&gt;|Sí| F[Qdrant]</span>
+<span id="cb16-326"><a href="#cb16-326" aria-hidden="true" tabindex="-1"></a>    E --&gt;|No| G[Pinecone]</span>
+<span id="cb16-327"><a href="#cb16-327" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb16-328"><a href="#cb16-328" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb16-329"><a href="#cb16-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-330"><a href="#cb16-330" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb16-331"><a href="#cb16-331" aria-hidden="true" tabindex="-1"></a><span class="fu">## Consejo práctico</span></span>
+<span id="cb16-332"><a href="#cb16-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-333"><a href="#cb16-333" aria-hidden="true" tabindex="-1"></a>Para el **proyecto del módulo** empieza con **Chroma**: es local, no requiere servidor, y escala bien para el alcance del curso. Si luego necesitas más rendimiento, migrar a FAISS o Qdrant es directo porque la API de búsqueda semántica es equivalente.</span>
+<span id="cb16-334"><a href="#cb16-334" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb16-335"><a href="#cb16-335" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-336"><a href="#cb16-336" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb16-337"><a href="#cb16-337" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-338"><a href="#cb16-338" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Has completado la teoría del **Bloque 1**. Ahora pasa al taller práctico: **[HPD 1 — Pipeline de embeddings y búsqueda semántica](../evaluables/hpd1-embeddings.qmd)**.</span></span>
+<span id="cb16-339"><a href="#cb16-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-340"><a href="#cb16-340" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb16-341"><a href="#cb16-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-342"><a href="#cb16-342" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb16-343"><a href="#cb16-343" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

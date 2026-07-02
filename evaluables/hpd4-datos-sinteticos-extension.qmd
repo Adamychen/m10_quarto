@@ -202,3 +202,8 @@ if eval3_metrics is not None:
 else:
     print("⚠️  Ejercicio 3 pendiente")
 ```
+
+# References
+
+::: {#refs}
+:::

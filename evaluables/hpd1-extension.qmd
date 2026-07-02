@@ -403,3 +403,8 @@ ext4_chunks = []     # ← list[str]: texto de los 3 chunks recuperados
 ext4_respuesta = ""  # ← str: respuesta del LLM
 ext4_fiel = False    # ← bool: ¿la respuesta es fiel al contexto?
 ```
+
+# References
+
+::: {#refs}
+:::

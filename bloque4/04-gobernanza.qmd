@@ -178,11 +178,16 @@ Este bloque te da las herramientas para llevar tus sistemas IA a calidad de prod
 El proyecto integrador evaluado en [05-evaluacion](../05-evaluacion.qmd) combina todas las competencias. La rúbrica penaliza explícitamente la ausencia de análisis de gobernanza y ética.
 
 > **Lecturas obligatorias:**
-> - Mitchell, M. et al. (2019). *Model Cards for Model Reporting*. [arXiv:1810.03993](https://arxiv.org/abs/1810.03993)
-> - Anthropic (2024). *Claude 3 Model Card y System Card* — referentes de la industria.
-> - Artículo de blog de Langfuse sobre [trazabilidad en producción](https://langfuse.com/blog).
-> - [Differential Privacy (Dwork & Roth, 2014)](https://www.cis.upenn.edu/~aaroth/Papers/privbook.pdf) — fundamentos teóricos.
+> - @mitchell2019modelcards
+> - @anthropic2023claude3mc, @anthropic2024claude3addendum y @anthropic2025claude37sc — referentes de la industria.
+> - Artículo de blog de [@langfuse] sobre [trazabilidad en producción](https://langfuse.com/blog).
+> - @dwork2014dp — fundamentos teóricos de privacidad diferencial.
 
 ---
 
 > Has completado la teoría del **Módulo 10**. Para la evaluación final consulta la [rúbrica del proyecto integrador](../05-evaluacion.qmd#sec-rubrica-evaluacion).
+
+# References
+
+::: {#refs}
+:::

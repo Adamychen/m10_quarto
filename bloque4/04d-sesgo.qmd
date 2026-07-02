@@ -136,7 +136,12 @@ else:
 ::: {.callout-note}
 ## Más allá de regex: frameworks de auditoría {#sec-sesgo-frameworks}
 
-- **[Bias Benchmark for QA (BBQ)](https://github.com/nyu-mll/BBQ)**: 58k preguntas para 11 sesgos sociales.
-- **[StereoSet](https://github.com/McGill-NLP/stereoset)**: mide sesgo, toxicidad y preferencia de información válida.
-- **[HolisticBias](https://github.com/facebookresearch/holistic-bias)**: 600+ términos demográficos.
+- **[Bias Benchmark for QA (BBQ)](https://github.com/nyu-mll/BBQ)** [@parrish2022bbq]: 58k preguntas para 11 sesgos sociales.
+- **[StereoSet](https://github.com/McGill-NLP/stereoset)** [@nadeem2021stereoset]: mide sesgo, toxicidad y preferencia de información válida.
+- **[HolisticBias](https://github.com/facebookresearch/holistic-bias)** [@smith2022holisticbias]: 600+ términos demográficos.
+:::
+
+# References
+
+::: {#refs}
 :::

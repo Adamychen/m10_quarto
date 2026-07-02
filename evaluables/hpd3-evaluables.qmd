@@ -387,3 +387,8 @@ for i, r in enumerate(eval4_riesgos):
         assert isinstance(r[k], str) and len(r[k]) > 10, f"❌ '{k}' demasiado corto en riesgo {i}"
 print("✅ Ejercicio 4: formato correcto")
 ```
+
+# References
+
+::: {#refs}
+:::

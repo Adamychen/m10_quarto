@@ -439,4 +439,9 @@ graph TD
 ```
 :::
 
-> **Lectura recomendada:** [LangChain Expression Language (LCEL)](https://python.langchain.com/docs/concepts/lcel/)
+> **Lectura recomendada:** [LangChain Expression Language (LCEL)](https://python.langchain.com/docs/concepts/lcel/) [@langchain].
+
+# References
+
+::: {#refs}
+:::

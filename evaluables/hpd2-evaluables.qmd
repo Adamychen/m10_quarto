@@ -392,3 +392,8 @@ for i, row in enumerate(eval4_log):
         f"❌ evaluacion inválida en fila {i}: {row['evaluacion']}"
 print("✅ Ejercicio 4: formato correcto")
 ```
+
+# References
+
+::: {#refs}
+:::

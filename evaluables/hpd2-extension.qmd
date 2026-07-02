@@ -416,3 +416,9 @@ for i, row in enumerate(ext4_log):
     assert len(row["subagentes_usados"]) >= 1, "❌ Al menos 1 sub-agente debe usarse"
 print("✅ Ejercicio 4: formato correcto")
 ```
+
+# References
+
+::: {#refs}
+:::
+```

@@ -7,7 +7,7 @@ engine: jupyter
 
 > Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). Se recomienda seguir el orden de las subsecciones.
 
-## 1. Evaluación de LLMs
+## 1. Evaluación de LLMs {#sec-eval-llms}
 
 La evaluación de un sistema con LLM no es un trámite: es la diferencia entre un prototipo que "parece funcionar" y un producto que cumple objetivos de calidad medibles.
 
@@ -29,6 +29,7 @@ Si evaluar a un LLM es complejo, es porque evaluar el desempeño de un ser human
 Por ello, al evaluar LLMs no buscamos una métrica perfecta, sino establecer un marco de concenso que minimice los riesgos (información falsa, lenguaje ofensivo) de utilizar y confiar en sistemas basados en estos modelos.
 :::
 
+::: {#fig-flujo-evaluacion}
 ```{mermaid}
 flowchart LR
     Q["Pregunta<br/>del usuario"]:::input --> S["Sistema<br/>LLM / RAG"]:::proc
@@ -60,26 +61,35 @@ flowchart LR
     classDef out    fill:#2e7d32,stroke:#0d3010,color:#fff
     classDef risk   fill:#e65100,stroke:#bf360c,color:#fff
 ```
+:::
 
-Tres reglas prácticas para guiar el resto de la sección:
+Tres reglas prácticas para guiar el resto de este tema:
 
 1. Ninguna métrica automática sustituye al evaluador humano para producción crítica. Úsalas para iterar rápido en desarrollo, no para certificar calidad.
 2. Combina siempre varias señales. Una sola métrica es fácil de "engañar" (gamear). Tres señales complementarias son robustas.
 3. Versiona los datasets de evaluación. Cada cambio (prompt, modelo, chunk size) requiere reevaluar contra el mismo set, si quieres comparar honestamente.
 
-### 1.1 Benchmarks públicos y leaderboards
+### 1.1 Benchmarks públicos y leaderboards {#sec-benchmarks}
 
-Las secciones 1.2-1.4 cubren cómo evaluar **tu sistema** (con tus datos, tus prompts, tu pipeline). Pero antes de construir nada, conviene conocer los **benchmarks públicos** que la comunidad usa para comparar modelos entre sí: son el "examen estandarizado" al que se somete cada modelo antes de que te lo plantees usar.
+Las secciones @sec-metricas-auto--@sec-frameworks cubren cómo evaluar un sistema (con tus datos, tus prompts, tu pipeline). Pero antes de construir nada, conviene conocer los benchmarks públicos que la comunidad usa para comparar modelos entre sí: son exámenes estandarizados a los que se someten cada modelo antes de que te lo plantees usar.
 
-Un **benchmark** combina tres ingredientes fijos:
 
-1. Un **dataset** de evaluación (preguntas, pares, tareas) que no cambia.
-2. Una **métrica** concreta (accuracy, F1, Spearman, pass@k…).
-3. Un **protocolo** de ejecución (pocos disparos, formato de prompt, longitud máxima).
+Para que la evaluación de un LLM deje de ser una apreciación subjetiva y se convierta en ciencia reproducible, un benchmark debe formalizar el proceso combinando
+estrictamente tres componentes inmutables:
 
-Gracias a esa combinación fija, dos equipos independientes pueden evaluar el mismo modelo y obtener el mismo número: el resultado es **comparable**. Esto es justo lo que las métricas reference-based de la sección 1.2 no pueden darte a nivel de modelo: tú comparas *tu salida* con *tu referencia*, pero no sabes si tu salida es buena en términos absolutos.
+1. Un dataset de evaluación inmutable: Es el corpus de prueba (preguntas, contextos, problemas de código o prompts estructurados) que permanece idéntico para todos los
+  modelos. Esto garantiza que todos los sujetos se enfrenten exactamente al mismo "examen" y bajo las mismas condiciones de dificultad.
+  2. Una métrica cuantitativa unificada: Define la regla matemática o el algoritmo con el que se juzgarán las respuestas (por ejemplo, Accuracy para opción múltiple, F1-score para extracción de información, o pass@k para verificar si el código generado pasa tests unitarios). Al estar automatizada y estandarizada, se elimina el sesgo del evaluador.
+  3. Un protocolo de ejecución rígido: Establece la configuración técnica exacta con la que se debe consultar al modelo. Esto incluye:
+      • El formato del prompt: Si se usa Zero-shot (ir directo a la pregunta) o Few-shot (darle ejemplos previos), y si se obliga al modelo a razonar antes de responder
+      (como en Chain of Thought).
+      • Parámetros de generación: La temperatura (normalmente configurada en  0  para buscar respuestas deterministas), penalizaciones de presencia o frecuencia, y límites estrictos de tokens de salida.
 
-#### Benchmarks clave
+Gracias a esa combinación fija, dos equipos independientes pueden evaluar el mismo modelo y obtener el mismo número: el resultado es comparable. Esto es justo lo que las métricas reference-based de @sec-metricas-auto no pueden darte a nivel de modelo: tú comparas *tu salida* con *tu referencia*, pero no sabes si tu salida es buena en términos absolutos.
+
+#### Benchmarks clave {#sec-benchmarks-clave}
+
+: Benchmarks públicos clave para evaluar LLMs {#tbl-benchmarks-clave}
 
 | Benchmark | Mide | Cuándo mirarlo |
 |---|---|---|
@@ -92,43 +102,48 @@ Gracias a esa combinación fija, dos equipos independientes pueden evaluar el mi
 | **Open LLM Leaderboard** | Agregado de varios benchmarks | Vista panorámica de modelos open-weight |
 | **HELM** | Holístico (múltiples métricas y escenarios a la vez) | Auditoría integral |
 
+
 ::: {.callout-tip}
 ## ¿Por qué MTEB aparece primero?
 
-Porque en este módulo ya lo usas: el [HPD 1 ejecuta MTEB](../evaluables/hpd1-embeddings.qmd#25-evaluación-mteb--validación-profesional-del-modelo) sobre BIOSSES y STS12, y el [entregable de HPD 1](../evaluables/hpd1-evaluables.qmd) te pide justificar la elección de un modelo de embeddings "teniendo en cuenta el benchmark MTEB". Esta sección te da el marco conceptual que da sentido a esa práctica.
+Porque en este módulo ya lo usas: el [HPD 1 ejecuta MTEB](../evaluables/hpd1-embeddings.qmd#sec-mteb-hpd1) sobre BIOSSES y STS12, y el [entregable de HPD 1](../evaluables/hpd1-evaluables.qmd) te pide justificar la elección de un modelo de embeddings "teniendo en cuenta el benchmark MTEB". Esta sección te da el marco conceptual que da sentido a esa práctica.
 :::
 
-#### Cómo leer un leaderboard críticamente
+#### Cómo leer un leaderboard críticamente {#sec-leer-leaderboard}
 
-Un número alto en un leaderboard **no es una garantía** de calidad para tu caso. Cuatro trampas frecuentes:
+Un número alto en un leaderboard no es una garantía de calidad para tu caso. Existen muchos trabajos que han analizado los problemas y límites que tiene la evaluación mediante *benchmarks*.
+
+Entre las cuatro trampas frecuentes se encuentran:
 
 1. **Contamination / overfitting.** Si un modelo se entrenó (total o parcialmente) con el dataset del benchmark, su score es artificial. Los Model Cards de HuggingFace suelen advertirlo; busca la frase *"trained on"* o *"evaluated on"*. Para MMLU y HumanEval hay análisis públicos de contamination que conviene revisar antes de fiarte.
 2. **Saturación.** Cuando todos los modelos punteros pasan del 95 % (lo que ya ocurre con MMLU desde 2024), el benchmark deja de **discriminar**: ya no diferencia "muy bueno" de "excelente". La señal útil está en benchmarks sucesores más duros (MMLU-Pro, GPQA) o en evaluaciones humanas (LMSYS Arena).
-3. **El benchmark no es tu dominio.** MMLU aprueba un examen académico multi-tema; HumanEval resuelve funciones cortas de Python. Ninguno mide "responder preguntas sobre los PDFs de tu empresa". Para eso existen las métricas y frameworks de las secciones 1.2-1.4: **tu** corpus, **tus** preguntas, **tu** ground truth.
+3. **El benchmark no es tu dominio.** MMLU aprueba un examen académico multi-tema; HumanEval resuelve funciones cortas de Python. Ninguno mide "responder preguntas sobre los PDFs de tu empresa". Para eso existen las métricas y frameworks de @sec-metricas-auto--@sec-frameworks: **tu** corpus, **tus** preguntas, **tu** ground truth.
 4. **Métrica ≠ utilidad.** TruthfulQA puntúa "no inventar", pero tu sistema puede fallar de formas que TruthfulQA no captura (alucinaciones con cifras concretas, formato incorrecto, pérdida del contexto RAG). Usa los benchmarks para **filtrar candidatos**, no para certificar el despliegue final.
 
-#### Conexión con el resto del módulo
+#### Conexión con el resto del módulo {#sec-conexion-modulo}
 
 Los benchmarks no aparecen solo en el Bloque 4:
 
-- **Bloque 1** — el [Model Card de HuggingFace](../bloque1/01b-llms.qmd) lista el "benchmark esperado" del modelo, y el HPD 1 lo usa de forma práctica.
-- **Bloque 3** — al hablar de QLoRA frente a LoRA, la diferencia se reporta en "<2 % en benchmarks" (pérdida menor de capacidad por la cuantización).
+- **Bloque 1** — el [Model Card de HuggingFace](../bloque1/01b-llms.qmd) [@huggingface_hub] lista el "benchmark esperado" del modelo, y el HPD 1 lo usa de forma práctica.
+- **Bloque 3** — al hablar de QLoRA frente a LoRA [@dettmers2023qlora; @hu2022lora], la diferencia se reporta en "<2 % en benchmarks" (pérdida menor de capacidad por la cuantización).
 - **Proyecto integrador** — la rúbrica del proyecto final puede pedirte que justifiques la elección de un modelo de embeddings o de un LLM; un leaderboard es la primera evidencia que citarás.
 
-En resumen: los benchmarks son el **filtro de entrada** (¿qué modelos merece la pena probar?), no el veredicto final (¿es bueno *mi* sistema?). Las secciones 1.2-1.4 cubren la segunda pregunta.
+En resumen: los benchmarks son el **filtro de entrada** (¿qué modelos merece la pena probar?), no el veredicto final (¿es bueno *mi* sistema?). @sec-metricas-auto--@sec-frameworks cubren la segunda pregunta.
 
-### 1.2 Métricas automáticas (reference-based)
+### 1.2 Métricas automáticas (reference-based) {#sec-metricas-auto}
 
 Las métricas automáticas comparan la salida del modelo contra una o varias **respuestas de referencia** (ground truth). Son **rápidas y reproducibles** —no necesitan GPU ni LLM externo— pero capturan solo coincidencia superficial, no comprensión real.
 
 | Métrica | Compara | Rango | Cuándo usarla |
 |---|---|---|---|
+: Métricas automáticas reference-based más usadas {#tbl-metricas-ref}
+
 | **ROUGE-L** | Subsecuencia común más larga entre candidato y referencia | [0, 1] | Resúmenes, respuestas largas |
 | **BERTScore** | Similitud de embeddings contextualizados | [0, 1] | Captura paráfrasis (no solo palabras) |
 | **BLEU** | n-gramas compartidos (precisión) | [0, 1] | Traducción, generación corta |
 | **Exact Match (EM)** | Coincidencia literal tras normalizar | {0, 1} | Respuestas factuales cortas |
 
-#### Intuición de ROUGE-L: la subsecuencia común
+#### Intuición de ROUGE-L: la subsecuencia común {#sec-rouge-intuicion}
 
 ROUGE-L mide la subsecuencia común más larga (LCS, *longest common subsequence*) entre candidato y referencia. Una subsecuencia es una secuencia de tokens que aparece en ambos textos en el mismo orden relativo, pero no necesariamente contigua. Por ejemplo, dadas las dos frases:
 
@@ -163,97 +178,58 @@ for c in candidatos:
     print(f"   ROUGE-L = {scores['rougeL'].fmeasure:.3f} -> {c}")
 ```
 
-```{python}
-#| echo: true
-#| eval: true
-
-from collections import Counter
-
-def rouge_l(candidate: str, reference: str, beta: float = 1.0) -> float:
-    """ROUGE-L basado en la subsecuencia común más larga (LCS).
-
-    Implementación con programación dinámica (DP) para encontrar la LCS
-    y combinarla como un F-score entre precisión y recall.
-
-    En producción: usa `rouge-score` (pip install rouge-score) o
-    `evaluate` de Hugging Face, que cubren edge cases y multilenguaje.
-    """
-    cand_tokens = candidate.lower().split()
-    ref_tokens  = reference.lower().split()
-
-    if not cand_tokens or not ref_tokens:
-        return 0.0
-
-    m, n = len(cand_tokens), len(ref_tokens)
-    # dp[i][j] = longitud de la LCS entre cand_tokens[:i] y ref_tokens[:j]
-    dp = [[0] * (n + 1) for _ in range(m + 1)]
-    for i in range(1, m + 1):
-        for j in range(1, n + 1):
-            if cand_tokens[i-1] == ref_tokens[j-1]:
-                # Coincidencia: extendemos la LCS un paso
-                dp[i][j] = dp[i-1][j-1] + 1
-            else:
-                # Sin coincidencia: mejor LCS excluyendo un token
-                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
-
-    lcs = dp[m][n]
-    precision = lcs / m   # ¿cuánto de la respuesta está en la referencia?
-    recall    = lcs / n   # ¿cuánto de la referencia está en la respuesta?
-    if precision + recall == 0:
-        return 0.0
-    # F-score: beta=1 equilibra precisión y recall; beta<1 prioriza precisión
-    return (1 + beta**2) * precision * recall / (recall + beta**2 * precision)
-
-
-# Demostración
-referencia = "El Transformer utiliza atención multi-cabeza para modelar dependencias"
-candidatos = [
-    "El Transformer usa atención multi-cabeza para dependencias",   # buena
-    "El modelo aplica self-attention con múltiples cabezas",         # paráfrasis
-    "Las redes recurrentes procesan secuencias con LSTM",            # incorrecta
-]
-
-print(f"Referencia: {referencia}\n")
-for c in candidatos:
-    print(f"  ROUGE-L = {rouge_l(c, referencia):.3f}  →  {c}")
-```
-
 Fíjate en la **F-score** con `beta`: si `beta = 1`, precisión y recall pesan igual. Si `beta < 1` (p. ej. `0.5`), la precisión pesa más, lo que penaliza respuestas largas con información extra. Para resúmenes suele usarse `beta` mayor (favorecer recall).
 
-#### Cuándo ROUGE miente
+#### Cuándo ROUGE miente {#sec-rouge-miente}
 
-ROUGE mide **estructura narrativa**, no corrección factual. Esto produce tres tipos de fallo típicos:
+ROUGE mide estructura narrativa, no corrección factual. Esto produce tres tipos de fallo típicos:
 
 | Caso | ROUGE-L | Realidad |
 |---|---|---|
+: Casos típicos en los que ROUGE-L produce un score engañoso {#tbl-rouge-fallos}
+
 | Paráfrasis perfecta con palabras distintas | ~0.4–0.5 | La respuesta es **correcta** |
 | Fecha incorrecta pero estructura idéntica | ~0.7 | La respuesta es **incorrecta** |
 | Respuesta "No tengo información" cuando no hay contexto | 0.0 | La respuesta es **apropiada** |
 
 El segundo caso es el más peligroso: una respuesta que suena plausible y comparte la estructura de la referencia obtendrá un score alto aunque el dato clave sea falso. Por eso ROUGE nunca debe ser la única métrica de un sistema en producción.
 
-#### BERTScore vs ROUGE: significado vs palabras
+#### BERTScore vs ROUGE: significado vs palabras {#sec-bertscore-vs-rouge}
 
-BERTScore reemplaza la comparación palabra-por-palabra por una comparación de **embeddings contextualizados** generados por un modelo tipo BERT. En lugar de preguntar *"¿coincide la palabra 'atención'?"*, pregunta *"¿el embedding contextual de 'atención' en esta frase es similar al embedding de 'self-attention' en la frase de referencia?"*. Esto captura paráfrasis que ROUGE pierde.
+BERTScore reemplaza la comparación palabra-por-palabra por una comparación de embeddings contextualizados generados por un modelo tipo BERT. En lugar de preguntar *"¿coincide la palabra 'atención'?"*, pregunta *"¿el embedding contextual de 'atención' en esta frase es similar al embedding de 'self-attention' en la frase de referencia?"*. Esto captura paráfrasis que ROUGE pierde.
 
 | Frase del candidato | Frase de la referencia | ROUGE-L | BERTScore |
 |---|---|---|---|
+: Comparativa de BERTScore frente a ROUGE-L en paráfrasis {#tbl-bertscore-vs-rouge}
+
 | "usa atención multi-cabeza" | "usa self-attention con varias cabezas" | ~0.5 | ~0.9 |
 | "aplica atención convolucional" | "usa auto-atención" | ~0.4 | ~0.7 |
 
-La segunda fila muestra la **limitación** clave de BERTScore: si la respuesta dice algo *plausible pero incorrecto* (atención **convolucional** en lugar de **auto-atención**), los embeddings siguen siendo cercanos y BERTScore da un score engañosamente alto. Por eso BERTScore complementa, pero no sustituye, a LLM-as-judge o evaluación humana.
+La segunda fila muestra la limitación clave de BERTScore: si la respuesta dice algo *plausible pero incorrecto* (atención convolucional en lugar de auto-atención), los embeddings siguen siendo cercanos y BERTScore da un score engañosamente alto. Por eso BERTScore complementa, pero no sustituye, a LLM-as-judge o evaluación humana.
 
 ::: {.callout-warning}
 ## Limitación fundamental de las métricas reference-based
 
-ROUGE/BLEU/BERTScore miden **similitud con la referencia**, no corrección factual. Una respuesta factualmente correcta pero con palabras distintas obtendrá score bajo; una respuesta incorrecta pero estructuralmente similar obtendrá score alto. Para detectar errores reales necesitas **LLM-as-a-judge** o evaluación humana.
+ROUGE/BLEU/BERTScore miden similitud con la referencia, no corrección factual. Una respuesta factualmente correcta pero con palabras distintas obtendrá score bajo; una respuesta incorrecta pero estructuralmente similar obtendrá score alto. Para detectar errores reales necesitas LLM-as-a-judge o evaluación humana.
 :::
 
-### 1.3 LLM-as-a-judge
+### 1.3 LLM-as-a-judge {#sec-llm-judge}
+La técnica de LLM-as-a-judge consiste en utilizar un modelo de lenguaje avanzado como evaluador automático. A diferencia de las métricas léxicas o basadas en embeddings (@sec-metricas-auto), que realizan comparaciones superficiales o matemáticas de vectores, el LLM-as-a-judge analiza la calidad de la salida interpretando el significado, la coherencia lógica y la adecuación contextual, de forma muy cercana a como lo haría un experto humano.
 
-Consiste en usar un LLM potente como **evaluador automático**: recibe `(pregunta, respuesta, contexto)`, produce una puntuación o un veredicto. Es la técnica más cercana a la evaluación humana sin necesidad de anotadores, y funciona porque los LLMs modernos han sido entrenados con RLHF, que internaliza parcialmente las preferencias humanas sobre calidad de texto.
+#### ¿Por qué funciona este enfoque?
+La fiabilidad de este paradigma se apoya en la hipótesis de alineación. Los LLMs punteros han sido entrenados mediante aprendizaje por refuerzo con feedback humano (RLHF) y optimización de preferencias (DPO). Este proceso no solo les capacita para seguir instrucciones, sino que les dota de una "sensibilidad" interna hacia los criterios de calidad humana (corrección, veracidad, tono y estructura). Múltiples estudios demuestran que la correlación de las decisiones de un juez potente (como GPT o Claude) con las de evaluadores humanos (comités de expertos) suele superar el 80%, superando con creces a cualquier métrica automática clásica.
 
-#### Scoring absoluto (escala 0-5)
+#### El flujo de información
+Para realizar una evaluación, el modelo juez suele ser alimentado con tres o cuatro elementos:
+1. **Entrada original (Pregunta/Prompt):** Define la tarea e intención del usuario.
+2. **Respuesta generada (Salida del sistema):** El texto que se desea juzgar.
+3. **Contexto de soporte (en RAG):** La información recuperada en la que debe basarse la respuesta.
+4. **Respuesta de referencia (Ground Truth - opcional):** La respuesta ideal redactada por un experto.
+
+A partir de este conjunto, y guiado por una rúbrica de evaluación muy definida en su prompt de sistema, el juez emite un veredicto estructurado que incluye dos partes: una calificación cuantitativa (puntuación numérica o clasificación) y una justificación cualitativa (el razonamiento detallado del veredicto), lo cual facilita enormemente la depuración del sistema.
+
+
+#### Scoring absoluto (escala 0-5) {#sec-scoring-absoluto}
 
 El patrón más simple: pedir al juez que asigne un número de una escala definida. Funciona bien cuando tienes una sola respuesta y quieres compararla con un umbral.
 
@@ -362,23 +338,83 @@ ejemplo = llm_as_judge(
 print(ejemplo)
 ```
 
-#### Diseñar el rubric del juez (5 principios)
+#### Diseñar el rubric del juez (5 principios) {#sec-rubric-juez}
 
-La calidad del juez depende casi enteramente del **prompt de evaluación**. Un rubric malo produce ruido; uno bueno, señales interpretables. Cinco principios probados:
+La calidad de un LLM como juez no depende de su tamaño o potencia de manera abstracta, sino de la precisión del prompt con el que se le instruye. Diseñar una **rúbrica de evaluación (rubric)** de baja calidad introduce ruido estadístico y sesgos; diseñar una buena rúbrica convierte las evaluaciones en señales de calidad fiables. 
 
-1. **Criterios explícitos y disjuntos**: cada nivel de la escala debe corresponder a un comportamiento distinguible. Si dos niveles adyacentes se solapan, el juez no sabe cuál elegir.
-2. **Escala con suficientes niveles**: 0–5 permite discriminar; 0–2 es demasiado burdo. Más de 7 niveles satura la capacidad del juez.
-3. **Anclas concretas**: mejor *"responde correctamente y cita la fuente"* que *"responde correctamente"*. Las anclas eliminan ambigüedad.
-4. **Output estructurado**: pide JSON con campos separados (`puntuacion`, `justificacion`). Facilita el post-procesado y reduce alucinaciones de formato.
-5. **Temperatura 0**: variabilidad del juez entre llamadas con el mismo input es ruido. Para evaluar, queremos determinismo.
+A continuación se detallan cinco principios fundamentales para diseñar prompts de evaluación:
 
-Ejemplo de rubric **malo** (puroSubjectividad):
+##### 1. Mutua exclusividad: Criterios explícitos y disjuntos
+Si dos niveles contiguos en una escala no son claramente distinguibles, el modelo dudará y distribuirá su voto de forma aleatoria, aumentando la variabilidad intra-juez. Evita descripciones subjetivas como *"Puntuación 3: La respuesta es mayormente buena"* y *"Puntuación 4: La respuesta es muy buena"*. En su lugar, define fronteras operativas claras basadas en hechos observables (por ejemplo: *"Puntuación 3: Responde la pregunta pero omite detalles numéricos"*; *"Puntuación 4: Responde la pregunta e incluye todos los datos numéricos exactos"*).
 
-> *"Evalúa la calidad de la respuesta de 0 a 5."*
+##### 2. Calibración de la escala (Granularidad adecuada)
+La elección de la escala de puntuación es un compromiso entre granularidad y consistencia:
+*   **Escalas binarias (0-1):** Ideales para verificar condiciones duras (p. ej., si la respuesta contiene o no lenguaje ofensivo, o si el formato es un JSON válido). Son altamente consistentes pero no capturan matices.
+*   **Escalas tipo Likert (1-4 o 1-5):** El estándar recomendado para evaluar calidad general, fluidez o veracidad. Permiten gradación sin saturar la capacidad de discriminación del modelo.
+*   **Escalas amplias (1-10 o 1-100):** Deben evitarse. A los LLMs les cuesta mucho calibrar la diferencia entre un 7 y un 8 sin una rúbrica extremadamente prolija, lo que genera una alta varianza y un sesgo hacia los extremos o el valor medio (5).
 
-Ejemplo de rubric **bueno** (el que usamos arriba): cada nivel tiene un comportamiento claro y mutuamente excluyente. El LLM tiene criterios objetivos para decidir entre niveles adyacentes.
+##### 3. Anclas operacionales (Evitar adjetivos cualitativos)
+El LLM no sabe qué es "coherente" o "útil" para tu negocio de forma mágica. Debes operacionalizar estos conceptos. En lugar de pedirle al modelo que evalúe si la respuesta es "precisa", indícale los pasos lógicos de verificación:
+*   *Incorrecto:* "Juzga si la respuesta es precisa."
+*   *Correcto:* "Verifica si cada afirmación de la respuesta está respaldada directamente por al menos una frase del contexto recuperado. Si hay alguna afirmación que no pueda rastrearse al contexto, reduce la puntuación."
 
-#### Comparación pairwise (A vs B)
+##### 4. Razonamiento antes de calificar (Chain of Thought en el Juez)
+Este es un principio crucial de la inferencia con LLMs. Si obligas al modelo a devolver el JSON empezando por la puntuación (p. ej., `{"puntuacion": 5, "justificacion": "..."}`), el modelo se ve forzado a estimar la nota en el primer token generado, sin haber "reflexionado" sobre las afirmaciones. 
+Al invertir el orden y pedirle que escriba primero su razonamiento detallado (p. ej., `{"justificacion": "...", "puntuacion": 5}`), el modelo realiza un proceso de Chain of Thought implícito que sustenta y estabiliza la nota final.
+
+##### 5. Configuración determinista y control de parámetros
+La evaluación requiere reproducibilidad. Un test unitario no puede pasar o fallar de forma aleatoria en base a la semilla del modelo.
+*   **Temperatura 0:** Apaga la creatividad del modelo evaluador para que la respuesta ante el mismo caso de test sea siempre idéntica.
+*   **JSON estructurado:** Exige y valida el formato del output mediante técnicas de *structured outputs* (como el modo JSON de OpenAI o esquemas Pydantic). Esto asegura que los scripts de análisis puedan parsear automáticamente miles de evaluaciones sin romperse debido a texto libre introducido por el modelo.
+
+---
+
+##### Comparativa de rúbricas: Del ruido a la señal
+
+Para ver la diferencia práctica de estos principios aplicados, comparemos un diseño deficiente frente a uno profesional:
+
+::: {.callout-note}
+## Rúbrica Deficiente (Mala)
+```markdown
+Eres un evaluador. Lee la respuesta del modelo y compárala con el contexto.
+Puntúa la respuesta de 1 a 5 según su calidad.
+
+Contexto: {contexto}
+Pregunta: {pregunta}
+Respuesta: {respuesta}
+
+Puntuación: 
+Justificación:
+```
+*   **Problemas:** Puntuación en primer lugar (sin CoT), escala sin descripciones de los niveles (puro criterio subjetivo del modelo), formato de salida no estructurado difícil de parsear por código.
+:::
+
+::: {.callout-tip}
+## Rúbrica Profesional (Buena)
+```markdown
+Eres un auditor de veracidad para sistemas de información. Tu tarea es evaluar si la respuesta generada por el asistente se sustenta rigurosamente en el contexto proporcionado.
+
+Analiza el caso siguiendo estos pasos:
+1. Lista las afirmaciones individuales presentes en la respuesta.
+2. Compara cada afirmación con el contexto y clasifícala como "Sustentada" o "No Sustentada".
+3. Escribe tu análisis detallado en el campo 'justificacion'.
+4. Asigna la puntuación en el campo 'puntuacion' según esta escala exacta:
+   - 1: La respuesta contiene afirmaciones contradichas directamente por el contexto.
+   - 2: La respuesta contiene afirmaciones que no pueden verificarse en el contexto (información inventada).
+   - 3: La respuesta no contiene contradicciones ni mentiras, pero omite responder a la pregunta central planteada.
+   - 4: La respuesta es verídica y responde a la pregunta, pero omite matices o datos secundarios del contexto.
+   - 5: La respuesta está totalmente sustentada en el contexto, responde de forma precisa y completa a la pregunta, sin añadir información externa.
+
+Formato de salida obligatorio (JSON):
+{
+  "justificacion": "<tu análisis paso a paso>",
+  "puntuacion": <int de 1 a 5>
+}
+```
+*   **Ventajas:** Exige el razonamiento estructurado previo a la nota (Chain of Thought), define niveles mutuamente excluyentes, elimina adjetivos abstractos, y fuerza una estructura JSON robusta con la justificación en primer lugar.
+:::
+
+#### Comparación pairwise (A vs B) {#sec-pairwise}
 
 Cuando el sistema genera **varias respuestas candidatas** (best-of-N, A/B testing de prompts, comparar dos modelos), el scoring absoluto se queda corto: el juez satura arriba o abajo y pierde sensibilidad. La comparación pairwise —*"¿A o B?"*— es más discriminante y más estable.
 
@@ -446,12 +482,14 @@ if LLM_KEY:
 
 Truco para A/B statistically robust: ejecuta el juez **dos veces** intercambiando el orden de A y B. Si el veredicto cambia, la diferencia es ambigua (position bias). Si se mantiene, es señal real.
 
-#### Coste y latencia
+#### Coste y latencia {#sec-coste-latencia}
 
 Cada evaluación es una llamada al LLM juez, así que el coste escala con el tamaño del dataset de evaluación. Una evaluación típica (250 tokens de prompt + 50 de salida) cuesta:
 
 | Modelo juez | Coste aprox. por evaluación | Notas |
 |---|---|---|
+: Coste aproximado por evaluación con LLM-as-judge {#tbl-juez-coste}
+
 | GPT-4o / Claude Sonnet (cloud) | $0.001 – $0.003 | Mejor calidad, datos salen a la nube |
 | `gemma4:e2b-mlx` (Llamus US) | institucional | Sin coste directo, datos en la US |
 | Llama-3.1-8B (on-prem) | solo GPU | Privacidad total, requiere infraestructura |
@@ -471,14 +509,14 @@ Truco del **filtrado en cascada**: si evalúas miles de casos, usa un juez barat
 Ninguna métrica automática sustituye al evaluador humano para producción crítica.
 :::
 
-### 1.4 Frameworks de evaluación
+### 1.4 Frameworks de evaluación {#sec-frameworks}
 
 - **RAGAS** (ya usado en el Bloque 3): `faithfulness`, `answer_relevancy`, `context_precision` sin necesidad de ground truth.
 - **DeepEval** ([github.com/confident-ai/deepeval](https://github.com/confident-ai/deepeval)): 14+ métricas (G-Eval, hallucination, bias, toxicity) con pytest.
 - **LangSmith** (LangChain): trazabilidad de cadenas + evaluadores integrados.
 - **OpenAI Evals**: framework open-source para crear benchmarks custom.
 
-#### DeepEval en detalle
+#### DeepEval en detalle {#sec-deepeval-detalle}
 
 DeepEval ([github.com/confident-ai/deepeval](https://github.com/confident-ai/deepeval)) es el framework más flexible para equipos que ya trabajan con `pytest`. Trata la evaluación de LLMs como **unit testing**: defines test cases, declaras métricas con thresholds, y los tests pasan o fallan en CI/CD. Sus dos puntos fuertes son:
 
@@ -561,10 +599,12 @@ deepeval test run test_rag.py
 
 Si alguna métrica no supera el threshold, el test falla y el CI bloquea el despliegue. Esto convierte la calidad del LLM en una propiedad verificable, no en una sensación.
 
-#### Cuándo usar cada framework
+#### Cuándo usar cada framework {#sec-cuando-framework}
 
 | Framework | Tipo de sistema | Punto fuerte | Limitación |
 |---|---|---|---|
+: Frameworks de evaluación de LLMs comparados {#tbl-frameworks}
+
 | **RAGAS** | RAG | Métricas listas sin ground truth (faithfulness, context_precision) | Solo cubre RAG, no agentes |
 | **DeepEval** | RAG, agentes, chat | Métricas custom con G-Eval + integración pytest | Requiere definir test cases |
 | **LangSmith** | LangChain / LlamaIndex | Trazabilidad de cada paso + evaluación online | Acoplado a un framework |
@@ -580,7 +620,12 @@ Regla práctica:
 ## Estrategia recomendada
 
 1. **Prototipo (semana 1-2):** RAGAS para evaluación rápida sin ground truth (faithfulness, answer_relevancy, context_precision).
-2. **Pre-producción (semana 3-4):** añade LLM-as-judge con un modelo distinto al que genera. Empieza con scoring absoluto (§1.2) y pasa a pairwise cuando compares versiones.
-3. **Producción:** dashboard con LangSmith + revisión humana de una muestra (5-10 %). Usa DeepEval para tests automatizados en CI/CD.
+2. **Pre-producción (semana 3-4):** añade LLM-as-judge con un modelo distinto al que genera. Empieza con scoring absoluto (@sec-scoring-absoluto) y pasa a pairwise cuando compares versiones.
+3. **Producción:** dashboard con LangSmith [@langsmith] + revisión humana de una muestra (5-10 %). Usa DeepEval [@deepeval] para tests automatizados en CI/CD.
 4. **Iteración:** cada cambio (prompt, modelo, chunk size) requiere reevaluar contra el mismo dataset versionado. Sin esto, no puedes saber si una mejora es real o ruido.
+:::
+
+# References
+
+::: {#refs}
 :::

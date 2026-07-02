@@ -84,3 +84,8 @@ graph LR
 3. Entiende **MCP** para estandarizar la conexión a datos
 4. Construye **agentes** uniendo todos los conceptos
 5. Ponlo en práctica con los HPDs: un **agente con herramientas** (HPD 2) y un **servidor MCP** (HPD 3)
+
+# References
+
+::: {#refs}
+:::

@@ -89,7 +89,7 @@ Los LLMs se preentrenan con un objetivo aparentemente simple: **predecir el sigu
 
 $$P(t_{i+1} | t_1, ..., t_i)$$
 
-De este proceso emergen capacidades complejas: sintaxis, semántica, razonamiento, conocimiento factual. Las **scaling laws** (Kaplan et al., 2020) demostraron que el rendimiento mejora de forma predecible al escalar:
+De este proceso emergen capacidades complejas: sintaxis, semántica, razonamiento, conocimiento factual. Las **scaling laws** (@kaplan2020scaling) demostraron que el rendimiento mejora de forma predecible al escalar:
 - Número de parámetros del modelo
 - Tamaño del dataset de entrenamiento
 - Cómputo total
@@ -366,3 +366,8 @@ for m in models["data"]:
 ---
 
 > Continúa con **[01c-embeddings.qmd](01c-embeddings.qmd)** — Modelos de Embeddings.
+
+# References
+
+::: {#refs}
+:::

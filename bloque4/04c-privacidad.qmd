@@ -68,7 +68,7 @@ Estas regex atrapan formatos comunes, pero fallan con:
 - Direcciones físicas completas.
 - Variantes con espacios, puntos o caracteres Unicode.
 
-Para producción usa herramientas especializadas: [Microsoft Presidio](https://github.com/microsoft/presidio) o [comprehend](https://aws.amazon.com/comprehend/) de AWS.
+Para producción usa herramientas especializadas: [Microsoft Presidio](https://github.com/microsoft/presidio) [@presidio] o [comprehend](https://aws.amazon.com/comprehend/) de AWS.
 :::
 
 ### 3.2 Datos sintéticos y privacidad {#sec-sinteticos-privacidad}
@@ -149,6 +149,11 @@ df_dp = synth_dp.sample(1000)
 - [ ] Calcular **DCR** (media y percentil 5) sobre datos sintéticos vs. reales.
 - [ ] Si `dcr_p5 < 0.01` (registros casi idénticos) → riesgo alto, no publiques.
 - [ ] Configurar `epsilon` entre 1.0 (privacidad fuerte) y 10.0 (utilidad alta).
-- [ ] Documentar el esquema y los parámetros en la **Model Card** del dataset sintético.
-- [ ] Considerar ataques de **membership inference** como test adversarial.
+- [ ] Documentar el esquema y los parámetros en la **Model Card** del dataset sintético [@mitchell2019modelcards].
+- [ ] Considerar ataques de **membership inference** como test adversarial. Para privacidad diferencial formal ver @dwork2014dp.
+:::
+
+# References
+
+::: {#refs}
 :::

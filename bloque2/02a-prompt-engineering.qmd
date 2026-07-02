@@ -541,4 +541,9 @@ else:
 5. **Itera**: el primer prompt casi nunca es el óptimo. Prueba, compara, mejora
 6. **System prompt**: define el tono, rol y restricciones al inicio
 
-> **Lectura recomendada:** [Prompt Engineering Guide (DAIR.AI)](https://www.promptingguide.ai/)
+> **Lectura recomendada:** [Prompt Engineering Guide (DAIR.AI)](https://www.promptingguide.ai/) [@promptingguide]. Para técnicas específicas de razonamiento, ver también @wei2022cot y @yao2023react.
+
+# References
+
+::: {#refs}
+:::

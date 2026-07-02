@@ -494,13 +494,18 @@ plt.show()
 
 ## Referencias del tema {#sec-referencias-datos-sinteticos}
 
-- Xu, L. et al. (2019). *Modeling Tabular Data using Conditional GAN* (CTGAN). NeurIPS 2019. [arXiv:1907.00503](https://arxiv.org/abs/1907.00503)
-- Patki, N. et al. (2016). *The Synthetic Data Vault*. IEEE DSAA 2016. [PDF](https://dai.lids.mit.edu/wp-content/uploads/2018/03/SDV.pdf)
-- Kotelnikov, A. et al. (2023). *TabDDPM: Modelling Tabular Data with Diffusion Models*. ICML 2023. [arXiv:2209.15421](https://arxiv.org/abs/2209.15421)
-- Xu, L. & Veeramachaneni, K. (2018). *Synthesizing Tabular Data using Generative Adversarial Networks*. [arXiv:1811.11264](https://arxiv.org/abs/1811.11264)
-- Goodfellow, I. et al. (2014). *Generative Adversarial Nets*. NeurIPS 2014. [arXiv:1406.2661](https://arxiv.org/abs/1406.2661)
-- Kingma, D. & Welling, M. (2013). *Auto-Encoding Variational Bayes*. ICLR 2014. [arXiv:1312.6114](https://arxiv.org/abs/1312.6114)
+- @xu2019ctgan
+- @patki2016sdv
+- @kotelnikov2023tabddpm
+- @xu2018tabular
+- @goodfellow2014gan
+- @kingma2014vae
 
 ---
 
 > Continúa con la validación práctica en los **[ejercicios de datos sintéticos](../evaluables/hpd4-datos-sinteticos.qmd)**.
+
+# References
+
+::: {#refs}
+:::

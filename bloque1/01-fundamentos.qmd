@@ -115,17 +115,17 @@ print(f"NumPy: {np.__version__}")
 
 ## Referencias del bloque {#sec-referencias}
 
-- Devlin, J., Chang, M., Lee, K. & Toutanova, K. (2018). **BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding**. arXiv:1810.04805
-- Vaswani, A. et al. (2017). **Attention is All You Need**. NeurIPS. [arXiv:1706.03762](https://arxiv.org/abs/1706.03762)
-- Kaplan, J. et al. (2020). **Scaling Laws for Neural Language Models**. arXiv:2001.08361
-- Hoffmann, J. et al. (2022). **Training Compute-Optimal Large Language Models** (Chinchilla). arXiv:2203.15556
-- Su, J. et al. (2021). **RoFormer: Enhanced Transformer with Rotary Position Embedding** (RoPE). arXiv:2104.09864
-- Dao, T. et al. (2022). **FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness**. arXiv:2205.14135
-- Reimers, N. & Gurevych, I. (2019). **Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks**. [arXiv:1908.10084](https://arxiv.org/abs/1908.10084)
-- Wang, L. et al. (2022). **Text Embeddings by Weakly-Supervised Contrastive Pre-training** (E5). arXiv:2212.03533
-- Radford, A. et al. (2021). **Learning Transferable Visual Models From Natural Language Supervision** (CLIP). arXiv:2103.00020
-- Malkov, Y. & Yashunin, D. (2018). **Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs** (HNSW). IEEE TPAMI. [arXiv:1603.09320](https://arxiv.org/abs/1603.09320)
-- Johnson, J., Douze, M. & Jégou, H. (2019). **Billion-scale similarity search with GPUs** (FAISS). IEEE TBD. [arXiv:1702.08734](https://arxiv.org/abs/1702.08734)
+- @devlin2019bert
+- @vaswani2017attention
+- @kaplan2020scaling
+- @hoffmann2022chinchilla
+- @su2021roformer
+- @dao2022flashattention
+- @reimers2019sbert
+- @wang2022e5
+- @radford2021clip
+- @malkov2018hnsw
+- @johnson2019faiss
 
 ---
 
@@ -160,5 +160,12 @@ Tras haber asimilado los conceptos de las secciones anteriores, puedes pasar al 
 
 1. Asegúrate de haber ejecutado `source .venv/bin/activate` (o `setup.bat` en Windows)
 2. Confirma que ejecutaste todas las celdas de código de los sub-temas sin errores
-3. Lee Vaswani et al. (2017) secciones 3-5 (lectura obligatoria)
+3. Lee Vaswani et al. [-@vaswani2017attention] secciones 3-5 (lectura obligatoria)
+:::
+
+---
+
+# References
+
+::: {#refs}
 :::

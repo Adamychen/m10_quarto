@@ -770,14 +770,19 @@ graph TD
 
 ## Referencias {#sec-referencias-rag}
 
-- Lewis, P. et al. (2020). **Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks**. NeurIPS. [arXiv:2005.11401](https://arxiv.org/abs/2005.11401)
-- Gao, Y. et al. (2024). **RAGAS: Automated Evaluation of Retrieval Augmented Generation**. [arXiv:2309.15217](https://arxiv.org/abs/2309.15217)
-- Gao, L. & Callan, J. (2024). **Precise Zero-Shot Dense Retrieval without Relevance Labels** (HyDE). ACL. [arXiv:2212.10496](https://arxiv.org/abs/2212.10496)
-- Luan, Y. et al. (2023). **FlashRank: Efficient and Accurate Reranking for Information Retrieval**. [GitHub](https://github.com/PrithivirajDamodaran/FlashRank)
-- Karpukhin, V. et al. (2020). **Dense Passage Retrieval for Open-Domain Question Answering** (DPR). EMNLP. [arXiv:2004.04906](https://arxiv.org/abs/2004.04906)
+- @lewis2020rag
+- @es2024ragas
+- @gao2024hyde
+- @luan2023flashrank
+- @karpukhin2020dpr
 
 ---
 
 > Continúa con **[03a — Datos Sintéticos](03a-datos-sinteticos.qmd)** o con **[03c — Fine-tuning Eficiente](03c-fine-tuning.qmd)**.
 >
 > Cuando estés listo, pasa al taller práctico: **[HPD 4 — Sistema RAG sobre datos mixtos](../evaluables/hpd4-rag-mixto.qmd)**.
+
+# References
+
+::: {#refs}
+:::

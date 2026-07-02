@@ -58,7 +58,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -77,7 +97,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-f97a59afa23c78b76dca51217b896fc0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-98abfb5de123bd3eb994533863133005.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -498,13 +518,14 @@ window.Quarto = {
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#arquitectura-transformer" id="toc-arquitectura-transformer" class="nav-link active" data-scroll-target="#arquitectura-transformer">Arquitectura Transformer</a>
+  <li><a href="#sec-arquitectura-transformer" id="toc-sec-arquitectura-transformer" class="nav-link active" data-scroll-target="#sec-arquitectura-transformer">Arquitectura Transformer</a>
   <ul class="collapse">
-  <li><a href="#el-problema-que-resuelve" id="toc-el-problema-que-resuelve" class="nav-link" data-scroll-target="#el-problema-que-resuelve">El problema que resuelve</a></li>
-  <li><a href="#atención-multi-cabeza-multi-head-attention" id="toc-atención-multi-cabeza-multi-head-attention" class="nav-link" data-scroll-target="#atención-multi-cabeza-multi-head-attention">Atención multi-cabeza (Multi-Head Attention)</a></li>
+  <li><a href="#sec-problema-resuelve" id="toc-sec-problema-resuelve" class="nav-link" data-scroll-target="#sec-problema-resuelve">El problema que resuelve</a></li>
+  <li><a href="#sec-atencion-multi-cabeza" id="toc-sec-atencion-multi-cabeza" class="nav-link" data-scroll-target="#sec-atencion-multi-cabeza">Atención multi-cabeza (Multi-Head Attention)</a></li>
   <li><a href="#codificación-posicional" id="toc-codificación-posicional" class="nav-link" data-scroll-target="#codificación-posicional">Codificación posicional</a></li>
-  <li><a href="#variantes-de-la-arquitectura" id="toc-variantes-de-la-arquitectura" class="nav-link" data-scroll-target="#variantes-de-la-arquitectura">Variantes de la arquitectura</a></li>
+  <li><a href="#sec-variantes" id="toc-sec-variantes" class="nav-link" data-scroll-target="#sec-variantes">Variantes de la arquitectura</a></li>
   </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="01a-transformer.ipynb" download="01a-transformer.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
@@ -534,10 +555,10 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p>Este tema forma parte del <strong>Bloque 1 — Fundamentos</strong>. Se recomienda seguir el orden propuesto: Transformer → LLMs → Embeddings → Vector DB.</p>
 </blockquote>
-<div id="e4e95d9a" class="cell" data-execution_count="1">
+<div id="227beaab" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q matplotlib</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="43a3d3ff" class="cell" data-execution_count="2">
+<div id="b6dcab73" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
@@ -553,19 +574,23 @@ window.Quarto = {
 <pre><code>Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<section id="arquitectura-transformer" class="level2">
-<h2 class="anchored" data-anchor-id="arquitectura-transformer">Arquitectura Transformer</h2>
-<section id="el-problema-que-resuelve" class="level3">
-<h3 class="anchored" data-anchor-id="el-problema-que-resuelve">El problema que resuelve</h3>
+<section id="sec-arquitectura-transformer" class="level2">
+<h2 class="anchored" data-anchor-id="sec-arquitectura-transformer">Arquitectura Transformer</h2>
+<section id="sec-problema-resuelve" class="level3">
+<h3 class="anchored" data-anchor-id="sec-problema-resuelve">El problema que resuelve</h3>
 <p>Antes de la aparición del modelo Transformer, los modelos secuenciales dominaban el procesamiento de lenguaje (RNN, LSTM, GRU, etc.). Estos modelos se catalogan bajo el paraguas de <strong>modelos secuenciales</strong> por su forma de procesar los tokens, uno tras otro, de forma secuencial, lo que imponía ciertas restricciones: - Impide la paralelización (cada token depende del anterior). - Sufre desvanecimiento de gradiente en secuencias largas. - Dificulta capturar dependencias de largo alcance.</p>
-<p>La arquitectura <strong>Transformer</strong> (Vaswani et al., 2017) resolvió estos problemas introduciendo el <strong>mecanismo de atención</strong> para reemplazar el <strong>mecanisno de recurrencia</strong> (limitada) usado hasta el momento, algo que permitió procesar un conjunto de tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones de ese conjunto de tokens.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="../images/diagrama_transformer_original.webp" class="img-fluid figure-img"></p>
-<figcaption>Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)</figcaption>
+<p>La arquitectura <strong>Transformer</strong> (<span class="citation" data-cites="vaswani2017attention">Vaswani et al. (<a href="#ref-vaswani2017attention" role="doc-biblioref">2017</a>)</span>) resolvió estos problemas introduciendo el <strong>mecanismo de atención</strong> para reemplazar el <strong>mecanisno de recurrencia</strong> (limitada) usado hasta el momento, algo que permitió procesar un conjunto de tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones de ese conjunto de tokens.</p>
+<div id="fig-arquitectura-transformer" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-arquitectura-transformer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../images/diagrama_transformer_original.webp" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-arquitectura-transformer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Arquitectura Transformer — encoder-decoder con atención multi-cabeza (<span class="citation" data-cites="vaswani2017attention">Vaswani et al. (<a href="#ref-vaswani2017attention" role="doc-biblioref">2017</a>)</span>, Figure 1)
+</figcaption>
 </figure>
 </div>
-<div id="27641f30" class="cell" data-execution_count="3">
+<div id="5eb1b0c8" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fig, (ax1, ax2) <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>, <span class="fl">3.5</span>))</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fig.patch.set_facecolor(<span class="st">'white'</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -611,8 +636,8 @@ window.Quarto = {
 </div>
 </div>
 </section>
-<section id="atención-multi-cabeza-multi-head-attention" class="level3">
-<h3 class="anchored" data-anchor-id="atención-multi-cabeza-multi-head-attention">Atención multi-cabeza (Multi-Head Attention)</h3>
+<section id="sec-atencion-multi-cabeza" class="level3">
+<h3 class="anchored" data-anchor-id="sec-atencion-multi-cabeza">Atención multi-cabeza (Multi-Head Attention)</h3>
 <p>El núcleo del Transformer se encuentra en el mecanismo de <strong>scaled dot-product attention</strong> (atención basada en el producto escalar). En este proceso, para cada token se calculan tres vectores numéricos, que <em>presuponen</em> el siguiente contenido semántico:</p>
 <ul>
 <li><strong>Q (Query):</strong> qué información busca este token.</li>
@@ -622,15 +647,19 @@ window.Quarto = {
 <p>A partir de estos, la atención se calcula como:</p>
 <p><span class="math display">\[\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V\]</span></p>
 <p>donde el producto <span class="math inline">\(Q·K^T\)</span> mide la similitud entre cada par de tokens; el factor <span class="math inline">\(\sqrt{d_k}\)</span> sirve como escala normalizadora para evitar que los valores crezcan demasiado en módulo; la <strong>multi-cabeza</strong> ejecuta este proceso en paralelo con pesos distintos, permitiendo al modelo <em>atender</em> a diferentes relaciones simultáneamente (sintaxis, semántica, coreferencias, etc.).</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="../images/multi-head-attention.webp" class="img-fluid figure-img"></p>
-<figcaption>Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (Vaswani et al., 2017, Figure 2)</figcaption>
+<div id="fig-sdpa-vs-mha" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-sdpa-vs-mha-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../images/multi-head-attention.webp" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-sdpa-vs-mha-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2: Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (<span class="citation" data-cites="vaswani2017attention">Vaswani et al. (<a href="#ref-vaswani2017attention" role="doc-biblioref">2017</a>)</span>, Figure 2)
+</figcaption>
 </figure>
 </div>
-<section id="scaled-dot-product-attention-low-level-numpy" class="level4">
-<h4 class="anchored" data-anchor-id="scaled-dot-product-attention-low-level-numpy">Scaled Dot-Product Attention — Low Level (numpy)</h4>
-<div id="5e85461f" class="cell" data-execution_count="4">
+<section id="sec-sdpa-numpy" class="level4">
+<h4 class="anchored" data-anchor-id="sec-sdpa-numpy">Scaled Dot-Product Attention — Low Level (numpy)</h4>
+<div id="2837bafa" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> scaled_dot_product_attention_numpy(Q, K, V):</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Atención paso a paso con numpy. Muestra la matemática subyacente."""</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    d_k <span class="op">=</span> K.shape[<span class="op">-</span><span class="dv">1</span>]</span>
@@ -660,9 +689,9 @@ Cada fila suma 1: [1. 1. 1.]</code></pre>
 </div>
 </div>
 </section>
-<section id="scaled-dot-product-attention-high-level-pytorch" class="level4">
-<h4 class="anchored" data-anchor-id="scaled-dot-product-attention-high-level-pytorch">Scaled Dot-Product Attention — High Level (PyTorch)</h4>
-<div id="23e91cd4" class="cell" data-execution_count="5">
+<section id="sec-sdpa-torch" class="level4">
+<h4 class="anchored" data-anchor-id="sec-sdpa-torch">Scaled Dot-Product Attention — High Level (PyTorch)</h4>
+<div id="7be6c940" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> scaled_dot_product_attention_torch(Q, K, V):</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Atención paso a paso con PyTorch, equivalente a la versión numpy."""</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    d_k <span class="op">=</span> K.shape[<span class="op">-</span><span class="dv">1</span>]</span>
@@ -690,9 +719,9 @@ Cada fila suma 1: [1. 1. 1.]</code></pre>
 </div>
 </div>
 </section>
-<section id="multi-head-attention-low-level-numpy" class="level4">
-<h4 class="anchored" data-anchor-id="multi-head-attention-low-level-numpy">Multi-Head Attention — Low Level (numpy)</h4>
-<div id="ae8839a7" class="cell" data-execution_count="6">
+<section id="sec-mha-numpy" class="level4">
+<h4 class="anchored" data-anchor-id="sec-mha-numpy">Multi-Head Attention — Low Level (numpy)</h4>
+<div id="378ad282" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> multi_head_attention_numpy(Q, K, V, num_heads<span class="op">=</span><span class="dv">2</span>):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Multi-head atención desde cero: divide en cabezas, atiende, concatena, proyecta."""</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    batch, seq_len, d_model <span class="op">=</span> Q.shape</span>
@@ -735,9 +764,9 @@ Cada cabeza atiende de forma distinta (diferentes pesos).</code></pre>
 </div>
 </div>
 </section>
-<section id="multi-head-attention-high-level-pytorch" class="level4">
-<h4 class="anchored" data-anchor-id="multi-head-attention-high-level-pytorch">Multi-Head Attention — High Level (PyTorch)</h4>
-<div id="03699ab9" class="cell" data-execution_count="7">
+<section id="sec-mha-torch" class="level4">
+<h4 class="anchored" data-anchor-id="sec-mha-torch">Multi-Head Attention — High Level (PyTorch)</h4>
+<div id="64f4b045" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>embed_dim <span class="op">=</span> <span class="dv">8</span></span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>num_heads <span class="op">=</span> <span class="dv">2</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>mha <span class="op">=</span> nn.MultiheadAttention(embed_dim<span class="op">=</span>embed_dim, num_heads<span class="op">=</span>num_heads, batch_first<span class="op">=</span><span class="va">True</span>)</span>
@@ -753,17 +782,17 @@ Cada cabeza atiende de forma distinta (diferentes pesos).</code></pre>
 <div class="cell-output cell-output-stdout">
 <pre><code>Salida nn.MultiheadAttention: torch.Size([1, 3, 8])
 Pesos de atención:
-[[[0.317 0.318 0.365]
-  [0.369 0.412 0.219]
-  [0.362 0.361 0.278]]]
+[[[0.368 0.264 0.368]
+  [0.33  0.313 0.356]
+  [0.322 0.413 0.265]]]
 
 Parámetros entrenables de la capa: 288</code></pre>
 </div>
 </div>
 </section>
-<section id="visualización-de-atención" class="level4">
-<h4 class="anchored" data-anchor-id="visualización-de-atención">Visualización de atención</h4>
-<div id="20100087" class="cell" data-execution_count="8">
+<section id="sec-visualizacion-atencion" class="level4">
+<h4 class="anchored" data-anchor-id="sec-visualizacion-atencion">Visualización de atención</h4>
+<div id="f15e91dd" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>fig, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">3</span>, figsize<span class="op">=</span>(<span class="dv">14</span>, <span class="dv">4</span>))</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>axes[<span class="dv">0</span>].imshow(attn_np[<span class="dv">0</span>], cmap<span class="op">=</span><span class="st">"Blues"</span>, vmin<span class="op">=</span><span class="dv">0</span>, vmax<span class="op">=</span><span class="dv">1</span>)</span>
@@ -798,9 +827,9 @@ Parámetros entrenables de la capa: 288</code></pre>
 <p>La atención es <strong>permutation-invariant</strong>: si cambiamos el orden de los tokens, el resultado es el mismo. Para inyectar información de posición, el Transformer añade un vector de <strong>codificación posicional</strong> a cada embedding de token.</p>
 <p>La codificación posicional sinusoidal usa frecuencias diferentes para cada dimensión:</p>
 <p><span class="math display">\[PE_{(pos, 2i)} = \sin(pos / 10000^{2i/d_{model}})\]</span> <span class="math display">\[PE_{(pos, 2i+1)} = \cos(pos / 10000^{2i/d_{model}})\]</span></p>
-<section id="codificación-posicional-low-level-numpy" class="level4">
-<h4 class="anchored" data-anchor-id="codificación-posicional-low-level-numpy">Codificación posicional — Low Level (numpy)</h4>
-<div id="08c8c4e1" class="cell" data-execution_count="9">
+<section id="sec-pe-numpy" class="level4">
+<h4 class="anchored" data-anchor-id="sec-pe-numpy">Codificación posicional — Low Level (numpy)</h4>
+<div id="e355d03e" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> positional_encoding_numpy(seq_len, d_model):</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Codificación posicional sinusoidal desde cero."""</span></span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    pos <span class="op">=</span> np.arange(seq_len)[:, np.newaxis]</span>
@@ -830,9 +859,9 @@ Parámetros entrenables de la capa: 288</code></pre>
 </div>
 </div>
 </section>
-<section id="codificación-posicional-high-level-pytorch" class="level4">
-<h4 class="anchored" data-anchor-id="codificación-posicional-high-level-pytorch">Codificación posicional — High Level (PyTorch)</h4>
-<div id="01a61ad8" class="cell" data-execution_count="10">
+<section id="sec-pe-torch" class="level4">
+<h4 class="anchored" data-anchor-id="sec-pe-torch">Codificación posicional — High Level (PyTorch)</h4>
+<div id="e8f86ab8" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>vocab_size <span class="op">=</span> <span class="dv">50</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>d_model <span class="op">=</span> <span class="dv">32</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>pos_embedding <span class="op">=</span> nn.Embedding(vocab_size, d_model)</span>
@@ -867,8 +896,14 @@ Parámetros entrenables de la capa: 288</code></pre>
 </div>
 </section>
 </section>
-<section id="variantes-de-la-arquitectura" class="level3">
-<h3 class="anchored" data-anchor-id="variantes-de-la-arquitectura">Variantes de la arquitectura</h3>
+<section id="sec-variantes" class="level3">
+<h3 class="anchored" data-anchor-id="sec-variantes">Variantes de la arquitectura</h3>
+<div id="tbl-variantes-transformer" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-variantes-transformer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Comparativa de las tres variantes principales de la arquitectura Transformer
+</figcaption>
+<div aria-describedby="tbl-variantes-transformer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
 <col style="width: 25%">
@@ -905,6 +940,12 @@ Parámetros entrenables de la capa: 288</code></pre>
 </tr>
 </tbody>
 </table>
+</div>
+</figure>
+</div>
+<div id="fig-variantes-transformer" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-variantes-transformer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -930,6 +971,12 @@ Parámetros entrenables de la capa: 288</code></pre>
 </div>
 </div>
 </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-variantes-transformer-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3
+</figcaption>
+</figure>
+</div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -940,20 +987,27 @@ Parámetros entrenables de la capa: 288</code></pre>
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Vaswani, A. et al.&nbsp;(2017). <strong>Attention is All You Need</strong>. NeurIPS.</p>
+<p><span class="citation" data-cites="vaswani2017attention">Vaswani et al. (<a href="#ref-vaswani2017attention" role="doc-biblioref">2017</a>)</span></p>
 <p>Leer secciones 3-5: Scaled Dot-Product Attention, Multi-Head Attention, Positional Encoding y el resumen de la arquitectura completa.</p>
-<p><a href="https://arxiv.org/abs/1706.03762">arXiv:1706.03762</a></p>
 </div>
 </div>
 <hr>
 <blockquote class="blockquote">
 <p>Continúa con <strong><a href="../bloque1/01b-llms.html">01b-llms.qmd</a></strong> — Grandes Modelos de Lenguaje e inferencia.</p>
 </blockquote>
+</section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-vaswani2017attention" class="csl-entry" role="listitem">
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., &amp; Polosukhin, I. (2017). <em>Attention is all you need</em>. <em>30</em>. <a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a>
+</div>
+</div>
 
 
 <!-- -->
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1449,18 +1503,18 @@ Parámetros entrenables de la capa: 288</code></pre>
 <span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span>
 <span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## Arquitectura Transformer</span></span>
+<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## Arquitectura Transformer {#sec-arquitectura-transformer}</span></span>
 <span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a><span class="fu">### El problema que resuelve</span></span>
+<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a><span class="fu">### El problema que resuelve {#sec-problema-resuelve}</span></span>
 <span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>Antes de la aparición del modelo Transformer, los modelos secuenciales dominaban el procesamiento de lenguaje (RNN, LSTM, GRU, etc.). Estos modelos se catalogan bajo el paraguas de **modelos secuenciales** por su forma de procesar los tokens, uno tras otro, de forma secuencial, lo que imponía ciertas restricciones:</span>
 <span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Impide la paralelización (cada token depende del anterior).</span>
 <span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Sufre desvanecimiento de gradiente en secuencias largas.</span>
 <span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Dificulta capturar dependencias de largo alcance.</span>
 <span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a>La arquitectura **Transformer** (Vaswani et al., 2017) resolvió estos problemas introduciendo el **mecanismo de atención** para reemplazar el **mecanisno de recurrencia** (limitada) usado hasta el momento, algo que permitió procesar un conjunto de tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones de ese conjunto de tokens.</span>
+<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a>La arquitectura **Transformer** (@vaswani2017attention) resolvió estos problemas introduciendo el **mecanismo de atención** para reemplazar el **mecanisno de recurrencia** (limitada) usado hasta el momento, algo que permitió procesar un conjunto de tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones de ese conjunto de tokens.</span>
 <span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a><span class="al">![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (Vaswani et al., 2017, Figure 1)](../images/diagrama_transformer_original.webp)</span></span>
+<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a><span class="al">![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (@vaswani2017attention, Figure 1)](../images/diagrama_transformer_original.webp)</span>{#fig-arquitectura-transformer}</span>
 <span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
@@ -1504,7 +1558,7 @@ Parámetros entrenables de la capa: 288</code></pre>
 <span id="cb17-94"><a href="#cb17-94" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
 <span id="cb17-95"><a href="#cb17-95" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb17-96"><a href="#cb17-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-97"><a href="#cb17-97" aria-hidden="true" tabindex="-1"></a><span class="fu">### Atención multi-cabeza (Multi-Head Attention)</span></span>
+<span id="cb17-97"><a href="#cb17-97" aria-hidden="true" tabindex="-1"></a><span class="fu">### Atención multi-cabeza (Multi-Head Attention) {#sec-atencion-multi-cabeza}</span></span>
 <span id="cb17-98"><a href="#cb17-98" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-99"><a href="#cb17-99" aria-hidden="true" tabindex="-1"></a>El núcleo del Transformer se encuentra en el mecanismo de **scaled dot-product attention** (atención basada en el producto escalar). En este proceso, para cada token se calculan tres vectores numéricos, que *presuponen* el siguiente contenido semántico:</span>
 <span id="cb17-100"><a href="#cb17-100" aria-hidden="true" tabindex="-1"></a></span>
@@ -1518,9 +1572,9 @@ Parámetros entrenables de la capa: 288</code></pre>
 <span id="cb17-108"><a href="#cb17-108" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-109"><a href="#cb17-109" aria-hidden="true" tabindex="-1"></a>donde el producto $Q·K^T$ mide la similitud entre cada par de tokens; el factor $\sqrt{d_k}$ sirve como escala normalizadora para evitar que los valores crezcan demasiado en módulo; la **multi-cabeza** ejecuta este proceso en paralelo con pesos distintos, permitiendo al modelo *atender* a diferentes relaciones simultáneamente (sintaxis, semántica, coreferencias, etc.).</span>
 <span id="cb17-110"><a href="#cb17-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-111"><a href="#cb17-111" aria-hidden="true" tabindex="-1"></a><span class="al">![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (Vaswani et al., 2017, Figure 2)](../images/multi-head-attention.webp)</span></span>
+<span id="cb17-111"><a href="#cb17-111" aria-hidden="true" tabindex="-1"></a><span class="al">![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (@vaswani2017attention, Figure 2)](../images/multi-head-attention.webp)</span>{#fig-sdpa-vs-mha}</span>
 <span id="cb17-112"><a href="#cb17-112" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-113"><a href="#cb17-113" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Scaled Dot-Product Attention — Low Level (numpy)</span></span>
+<span id="cb17-113"><a href="#cb17-113" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Scaled Dot-Product Attention — Low Level (numpy) {#sec-sdpa-numpy}</span></span>
 <span id="cb17-114"><a href="#cb17-114" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-117"><a href="#cb17-117" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb17-118"><a href="#cb17-118" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
@@ -1550,7 +1604,7 @@ Parámetros entrenables de la capa: 288</code></pre>
 <span id="cb17-142"><a href="#cb17-142" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-143"><a href="#cb17-143" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb17-144"><a href="#cb17-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-145"><a href="#cb17-145" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Scaled Dot-Product Attention — High Level (PyTorch)</span></span>
+<span id="cb17-145"><a href="#cb17-145" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Scaled Dot-Product Attention — High Level (PyTorch) {#sec-sdpa-torch}</span></span>
 <span id="cb17-146"><a href="#cb17-146" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-149"><a href="#cb17-149" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb17-150"><a href="#cb17-150" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
@@ -1578,7 +1632,7 @@ Parámetros entrenables de la capa: 288</code></pre>
 <span id="cb17-172"><a href="#cb17-172" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-173"><a href="#cb17-173" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb17-174"><a href="#cb17-174" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-175"><a href="#cb17-175" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Multi-Head Attention — Low Level (numpy)</span></span>
+<span id="cb17-175"><a href="#cb17-175" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Multi-Head Attention — Low Level (numpy) {#sec-mha-numpy}</span></span>
 <span id="cb17-176"><a href="#cb17-176" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-179"><a href="#cb17-179" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb17-180"><a href="#cb17-180" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
@@ -1616,7 +1670,7 @@ Parámetros entrenables de la capa: 288</code></pre>
 <span id="cb17-212"><a href="#cb17-212" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-213"><a href="#cb17-213" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb17-214"><a href="#cb17-214" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-215"><a href="#cb17-215" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Multi-Head Attention — High Level (PyTorch)</span></span>
+<span id="cb17-215"><a href="#cb17-215" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Multi-Head Attention — High Level (PyTorch) {#sec-mha-torch}</span></span>
 <span id="cb17-216"><a href="#cb17-216" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-219"><a href="#cb17-219" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb17-220"><a href="#cb17-220" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
@@ -1639,7 +1693,7 @@ Parámetros entrenables de la capa: 288</code></pre>
 <span id="cb17-237"><a href="#cb17-237" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-238"><a href="#cb17-238" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb17-239"><a href="#cb17-239" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-240"><a href="#cb17-240" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Visualización de atención</span></span>
+<span id="cb17-240"><a href="#cb17-240" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Visualización de atención {#sec-visualizacion-atencion}</span></span>
 <span id="cb17-241"><a href="#cb17-241" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-244"><a href="#cb17-244" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb17-245"><a href="#cb17-245" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
@@ -1678,7 +1732,7 @@ Parámetros entrenables de la capa: 288</code></pre>
 <span id="cb17-278"><a href="#cb17-278" aria-hidden="true" tabindex="-1"></a>$$PE_{(pos, 2i)} = \sin(pos / 10000^{2i/d_{model}})$$</span>
 <span id="cb17-279"><a href="#cb17-279" aria-hidden="true" tabindex="-1"></a>$$PE_{(pos, 2i+1)} = \cos(pos / 10000^{2i/d_{model}})$$</span>
 <span id="cb17-280"><a href="#cb17-280" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-281"><a href="#cb17-281" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Codificación posicional — Low Level (numpy)</span></span>
+<span id="cb17-281"><a href="#cb17-281" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Codificación posicional — Low Level (numpy) {#sec-pe-numpy}</span></span>
 <span id="cb17-282"><a href="#cb17-282" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-285"><a href="#cb17-285" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb17-286"><a href="#cb17-286" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
@@ -1709,7 +1763,7 @@ Parámetros entrenables de la capa: 288</code></pre>
 <span id="cb17-311"><a href="#cb17-311" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-312"><a href="#cb17-312" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb17-313"><a href="#cb17-313" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-314"><a href="#cb17-314" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Codificación posicional — High Level (PyTorch)</span></span>
+<span id="cb17-314"><a href="#cb17-314" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Codificación posicional — High Level (PyTorch) {#sec-pe-torch}</span></span>
 <span id="cb17-315"><a href="#cb17-315" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-318"><a href="#cb17-318" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb17-319"><a href="#cb17-319" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
@@ -1741,44 +1795,51 @@ Parámetros entrenables de la capa: 288</code></pre>
 <span id="cb17-345"><a href="#cb17-345" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb17-346"><a href="#cb17-346" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb17-347"><a href="#cb17-347" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-348"><a href="#cb17-348" aria-hidden="true" tabindex="-1"></a><span class="fu">### Variantes de la arquitectura</span></span>
+<span id="cb17-348"><a href="#cb17-348" aria-hidden="true" tabindex="-1"></a><span class="fu">### Variantes de la arquitectura {#sec-variantes}</span></span>
 <span id="cb17-349"><a href="#cb17-349" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-350"><a href="#cb17-350" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Variante <span class="pp">|</span> Arquitectura <span class="pp">|</span> Ejemplos <span class="pp">|</span> Uso principal <span class="pp">|</span></span>
-<span id="cb17-351"><a href="#cb17-351" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
-<span id="cb17-352"><a href="#cb17-352" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Encoder-only** <span class="pp">|</span> Solo encoder (atención bidireccional) <span class="pp">|</span> BERT, RoBERTa <span class="pp">|</span> Clasificación, NER, embeddings <span class="pp">|</span></span>
-<span id="cb17-353"><a href="#cb17-353" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Decoder-only** <span class="pp">|</span> Solo decoder (atención causal/masked) <span class="pp">|</span> GPT, Llama, Qwen, Gemma, DeepSeek <span class="pp">|</span> Generación de texto, chat <span class="pp">|</span></span>
-<span id="cb17-354"><a href="#cb17-354" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Encoder-decoder** <span class="pp">|</span> Encoder + decoder con cross-attention <span class="pp">|</span> T5, BART <span class="pp">|</span> Traducción, resumen, QA <span class="pp">|</span></span>
-<span id="cb17-355"><a href="#cb17-355" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-358"><a href="#cb17-358" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb17-359"><a href="#cb17-359" aria-hidden="true" tabindex="-1"></a>graph LR</span>
-<span id="cb17-360"><a href="#cb17-360" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Encoder-only (BERT)</span><span class="ot">"</span></span>
-<span id="cb17-361"><a href="#cb17-361" aria-hidden="true" tabindex="-1"></a>        A[Entrada] --&gt; B[Encoder&lt;br/&gt;Bidireccional]</span>
-<span id="cb17-362"><a href="#cb17-362" aria-hidden="true" tabindex="-1"></a>        B --&gt; C[Clasificación / Embeddings]</span>
-<span id="cb17-363"><a href="#cb17-363" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb17-364"><a href="#cb17-364" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Decoder-only (GPT)</span><span class="ot">"</span></span>
-<span id="cb17-365"><a href="#cb17-365" aria-hidden="true" tabindex="-1"></a>        D[Entrada] --&gt; E[Decoder&lt;br/&gt;Causal]</span>
-<span id="cb17-366"><a href="#cb17-366" aria-hidden="true" tabindex="-1"></a>        E --&gt; F[Texto generado]</span>
-<span id="cb17-367"><a href="#cb17-367" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb17-368"><a href="#cb17-368" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Encoder-Decoder (T5)</span><span class="ot">"</span></span>
-<span id="cb17-369"><a href="#cb17-369" aria-hidden="true" tabindex="-1"></a>        G[Entrada] --&gt; H[Encoder]</span>
-<span id="cb17-370"><a href="#cb17-370" aria-hidden="true" tabindex="-1"></a>        H --&gt; I[Decoder]</span>
-<span id="cb17-371"><a href="#cb17-371" aria-hidden="true" tabindex="-1"></a>        I --&gt; J[Salida]</span>
-<span id="cb17-372"><a href="#cb17-372" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb17-373"><a href="#cb17-373" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb17-374"><a href="#cb17-374" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-375"><a href="#cb17-375" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
-<span id="cb17-376"><a href="#cb17-376" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lectura obligatoria</span></span>
-<span id="cb17-377"><a href="#cb17-377" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-378"><a href="#cb17-378" aria-hidden="true" tabindex="-1"></a>Vaswani, A. et al. (2017). **Attention is All You Need**. NeurIPS.</span>
-<span id="cb17-379"><a href="#cb17-379" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-380"><a href="#cb17-380" aria-hidden="true" tabindex="-1"></a>Leer secciones 3-5: Scaled Dot-Product Attention, Multi-Head Attention, Positional Encoding y el resumen de la arquitectura completa.</span>
+<span id="cb17-350"><a href="#cb17-350" aria-hidden="true" tabindex="-1"></a>: Comparativa de las tres variantes principales de la arquitectura Transformer {#tbl-variantes-transformer}</span>
+<span id="cb17-351"><a href="#cb17-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-352"><a href="#cb17-352" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Variante <span class="pp">|</span> Arquitectura <span class="pp">|</span> Ejemplos <span class="pp">|</span> Uso principal <span class="pp">|</span></span>
+<span id="cb17-353"><a href="#cb17-353" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb17-354"><a href="#cb17-354" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Encoder-only** <span class="pp">|</span> Solo encoder (atención bidireccional) <span class="pp">|</span> BERT, RoBERTa <span class="pp">|</span> Clasificación, NER, embeddings <span class="pp">|</span></span>
+<span id="cb17-355"><a href="#cb17-355" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Decoder-only** <span class="pp">|</span> Solo decoder (atención causal/masked) <span class="pp">|</span> GPT, Llama, Qwen, Gemma, DeepSeek <span class="pp">|</span> Generación de texto, chat <span class="pp">|</span></span>
+<span id="cb17-356"><a href="#cb17-356" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Encoder-decoder** <span class="pp">|</span> Encoder + decoder con cross-attention <span class="pp">|</span> T5, BART <span class="pp">|</span> Traducción, resumen, QA <span class="pp">|</span></span>
+<span id="cb17-357"><a href="#cb17-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-358"><a href="#cb17-358" aria-hidden="true" tabindex="-1"></a>::: {#fig-variantes-transformer}</span>
+<span id="cb17-361"><a href="#cb17-361" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb17-362"><a href="#cb17-362" aria-hidden="true" tabindex="-1"></a>graph LR</span>
+<span id="cb17-363"><a href="#cb17-363" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Encoder-only (BERT)</span><span class="ot">"</span></span>
+<span id="cb17-364"><a href="#cb17-364" aria-hidden="true" tabindex="-1"></a>        A[Entrada] --&gt; B[Encoder&lt;br/&gt;Bidireccional]</span>
+<span id="cb17-365"><a href="#cb17-365" aria-hidden="true" tabindex="-1"></a>        B --&gt; C[Clasificación / Embeddings]</span>
+<span id="cb17-366"><a href="#cb17-366" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb17-367"><a href="#cb17-367" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Decoder-only (GPT)</span><span class="ot">"</span></span>
+<span id="cb17-368"><a href="#cb17-368" aria-hidden="true" tabindex="-1"></a>        D[Entrada] --&gt; E[Decoder&lt;br/&gt;Causal]</span>
+<span id="cb17-369"><a href="#cb17-369" aria-hidden="true" tabindex="-1"></a>        E --&gt; F[Texto generado]</span>
+<span id="cb17-370"><a href="#cb17-370" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb17-371"><a href="#cb17-371" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Encoder-Decoder (T5)</span><span class="ot">"</span></span>
+<span id="cb17-372"><a href="#cb17-372" aria-hidden="true" tabindex="-1"></a>        G[Entrada] --&gt; H[Encoder]</span>
+<span id="cb17-373"><a href="#cb17-373" aria-hidden="true" tabindex="-1"></a>        H --&gt; I[Decoder]</span>
+<span id="cb17-374"><a href="#cb17-374" aria-hidden="true" tabindex="-1"></a>        I --&gt; J[Salida]</span>
+<span id="cb17-375"><a href="#cb17-375" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb17-376"><a href="#cb17-376" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb17-377"><a href="#cb17-377" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb17-378"><a href="#cb17-378" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-379"><a href="#cb17-379" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
+<span id="cb17-380"><a href="#cb17-380" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lectura obligatoria</span></span>
 <span id="cb17-381"><a href="#cb17-381" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-382"><a href="#cb17-382" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="ot">arXiv:1706.03762</span><span class="co">](https://arxiv.org/abs/1706.03762)</span></span>
-<span id="cb17-383"><a href="#cb17-383" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb17-384"><a href="#cb17-384" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-385"><a href="#cb17-385" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb17-382"><a href="#cb17-382" aria-hidden="true" tabindex="-1"></a>@vaswani2017attention</span>
+<span id="cb17-383"><a href="#cb17-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-384"><a href="#cb17-384" aria-hidden="true" tabindex="-1"></a>Leer secciones 3-5: Scaled Dot-Product Attention, Multi-Head Attention, Positional Encoding y el resumen de la arquitectura completa.</span>
+<span id="cb17-385"><a href="#cb17-385" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb17-386"><a href="#cb17-386" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-387"><a href="#cb17-387" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Continúa con **[01b-llms.qmd](01b-llms.qmd)** — Grandes Modelos de Lenguaje e inferencia.</span></span>
+<span id="cb17-387"><a href="#cb17-387" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb17-388"><a href="#cb17-388" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-389"><a href="#cb17-389" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Continúa con **[01b-llms.qmd](01b-llms.qmd)** — Grandes Modelos de Lenguaje e inferencia.</span></span>
+<span id="cb17-390"><a href="#cb17-390" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-391"><a href="#cb17-391" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb17-392"><a href="#cb17-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-393"><a href="#cb17-393" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb17-394"><a href="#cb17-394" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

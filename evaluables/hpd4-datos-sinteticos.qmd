@@ -256,3 +256,9 @@ if eval4_dict is not None:
 else:
     print("⚠️  Ejercicio 4 pendiente")
 ```
+
+# References
+
+::: {#refs}
+:::
+```

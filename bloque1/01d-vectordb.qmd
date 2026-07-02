@@ -316,3 +316,8 @@ Para el **proyecto del módulo** empieza con **Chroma**: es local, no requiere s
 ---
 
 > Has completado la teoría del **Bloque 1**. Ahora pasa al taller práctico: **[HPD 1 — Pipeline de embeddings y búsqueda semántica](../evaluables/hpd1-embeddings.qmd)**.
+
+# References
+
+::: {#refs}
+:::

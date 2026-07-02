@@ -77,7 +77,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f97a59afa23c78b76dca51217b896fc0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-98abfb5de123bd3eb994533863133005.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -465,13 +465,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#instalación-rápida" id="toc-instalación-rápida" class="nav-link active" data-scroll-target="#instalación-rápida">Instalación rápida</a></li>
-  <li><a href="#configuración-de-la-api-key-de-llamus" id="toc-configuración-de-la-api-key-de-llamus" class="nav-link" data-scroll-target="#configuración-de-la-api-key-de-llamus">Configuración de la API key de Llamus</a>
+  <li><a href="#sec-instalacion" id="toc-sec-instalacion" class="nav-link active" data-scroll-target="#sec-instalacion">Instalación rápida</a></li>
+  <li><a href="#sec-config-api-key" id="toc-sec-config-api-key" class="nav-link" data-scroll-target="#sec-config-api-key">Configuración de la API key de Llamus</a>
   <ul class="collapse">
-  <li><a href="#vía-1-google-colab-recomendada-sin-instalación-local" id="toc-vía-1-google-colab-recomendada-sin-instalación-local" class="nav-link" data-scroll-target="#vía-1-google-colab-recomendada-sin-instalación-local">Vía 1 — Google Colab (recomendada, sin instalación local)</a></li>
-  <li><a href="#vía-2-local-vscode-jupyter-quarto-preview" id="toc-vía-2-local-vscode-jupyter-quarto-preview" class="nav-link" data-scroll-target="#vía-2-local-vscode-jupyter-quarto-preview">Vía 2 — Local (VSCode, Jupyter, <code>quarto preview</code>)</a></li>
-  <li><a href="#orden-de-resolución" id="toc-orden-de-resolución" class="nav-link" data-scroll-target="#orden-de-resolución">Orden de resolución</a></li>
-  <li><a href="#diagnóstico-rápido" id="toc-diagnóstico-rápido" class="nav-link" data-scroll-target="#diagnóstico-rápido">Diagnóstico rápido</a></li>
+  <li><a href="#sec-via-colab" id="toc-sec-via-colab" class="nav-link" data-scroll-target="#sec-via-colab">Vía 1 — Google Colab (recomendada, sin instalación local)</a></li>
+  <li><a href="#sec-via-local" id="toc-sec-via-local" class="nav-link" data-scroll-target="#sec-via-local">Vía 2 — Local (VSCode, Jupyter, <code>quarto preview</code>)</a></li>
+  <li><a href="#sec-orden-resolucion" id="toc-sec-orden-resolucion" class="nav-link" data-scroll-target="#sec-orden-resolucion">Orden de resolución</a></li>
+  <li><a href="#sec-diagnostico" id="toc-sec-diagnostico" class="nav-link" data-scroll-target="#sec-diagnostico">Diagnóstico rápido</a></li>
   </ul></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="06-herramientas.ipynb" download="06-herramientas.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
@@ -499,6 +499,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <p>El módulo está diseñado para ser completado íntegramente con herramientas gratuitas o de tier libre. El siguiente stack solo muestra algunas opciones; el alumno puede sustituir componentes equivalentes justificando la elección.</p>
+<div id="tbl-stack" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-stack-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Stack tecnológico recomendado para el módulo
+</figcaption>
+<div aria-describedby="tbl-stack-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <thead>
 <tr class="header">
@@ -570,8 +576,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
-<section id="instalación-rápida" class="level2">
-<h2 class="anchored" data-anchor-id="instalación-rápida">Instalación rápida</h2>
+</div>
+</figure>
+</div>
+<section id="sec-instalacion" class="level2">
+<h2 class="anchored" data-anchor-id="sec-instalacion">Instalación rápida</h2>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Entorno base</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
@@ -585,11 +594,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install torch torchvision torchaudio</span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install transformers accelerate peft bitsandbytes trl</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
-<section id="configuración-de-la-api-key-de-llamus" class="level2">
-<h2 class="anchored" data-anchor-id="configuración-de-la-api-key-de-llamus">Configuración de la API key de Llamus</h2>
+<section id="sec-config-api-key" class="level2">
+<h2 class="anchored" data-anchor-id="sec-config-api-key">Configuración de la API key de Llamus</h2>
 <p>Todos los notebooks que usan LLMs leen la API key desde la variable de entorno <code>LLM_API_KEY</code>. La fuente única de la lógica de carga es <code>includes/setup_keys.py</code> (se inyecta automáticamente en cada notebook al renderizar). Si la celda de setup imprime <code>✓ LLM_API_KEY cargada.</code>, todo está bien. Si imprime <code>⚠️ LLM_API_KEY no encontrada.</code>, sigue una de las dos vías de abajo.</p>
-<section id="vía-1-google-colab-recomendada-sin-instalación-local" class="level3">
-<h3 class="anchored" data-anchor-id="vía-1-google-colab-recomendada-sin-instalación-local">Vía 1 — Google Colab (recomendada, sin instalación local)</h3>
+<section id="sec-via-colab" class="level3">
+<h3 class="anchored" data-anchor-id="sec-via-colab">Vía 1 — Google Colab (recomendada, sin instalación local)</h3>
 <ol type="1">
 <li>Abre el notebook en Colab (badge “Open in Colab” o desde la página <a href="./index.html">Inicio</a>).</li>
 <li>En la barra lateral izquierda, haz clic en el icono 🔑 (<strong>Secrets</strong>).</li>
@@ -615,8 +624,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </section>
-<section id="vía-2-local-vscode-jupyter-quarto-preview" class="level3">
-<h3 class="anchored" data-anchor-id="vía-2-local-vscode-jupyter-quarto-preview">Vía 2 — Local (VSCode, Jupyter, <code>quarto preview</code>)</h3>
+<section id="sec-via-local" class="level3">
+<h3 class="anchored" data-anchor-id="sec-via-local">Vía 2 — Local (VSCode, Jupyter, <code>quarto preview</code>)</h3>
 <ol type="1">
 <li><p>En la raíz del proyecto (junto a <code>_quarto.yml</code>), crea un archivo <code>.env</code>:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">'LLM_API_KEY=tu_clave_aquí'</span> <span class="op">&gt;</span> .env</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div></li>
@@ -638,8 +647,8 @@ Warning
 </div>
 </div>
 </section>
-<section id="orden-de-resolución" class="level3">
-<h3 class="anchored" data-anchor-id="orden-de-resolución">Orden de resolución</h3>
+<section id="sec-orden-resolucion" class="level3">
+<h3 class="anchored" data-anchor-id="sec-orden-resolucion">Orden de resolución</h3>
 <p>Si en algún momento te preguntas de dónde sale la clave, este es el orden que sigue <code>setup_keys.py</code> (el primero que la encuentre gana):</p>
 <ol type="1">
 <li>Variable <code>LLM_API_KEY</code> ya configurada en el proceso (<code>os.environ</code>).</li>
@@ -647,8 +656,8 @@ Warning
 <li>Secret de Colab (<code>userdata.get("LLAMUS_API_KEY")</code> o <code>userdata.get("LLM_API_KEY")</code>).</li>
 </ol>
 </section>
-<section id="diagnóstico-rápido" class="level3">
-<h3 class="anchored" data-anchor-id="diagnóstico-rápido">Diagnóstico rápido</h3>
+<section id="sec-diagnostico" class="level3">
+<h3 class="anchored" data-anchor-id="sec-diagnostico">Diagnóstico rápido</h3>
 <p>Si una celda con LLM devuelve error 401 (“Incorrect API key”), ejecuta en una celda aparte:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"LLM_API_KEY set:"</span>, <span class="bu">bool</span>(os.getenv(<span class="st">"LLM_API_KEY"</span>)))</span>
@@ -1128,98 +1137,100 @@ Warning
 <span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>El módulo está diseñado para ser completado íntegramente con herramientas gratuitas o de tier libre. El siguiente stack solo muestra algunas opciones; el alumno puede sustituir componentes equivalentes justificando la elección.</span>
 <span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Categoría <span class="pp">|</span> Herramienta recomendada <span class="pp">|</span> Alternativas / Notas <span class="pp">|</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **LLM API** <span class="pp">|</span> Llamus US (<span class="in">`https://llamus.cs.us.es/api/v1`</span>) <span class="pp">|</span> OpenAI, Anthropic, Google (API key propia) <span class="pp">|</span></span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Modelos Llamus** <span class="pp">|</span> <span class="in">`gemma4:e2b-mlx`</span>, <span class="in">`gemma4:26b`</span>, <span class="in">`llama3.3:70b`</span> <span class="pp">|</span> <span class="in">`gemma4:e2b-mlx`</span> para demos rápidas <span class="pp">|</span></span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **LLM local** <span class="pp">|</span> Ollama + Qwen 3.6 / Llama 3.3 <span class="pp">|</span> LM Studio; recomendado para HPD 3 (privacidad) <span class="pp">|</span></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Hub de modelos** <span class="pp">|</span> <span class="co">[</span><span class="ot">Hugging Face Hub</span><span class="co">](https://huggingface.co/models)</span> <span class="pp">|</span> Descubrimiento, model cards, Spaces <span class="pp">|</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Embeddings** <span class="pp">|</span> Sentence-Transformers (<span class="in">`intfloat/e5-small-v2`</span>) <span class="pp">|</span> <span class="in">`qwen3-embedding:0.6b`</span>, <span class="in">`all-MiniLM-L6-v2`</span> <span class="pp">|</span></span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Vector DB** <span class="pp">|</span> Chroma (local) <span class="pp">|</span> FAISS (embebible); Qdrant para producción <span class="pp">|</span></span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Orquestación** <span class="pp">|</span> LangChain &gt;= 0.3 (LCEL) <span class="pp">|</span> LlamaIndex para indexación documental <span class="pp">|</span></span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Fine-tuning** <span class="pp">|</span> Hugging Face TRL + bitsandbytes (QLoRA) <span class="pp">|</span> Google Colab Pro o Kaggle (GPU T4 gratuita) <span class="pp">|</span></span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Evaluación RAG** <span class="pp">|</span> RAGAS &gt;= 0.1 <span class="pp">|</span> DeepEval; LangSmith (trazabilidad) <span class="pp">|</span></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Datos sintéticos** <span class="pp">|</span> SDV (CTGAN, TVAE) <span class="pp">|</span> LLM + JSON Schema para prototipado rápido <span class="pp">|</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **MCP** <span class="pp">|</span> Python MCP SDK (Anthropic) <span class="pp">|</span> Servidor stdio local; sin infraestructura cloud <span class="pp">|</span></span>
-<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Entorno** <span class="pp">|</span> VS Code + Python 3.11, Jupyter <span class="pp">|</span> Google Colab para talleres con GPU <span class="pp">|</span></span>
-<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="fu">## Instalación rápida</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>: Stack tecnológico recomendado para el módulo {#tbl-stack}</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Categoría <span class="pp">|</span> Herramienta recomendada <span class="pp">|</span> Alternativas / Notas <span class="pp">|</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **LLM API** <span class="pp">|</span> Llamus US (<span class="in">`https://llamus.cs.us.es/api/v1`</span>) <span class="pp">|</span> OpenAI, Anthropic, Google (API key propia) <span class="pp">|</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Modelos Llamus** <span class="pp">|</span> <span class="in">`gemma4:e2b-mlx`</span>, <span class="in">`gemma4:26b`</span>, <span class="in">`llama3.3:70b`</span> <span class="pp">|</span> <span class="in">`gemma4:e2b-mlx`</span> para demos rápidas <span class="pp">|</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **LLM local** <span class="pp">|</span> Ollama + Qwen 3.6 / Llama 3.3 <span class="pp">|</span> LM Studio; recomendado para HPD 3 (privacidad) <span class="pp">|</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Hub de modelos** <span class="pp">|</span> <span class="co">[</span><span class="ot">Hugging Face Hub</span><span class="co">](https://huggingface.co/models)</span> <span class="pp">|</span> Descubrimiento, model cards, Spaces <span class="pp">|</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Embeddings** <span class="pp">|</span> Sentence-Transformers (<span class="in">`intfloat/e5-small-v2`</span>) <span class="pp">|</span> <span class="in">`qwen3-embedding:0.6b`</span>, <span class="in">`all-MiniLM-L6-v2`</span> <span class="pp">|</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Vector DB** <span class="pp">|</span> Chroma (local) <span class="pp">|</span> FAISS (embebible); Qdrant para producción <span class="pp">|</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Orquestación** <span class="pp">|</span> LangChain &gt;= 0.3 (LCEL) <span class="pp">|</span> LlamaIndex para indexación documental <span class="pp">|</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Fine-tuning** <span class="pp">|</span> Hugging Face TRL + bitsandbytes (QLoRA) <span class="pp">|</span> Google Colab Pro o Kaggle (GPU T4 gratuita) <span class="pp">|</span></span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Evaluación RAG** <span class="pp">|</span> RAGAS &gt;= 0.1 <span class="pp">|</span> DeepEval; LangSmith (trazabilidad) <span class="pp">|</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Datos sintéticos** <span class="pp">|</span> SDV (CTGAN, TVAE) <span class="pp">|</span> LLM + JSON Schema para prototipado rápido <span class="pp">|</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **MCP** <span class="pp">|</span> Python MCP SDK (Anthropic) <span class="pp">|</span> Servidor stdio local; sin infraestructura cloud <span class="pp">|</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Entorno** <span class="pp">|</span> VS Code + Python 3.11, Jupyter <span class="pp">|</span> Google Colab para talleres con GPU <span class="pp">|</span></span>
 <span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
-<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a><span class="co"># Entorno base</span></span>
-<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
-<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
-<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="co"># Librerías principales</span></span>
-<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install langchain langchain-openai chromadb sentence-transformers</span>
-<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install ragas datasets pandas numpy matplotlib requests</span>
-<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install mcp  <span class="co"># Python MCP SDK</span></span>
-<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="co"># Para fine-tuning (GPU recomendada)</span></span>
-<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install torch torchvision torchaudio</span>
-<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install transformers accelerate peft bitsandbytes trl</span>
-<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="fu">## Configuración de la API key de Llamus</span></span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="fu">## Instalación rápida {#sec-instalacion}</span></span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a><span class="in">```bash</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Entorno base</span></span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a><span class="ex">python</span> <span class="at">-m</span> venv .venv</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> .venv/bin/activate</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a><span class="co"># Librerías principales</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install langchain langchain-openai chromadb sentence-transformers</span>
+<span id="cb5-33"><a href="#cb5-33" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install ragas datasets pandas numpy matplotlib requests</span>
+<span id="cb5-34"><a href="#cb5-34" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install mcp  <span class="co"># Python MCP SDK</span></span>
+<span id="cb5-35"><a href="#cb5-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-36"><a href="#cb5-36" aria-hidden="true" tabindex="-1"></a><span class="co"># Para fine-tuning (GPU recomendada)</span></span>
+<span id="cb5-37"><a href="#cb5-37" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install torch torchvision torchaudio</span>
+<span id="cb5-38"><a href="#cb5-38" aria-hidden="true" tabindex="-1"></a><span class="ex">pip</span> install transformers accelerate peft bitsandbytes trl</span>
+<span id="cb5-39"><a href="#cb5-39" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb5-40"><a href="#cb5-40" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a>Todos los notebooks que usan LLMs leen la API key desde la variable de entorno <span class="in">`LLM_API_KEY`</span>. La fuente única de la lógica de carga es <span class="in">`includes/setup_keys.py`</span> (se inyecta automáticamente en cada notebook al renderizar). Si la celda de setup imprime <span class="in">`✓ LLM_API_KEY cargada.`</span>, todo está bien. Si imprime <span class="in">`⚠️ LLM_API_KEY no encontrada.`</span>, sigue una de las dos vías de abajo.</span>
+<span id="cb5-41"><a href="#cb5-41" aria-hidden="true" tabindex="-1"></a><span class="fu">## Configuración de la API key de Llamus {#sec-config-api-key}</span></span>
 <span id="cb5-42"><a href="#cb5-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a><span class="fu">### Vía 1 — Google Colab (recomendada, sin instalación local)</span></span>
+<span id="cb5-43"><a href="#cb5-43" aria-hidden="true" tabindex="-1"></a>Todos los notebooks que usan LLMs leen la API key desde la variable de entorno <span class="in">`LLM_API_KEY`</span>. La fuente única de la lógica de carga es <span class="in">`includes/setup_keys.py`</span> (se inyecta automáticamente en cada notebook al renderizar). Si la celda de setup imprime <span class="in">`✓ LLM_API_KEY cargada.`</span>, todo está bien. Si imprime <span class="in">`⚠️ LLM_API_KEY no encontrada.`</span>, sigue una de las dos vías de abajo.</span>
 <span id="cb5-44"><a href="#cb5-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Abre el notebook en Colab (badge "Open in Colab" o desde la página <span class="co">[</span><span class="ot">Inicio</span><span class="co">](index.qmd)</span>).</span>
-<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>En la barra lateral izquierda, haz clic en el icono 🔑 (**Secrets**).</span>
-<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Pulsa **"Add new secret"** y rellena:</span>
-<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Name:** <span class="in">`LLAMUS_API_KEY`</span> (preferente) o <span class="in">`LLM_API_KEY`</span> (alternativa).</span>
-<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Value:** pega la clave que te ha proporcionado el profesorado.</span>
-<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Activa la casilla **"Notebook access"** para que el notebook pueda leerla.</span>
-<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Vuelve a la celda de setup del notebook y ejecútala de nuevo. Debería imprimir <span class="in">`✓ LLM_API_KEY cargada.`</span></span>
-<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
-<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a><span class="fu">## ¿Por qué `LLAMUS_API_KEY` y no `LLM_API_KEY`?</span></span>
-<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a>El notebook intenta primero el nombre <span class="in">`LLAMUS_API_KEY`</span> (más descriptivo, identifica la plataforma) y si no existe, recae a <span class="in">`LLM_API_KEY`</span> (compatible con quien ya tenga la variable configurada con el nombre antiguo). Puedes usar cualquiera de los dos.</span>
-<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a><span class="fu">### Vía 2 — Local (VSCode, Jupyter, `quarto preview`)</span></span>
+<span id="cb5-45"><a href="#cb5-45" aria-hidden="true" tabindex="-1"></a><span class="fu">### Vía 1 — Google Colab (recomendada, sin instalación local) {#sec-via-colab}</span></span>
+<span id="cb5-46"><a href="#cb5-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-47"><a href="#cb5-47" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Abre el notebook en Colab (badge "Open in Colab" o desde la página <span class="co">[</span><span class="ot">Inicio</span><span class="co">](index.qmd)</span>).</span>
+<span id="cb5-48"><a href="#cb5-48" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>En la barra lateral izquierda, haz clic en el icono 🔑 (**Secrets**).</span>
+<span id="cb5-49"><a href="#cb5-49" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Pulsa **"Add new secret"** y rellena:</span>
+<span id="cb5-50"><a href="#cb5-50" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Name:** <span class="in">`LLAMUS_API_KEY`</span> (preferente) o <span class="in">`LLM_API_KEY`</span> (alternativa).</span>
+<span id="cb5-51"><a href="#cb5-51" aria-hidden="true" tabindex="-1"></a><span class="ss">   - </span>**Value:** pega la clave que te ha proporcionado el profesorado.</span>
+<span id="cb5-52"><a href="#cb5-52" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>Activa la casilla **"Notebook access"** para que el notebook pueda leerla.</span>
+<span id="cb5-53"><a href="#cb5-53" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>Vuelve a la celda de setup del notebook y ejecútala de nuevo. Debería imprimir <span class="in">`✓ LLM_API_KEY cargada.`</span></span>
+<span id="cb5-54"><a href="#cb5-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-55"><a href="#cb5-55" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb5-56"><a href="#cb5-56" aria-hidden="true" tabindex="-1"></a><span class="fu">## ¿Por qué `LLAMUS_API_KEY` y no `LLM_API_KEY`?</span></span>
+<span id="cb5-57"><a href="#cb5-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-58"><a href="#cb5-58" aria-hidden="true" tabindex="-1"></a>El notebook intenta primero el nombre <span class="in">`LLAMUS_API_KEY`</span> (más descriptivo, identifica la plataforma) y si no existe, recae a <span class="in">`LLM_API_KEY`</span> (compatible con quien ya tenga la variable configurada con el nombre antiguo). Puedes usar cualquiera de los dos.</span>
+<span id="cb5-59"><a href="#cb5-59" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb5-60"><a href="#cb5-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>En la raíz del proyecto (junto a <span class="in">`_quarto.yml`</span>), crea un archivo <span class="in">`.env`</span>:</span>
+<span id="cb5-61"><a href="#cb5-61" aria-hidden="true" tabindex="-1"></a><span class="fu">### Vía 2 — Local (VSCode, Jupyter, `quarto preview`) {#sec-via-local}</span></span>
 <span id="cb5-62"><a href="#cb5-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a>   <span class="in">```bash</span></span>
-<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a>   <span class="bu">echo</span> <span class="st">'LLM_API_KEY=tu_clave_aquí'</span> <span class="op">&gt;</span> .env</span>
-<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>   <span class="in">```</span></span>
-<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Verifica que <span class="in">`python-dotenv`</span> está instalado (ya está en <span class="in">`requirements.txt`</span>):</span>
+<span id="cb5-63"><a href="#cb5-63" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>En la raíz del proyecto (junto a <span class="in">`_quarto.yml`</span>), crea un archivo <span class="in">`.env`</span>:</span>
+<span id="cb5-64"><a href="#cb5-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-65"><a href="#cb5-65" aria-hidden="true" tabindex="-1"></a>   <span class="in">```bash</span></span>
+<span id="cb5-66"><a href="#cb5-66" aria-hidden="true" tabindex="-1"></a>   <span class="bu">echo</span> <span class="st">'LLM_API_KEY=tu_clave_aquí'</span> <span class="op">&gt;</span> .env</span>
+<span id="cb5-67"><a href="#cb5-67" aria-hidden="true" tabindex="-1"></a>   <span class="in">```</span></span>
 <span id="cb5-68"><a href="#cb5-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a>   <span class="in">```bash</span></span>
-<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a>   <span class="ex">pip</span> install python-dotenv</span>
-<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>   <span class="in">```</span></span>
-<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Ejecuta el notebook o <span class="in">`quarto preview`</span>. La celda de setup cargará <span class="in">`.env`</span> automáticamente.</span>
+<span id="cb5-69"><a href="#cb5-69" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Verifica que <span class="in">`python-dotenv`</span> está instalado (ya está en <span class="in">`requirements.txt`</span>):</span>
+<span id="cb5-70"><a href="#cb5-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-71"><a href="#cb5-71" aria-hidden="true" tabindex="-1"></a>   <span class="in">```bash</span></span>
+<span id="cb5-72"><a href="#cb5-72" aria-hidden="true" tabindex="-1"></a>   <span class="ex">pip</span> install python-dotenv</span>
+<span id="cb5-73"><a href="#cb5-73" aria-hidden="true" tabindex="-1"></a>   <span class="in">```</span></span>
 <span id="cb5-74"><a href="#cb5-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
-<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a>El archivo <span class="in">`.env`</span> está en <span class="in">`.gitignore`</span> (no se sube al repositorio). Si clonas el repo en otro equipo, tienes que crear el <span class="in">`.env`</span> de nuevo.</span>
-<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a><span class="fu">### Orden de resolución</span></span>
+<span id="cb5-75"><a href="#cb5-75" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Ejecuta el notebook o <span class="in">`quarto preview`</span>. La celda de setup cargará <span class="in">`.env`</span> automáticamente.</span>
+<span id="cb5-76"><a href="#cb5-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-77"><a href="#cb5-77" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb5-78"><a href="#cb5-78" aria-hidden="true" tabindex="-1"></a>El archivo <span class="in">`.env`</span> está en <span class="in">`.gitignore`</span> (no se sube al repositorio). Si clonas el repo en otro equipo, tienes que crear el <span class="in">`.env`</span> de nuevo.</span>
+<span id="cb5-79"><a href="#cb5-79" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb5-80"><a href="#cb5-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a>Si en algún momento te preguntas de dónde sale la clave, este es el orden que sigue <span class="in">`setup_keys.py`</span> (el primero que la encuentre gana):</span>
+<span id="cb5-81"><a href="#cb5-81" aria-hidden="true" tabindex="-1"></a><span class="fu">### Orden de resolución {#sec-orden-resolucion}</span></span>
 <span id="cb5-82"><a href="#cb5-82" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Variable <span class="in">`LLM_API_KEY`</span> ya configurada en el proceso (<span class="in">`os.environ`</span>).</span>
-<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Archivo <span class="in">`.env`</span> local (vía <span class="in">`python-dotenv`</span>).</span>
-<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Secret de Colab (<span class="in">`userdata.get("LLAMUS_API_KEY")`</span> o <span class="in">`userdata.get("LLM_API_KEY")`</span>).</span>
-<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a><span class="fu">### Diagnóstico rápido</span></span>
+<span id="cb5-83"><a href="#cb5-83" aria-hidden="true" tabindex="-1"></a>Si en algún momento te preguntas de dónde sale la clave, este es el orden que sigue <span class="in">`setup_keys.py`</span> (el primero que la encuentre gana):</span>
+<span id="cb5-84"><a href="#cb5-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-85"><a href="#cb5-85" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Variable <span class="in">`LLM_API_KEY`</span> ya configurada en el proceso (<span class="in">`os.environ`</span>).</span>
+<span id="cb5-86"><a href="#cb5-86" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Archivo <span class="in">`.env`</span> local (vía <span class="in">`python-dotenv`</span>).</span>
+<span id="cb5-87"><a href="#cb5-87" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Secret de Colab (<span class="in">`userdata.get("LLAMUS_API_KEY")`</span> o <span class="in">`userdata.get("LLM_API_KEY")`</span>).</span>
 <span id="cb5-88"><a href="#cb5-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a>Si una celda con LLM devuelve error 401 ("Incorrect API key"), ejecuta en una celda aparte:</span>
+<span id="cb5-89"><a href="#cb5-89" aria-hidden="true" tabindex="-1"></a><span class="fu">### Diagnóstico rápido {#sec-diagnostico}</span></span>
 <span id="cb5-90"><a href="#cb5-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
-<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"LLM_API_KEY set:"</span>, <span class="bu">bool</span>(os.getenv(<span class="st">"LLM_API_KEY"</span>)))</span>
-<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Source:"</span>, <span class="st">"env"</span> <span class="cf">if</span> <span class="st">"LLM_API_KEY"</span> <span class="kw">in</span> os.environ <span class="cf">else</span> <span class="st">"missing"</span>)</span>
-<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Si imprime <span class="in">`set: False`</span> → la clave no se ha cargado. Revisa los pasos de arriba.</span>
-<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Si imprime <span class="in">`set: True`</span> pero el 401 persiste → la clave es incorrecta. Pide una nueva al profesorado.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb5-91"><a href="#cb5-91" aria-hidden="true" tabindex="-1"></a>Si una celda con LLM devuelve error 401 ("Incorrect API key"), ejecuta en una celda aparte:</span>
+<span id="cb5-92"><a href="#cb5-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-93"><a href="#cb5-93" aria-hidden="true" tabindex="-1"></a><span class="in">```python</span></span>
+<span id="cb5-94"><a href="#cb5-94" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb5-95"><a href="#cb5-95" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"LLM_API_KEY set:"</span>, <span class="bu">bool</span>(os.getenv(<span class="st">"LLM_API_KEY"</span>)))</span>
+<span id="cb5-96"><a href="#cb5-96" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Source:"</span>, <span class="st">"env"</span> <span class="cf">if</span> <span class="st">"LLM_API_KEY"</span> <span class="kw">in</span> os.environ <span class="cf">else</span> <span class="st">"missing"</span>)</span>
+<span id="cb5-97"><a href="#cb5-97" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb5-98"><a href="#cb5-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-99"><a href="#cb5-99" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Si imprime <span class="in">`set: False`</span> → la clave no se ha cargado. Revisa los pasos de arriba.</span>
+<span id="cb5-100"><a href="#cb5-100" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Si imprime <span class="in">`set: True`</span> pero el 401 persiste → la clave es incorrecta. Pide una nueva al profesorado.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 

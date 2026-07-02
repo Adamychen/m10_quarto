@@ -82,9 +82,9 @@ graph LR
 
 ## Lecturas obligatorias
 
-- Es, S. et al. (2023). **RAGAS: Automated Evaluation of Retrieval Augmented Generation**. [arXiv:2309.15217](https://arxiv.org/abs/2309.15217)
-- Hu, E. et al. (2022). **LoRA: Low-Rank Adaptation of Large Language Models**. ICLR. [arXiv:2106.09685](https://arxiv.org/abs/2106.09685) — secciones 1-4
-- Lewis, P. et al. (2020). **Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks**. NeurIPS. [arXiv:2005.11401](https://arxiv.org/abs/2005.11401)
+- @es2024ragas
+- @hu2022lora — secciones 1-4
+- @lewis2020rag
 
 ## Resumen del bloque {#sec-b3-resumen}
 
@@ -109,3 +109,8 @@ Este bloque te da las herramientas para llevar tus sistemas IA a **calidad de pr
 - **Proyecto integrador:** combinarás RAG + datos sintéticos + fine-tuning en un sistema completo de tu dominio.
 
 Ahora pasa al primer tema: **[RAG Avanzado](03b-rag-avanzado.qmd)**.
+
+# References
+
+::: {#refs}
+:::

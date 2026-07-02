@@ -452,4 +452,9 @@ graph TD
 ```
 :::
 
-> **Lectura recomendada:** [Model Context Protocol Specification](https://spec.modelcontextprotocol.io/) | [FastMCP Documentation](https://gofastmcp.com/)
+> **Lectura recomendada:** [Model Context Protocol Specification](https://spec.modelcontextprotocol.io/) | [FastMCP Documentation](https://gofastmcp.com/) [@mcp].
+
+# References
+
+::: {#refs}
+:::

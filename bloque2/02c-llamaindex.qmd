@@ -460,4 +460,9 @@ graph TD
 ```
 :::
 
-> **Lectura recomendada:** [LlamaIndex Documentation](https://docs.llamaindex.ai/en/stable/)
+> **Lectura recomendada:** [LlamaIndex Documentation](https://docs.llamaindex.ai/en/stable/) [@llamaindex].
+
+# References
+
+::: {#refs}
+:::
