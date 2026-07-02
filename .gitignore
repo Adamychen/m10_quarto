@@ -2,12 +2,14 @@ __pycache__/
 .chroma_db/
 _site/
 .site/
+site_libs/
+notebooks/site_libs/
 *_files/
 *.ipynb
 !notebooks/**/*.ipynb
 .DS_Store
 .venv
-
+site_libs/
 /.quarto/
 **/*.quarto_ipynb
 .env
@@ -29,3 +31,6 @@ models/
 
 # Documentos internos del módulo
 Modulo10_IA_Generativa_DataScience.*
+
+# Fragmentos de quarto .html
+*.html
