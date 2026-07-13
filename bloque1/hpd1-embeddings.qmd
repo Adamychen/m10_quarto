@@ -859,26 +859,27 @@ a la calidad de la búsqueda semántica? ¿Por qué?
 ---
 
 **Diagrama de arquitectura**
+
 ::: {#fig-hpd1-arquitectura}
 ```{mermaid}
 graph TD
-    subgraph "Ingesta"
-        A[Documentos PDF<br/>Sintéticos + ArXiv] --> B[PyPDFLoader<br/>Extracción de texto]
-        B --> C[RecursiveCharacterTextSplitter<br/>Chunking con solapamiento]
-    end
-    subgraph "Indexación"
-        C --> D[Modelo de embeddings<br/>intfloat/e5-small-v2]
-        D --> E[(Chroma DB<br/>Índice vectorial)]
-    end
-    subgraph "Consulta"
-        F[Query en lenguaje natural] --> G[Embedding de consulta]
-        G --> E
-        E --> H[Resultados top-k]
-    end
-    subgraph "Evaluación"
-        H --> I[Recall@k]
-        D --> J[MTEB<br/>Similitud textual]
-    end
+subgraph "Ingesta"
+    A["Documentos PDF<br>Sintéticos + ArXiv"] --> B["PyPDFLoader<br>Extracción de texto"]
+    B --> C["RecursiveCharacterTextSplitter<br>Chunking con solapamiento"]
+end
+subgraph "Indexación"
+    C --> D["Modelo de embeddings<br>intfloat/e5-small-v2"]
+    D --> E["Chroma DB<br>Índice vectorial"]
+end
+subgraph "Consulta"
+    F["Query en lenguaje natural"] --> G["Embedding de consulta"]
+    G --> E
+    E --> H["Resultados top-k"]
+end
+subgraph "Evaluación"
+    H --> I["Recall@k"]
+    D --> J["MTEB<br>Similitud textual"]
+end
 ```
 :::
 

@@ -1,0 +1,718 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "efe612cf",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "title: \"02b — LangChain: Cadenas, Memoria y Recuperación\"\n",
+    "engine: jupyter\n",
+    "---\n",
+    "\n",
+    "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02b-langchain.ipynb)\n",
+    "\n",
+    "> Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber visto [Prompt Engineering](02a-prompt-engineering.qmd) primero."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "ec20a470",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#| echo: true\n",
+    "#| eval: false\n",
+    "\n",
+    "!pip install -q langchain langchain-openai langchain-community python-dotenv"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "950d5720",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "✓ LLM_API_KEY cargada.\n",
+      "Librerías cargadas correctamente.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "import os\n",
+    "\"\"\"\n",
+    "Setup compartido para la API key de Llamus en todos los notebooks.\n",
+    "Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).\n",
+    "\n",
+    "Orden de resolución:\n",
+    "  1. .env local (python-dotenv)\n",
+    "  2. os.environ ya configurado externamente\n",
+    "  3. Google Colab userdata: secret \"LLAMUS_API_KEY\" (preferente) o \"LLM_API_KEY\"\n",
+    "\n",
+    "Las celdas posteriores pueden leer la key con os.environ.get(\"LLM_API_KEY\").\n",
+    "\"\"\"\n",
+    "\n",
+    "import os\n",
+    "\n",
+    "\n",
+    "def _load_llm_api_key():\n",
+    "    try:\n",
+    "        from dotenv import load_dotenv\n",
+    "        load_dotenv()\n",
+    "    except ImportError:\n",
+    "        pass\n",
+    "\n",
+    "    if not os.getenv(\"LLM_API_KEY\"):\n",
+    "        try:\n",
+    "            from google.colab import userdata\n",
+    "            for name in (\"LLAMUS_API_KEY\", \"LLM_API_KEY\"):\n",
+    "                try:\n",
+    "                    value = userdata.get(name)\n",
+    "                    if value:\n",
+    "                        os.environ[\"LLM_API_KEY\"] = value\n",
+    "                        break\n",
+    "                except Exception:\n",
+    "                    continue\n",
+    "        except ImportError:\n",
+    "            pass\n",
+    "\n",
+    "\n",
+    "_load_llm_api_key()\n",
+    "\n",
+    "if os.getenv(\"LLM_API_KEY\"):\n",
+    "    print(\"✓ LLM_API_KEY cargada.\")\n",
+    "else:\n",
+    "    print(\"⚠️  LLM_API_KEY no encontrada.\")\n",
+    "    print(\"    • Local: crea un archivo .env con LLM_API_KEY=tu_clave\")\n",
+    "    print(\"    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'\")\n",
+    "\n",
+    "os.environ[\"TOKENIZERS_PARALLELISM\"] = \"false\"\n",
+    "import warnings\n",
+    "warnings.filterwarnings(\"ignore\")\n",
+    "print(\"Librerías cargadas correctamente.\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "26ed6d58",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "✅ ChatOpenAI configurado. Las celdas de ejemplo funcionarán correctamente.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from langchain_openai import ChatOpenAI\n",
+    "\n",
+    "LLM_KEY = os.getenv(\"LLM_API_KEY\")\n",
+    "LLM_URL = \"https://llamus.cs.us.es/api/v1\"\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Crea un archivo .env en la raíz del proyecto con:\\n    LLM_API_KEY=tu_api_key\\n    Las celdas siguientes mostrarán este mensaje hasta que configures la clave.\")\n",
+    "else:\n",
+    "    llm = ChatOpenAI(model=\"gemma4:e2b-mlx\", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)\n",
+    "    print(\"✅ ChatOpenAI configurado. Las celdas de ejemplo funcionarán correctamente.\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "8d867b36",
+   "metadata": {},
+   "source": [
+    "## LangChain {#sec-langchain}\n",
+    "\n",
+    "### ¿Qué es y para qué sirve? {#sec-que-es-langchain}\n",
+    "\n",
+    "LangChain es un **framework de orquestación** para aplicaciones con LLMs. Si usar la API de OpenAI directamente es como cocinar con un solo fuego, LangChain te da una cocina completa: fogones, temporizador, nevera con ingredientes y libro de recetas.\n",
+    "\n",
+    "::: {#fig-langchain-componentes}\n",
+    "```{mermaid}\n",
+    "graph TD\n",
+    "    subgraph \"Aplicación con LangChain\"\n",
+    "        A[Prompt<br/>Template] --> B[LLM]\n",
+    "        B --> C[Output<br/>Parser]\n",
+    "        D[Retriever<br/>Vector DB] -.-> A\n",
+    "        E[Memory] -.-> A\n",
+    "        F[Tools/APIs] -.-> B\n",
+    "    end\n",
+    "\n",
+    "    A --> G[Usuario]\n",
+    "    C --> G\n",
+    "\n",
+    "    style A fill:#4B8BBE,color:#fff\n",
+    "    style B fill:#306998,color:#fff\n",
+    "    style C fill:#2e7d32,color:#fff\n",
+    "```\n",
+    ":::\n",
+    "\n",
+    "**Componentes clave que veremos:**\n",
+    "\n",
+    ": Componentes principales de LangChain {#tbl-langchain-componentes}\n",
+    "\n",
+    "| Componente | ¿Qué hace? |\n",
+    "|---|---|\n",
+    "| **Prompt Templates** | Plantillas reutilizables con variables |\n",
+    "| **LCEL** | Encadenar componentes con `\\|` |\n",
+    "| **Memory** | Mantener historial de conversación |\n",
+    "| **Retrievers** | Buscar documentos relevantes |\n",
+    "| **Output Parsers** | Estructurar la salida del modelo |\n",
+    "| **Callbacks** | Monitorizar y loguear la ejecución |\n",
+    "\n",
+    "### LCEL — LangChain Expression Language {#sec-lcel}\n",
+    "\n",
+    "LCEL usa el operador `|` (pipe) para encadenar componentes, como en las tuberías de Unix:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "b3e23e23",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "La desviación estándar es una medida que cuantifica la dispersión o variabilidad de un conjunto de datos respecto a su media. Indica cuánto se desvían los valores individuales del promedio. Una desviación baja sugiere datos agrupados, mientras que una alta indica una gran dispersión y menor confiabilidad en el promedio.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from langchain_core.prompts import ChatPromptTemplate\n",
+    "from langchain_core.output_parsers import StrOutputParser\n",
+    "\n",
+    "prompt = ChatPromptTemplate.from_template(\n",
+    "    \"Eres un analista de datos. Explica {concepto} en {num_palabras} palabras.\"\n",
+    ")\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.\")\n",
+    "else:\n",
+    "    cadena = prompt | llm | StrOutputParser()\n",
+    "    resultado = cadena.invoke({\n",
+    "        \"concepto\": \"desviación estándar\",\n",
+    "        \"num_palabras\": \"50\"\n",
+    "    })\n",
+    "    print(resultado)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "183d00c1",
+   "metadata": {},
+   "source": [
+    "::: {#fig-lcel-pipe}\n",
+    "```{mermaid}\n",
+    "graph LR\n",
+    "    A[\"prompt<br/>{concepto}\"] -->|\"|\"| B[\"llm<br/>Qwen3\"]\n",
+    "    B -->|\"|\"| C[\"StrOutputParser<br/>texto limpio\"]\n",
+    "\n",
+    "    style A fill:#4B8BBE,color:#fff\n",
+    "    style B fill:#306998,color:#fff\n",
+    "    style C fill:#2e7d32,color:#fff\n",
+    "```\n",
+    ":::\n",
+    "\n",
+    "**¿Por qué LCEL?** Esta sintaxis de tubería permite:\n",
+    "- Componer cadenas complejas de forma legible\n",
+    "- Ejecución asíncrona, streaming y paralela sin código extra\n",
+    "- Trazabilidad automática con LangSmith"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "6a07fcca",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "EL P-VALOR ES LA PROBABILIDAD DE OBTENER TUS RESULTADOS SI LA HIPÓTESIS NULA FUERA CIERTA. UN VALOR BAJO INDICA QUE EL RESULTADO ES ESTADÍSTICAMENTE SIGNIFICATIVO, SUGIRIENDO QUE EXISTE UN EFECTO REAL.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from langchain_core.runnables import RunnableLambda\n",
+    "\n",
+    "def procesar_intermedio(texto):\n",
+    "    return texto.upper()\n",
+    "\n",
+    "cadena_compleja = prompt | llm | StrOutputParser() | RunnableLambda(procesar_intermedio)\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.\")\n",
+    "else:\n",
+    "    print(cadena_compleja.invoke({\"concepto\": \"p-valor\", \"num_palabras\": \"30\"}))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fd7df81e",
+   "metadata": {},
+   "source": [
+    "### Prompt Templates {#sec-prompt-templates}\n",
+    "\n",
+    "Las plantillas permiten separar la lógica del prompt del código. Soporta variables, few-shot examples y carga desde archivo:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "18a7ac81",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Genera un resumen de informe ejecutivo sobre ventas Q1 2026 con tono formal.\n",
+      "\n",
+      "--- Prompt generado con few-shot ---\n",
+      "Eres un profesor de estadística. Responde de forma similar a los ejemplos:\n",
+      "\n",
+      "P: ¿Qué es una media?\n",
+      "R: La media es la suma dividida por el número de elementos.\n",
+      "\n",
+      "P: ¿Qué es una mediana?\n",
+      "R: La mediana es el valor central al ordenar los datos.\n",
+      "\n",
+      "P: ¿Qué es una moda?\n",
+      "R:\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from langchain_core.prompts import PromptTemplate, FewShotPromptTemplate\n",
+    "\n",
+    "plantilla_simple = PromptTemplate.from_template(\n",
+    "    \"Genera un resumen de {tipo_documento} sobre {tema} con tono {tono}.\"\n",
+    ")\n",
+    "\n",
+    "print(plantilla_simple.format(\n",
+    "    tipo_documento=\"informe ejecutivo\",\n",
+    "    tema=\"ventas Q1 2026\",\n",
+    "    tono=\"formal\"\n",
+    "))\n",
+    "\n",
+    "ejemplos = [\n",
+    "    {\"pregunta\": \"¿Qué es una media?\", \"respuesta\": \"La media es la suma dividida por el número de elementos.\"},\n",
+    "    {\"pregunta\": \"¿Qué es una mediana?\", \"respuesta\": \"La mediana es el valor central al ordenar los datos.\"},\n",
+    "]\n",
+    "\n",
+    "plantilla_few_shot = FewShotPromptTemplate(\n",
+    "    examples=ejemplos,\n",
+    "    example_prompt=PromptTemplate.from_template(\"P: {pregunta}\\nR: {respuesta}\"),\n",
+    "    prefix=\"Eres un profesor de estadística. Responde de forma similar a los ejemplos:\",\n",
+    "    suffix=\"P: {pregunta}\\nR:\",\n",
+    "    input_variables=[\"pregunta\"]\n",
+    ")\n",
+    "\n",
+    "print(\"\\n--- Prompt generado con few-shot ---\")\n",
+    "print(plantilla_few_shot.format(pregunta=\"¿Qué es una moda?\"))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "aab42d81",
+   "metadata": {},
+   "source": [
+    "### Memoria conversacional {#sec-memoria-conversacional}\n",
+    "\n",
+    "Sin memoria, cada llamada al LLM es independiente: el modelo no recuerda lo que dijiste antes. La memoria almacena el historial y lo inyecta en cada nuevo prompt:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "0b200b29",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "/home/adam/Escritorio/m10_quarto/.venv/lib/python3.13/site-packages/IPython/core/interactiveshell.py:3748: LangChainDeprecationWarning: RunnableWithMessageHistory is deprecated. Use LangGraph's built-in persistence instead.\n",
+      "  exec(code_obj, self.user_global_ns, self.user_ns)\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "R1: Es una medida que indica cuánto se dispersan los datos alrededor de la media. Cuanto mayor sea, mayor será la variabilidad o dispersión del conjunto.\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "R2: La varianza mide qué tan dispersos están los datos respecto a la media. Una varianza alta indica que los datos están muy separados, mientras que una baja sugiere que están agrupados cerca del promedio.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from langchain_community.chat_message_histories import ChatMessageHistory\n",
+    "from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder\n",
+    "from langchain_core.runnables.history import RunnableWithMessageHistory\n",
+    "\n",
+    "llm_chat = ChatOpenAI(model=\"gemma4:e2b-mlx\", base_url=LLM_URL, api_key=LLM_KEY, temperature=0.7)\n",
+    "\n",
+    "prompt_con_memoria = ChatPromptTemplate.from_messages([\n",
+    "    (\"system\", \"Eres un profesor de estadística amable. Responde en 2 frases máximo.\"),\n",
+    "    MessagesPlaceholder(variable_name=\"history\"),\n",
+    "    (\"human\", \"{input}\")\n",
+    "])\n",
+    "\n",
+    "cadena_con_historial = RunnableWithMessageHistory(\n",
+    "    prompt_con_memoria | llm_chat,\n",
+    "    lambda session_id: ChatMessageHistory(),\n",
+    "    input_messages_key=\"input\",\n",
+    "    history_messages_key=\"history\"\n",
+    ")\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.\")\n",
+    "else:\n",
+    "    r1 = cadena_con_historial.invoke(\n",
+    "        {\"input\": \"¿Qué es la desviación estándar?\"},\n",
+    "        config={\"configurable\": {\"session_id\": \"alumno_01\"}}\n",
+    "    )\n",
+    "    print(\"R1:\", r1.content)\n",
+    "\n",
+    "    r2 = cadena_con_historial.invoke(\n",
+    "        {\"input\": \"¿Y cómo se relaciona con la varianza?\"},\n",
+    "        config={\"configurable\": {\"session_id\": \"alumno_01\"}}\n",
+    "    )\n",
+    "    print(\"R2:\", r2.content)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6b96cb91",
+   "metadata": {},
+   "source": [
+    "::: {.callout-tip}\n",
+    "## Tipos de memoria en LangChain\n",
+    "\n",
+    ": Tipos de memoria disponibles en LangChain {#tbl-tipos-memoria}\n",
+    "\n",
+    "| Tipo | Estrategia | Ideal para |\n",
+    "|---|---|---|\n",
+    "| `ConversationBufferMemory` | Guarda todo el historial | Conversaciones cortas |\n",
+    "| `ConversationBufferWindowMemory` | Solo las últimas K interacciones | Ventana deslizante |\n",
+    "| `ConversationSummaryMemory` | Resume historial con otro LLM | Conversaciones largas |\n",
+    "| `ConversationTokenBufferMemory` | Limita por número de tokens | Control de costes |\n",
+    ":::\n",
+    "\n",
+    "### Retrievers {#sec-retrievers}\n",
+    "\n",
+    "Un **retriever** busca documentos relevantes en una base de conocimiento (vectorial o clásica) y los inyecta en el prompt. Es el corazón del patrón RAG (Retrieval-Augmented Generation):"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "19f0f755",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Documento troceado en 2 fragmentos\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "--- Documento 1 ---\n",
+      "Informe Anual de Ventas 2025\n",
+      "\n",
+      "Q1: Los ingresos del primer trimestre alcanzaron 1.2 millones de euros, un 15% más que el año anterior.\n",
+      "El producto estrella fue CloudSync Pro con 450k€ en ventas. La reg\n",
+      "\n",
+      "--- Documento 2 ---\n",
+      "Q3: Tercer trimestre con 1.1 millones de euros. Hubo una caída estacional del 10% en agosto.\n",
+      "La región Norte incorporó 15 nuevos clientes corporativos.\n",
+      "\n",
+      "Q4: Cierre de año récord con 1.8 millones de eu\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from langchain_community.document_loaders import TextLoader\n",
+    "from langchain_text_splitters import RecursiveCharacterTextSplitter\n",
+    "from langchain_community.vectorstores import Chroma\n",
+    "from langchain_openai import OpenAIEmbeddings\n",
+    "\n",
+    "# Crear un documento de ejemplo para la demo\n",
+    "import tempfile\n",
+    "with tempfile.NamedTemporaryFile(mode=\"w\", suffix=\".txt\", delete=False, encoding=\"utf-8\") as f:\n",
+    "    f.write(\"\"\"\n",
+    "Informe Anual de Ventas 2025\n",
+    "\n",
+    "Q1: Los ingresos del primer trimestre alcanzaron 1.2 millones de euros, un 15% más que el año anterior.\n",
+    "El producto estrella fue CloudSync Pro con 450k€ en ventas. La región de Madrid lideró con el 40% del total.\n",
+    "\n",
+    "Q2: Los ingresos del segundo trimestre fueron de 1.5 millones de euros. Se lanzó el nuevo producto DataViz Analytics\n",
+    "que facturó 200k€ en su primer mes. La región de Barcelona creció un 25% respecto al Q1.\n",
+    "\n",
+    "Q3: Tercer trimestre con 1.1 millones de euros. Hubo una caída estacional del 10% en agosto.\n",
+    "La región Norte incorporó 15 nuevos clientes corporativos.\n",
+    "\n",
+    "Q4: Cierre de año récord con 1.8 millones de euros. La campaña de Black Friday generó 300k€ adicionales.\n",
+    "El total anual fue de 5.6 millones de euros, superando el objetivo de 5 millones.\n",
+    "\"\"\")\n",
+    "    doc_path = f.name\n",
+    "\n",
+    "loader = TextLoader(doc_path)\n",
+    "documentos = loader.load()\n",
+    "\n",
+    "splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)\n",
+    "chunks = splitter.split_documents(documentos)\n",
+    "print(f\"Documento troceado en {len(chunks)} fragmentos\")\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Configura LLM_API_KEY en .env para indexar y buscar.\")\n",
+    "else:\n",
+    "    embeddings = OpenAIEmbeddings(\n",
+    "        model=\"embeddinggemma:latest\",\n",
+    "        base_url=LLM_URL,\n",
+    "        api_key=LLM_KEY,\n",
+    "        tiktoken_enabled=False,\n",
+    "        check_embedding_ctx_length=False,\n",
+    "    )\n",
+    "    vectorstore = Chroma.from_documents(chunks, embeddings)\n",
+    "    retriever = vectorstore.as_retriever(search_kwargs={\"k\": 2})\n",
+    "\n",
+    "    pregunta = \"¿Cuáles fueron los ingresos del Q2?\"\n",
+    "    docs_relevantes = retriever.invoke(pregunta)\n",
+    "\n",
+    "    for i, doc in enumerate(docs_relevantes):\n",
+    "        print(f\"\\n--- Documento {i+1} ---\")\n",
+    "        print(doc.page_content[:200])\n",
+    "\n",
+    "import os as _os; _os.unlink(doc_path)"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3bf10d68",
+   "metadata": {},
+   "source": [
+    "::: {#fig-rag-patron}\n",
+    "```{mermaid}\n",
+    "graph LR\n",
+    "    A[Pregunta<br/>usuario] --> B[Retriever<br/>búsqueda semántica]\n",
+    "    B --> C[Vector DB<br/>top-K chunks]\n",
+    "    C --> D[Prompt<br/>pregunta + contexto]\n",
+    "    D --> E[LLM]\n",
+    "    E --> F[Respuesta<br/>fundamentada]\n",
+    "\n",
+    "    style A fill:#4B8BBE,color:#fff\n",
+    "    style B fill:#e65100,color:#fff\n",
+    "    style C fill:#FFD43B,color:#000\n",
+    "    style F fill:#2e7d32,color:#fff\n",
+    "```\n",
+    ":::\n",
+    "\n",
+    "### Output Parsers {#sec-output-parsers}\n",
+    "\n",
+    "Los parsers convierten la salida textual del LLM en objetos Python utilizables:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "6c99d63c",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Métrica: Ventas mensuales\n",
+      "Valor: 115\n",
+      "Tendencia: estable\n",
+      "Recomendación: Se recomienda monitorear la fluctuación y ajustar las estrategias para estabilizar el crecimiento.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from langchain_core.output_parsers import JsonOutputParser\n",
+    "from pydantic import BaseModel, Field\n",
+    "\n",
+    "class AnalisisDatos(BaseModel):\n",
+    "    metrica_principal: str = Field(description=\"Nombre de la métrica más relevante\")\n",
+    "    valor: float = Field(description=\"Valor numérico de la métrica\")\n",
+    "    tendencia: str = Field(description=\"'sube', 'baja' o 'estable'\")\n",
+    "    recomendacion: str = Field(description=\"Recomendación de 1 frase\")\n",
+    "\n",
+    "parser = JsonOutputParser(pydantic_object=AnalisisDatos)\n",
+    "\n",
+    "prompt_con_parser = ChatPromptTemplate.from_messages([\n",
+    "    (\"system\", \"Analizas datos empresariales. {formato}\"),\n",
+    "    (\"user\", \"Ventas enero: 100, febrero: 120, marzo: 115. ¿Qué ves?\")\n",
+    "])\n",
+    "\n",
+    "cadena_con_parser = prompt_con_parser | llm | parser\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.\")\n",
+    "else:\n",
+    "    resultado = cadena_con_parser.invoke({\n",
+    "        \"formato\": parser.get_format_instructions()\n",
+    "    })\n",
+    "    print(f\"Métrica: {resultado['metrica_principal']}\")\n",
+    "    print(f\"Valor: {resultado['valor']}\")\n",
+    "    print(f\"Tendencia: {resultado['tendencia']}\")\n",
+    "    print(f\"Recomendación: {resultado['recomendacion']}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "3ea65cc9",
+   "metadata": {},
+   "source": [
+    "### Callbacks {#sec-callbacks}\n",
+    "\n",
+    "Los callbacks permiten ejecutar código en puntos clave del pipeline:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "9992ba42",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CALLBACK] Llamando al LLM con 1 prompt(s)\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "[CALLBACK] Respuesta recibida. Tokens usados: 451\n",
+      "\n",
+      "Resultado: La regresión lineal establece una relación matemática mediante una línea recta para predecir cómo una variable afecta a otra. Es un modelo clave para entender y proyectar tendencias de los datos.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from langchain_core.callbacks import BaseCallbackHandler\n",
+    "\n",
+    "class MiCallback(BaseCallbackHandler):\n",
+    "    def on_llm_start(self, serialized, prompts, **kwargs):\n",
+    "        print(f\"[CALLBACK] Llamando al LLM con {len(prompts)} prompt(s)\")\n",
+    "\n",
+    "    def on_llm_end(self, response, **kwargs):\n",
+    "        tokens = response.llm_output.get(\"token_usage\", {}).get(\"total_tokens\", \"?\") if response.llm_output else \"?\"\n",
+    "        print(f\"[CALLBACK] Respuesta recibida. Tokens usados: {tokens}\")\n",
+    "\n",
+    "cadena = prompt | llm | StrOutputParser()\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.\")\n",
+    "else:\n",
+    "    resultado = cadena.invoke(\n",
+    "        {\"concepto\": \"regresión lineal\", \"num_palabras\": \"30\"},\n",
+    "        config={\"callbacks\": [MiCallback()]}\n",
+    "    )\n",
+    "    print(f\"\\nResultado: {resultado}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "b677204f",
+   "metadata": {},
+   "source": [
+    "::: {.callout-note}\n",
+    "Los callbacks son la base del **tracing** (LangSmith), el **logging** y la **monitorización** en producción. Te permiten saber exactamente qué está pasando dentro de tus cadenas y cuánto te está costando.\n",
+    ":::\n",
+    "\n",
+    "### Resumen del flujo completo {#sec-resumen-flujo-langchain}\n",
+    "\n",
+    "::: {#fig-flujo-completo-langchain}\n",
+    "```{mermaid}\n",
+    "graph TD\n",
+    "    A[Usuario pregunta] --> B[Memory<br/>carga historial]\n",
+    "    B --> C[Retriever<br/>busca docs relevantes]\n",
+    "    C --> D[Prompt Template<br/>construye prompt final]\n",
+    "    D --> E[LLM<br/>genera respuesta]\n",
+    "    E --> F[Output Parser<br/>estructura salida]\n",
+    "    F --> G[Memory<br/>guarda interacción]\n",
+    "    F --> H[Usuario recibe<br/>respuesta]\n",
+    "\n",
+    "    style A fill:#4B8BBE,color:#fff\n",
+    "    style H fill:#2e7d32,color:#fff\n",
+    "```\n",
+    ":::\n",
+    "\n",
+    "> **Lectura recomendada:** [LangChain Expression Language (LCEL)](https://python.langchain.com/docs/concepts/lcel/) [@langchain].\n",
+    "\n",
+    "# References\n",
+    "\n",
+    "::: {#refs}\n",
+    ":::"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3",
+   "path": "/home/adam/.local/share/jupyter/kernels/python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.13.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}

@@ -1,0 +1,714 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "id": "2841bb3c",
+   "metadata": {},
+   "source": [
+    "---\n",
+    "title: \"02c — LlamaIndex: Indexación y Consulta de Documentos\"\n",
+    "engine: jupyter\n",
+    "---\n",
+    "\n",
+    "[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02c-llamaindex.ipynb)\n",
+    "\n",
+    "> Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber visto [LangChain](02b-langchain.qmd) primero."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "f6eb56b7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "#| echo: true\n",
+    "#| eval: false\n",
+    "\n",
+    "!pip install -q llama-index llama-index-llms-openai-like python-dotenv"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "34b91782",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "✓ LLM_API_KEY cargada.\n",
+      "Librerías cargadas correctamente.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "import os\n",
+    "\"\"\"\n",
+    "Setup compartido para la API key de Llamus en todos los notebooks.\n",
+    "Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).\n",
+    "\n",
+    "Orden de resolución:\n",
+    "  1. .env local (python-dotenv)\n",
+    "  2. os.environ ya configurado externamente\n",
+    "  3. Google Colab userdata: secret \"LLAMUS_API_KEY\" (preferente) o \"LLM_API_KEY\"\n",
+    "\n",
+    "Las celdas posteriores pueden leer la key con os.environ.get(\"LLM_API_KEY\").\n",
+    "\"\"\"\n",
+    "\n",
+    "import os\n",
+    "\n",
+    "\n",
+    "def _load_llm_api_key():\n",
+    "    try:\n",
+    "        from dotenv import load_dotenv\n",
+    "        load_dotenv()\n",
+    "    except ImportError:\n",
+    "        pass\n",
+    "\n",
+    "    if not os.getenv(\"LLM_API_KEY\"):\n",
+    "        try:\n",
+    "            from google.colab import userdata\n",
+    "            for name in (\"LLAMUS_API_KEY\", \"LLM_API_KEY\"):\n",
+    "                try:\n",
+    "                    value = userdata.get(name)\n",
+    "                    if value:\n",
+    "                        os.environ[\"LLM_API_KEY\"] = value\n",
+    "                        break\n",
+    "                except Exception:\n",
+    "                    continue\n",
+    "        except ImportError:\n",
+    "            pass\n",
+    "\n",
+    "\n",
+    "_load_llm_api_key()\n",
+    "\n",
+    "if os.getenv(\"LLM_API_KEY\"):\n",
+    "    print(\"✓ LLM_API_KEY cargada.\")\n",
+    "else:\n",
+    "    print(\"⚠️  LLM_API_KEY no encontrada.\")\n",
+    "    print(\"    • Local: crea un archivo .env con LLM_API_KEY=tu_clave\")\n",
+    "    print(\"    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'\")\n",
+    "\n",
+    "os.environ[\"TOKENIZERS_PARALLELISM\"] = \"false\"\n",
+    "import warnings\n",
+    "warnings.filterwarnings(\"ignore\")\n",
+    "print(\"Librerías cargadas correctamente.\")"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "a269c02e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "✅ LlamaIndex configurado. Las celdas de ejemplo funcionarán correctamente.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from llama_index.llms.openai_like import OpenAILike\n",
+    "from llama_index.core.base.embeddings.base import BaseEmbedding\n",
+    "from llama_index.core.base.llms.types import LLMMetadata\n",
+    "from llama_index.core import Settings\n",
+    "from openai import OpenAI\n",
+    "\n",
+    "LLM_KEY = os.getenv(\"LLM_API_KEY\")\n",
+    "LLM_URL = \"https://llamus.cs.us.es/api/v1\"\n",
+    "\n",
+    "# Llamus usa una API compatible con OpenAI, pero llama-index necesita adaptadores\n",
+    "# porque valida los modelos contra listas fijas de OpenAI.\n",
+    "\n",
+    "class LlamusChatLLM(OpenAILike):\n",
+    "    \"\"\"OpenAILike con is_chat_model=True para usar /v1/chat/completions.\"\"\"\n",
+    "    @property\n",
+    "    def metadata(self) -> LLMMetadata:\n",
+    "        meta = super().metadata\n",
+    "        meta.is_chat_model = True\n",
+    "        return meta\n",
+    "\n",
+    "class LlamusEmbedding(BaseEmbedding):\n",
+    "    \"\"\"Embeddings vía API de Llamus (qwen3-embedding).\"\"\"\n",
+    "    def __init__(self, model_name: str, api_key: str, api_base: str):\n",
+    "        super().__init__(model_name=model_name)\n",
+    "        self._client = OpenAI(api_key=api_key, base_url=api_base)\n",
+    "        self._model = model_name\n",
+    "\n",
+    "    def _get_text_embedding(self, text: str) -> list[float]:\n",
+    "        return self._client.embeddings.create(input=text, model=self._model).data[0].embedding\n",
+    "\n",
+    "    def _get_text_embeddings(self, texts: list[str]) -> list[list[float]]:\n",
+    "        return [d.embedding for d in self._client.embeddings.create(input=texts, model=self._model).data]\n",
+    "\n",
+    "    def _get_query_embedding(self, query: str) -> list[float]:\n",
+    "        return self._get_text_embedding(query)\n",
+    "\n",
+    "    async def _aget_text_embedding(self, text: str) -> list[float]:\n",
+    "        return self._get_text_embedding(text)\n",
+    "\n",
+    "    async def _aget_text_embeddings(self, texts: list[str]) -> list[list[float]]:\n",
+    "        return self._get_text_embeddings(texts)\n",
+    "\n",
+    "    async def _aget_query_embedding(self, query: str) -> list[float]:\n",
+    "        return self._get_query_embedding(query)\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Crea un archivo .env en la raíz del proyecto con:\\n    LLM_API_KEY=tu_api_key\\n    Las celdas siguientes mostrarán este mensaje hasta que configures la clave.\")\n",
+    "else:\n",
+    "    Settings.llm = LlamusChatLLM(model=\"gemma4:e2b-mlx\", api_base=LLM_URL, api_key=LLM_KEY, temperature=0)\n",
+    "    Settings.embed_model = LlamusEmbedding(\"qwen3-embedding:0.6b\", api_key=LLM_KEY, api_base=LLM_URL)\n",
+    "    Settings.chunk_size = 512\n",
+    "    Settings.chunk_overlap = 50\n",
+    "    print(\"✅ LlamaIndex configurado. Las celdas de ejemplo funcionarán correctamente.\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "9a83c43e",
+   "metadata": {},
+   "source": [
+    "::: {.callout-note}\n",
+    "## Modelo de embeddings multilingüe\n",
+    "\n",
+    "`qwen3-embedding:0.6b` es un modelo de embeddings **multilingüe** disponible en Llamus, a diferencia de los modelos ingleses (`all-MiniLM-L6-v2`, `e5-small-v2`) usados en el Bloque 1. Esto permite que los ejemplos de esta página usen texto en **español** sin pérdida de calidad: el tokenizador de Qwen maneja correctamente caracteres acentuados y la distribución del espacio semántico está calibrada para múltiples idiomas.\n",
+    "\n",
+    "Para usar embeddings en español en tu proyecto, `qwen3-embedding:0.6b` (o su versión mayor `qwen3-embedding:4b`) son la opción recomendada.\n",
+    ":::\n",
+    "\n",
+    "## LlamaIndex {#sec-llamaindex}\n",
+    "\n",
+    "### ¿Qué es LlamaIndex? {#sec-que-es-llamaindex}\n",
+    "\n",
+    "LlamaIndex (antes GPT Index) es un **framework de indexación diseñado específicamente para RAG** (Retrieval-Augmented Generation) y aplicaciones de pregunta-respuesta sobre tus propios datos.\n",
+    "\n",
+    "Mientras LangChain es un framework generalista (cadenas, agentes, herramientas...), LlamaIndex está especializado en una cosa y la hace muy bien: **convertir tus documentos en un índice consultable por un LLM**.\n",
+    "\n",
+    "::: {#fig-llamaindex-pipeline}\n",
+    "```{mermaid}\n",
+    "graph TD\n",
+    "    subgraph \"LlamaIndex Pipeline\"\n",
+    "        A[Documentos<br/>PDF, CSV, TXT, DB] --> B[Ingesta<br/>load + parse]\n",
+    "        B --> C[Nodos<br/>chunks semánticos]\n",
+    "        C --> D[Índice<br/>vector, keyword, tree...]\n",
+    "        D --> E[Query Engine<br/>lenguaje natural]\n",
+    "        E --> F[Respuesta<br/>con fuentes]\n",
+    "    end\n",
+    "\n",
+    "    style A fill:#4B8BBE,color:#fff\n",
+    "    style D fill:#e65100,color:#fff\n",
+    "    style F fill:#2e7d32,color:#fff\n",
+    "```\n",
+    ":::\n",
+    "\n",
+    "**¿Cuándo elegir LlamaIndex vs LangChain?**\n",
+    "\n",
+    ": Comparativa entre LlamaIndex y LangChain por criterio de uso {#tbl-llamaindex-vs-langchain}\n",
+    "\n",
+    "| Criterio | LlamaIndex | LangChain |\n",
+    "|---|---|---|\n",
+    "| **Foco principal** | Indexación y RAG | Orquestación general |\n",
+    "| **Curva de aprendizaje** | Más suave (más opinado) | Más empinada (más flexible) |\n",
+    "| **Carga de documentos** | `SimpleDirectoryReader` carga 20+ formatos | Necesitas cargadores específicos |\n",
+    "| **Índices avanzados** | Árboles, grafos, keywords | Depende de VectorStore |\n",
+    "| **Agentes** | Básico (con herramientas) | Muy potente (ReAct, multi-agente) |\n",
+    "\n",
+    "> En muchos proyectos se usan **ambos**: LlamaIndex para indexar y recuperar, LangChain para orquestar el agente.\n",
+    "\n",
+    "### Primer contacto: indexar y preguntar {#sec-primer-contacto-llamaindex}"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "6f4056a3",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Documentos cargados: 4\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Pregunta: ¿Cuáles fueron los ingresos totales en 2025?\n",
+      "Respuesta: Las ventas en 2025 fueron de 5.6 millones de euros.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from llama_index.core import VectorStoreIndex, Document\n",
+    "\n",
+    "# Creamos documentos de ejemplo en memoria (sin necesidad de archivos externos)\n",
+    "textos = [\n",
+    "    \"Las ventas de 2025 fueron de 5.6 millones de euros. El producto CloudSync Pro facturó 450k€ en Q1. La región de Madrid aportó el 40% del total.\",\n",
+    "    \"En 2024 las ventas fueron de 4.8 millones de euros, un crecimiento del 16.7% respecto a 2023. El mejor trimestre fue Q4 con 1.4 millones.\",\n",
+    "    \"El equipo de Data Science está formado por 12 personas: 4 ingenieros ML, 5 analistas y 3 data engineers. Ana lidera el equipo desde 2023.\",\n",
+    "    \"La empresa abrió oficina en Barcelona en marzo de 2025 con 8 empleados. La previsión para 2026 es duplicar la plantilla en esta sede.\",\n",
+    "]\n",
+    "documentos = [Document(text=t) for t in textos]\n",
+    "print(f\"Documentos cargados: {len(documentos)}\")\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.\")\n",
+    "else:\n",
+    "    indice = VectorStoreIndex.from_documents(documentos)\n",
+    "    query_engine = indice.as_query_engine(similarity_top_k=2)\n",
+    "\n",
+    "    respuesta = query_engine.query(\"¿Cuáles fueron los ingresos totales en 2025?\")\n",
+    "    print(f\"\\nPregunta: ¿Cuáles fueron los ingresos totales en 2025?\")\n",
+    "    print(f\"Respuesta: {respuesta}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "d4d73da7",
+   "metadata": {},
+   "source": [
+    "### El pipeline de ingesta {#sec-pipeline-ingesta}\n",
+    "\n",
+    "La ingesta convierte documentos brutos en nodos indexables:\n",
+    "\n",
+    "::: {#fig-pipeline-ingesta}\n",
+    "```{mermaid}\n",
+    "graph LR\n",
+    "    A[PDF] --> B[Reader<br/>extrae texto]\n",
+    "    C[CSV] --> B\n",
+    "    D[Web] --> B\n",
+    "    B --> E[Transformations<br/>chunking, metadatos]\n",
+    "    E --> F[Nodes<br/>unidades indexables]\n",
+    "    F --> G[Embeddings<br/>vectoriza]\n",
+    "    G --> H[(Vector Store<br/>ChromaDB/FAISS)]\n",
+    "\n",
+    "    style A fill:#4B8BBE,color:#fff\n",
+    "    style F fill:#e65100,color:#fff\n",
+    "    style H fill:#FFD43B,color:#000\n",
+    "```\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "0edd905b",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Documentos: 4\n",
+      "Nodos generados: 4\n",
+      "Ejemplo de nodo: Las ventas de 2025 fueron de 5.6 millones de euros. El producto CloudSync Pro facturó 450k€ en Q1. La región de Madrid aportó el 40% del total....\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from llama_index.core.node_parser import SentenceSplitter\n",
+    "from llama_index.core.ingestion import IngestionPipeline\n",
+    "\n",
+    "pipeline = IngestionPipeline(\n",
+    "    transformations=[\n",
+    "        SentenceSplitter(chunk_size=256, chunk_overlap=30),\n",
+    "    ]\n",
+    ")\n",
+    "\n",
+    "nodos = pipeline.run(documents=documentos)\n",
+    "\n",
+    "print(f\"Documentos: {len(documentos)}\")\n",
+    "print(f\"Nodos generados: {len(nodos)}\")\n",
+    "if nodos:\n",
+    "    print(f\"Ejemplo de nodo: {nodos[0].text[:150]}...\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "ebb6a491",
+   "metadata": {},
+   "source": [
+    "### Tipos de índices {#sec-tipos-indices}\n",
+    "\n",
+    "No todos los datos se consultan igual. LlamaIndex ofrece varios tipos de índices:\n",
+    "\n",
+    ": Tipos de índices en LlamaIndex y cuándo usar cada uno {#tbl-tipos-indices}\n",
+    "\n",
+    "| Índice | ¿Cómo funciona? | Mejor para |\n",
+    "|---|---|---|\n",
+    "| **VectorStoreIndex** | Embeddings + búsqueda por similitud | Preguntas semánticas |\n",
+    "| **SummaryIndex** | Resume cada chunk y lo encadena | Preguntas generales sobre TODO el documento |\n",
+    "| **KeywordTableIndex** | Extrae keywords de cada chunk | Preguntas muy específicas |\n",
+    "\n",
+    "::: {#fig-tipos-indices}\n",
+    "```{mermaid}\n",
+    "graph TD\n",
+    "    subgraph \"VectorStoreIndex\"\n",
+    "        V[Pregunta] --> VQ[Búsqueda<br/>similitud coseno]\n",
+    "        VQ --> VD[(Vectores<br/>top-K chunks)]\n",
+    "    end\n",
+    "\n",
+    "    subgraph \"SummaryIndex\"\n",
+    "        S[Pregunta] --> SQ[Recorre<br/>todos los chunks]\n",
+    "        SQ --> SR[Resumen<br/>completo]\n",
+    "    end\n",
+    "\n",
+    "    subgraph \"KeywordTableIndex\"\n",
+    "        K[Pregunta] --> KQ[Extrae<br/>keyword]\n",
+    "        KQ --> KT[(Tabla<br/>keyword→chunk)]\n",
+    "        KT --> KR[Chunks<br/>específicos]\n",
+    "    end\n",
+    "\n",
+    "    style V fill:#4B8BBE,color:#fff\n",
+    "    style S fill:#306998,color:#fff\n",
+    "    style K fill:#2e7d32,color:#fff\n",
+    "```\n",
+    ":::"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "c68624eb",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "=== VectorStoreIndex ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "No hay información sobre el crecimiento de la empresa entre 2024 y 2025. Se mencionan las ventas de 2025, que fueron de 5.6 millones de euros.\n",
+      "\n",
+      "=== SummaryIndex (tree_summarize) ===\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Las ventas en 2024 fueron de 4.8 millones de euros y en 2025 fueron de 5.6 millones de euros.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from llama_index.core import VectorStoreIndex, SummaryIndex\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.\")\n",
+    "else:\n",
+    "    vector_index = VectorStoreIndex.from_documents(documentos)\n",
+    "    summary_index = SummaryIndex.from_documents(documentos)\n",
+    "\n",
+    "    pregunta = \"¿Cuánto ha crecido la empresa entre 2024 y 2025?\"\n",
+    "\n",
+    "    print(\"=== VectorStoreIndex ===\")\n",
+    "    print(vector_index.as_query_engine().query(pregunta))\n",
+    "\n",
+    "    print(\"\\n=== SummaryIndex (tree_summarize) ===\")\n",
+    "    print(summary_index.as_query_engine(response_mode=\"tree_summarize\").query(pregunta))"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "fa6d4307",
+   "metadata": {},
+   "source": [
+    "### Query Engines {#sec-query-engines}\n",
+    "\n",
+    "Un **Query Engine** es el punto final de la API: recibe una pregunta en lenguaje natural y devuelve una respuesta."
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "b5083b0f",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Respuesta: Ana lidera el equipo de Data Science, y el equipo tiene 12 personas.\n",
+      "\n",
+      "--- Fuentes utilizadas ---\n",
+      "Fuente 1 (score: 0.819):\n",
+      "  El equipo de Data Science está formado por 12 personas: 4 ingenieros ML, 5 analistas y 3 data engineers. Ana lidera el e...\n",
+      "Fuente 2 (score: 0.283):\n",
+      "  La empresa abrió oficina en Barcelona en marzo de 2025 con 8 empleados. La previsión para 2026 es duplicar la plantilla ...\n",
+      "Fuente 3 (score: 0.162):\n",
+      "  Las ventas de 2025 fueron de 5.6 millones de euros. El producto CloudSync Pro facturó 450k€ en Q1. La región de Madrid a...\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.\")\n",
+    "else:\n",
+    "    indice = VectorStoreIndex.from_documents(documentos)\n",
+    "    query_engine = indice.as_query_engine(\n",
+    "        similarity_top_k=3,\n",
+    "        response_mode=\"compact\",\n",
+    "        verbose=True,\n",
+    "    )\n",
+    "\n",
+    "    respuesta = query_engine.query(\"¿Quién lidera el equipo de Data Science y cuántas personas tiene?\")\n",
+    "    print(f\"\\nRespuesta: {respuesta}\")\n",
+    "\n",
+    "    # Inspeccionar fuentes\n",
+    "    print(\"\\n--- Fuentes utilizadas ---\")\n",
+    "    for i, nodo in enumerate(respuesta.source_nodes):\n",
+    "        print(f\"Fuente {i+1} (score: {nodo.score:.3f}):\")\n",
+    "        print(f\"  {nodo.text[:120]}...\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "6d99cd6a",
+   "metadata": {},
+   "source": [
+    "### Consultas sobre datos estructurados (SQL) {#sec-nlsql}\n",
+    "\n",
+    "LlamaIndex también puede traducir lenguaje natural a SQL:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "6acf65b7",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Base de datos creada:\n",
+      "  (1, 'CloudSync', 450000.0, 'Madrid')\n",
+      "  (2, 'DataViz', 200000.0, 'Barcelona')\n",
+      "  (3, 'CloudSync', 320000.0, 'Madrid')\n",
+      "  (4, 'AI Toolkit', 180000.0, 'Norte')\n"
+     ]
+    },
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "\n",
+      "Pregunta: ¿Cuánto ha facturado CloudSync en total?\n",
+      "SQL generado: SELECT SUM(importe) FROM ventas WHERE producto = 'CloudSync'\n",
+      "Respuesta: CloudSync ha facturado un total de 770,000.0.\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "import sqlite3\n",
+    "import tempfile\n",
+    "\n",
+    "# Creamos una BD SQLite de ejemplo en memoria\n",
+    "db = sqlite3.connect(\":memory:\")\n",
+    "db.execute(\"CREATE TABLE ventas (id INTEGER, producto TEXT, importe REAL, region TEXT)\")\n",
+    "db.execute(\"INSERT INTO ventas VALUES (1, 'CloudSync', 450000, 'Madrid')\")\n",
+    "db.execute(\"INSERT INTO ventas VALUES (2, 'DataViz', 200000, 'Barcelona')\")\n",
+    "db.execute(\"INSERT INTO ventas VALUES (3, 'CloudSync', 320000, 'Madrid')\")\n",
+    "db.execute(\"INSERT INTO ventas VALUES (4, 'AI Toolkit', 180000, 'Norte')\")\n",
+    "db.commit()\n",
+    "\n",
+    "print(\"Base de datos creada:\")\n",
+    "for row in db.execute(\"SELECT * FROM ventas\"):\n",
+    "    print(f\"  {row}\")\n",
+    "\n",
+    "# Guardar a disco para usar con SQLAlchemy\n",
+    "tmp = tempfile.NamedTemporaryFile(suffix=\".db\", delete=False)\n",
+    "tmp.close()\n",
+    "bkp = sqlite3.connect(tmp.name)\n",
+    "for line in db.iterdump():\n",
+    "    bkp.execute(line)\n",
+    "bkp.commit()\n",
+    "bkp.close(); db.close()\n",
+    "db_path = tmp.name\n",
+    "\n",
+    "if not LLM_KEY:\n",
+    "    print(\"\\n⚠️  Configura LLM_API_KEY en .env para la demo NLSQL.\")\n",
+    "else:\n",
+    "    from llama_index.core import SQLDatabase\n",
+    "    from llama_index.core.query_engine import NLSQLTableQueryEngine\n",
+    "    from sqlalchemy import create_engine\n",
+    "\n",
+    "    engine = create_engine(f\"sqlite:///{db_path}\")\n",
+    "    sql_database = SQLDatabase(engine, include_tables=[\"ventas\"])\n",
+    "\n",
+    "    query_engine = NLSQLTableQueryEngine(\n",
+    "        sql_database=sql_database,\n",
+    "        llm=Settings.llm,\n",
+    "        tables=[\"ventas\"]\n",
+    "    )\n",
+    "\n",
+    "    pregunta = \"¿Cuánto ha facturado CloudSync en total?\"\n",
+    "    respuesta = query_engine.query(pregunta)\n",
+    "\n",
+    "    print(f\"\\nPregunta: {pregunta}\")\n",
+    "    print(f\"SQL generado: {respuesta.metadata.get('sql_query', 'no disponible')}\")\n",
+    "    print(f\"Respuesta: {respuesta}\")\n",
+    "\n",
+    "import os as _os\n",
+    "try:\n",
+    "    _os.unlink(db_path)\n",
+    "except FileNotFoundError:\n",
+    "    pass"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "2f714459",
+   "metadata": {},
+   "source": [
+    "::: {#fig-nlsql-patron}\n",
+    "```{mermaid}\n",
+    "graph LR\n",
+    "    A[Pregunta NL] --> B[LLM<br/>genera SQL]\n",
+    "    B --> C{SQL válido?}\n",
+    "    C -->|Sí| D[Ejecuta en BD]\n",
+    "    D --> E[Resultados]\n",
+    "    E --> F[LLM<br/>resume respuesta]\n",
+    "    F --> G[Respuesta NL<br/>+ datos]\n",
+    "\n",
+    "    style A fill:#4B8BBE,color:#fff\n",
+    "    style G fill:#2e7d32,color:#fff\n",
+    "```\n",
+    ":::\n",
+    "\n",
+    "### Chunking estratégico {#sec-chunking-estrategico}\n",
+    "\n",
+    "El tamaño y solapamiento de los chunks afecta drásticamente a la calidad del RAG:"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "83ff6adf",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Texto original: 2760 caracteres\n",
+      "Chunks por frases: 3\n",
+      "Chunks por tokens: 5\n"
+     ]
+    }
+   ],
+   "source": [
+    "#| echo: true\n",
+    "\n",
+    "from llama_index.core.node_parser import SentenceSplitter, TokenTextSplitter\n",
+    "\n",
+    "texto_largo = \"La inteligencia artificial generativa está transformando el panorama del análisis de datos. \" * 30\n",
+    "\n",
+    "# Chunking por frases\n",
+    "parser_frases = SentenceSplitter(chunk_size=256, chunk_overlap=30)\n",
+    "nodos_frases = parser_frases.get_nodes_from_documents([Document(text=texto_largo)])\n",
+    "\n",
+    "# Chunking por tokens\n",
+    "parser_tokens = TokenTextSplitter(chunk_size=128, chunk_overlap=20)\n",
+    "nodos_tokens = parser_tokens.get_nodes_from_documents([Document(text=texto_largo)])\n",
+    "\n",
+    "print(f\"Texto original: {len(texto_largo)} caracteres\")\n",
+    "print(f\"Chunks por frases: {len(nodos_frases)}\")\n",
+    "print(f\"Chunks por tokens: {len(nodos_tokens)}\")"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "92873b68",
+   "metadata": {},
+   "source": [
+    "::: {.callout-tip}\n",
+    "## Reglas prácticas de chunking\n",
+    "- **Chunk pequeño** (128-256 tokens): más preciso, pero puede perder contexto. Bueno para FAQs.\n",
+    "- **Chunk medio** (512 tokens): buen equilibrio. Funciona para la mayoría de casos.\n",
+    "- **Chunk grande** (1024+ tokens): mantiene contexto pero es más caro.\n",
+    "- **Overlap** (10-20% del chunk): evita que una frase quede cortada entre dos chunks.\n",
+    ":::\n",
+    "\n",
+    "### Resumen del flujo RAG con LlamaIndex {#sec-resumen-flujo-llamaindex}\n",
+    "\n",
+    "::: {#fig-rag-completo-llamaindex}\n",
+    "```{mermaid}\n",
+    "graph TD\n",
+    "    A[Documentos<br/>PDF, CSV, SQL] --> B[SimpleDirectoryReader<br/>carga multi-formato]\n",
+    "    B --> C[Node Parser<br/>chunking + metadatos]\n",
+    "    C --> D[Embedding Model<br/>vectorización]\n",
+    "    D --> E[Vector Store<br/>ChromaDB / FAISS]\n",
+    "    E --> F[Índice<br/>VectorStoreIndex]\n",
+    "\n",
+    "    P[Usuario pregunta] --> F\n",
+    "    F --> G[Retriever<br/>top-K chunks]\n",
+    "    G --> H[Response Synthesizer<br/>combina + LLM]\n",
+    "    H --> I[Respuesta<br/>con fuentes]\n",
+    "\n",
+    "    style A fill:#4B8BBE,color:#fff\n",
+    "    style F fill:#e65100,color:#fff\n",
+    "    style I fill:#2e7d32,color:#fff\n",
+    "```\n",
+    ":::\n",
+    "\n",
+    "> **Lectura recomendada:** [LlamaIndex Documentation](https://docs.llamaindex.ai/en/stable/) [@llamaindex].\n",
+    "\n",
+    "# References\n",
+    "\n",
+    "::: {#refs}\n",
+    ":::"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3",
+   "path": "/home/adam/.local/share/jupyter/kernels/python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.13.13"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
