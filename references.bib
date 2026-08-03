@@ -24,6 +24,76 @@
   url       = {https://arxiv.org/abs/1706.03762}
 }
 
+@article{ba2016layernorm,
+  author       = {Ba, Jimmy Lei and Kiros, Jamie Ryan and Hinton, Geoffrey E.},
+  title        = {Layer Normalization},
+  journal      = {arXiv preprint arXiv:1607.06450},
+  year         = {2016},
+  eprint       = {1607.06450},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/1607.06450}
+}
+
+@inproceedings{zhang2019rmsnorm,
+  author       = {Zhang, Biao and Sennrich, Rico},
+  title        = {Root Mean Square Layer Normalization},
+  booktitle    = {Advances in Neural Information Processing Systems},
+  year         = {2019},
+  eprint       = {1910.07467},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/1910.07467}
+}
+
+@inproceedings{geva2021transformer,
+  author       = {Geva, Mor and Schuster, Roei and Berant, Jonathan and Levy, Omer},
+  title        = {Transformer Feed-Forward Layers Are Key-Value Memories},
+  booktitle    = {Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing},
+  year         = {2021},
+  url          = {https://aclanthology.org/2021.emnlp-main.446/}
+}
+
+@article{grattafiori2024llama3,
+  author       = {Grattafiori, Aaron and Dubey, Abhimanyu and Jauhri, Abhinav and others},
+  title        = {The Llama 3 Herd of Models},
+  journal      = {arXiv preprint arXiv:2407.21783},
+  year         = {2024},
+  eprint       = {2407.21783},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2407.21783}
+}
+
+@inproceedings{jain2019attention,
+  author       = {Jain, Sarthak and Wallace, Byron C.},
+  title        = {Attention is Not Explanation},
+  booktitle    = {Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics},
+  year         = {2019},
+  pages        = {3543--3556},
+  url          = {https://aclanthology.org/N19-1357/}
+}
+
+@article{press2022train,
+  author       = {Press, Ofir and Smith, Noah A. and Lewis, Mike},
+  title        = {Train Short, Test Long: Attention with Linear Biases Enables Input Length Generalization},
+  journal      = {International Conference on Learning Representations},
+  year         = {2022},
+  eprint       = {2108.12409},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2108.12409}
+}
+
+@article{raffel2020t5,
+  author       = {Raffel, Colin and Shazeer, Noam and Roberts, Adam and Lee, Katherine and Narang, Sharan and Matena, Michael and Zhou, Yanqi and Li, Wei and Liu, Peter J.},
+  title        = {Exploring the Limits of Transfer Learning with a Unified Text-to-Text Transformer},
+  journal      = {Journal of Machine Learning Research},
+  volume       = {21},
+  number       = {140},
+  pages        = {1--67},
+  year         = {2020},
+  eprint       = {1910.10683},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/1910.10683}
+}
+
 @inproceedings{devlin2019bert,
   author    = {Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina},
   title     = {{BERT}: Pre-training of Deep Bidirectional Transformers for Language Understanding},
@@ -140,6 +210,51 @@
   eprint    = {1702.08734},
   archivePrefix = {arXiv},
   url       = {https://arxiv.org/abs/1702.08734}
+}
+
+@article{sennrich2016bpe,
+  author    = {Sennrich, Rico and Haddow, Barry and Birch, Alexandra},
+  title     = {Neural Machine Translation of Rare Words with Subword Units},
+  booktitle = {Proceedings of the 54th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers)},
+  year      = {2016},
+  pages     = {1715--1725},
+  publisher = {Association for Computational Linguistics},
+  address   = {Berlin, Germany},
+  doi       = {10.18653/v1/P16-1162},
+  url       = {https://aclanthology.org/P16-1162/}
+}
+
+@article{bengio2003neural,
+  author    = {Bengio, Yoshua and Ducharme, R{\'e}jean and Vincent, Pascal and Jauvin, Christian},
+  title     = {A Neural Probabilistic Language Model},
+  journal   = {Journal of Machine Learning Research},
+  volume    = {3},
+  pages     = {1137--1155},
+  year      = {2003},
+  url       = {https://www.jmlr.org/papers/v3/bengio03a.html}
+}
+
+@article{salton1988termweighting,
+  author    = {Salton, Gerard and Buckley, Christopher},
+  title     = {Term-weighting Approaches in Automatic Text Retrieval},
+  journal   = {Information Processing and Management},
+  volume    = {24},
+  number    = {5},
+  pages     = {513--523},
+  year      = {1988},
+  doi       = {10.1016/0306-4573(88)90021-0}
+}
+
+@inproceedings{peters2018deep,
+  author    = {Peters, Matthew E. and Neumann, Mark and Iyyer, Mohit and Gardner, Matt and Clark, Christopher and Lee, Kenton and Zettlemoyer, Luke},
+  title     = {Deep Contextualized Word Representations},
+  booktitle = {Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long Papers)},
+  year      = {2018},
+  pages     = {2227--2237},
+  publisher = {Association for Computational Linguistics},
+  address   = {New Orleans, Louisiana},
+  doi       = {10.18653/v1/N18-1202},
+  url       = {https://aclanthology.org/N18-1202/}
 }
 
 @article{mikolov2013word2vec,
@@ -324,6 +439,38 @@
   eprint    = {2104.08691},
   archivePrefix = {arXiv},
   url       = {https://arxiv.org/abs/2104.08691}
+}
+
+@article{ouyang2022training,
+  author       = {Ouyang, Long and Wu, Jeffrey and Jiang, Xu and Almeida, Diogo and Wainwright, Carroll and Mishkin, Pamela and Zhang, Chong and Agarwal, Sandhini and Slama, Katarina and Ray, Alex and others},
+  title        = {Training Language Models to Follow Instructions with Human Feedback},
+  journal      = {Advances in Neural Information Processing Systems},
+  volume       = {35},
+  year         = {2022},
+  eprint       = {2203.02155},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2203.02155}
+}
+
+@article{schulman2017proximal,
+  author       = {Schulman, John and Wolski, Filip and Dhariwal, Prafulla and Radford, Alec and Klimov, Oleg},
+  title        = {Proximal Policy Optimization Algorithms},
+  journal      = {arXiv preprint arXiv:1707.06347},
+  year         = {2017},
+  eprint       = {1707.06347},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/1707.06347}
+}
+
+@article{rafailov2023direct,
+  author       = {Rafailov, Rafael and Sharma, Archit and Mitchell, Eric and Manning, Christopher D. and Ermon, Stefano and Finn, Chelsea},
+  title        = {Direct Preference Optimization: Your Language Model is Secretly a Reward Model},
+  journal      = {Advances in Neural Information Processing Systems},
+  volume       = {36},
+  year         = {2023},
+  eprint       = {2305.18290},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2305.18290}
 }
 
 
@@ -683,11 +830,112 @@
 }
 
 @misc{zheng2023judgingllmasajudgemtbenchchatbot,
-      title={Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena}, 
+      title={Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena},
       author={Lianmin Zheng and Wei-Lin Chiang and Ying Sheng and Siyuan Zhuang and Zhanghao Wu and Yonghao Zhuang and Zi Lin and Zhuohan Li and Dacheng Li and Eric P. Xing and Hao Zhang and Joseph E. Gonzalez and Ion Stoica},
       year={2023},
       eprint={2306.05685},
       archivePrefix={arXiv},
       primaryClass={cs.CL},
-      url={https://arxiv.org/abs/2306.05685}, 
+      url={https://arxiv.org/abs/2306.05685},
+}
+
+@misc{roitman2026hitchhiker,
+  author       = {Roitman, Haggai},
+  title        = {The Hitchhiker's Guide to Agentic AI: From Foundations to Systems},
+  year         = {2026},
+  howpublished = {Versión 1.2.2. Licencia CC BY-SA 4.0},
+  url          = {https://creativecommons.org/licenses/by-sa/4.0/},
+  urldate      = {2026-07-27},
+  note         = {Fuente de la figura de espacio de embeddings usada en 01c}
+}
+
+% -------------------------------------------------------------
+% Bloque 2 — Patrones de diseño de agentes
+% -------------------------------------------------------------
+
+@misc{anthropic2024buildingagents,
+  author       = {{Anthropic}},
+  title        = {Building Effective Agents},
+  year         = {2024},
+  howpublished = {Blog técnico},
+  url          = {https://www.anthropic.com/research/building-effective-agents},
+  urldate      = {2025-07-01}
+}
+
+@article{wang2023planandsolve,
+  author       = {Wang, Lei and Xu, Wanyu and Lan, Yihuai and Hu, Zhiqiang and Lan, Yunshi and Lee, Roy Ka-Wei and Lim, Ee-Peng},
+  title        = {Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models},
+  journal      = {Proceedings of the 61st Annual Meeting of the Association for Computational Linguistics (ACL)},
+  year         = {2023},
+  eprint       = {2305.04091},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2305.04091}
+}
+
+@article{shinn2023reflexion,
+  author       = {Shinn, Noah and Cassano, Federico and Gopinath, Ashwin and Narasimhan, Karthik and Yao, Shunyu},
+  title        = {Reflexion: Language Agents with Verbal Reinforcement Learning},
+  journal      = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year         = {2023},
+  eprint       = {2303.11366},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2303.11366}
+}
+
+@article{madaan2023selfrefine,
+  author       = {Madaan, Aman and Tandon, Niket and Gupta, Prakhar and others},
+  title        = {Self-Refine: Iterative Refinement with Self-Feedback},
+  journal      = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year         = {2023},
+  eprint       = {2303.17651},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2303.17651}
+}
+
+@article{schick2023toolformer,
+  author       = {Schick, Timo and Dwivedi-Yu, Jane and Dess{\`i}, Roberto and others},
+  title        = {Toolformer: Language Models Can Teach Themselves to Use Tools},
+  journal      = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year         = {2023},
+  eprint       = {2302.04761},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2302.04761}
+}
+
+@misc{openai2024swarm,
+  author       = {{OpenAI}},
+  title        = {Swarm: An Educational Framework for Lightweight Multi-Agent Orchestration},
+  year         = {2024},
+  howpublished = {Repositorio GitHub},
+  url          = {https://github.com/openai/swarm},
+  urldate      = {2025-07-01}
+}
+
+@article{wang2022selfconsistency,
+  author       = {Wang, Xuezhi and Wei, Jason and Schuurmans, Dale and Le, Quoc V. and Chi, Ed H. and Narang, Sharan and Chowdhery, Aakanksha and Zhou, Denny},
+  title        = {Self-Consistency Improves Chain of Thought Reasoning in Language Models},
+  journal      = {International Conference on Learning Representations (ICLR)},
+  year         = {2023},
+  eprint       = {2203.11171},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2203.11171}
+}
+
+@article{wu2023autogen,
+  author       = {Wu, Qingyun and Bansal, Gagan and Zhang, Jieyu and others},
+  title        = {AutoGen: Enabling Next-Gen LLM Applications via Multi-Agent Conversation},
+  journal      = {arXiv preprint arXiv:2308.08155},
+  year         = {2023},
+  eprint       = {2308.08155},
+  archivePrefix = {arXiv},
+  url          = {https://arxiv.org/abs/2308.08155}
+}
+
+@misc{langchain2024langgraph,
+  author       = {{LangChain}},
+  title        = {LangGraph: Build Stateful Multi-Actor Applications with LLMs},
+  year         = {2024},
+  howpublished = {Repositorio GitHub},
+  url          = {https://github.com/langchain-ai/langgraph},
+  urldate      = {2025-07-01}
 }

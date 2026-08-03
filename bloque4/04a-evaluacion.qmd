@@ -317,7 +317,7 @@ RESPUESTA DEL MODELO:
 
 Evalúa la respuesta."""
     raw = client.chat.completions.create(
-        model="gemma4:e2b-mlx",
+        model="mlx-community/Qwen3.6-35B-A3B-8bit",
         messages=[
             {"role": "system", "content": JUEZ_PROMPT},
             {"role": "user",   "content": user_msg},
@@ -457,7 +457,7 @@ def llm_as_judge_pairwise(pregunta, respuesta_a, respuesta_b, contexto, llm_clie
         respuesta_b=respuesta_b,
     )
     raw = llm_client.chat.completions.create(
-        model="gemma4:e2b-mlx",
+        model="mlx-community/Qwen3.6-35B-A3B-8bit",
         messages=[{"role": "user", "content": user_msg}],
         temperature=0,
     ).choices[0].message.content.strip().upper()
@@ -491,7 +491,7 @@ Cada evaluación es una llamada al LLM juez, así que el coste escala con el tam
 : Coste aproximado por evaluación con LLM-as-judge {#tbl-juez-coste}
 
 | GPT-4o / Claude Sonnet (cloud) | $0.001 – $0.003 | Mejor calidad, datos salen a la nube |
-| `gemma4:e2b-mlx` (Llamus US) | institucional | Sin coste directo, datos en la US |
+| `mlx-community/Qwen3.6-35B-A3B-8bit` (Llamus US) | institucional | Sin coste directo, datos en la US |
 | Llama-3.1-8B (on-prem) | solo GPU | Privacidad total, requiere infraestructura |
 
 Truco del **filtrado en cascada**: si evalúas miles de casos, usa un juez barato (o un clasificador ligero) para descartar casos "claros" (puntuación 0 o 5 en scoring absoluto) y reserva el juez potente solo para los dudosos (puntuaciones 2-3). En la práctica reduce el coste 5-10x sin pérdida de calidad significativa.

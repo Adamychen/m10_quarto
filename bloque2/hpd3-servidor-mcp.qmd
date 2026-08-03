@@ -623,7 +623,7 @@ def preguntar_al_llm(pregunta: str) -> str:
 
     # ─── COMPLETAR: implementa el bucle de tool calling ───
     # TODO: Llamar a client.chat.completions.create con:
-    #   model="gemma4:e2b-mlx", messages=messages, tools=tools_definition, tool_choice="auto"
+    #   model="mlx-community/Qwen3.6-35B-A3B-8bit", messages=messages, tools=tools_definition, tool_choice="auto"
     # TODO: Si la respuesta tiene tool_calls, ejecutar cada tool con ejecutar_tool_mcp()
     # TODO: Añadir el resultado al historial y volver a llamar al LLM
     # TODO: Devolver la respuesta final del LLM (response.choices[0].message.content)

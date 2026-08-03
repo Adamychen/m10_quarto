@@ -22,6 +22,19 @@ Esta página agrupa los **recursos externos** que complementan los materiales de
 - [Ollama](https://ollama.com) — runtime local para modelos open-weight.
 - [DAIR.AI Prompt Engineering Guide](https://www.promptingguide.ai/) — guía canónica de prompting.
 
+## Historia de las representaciones y embeddings
+
+Estas lecturas acompañan el [panorama histórico del Bloque 1](bloque1/00-panorama.qmd) y permiten seguir el paso desde las representaciones dispersas hasta la recuperación semántica:
+
+- @bengio2003neural — modelos neuronales de lenguaje y representaciones distribuidas.
+- @mikolov2013word2vec — embeddings de palabras mediante CBOW y Skip-gram.
+- @pennington2014glove — vectores globales a partir de estadísticas de coocurrencia.
+- @peters2018deep — representaciones contextuales con ELMo.
+- @reimers2019sbert — embeddings de frases con arquitectura siamesa.
+- @wang2022e5 — aprendizaje contrastivo para embeddings de texto.
+- @karpukhin2020dpr — recuperación densa de pasajes.
+- @lewis2020rag — generación aumentada mediante recuperación.
+
 ## Model Cards y System Cards de referencia
 
 - [Claude 3 (Opus, Sonnet, Haiku) — Model Card](https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf)

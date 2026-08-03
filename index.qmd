@@ -42,6 +42,8 @@ Este módulo introduce al alumno en el ecosistema de la IA Generativa desde una 
 
 El módulo está diseñado con un enfoque *hands-on*: cada bloque teórico tiene un correlato práctico directo, y todas las actividades se articulan en torno a un proyecto integrador que el alumno construye de forma incremental a lo largo del módulo.
 
+El recorrido comienza con una pregunta transversal: **¿cómo pasamos del texto y los datos a representaciones que una máquina pueda comparar, transformar y utilizar?** La respuesta histórica va desde las representaciones dispersas de palabras hasta los embeddings contextuales, los LLMs, la recuperación semántica y los agentes. Puedes consultar este mapa antes de empezar el Bloque 1 en el [panorama histórico: del texto a los embeddings](bloque1/00-panorama.qmd).
+
 > **Prerrequisitos:** haber superado los módulos anteriores del máster, con especial dominio de Python, manipulación de datos con pandas/NumPy y fundamentos de Machine Learning supervisado y no supervisado.
 
 ## Contenidos {#sec-contenidos}

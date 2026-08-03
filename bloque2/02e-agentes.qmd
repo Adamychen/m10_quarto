@@ -81,7 +81,7 @@ LLM_URL = "https://llamus.cs.us.es/api/v1"
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env en la raíz del proyecto con:\n    LLM_API_KEY=tu_api_key\n    Las celdas siguientes mostrarán este mensaje hasta que configures la clave.")
 else:
-    llm = ChatOpenAI(model="gemma4:e2b-mlx", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
+    llm = ChatOpenAI(model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
     print("✅ ChatOpenAI configurado. Las celdas de ejemplo funcionarán correctamente.")
 ```
 

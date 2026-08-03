@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1120 540" role="img" aria-labelledby="title desc">
+  <title id="title">Value por estado y reward por secuencia</title>
+  <desc id="desc">Comparación entre valores estimados para cada estado y una recompensa que resume una respuesta completa, seguida de una comparación entre respuestas elegida y rechazada.</desc>
+  <style>
+    .title { font: 700 24px Arial, sans-serif; fill: #1e3a5f; }
+    .panel-title { font: 700 19px Arial, sans-serif; fill: #1e293b; }
+    .label { font: 700 14px Arial, sans-serif; fill: #1e293b; }
+    .small { font: 14px Arial, sans-serif; fill: #475569; }
+    .cell { font: 14px Arial, sans-serif; fill: #fff; text-anchor: middle; dominant-baseline: middle; }
+    .cell-start { font: 14px Arial, sans-serif; fill: #fff; dominant-baseline: middle; }
+    .dark-cell { font: 14px Arial, sans-serif; fill: #000; text-anchor: middle; dominant-baseline: middle; }
+  </style>
+
+  <rect width="1120" height="540" rx="14" fill="#ffffff"/>
+  <text x="24" y="34" class="title">Dos escalares, dos preguntas distintas</text>
+  <text x="24" y="58" class="small">La value head mira estados intermedios; la reward head resume una trayectoria completa.</text>
+
+  <rect x="24" y="78" width="520" height="235" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <rect x="576" y="78" width="520" height="235" rx="12" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1.5"/>
+  <text x="48" y="112" class="panel-title">Value head</text>
+  <text x="600" y="112" class="panel-title">Reward head</text>
+  <text x="48" y="136" class="small">¿Qué retorno espero desde este estado?</text>
+  <text x="600" y="136" class="small">¿Qué puntuación asigno a esta respuesta?</text>
+
+  <g>
+    <rect x="48" y="160" width="84" height="38" rx="6" fill="#4B8BBE" stroke="#1e3a5f"/>
+    <rect x="140" y="160" width="84" height="38" rx="6" fill="#4B8BBE" stroke="#1e3a5f"/>
+    <rect x="232" y="160" width="84" height="38" rx="6" fill="#4B8BBE" stroke="#1e3a5f"/>
+    <rect x="324" y="160" width="84" height="38" rx="6" fill="#4B8BBE" stroke="#1e3a5f"/>
+    <rect x="416" y="160" width="84" height="38" rx="6" fill="#4B8BBE" stroke="#1e3a5f"/>
+    <text x="90" y="179" class="cell">prompt</text>
+    <text x="182" y="179" class="cell">token 1</text>
+    <text x="274" y="179" class="cell">token 2</text>
+    <text x="366" y="179" class="cell">token 3</text>
+    <text x="458" y="179" class="cell">EOS</text>
+
+    <line x1="90" y1="218" x2="90" y2="244" stroke="#e65100" stroke-width="2"/>
+    <line x1="182" y1="218" x2="182" y2="244" stroke="#e65100" stroke-width="2"/>
+    <line x1="274" y1="218" x2="274" y2="244" stroke="#e65100" stroke-width="2"/>
+    <line x1="366" y1="218" x2="366" y2="244" stroke="#e65100" stroke-width="2"/>
+    <line x1="458" y1="218" x2="458" y2="244" stroke="#e65100" stroke-width="2"/>
+    <text x="90" y="265" class="small" text-anchor="middle">V(s_1)</text>
+    <text x="182" y="265" class="small" text-anchor="middle">V(s_2)</text>
+    <text x="274" y="265" class="small" text-anchor="middle">V(s_3)</text>
+    <text x="366" y="265" class="small" text-anchor="middle">V(s_4)</text>
+    <text x="458" y="265" class="small" text-anchor="middle">V(s_5)</text>
+  </g>
+  <text x="48" y="292" class="small">Un valor por estado o prefijo de la secuencia.</text>
+
+  <g>
+    <rect x="600" y="160" width="450" height="78" rx="8" fill="#FFD43B" stroke="#b8860b"/>
+    <text x="625" y="184" class="label">x + y</text>
+    <text x="625" y="207" class="small">prompt + respuesta completa + EOS</text>
+    <rect x="900" y="174" width="126" height="48" rx="8" fill="#e65100" stroke="#bf360c"/>
+    <text x="963" y="198" class="cell">r(x, y)</text>
+    <text x="600" y="269" class="small">Un escalar para ordenar la respuesta completa.</text>
+    <text x="600" y="291" class="small">El pooling puede usar el último token válido o EOS.</text>
+  </g>
+
+  <line x1="24" y1="340" x2="1096" y2="340" stroke="#cbd5e1"/>
+  <text x="24" y="374" class="panel-title">Preferencias: el reward model compara respuestas</text>
+
+  <rect x="48" y="398" width="380" height="48" rx="8" fill="#2e7d32" stroke="#0d3010"/>
+  <text x="72" y="422" class="cell-start">Respuesta elegida (chosen)</text>
+  <text x="395" y="422" class="cell">r+ = 0.82</text>
+  <rect x="48" y="462" width="380" height="48" rx="8" fill="#e2e8f0" stroke="#94a3b8"/>
+  <text x="72" y="486" class="label" text-anchor="start">Respuesta rechazada</text>
+  <text x="395" y="486" class="dark-cell">r- = 0.31</text>
+
+  <line x1="460" y1="454" x2="680" y2="454" stroke="#306998" stroke-width="2" marker-end="url(#arrow)"/>
+  <text x="555" y="432" class="small" text-anchor="middle">comparar r+ - r-</text>
+  <rect x="680" y="414" width="390" height="80" rx="10" fill="#306998" stroke="#0d1f33"/>
+  <text x="875" y="443" class="cell">Bradley-Terry</text>
+  <text x="875" y="469" class="cell">P(chosen) = sigma(r+ - r-)</text>
+
+  <defs>
+    <marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0 L0,7 L7,3.5 z" fill="#306998"/>
+    </marker>
+  </defs>
+</svg>

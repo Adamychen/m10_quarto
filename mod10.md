@@ -27,6 +27,8 @@ Este módulo introduce al alumno en el ecosistema de la IA Generativa desde una 
 
 El módulo está diseñado con un enfoque hands-on: cada bloque teórico tiene un correlato práctico directo, y todas las actividades se articulan en torno a un proyecto integrador que el alumno construye de forma incremental a lo largo del módulo.
 
+Como orientación inicial, el módulo incorpora un recorrido histórico que explica cómo se ha pasado de representar palabras mediante símbolos y conteos a aprender espacios vectoriales contextuales. Este recorrido conecta TF-IDF, word2vec, GloVe, BERT, SBERT, búsqueda densa, RAG y LLMs sin sustituir los contenidos técnicos de los bloques. Se presenta en el [panorama histórico: del texto a los embeddings](bloque1/00-panorama.qmd).
+
 _Prerrequisitos: haber superado los módulos anteriores del máster, con especial dominio de Python, manipulación de datos con pandas/NumPy y fundamentos de Machine Learning supervisado y no supervisado._
 
 # 2\. Contenidos
@@ -37,6 +39,7 @@ _Objetivos de bloque: comprender la arquitectura que subyace a los LLMs modernos
 
 **Contenidos teóricos:**
 
+- Panorama histórico de las representaciones: one-hot, Bag of Words, TF-IDF, semántica distribucional, word2vec, GloVe, ELMo, BERT, Sentence-BERT, E5 y recuperación densa. Distinción entre embeddings de token, estados ocultos contextuales y embeddings de frase.
 - Arquitectura Transformer: mecanismo de atención multi-cabeza, codificación posicional y variantes (encoder-only, decoder-only, encoder-decoder). Lectura complementaria: Vaswani et al. (2017), secciones 3-5.
 - Grandes Modelos de Lenguaje (LLMs): preentrenamiento, tokenización (BPE, SentencePiece), ventana de contexto y parámetros relevantes para su uso en producción (temperatura, top-p, top-k).
 - Modelos de embeddings: semántica distribucional, modelos de frase (Sentence-BERT, E5, text-embedding-3-small de OpenAI). Embeddings multimodales y para datos tabulares (TabNet, SCARF).

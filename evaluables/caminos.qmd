@@ -4,11 +4,15 @@ engine: jupyter
 ---
 
 > Al inicio del módulo, cada alumno elige uno de los tres **caminos de aplicación**.
-> Esta elección determina el contexto, los datasets y la narrativa de todos los
-> entregables (HPD 1-4) y del proyecto final.
+> Esta elección determina el contexto, los datasets y la narrativa de los
+> entregables HPD 1-4.
 >
 > **Las competencias y los criterios de evaluación son los mismos** en los tres
 > caminos. Solo cambia el dominio de aplicación.
+>
+> **El proyecto integrador final es libre**: los caminos A/B/C aplican a los HPD 1-4;
+> el proyecto final se define con tu propio problema y tu propio patrón agéntico
+> (ver [Proyecto integrador final](proyecto-final.qmd)).
 
 ## Los tres caminos {#sec-caminos}
 
@@ -83,7 +87,7 @@ graph LR
         H1["HPD 1<br/>Embeddings"] --> H2["HPD 2<br/>Agente"]
         H2 --> H3["HPD 3<br/>Servidor MCP"]
         H3 --> H4["HPD 4<br/>RAG + Evaluación"]
-        H4 --> PF["Proyecto final<br/>Sistema completo"]
+        H4 --> PF["Proyecto final<br/>100 % libre"]
     end
     style H1 fill:#4B8BBE,color:#fff
     style H2 fill:#306998,color:#fff
@@ -91,4 +95,10 @@ graph LR
     style H4 fill:#FFD43B,color:#000
     style PF fill:#2e7d32,color:#fff
 ```
+:::
+
+::: {.callout-tip}
+## ¿Y el proyecto final?
+
+Los caminos A/B/C te dan **datos y contexto para los HPD 1-4**. El [proyecto integrador final](proyecto-final.qmd) es otra cosa: eliges **tu propio problema** y aplicas **un patrón de diseño de agentes** de la taxonomía de [02f — Patrones de Diseño de Agentes](../bloque2/02f-patrones-agentes.qmd) — o propones uno propio. Puedes reutilizar los datos de tu camino como punto de partida, pero el proyecto no está limitado a ellos.
 :::

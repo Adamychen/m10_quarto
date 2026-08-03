@@ -9,6 +9,7 @@ m10_quarto/
 ├── about.qmd                    # Acerca de
 ├── mod10.md                     # Guía docente pública del módulo
 ├── bloque1/                     # Fundamentos: Transformers, LLMs, embeddings, vector DB
+│   ├── 00-panorama.qmd          # Panorama histórico: representaciones y embeddings
 │   ├── 01-fundamentos.qmd      # Índice del bloque
 │   ├── 01a-transformer.qmd      # Arquitectura Transformer
 │   ├── 01b-llms.qmd             # LLMs e inferencia
@@ -22,6 +23,7 @@ m10_quarto/
 │   ├── 02c-llamaindex.qmd
 │   ├── 02d-mcp.qmd
 │   ├── 02e-agentes.qmd
+│   ├── 02f-patrones-agentes.qmd       # Patrones de diseño de agentes
 │   ├── hpd2-agente-tool-calling.qmd   # HPD 2
 │   └── hpd3-servidor-mcp.qmd         # HPD 3
 ├── bloque3/                     # Aplicaciones: RAG, datos sintéticos, fine-tuning
@@ -70,8 +72,8 @@ m10_quarto/
 | Sección | Páginas |
 |---|---|
 | **Inicio** | `index.qmd` (Presentación), `about.qmd` (Acerca de), `mod10.md` (Guía docente) |
-| **Bloque 1 — Fundamentos** | `bloque1/01-fundamentos.qmd`, `01a-transformer.qmd`, `01b-llms.qmd`, `01c-embeddings.qmd`, `01d-vectordb.qmd`, `bloque1/hpd1-embeddings.qmd`, `evaluables/hpd1-entregable.qmd` |
-| **Bloque 2 — Orquestación** | `bloque2/02-orquestacion.qmd`, `02a-prompt-engineering.qmd`, `02b-langchain.qmd`, `02c-llamaindex.qmd`, `02d-mcp.qmd`, `02e-agentes.qmd`, `bloque2/hpd2-agente-tool-calling.qmd`, `evaluables/hpd2-entregable.qmd`, `bloque2/hpd3-servidor-mcp.qmd`, `evaluables/hpd3-entregable.qmd` |
+| **Bloque 1 — Fundamentos** | `bloque1/00-panorama.qmd` (Panorama histórico), `bloque1/01-fundamentos.qmd`, `01a-transformer.qmd`, `01b-llms.qmd`, `01c-embeddings.qmd`, `01d-vectordb.qmd`, `bloque1/hpd1-embeddings.qmd`, `evaluables/hpd1-entregable.qmd` |
+| **Bloque 2 — Orquestación** | `bloque2/02-orquestacion.qmd`, `02a-prompt-engineering.qmd`, `02b-langchain.qmd`, `02c-llamaindex.qmd`, `02d-mcp.qmd`, `02e-agentes.qmd`, `02f-patrones-agentes.qmd`, `bloque2/hpd2-agente-tool-calling.qmd`, `evaluables/hpd2-entregable.qmd`, `bloque2/hpd3-servidor-mcp.qmd`, `evaluables/hpd3-entregable.qmd` |
 | **Bloque 3 — Aplicaciones** | `bloque3/03-aplicaciones.qmd`, `03b-rag-avanzado.qmd`, `03a-datos-sinteticos.qmd`, `03c-fine-tuning.qmd`, `evaluables/hpd4-rag-mixto.qmd`, `evaluables/hpd4-entregable.qmd` |
 | **Bloque 4 — Gobernanza** | `bloque4/04-gobernanza.qmd`, `04a-evaluacion.qmd`, `04b-alucinaciones.qmd`, `04c-privacidad.qmd`, `04d-sesgo.qmd`, `04e-documentacion.qmd`, `04f-despliegue.qmd` |
 | **Evaluación** | `evaluables/caminos.qmd`, `05-evaluacion.qmd`, `evaluables/proyecto-final.qmd` |
@@ -148,6 +150,8 @@ Los `.ipynb` que se enlazan desde los badges "Open in Colab" se generan desde lo
 ```
 
 Esto descubre automáticamente todos los `.qmd` con `engine: jupyter` en `bloque1/..4/` y `evaluables/`, y produce los `.ipynb` correspondientes en `notebooks/` (preservando la estructura de carpetas).
+
+El script elimina antes y después de cada render los intermediarios temporales de Quarto (`*.quarto_ipynb*`). Estos archivos no deben versionarse ni utilizarse como fuente de notebooks.
 
 ## API key centralizada (Llamus)
 

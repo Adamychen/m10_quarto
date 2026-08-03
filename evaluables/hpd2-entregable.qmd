@@ -121,8 +121,8 @@ LLM_URL = "https://llamus.cs.us.es/api/v1"
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env con LLM_API_KEY=tu_clave para activar el agente.")
 else:
-    llm = ChatOpenAI(model="gemma4:e2b-mlx", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
-    print("✅ LLM configurado (gemma4:e2b-mlx).")
+    llm = ChatOpenAI(model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
+    print("✅ LLM configurado (mlx-community/Qwen3.6-35B-A3B-8bit).")
 ```
 
 ::: {.panel-tabset}
@@ -266,9 +266,10 @@ if CAMINO == "A":
     Siempre que necesites datos numéricos, usa tus herramientas en lugar de inventar valores.
     Responde en español, de forma concisa y profesional."""
 
-    # TODO: crear el agente con create_react_agent y AgentExecutor
-    #   prompt = ChatPromptTemplate.from_messages([...])
-    #   agent = create_agent(model=llm, tools=tools, system_prompt=prompt)
+    # TODO: crear el agente y ejecutar el análisis
+    #   agente = create_agent(model=llm, tools=tools, system_prompt=system_prompt_a)
+    #   result = agente.invoke({"messages": [{"role": "user", "content": pregunta}]})
+    #   eval2_analisis = result["messages"][-1].content
 
     eval2_analisis = """Resultado del análisis del ticker M10 pendiente de implementar."""
     print("⚠️  Completa la implementación del agente y ejecuta el análisis.")
@@ -289,8 +290,8 @@ if CAMINO == "A":
     pregunta_a = "¿Qué ticker del sector tecnología ha tenido mejor rendimiento en los últimos 3 meses, y cuál ha sido su precio máximo y su volumen medio?"
 
     # TODO: ejecutar la pregunta con el agente
-    #   result = agent_executor.invoke({"input": pregunta_a})
-    #   respuesta_a = result["output"]
+    #   result = agente.invoke({"messages": [{"role": "user", "content": pregunta_a}]})
+    #   respuesta_a = result["messages"][-1].content
 
     eval3_pregunta = {
         "pregunta": pregunta_a,
@@ -304,14 +305,17 @@ else:
 
 #### Ejercicio 4 — Log del razonamiento (1.5 ptos) {#sec-hpd2-e4-a}
 
-Ejecuta el agente con la pregunta del ejercicio anterior y captura el log de razonamiento (los intermediate steps / pensamientos del agente). Asigna los pasos intermedios a `eval4_log`.
+Ejecuta el agente con la pregunta del ejercicio anterior y captura el log de razonamiento (la secuencia de pensamientos, llamadas a tools y observaciones). Asigna los pasos intermedios a `eval4_log`.
 
 ```{python}
 #| echo: true
 
 if CAMINO == "A":
-    # TODO: ejecutar con return_intermediate_steps=True y capturar el log
-    #   result = agent_executor.invoke({"input": pregunta_a}, return_intermediate_steps=True)
+    # TODO: ejecutar la pregunta y capturar el log de razonamiento.
+    #   Con create_agent, el razonamiento está en result["messages"]:
+    #   - AIMessage con tool_calls: qué tool llamó el agente y con qué argumentos
+    #   - ToolMessage: la observación devuelta por la tool
+    #   Recorre result["messages"] y guarda cada paso (tool_call → observación) en eval4_log.
 
     eval4_log = "Log del razonamiento pendiente de implementar."
     print("⚠️  Completa la captura del log de razonamiento del agente.")
@@ -464,6 +468,10 @@ if CAMINO == "B":
     y resultados. Siempre usa herramientas para obtener datos reales. Responde en español."""
 
     # TODO: crear agente y ejecutar análisis
+    #   agente = create_agent(model=llm, tools=tools, system_prompt=system_prompt_b)
+    #   result = agente.invoke({"messages": [{"role": "user", "content": pregunta}]})
+    #   eval2_analisis = result["messages"][-1].content
+
     eval2_analisis = """Análisis de pacientes DM2 pendiente de implementar."""
     print("⚠️  Completa la implementación del agente.")
 else:
@@ -483,6 +491,9 @@ if CAMINO == "B":
     pregunta_b = "Compara la tasa de éxito y la estancia media entre pacientes con Neumonía y Sepsis, segmentando por gravedad. ¿Qué tratamiento tiene mejores resultados en cada diagnóstico?"
 
     # TODO: ejecutar con el agente
+    #   result = agente.invoke({"messages": [{"role": "user", "content": pregunta_b}]})
+    #   eval3_pregunta["respuesta"] = result["messages"][-1].content
+
     eval3_pregunta = {
         "pregunta": pregunta_b,
         "respuesta": "Pendiente de implementar — ejecutar con el agente.",
@@ -495,12 +506,18 @@ else:
 
 #### Ejercicio 4 — Log del razonamiento (1.5 ptos) {#sec-hpd2-e4-b}
 
-Ejecuta el agente capturando el log de razonamiento. Asigna los pasos intermedios a `eval4_log`.
+Ejecuta el agente capturando el log de razonamiento (secuencia de pensamientos, llamadas a tools y observaciones). Asigna los pasos intermedios a `eval4_log`.
 
 ```{python}
 #| echo: true
 
 if CAMINO == "B":
+    # TODO: capturar el log de razonamiento.
+    #   Con create_agent, el razonamiento está en result["messages"]:
+    #   - AIMessage con tool_calls: qué tool llamó el agente y con qué argumentos
+    #   - ToolMessage: la observación devuelta por la tool
+    #   Recorre result["messages"] y guarda cada paso (tool_call → observación) en eval4_log.
+
     eval4_log = "Log del razonamiento pendiente de implementar."
     print("⚠️  Completa la captura del log de razonamiento del agente.")
 else:
@@ -652,6 +669,10 @@ if CAMINO == "C":
     Siempre obtienes datos reales con herramientas. Responde en español de forma clara y concisa."""
 
     # TODO: crear agente y ejecutar análisis
+    #   agente = create_agent(model=llm, tools=tools, system_prompt=system_prompt_c)
+    #   result = agente.invoke({"messages": [{"role": "user", "content": pregunta}]})
+    #   eval2_analisis = result["messages"][-1].content
+
     eval2_analisis = """Análisis de categoría Electrónica pendiente de implementar."""
     print("⚠️  Completa la implementación del agente.")
 else:
@@ -671,6 +692,9 @@ if CAMINO == "C":
     pregunta_c = "¿Qué categorías tienen un rating medio superior a 4.0? De esas, ¿cuál genera más ingresos totales y qué producto concreto de esa categoría tiene la mejor relación ventas/tasa de retorno?"
 
     # TODO: ejecutar con el agente
+    #   result = agente.invoke({"messages": [{"role": "user", "content": pregunta_c}]})
+    #   eval3_pregunta["respuesta"] = result["messages"][-1].content
+
     eval3_pregunta = {
         "pregunta": pregunta_c,
         "respuesta": "Pendiente de implementar — ejecutar con el agente.",
@@ -683,12 +707,18 @@ else:
 
 #### Ejercicio 4 — Log del razonamiento (1.5 ptos) {#sec-hpd2-e4-c}
 
-Ejecuta el agente capturando el log de razonamiento. Asigna los pasos intermedios a `eval4_log`.
+Ejecuta el agente capturando el log de razonamiento (secuencia de pensamientos, llamadas a tools y observaciones). Asigna los pasos intermedios a `eval4_log`.
 
 ```{python}
 #| echo: true
 
 if CAMINO == "C":
+    # TODO: capturar el log de razonamiento.
+    #   Con create_agent, el razonamiento está en result["messages"]:
+    #   - AIMessage con tool_calls: qué tool llamó el agente y con qué argumentos
+    #   - ToolMessage: la observación devuelta por la tool
+    #   Recorre result["messages"] y guarda cada paso (tool_call → observación) en eval4_log.
+
     eval4_log = "Log del razonamiento pendiente de implementar."
     print("⚠️  Completa la captura del log de razonamiento del agente.")
 else:

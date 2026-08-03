@@ -44,6 +44,12 @@ cambiar de dominio (legal, médico, financiero) solo requiere cambiar los docume
 de entrada — el código es el mismo.
 :::
 
+::: {.callout-info icon=false}
+## Del recorrido histórico al pipeline
+
+El [panorama histórico del Bloque 1](00-panorama.qmd) termina en la idea de que un documento y una consulta pueden situarse en un mismo espacio semántico. Este taller convierte esa idea en un sistema ejecutable: ingesta de documentos, chunking, embeddings, indexación, recuperación y evaluación. El objetivo no es solo llamar a un modelo, sino comprobar qué calidad tiene la representación cuando se utiliza para recuperar información.
+:::
+
 ```{python}
 #| echo: true
 #| eval: false
@@ -887,4 +893,3 @@ end
 
 ::: {#refs}
 :::
-

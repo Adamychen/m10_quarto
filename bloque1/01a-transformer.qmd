@@ -1,12 +1,15 @@
 ---
 title: "01a — Arquitectura Transformer"
 engine: jupyter
+lang: es
 ---
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01a-transformer.ipynb)
 
 > Este tema forma parte del **Bloque 1 — Fundamentos**. 
 > Se recomienda seguir el orden propuesto: Transformer → LLMs → Embeddings → Vector DB.
+
+> Para situar esta arquitectura en la evolución de las representaciones, consulta antes el [panorama histórico: del texto a los embeddings](00-panorama.qmd). La sección explica por qué los embeddings de palabras son anteriores al Transformer y por qué BERT y SBERT aprovechan después esta arquitectura.
 
 ```{python}
 #| echo: true
@@ -37,84 +40,152 @@ print("Librerías cargadas correctamente.")
 
 ### El problema que resuelve {#sec-problema-resuelve}
 
-Antes de la aparición del modelo Transformer, los modelos secuenciales dominaban el procesamiento de lenguaje (RNN, LSTM, GRU, etc.). Estos modelos se catalogan bajo el paraguas de **modelos secuenciales** por su forma de procesar los tokens, uno tras otro, de forma secuencial, lo que imponía ciertas restricciones:
-- Impide la paralelización (cada token depende del anterior).
-- Sufre desvanecimiento de gradiente en secuencias largas.
-- Dificulta capturar dependencias de largo alcance.
+Antes del Transformer, buena parte del procesamiento de lenguaje se apoyaba en modelos recurrentes como RNN, LSTM y GRU. Estos modelos actualizaban un estado oculto después de leer cada token, de modo que el procesamiento de una posición dependía del resultado de la posición anterior.
 
-La arquitectura **Transformer** (@vaswani2017attention) resolvió estos problemas introduciendo el **mecanismo de atención** para reemplazar el **mecanisno de recurrencia** (limitada) usado hasta el momento, algo que permitió procesar un conjunto de tokens en paralelo y modelar dependencias directas entre cualquier par de posiciones de ese conjunto de tokens.
+Ese diseño planteaba tres dificultades. La primera era la falta de paralelismo: no se podía procesar una secuencia completa de una sola vez. La segunda era el deterioro de las señales de gradiente en secuencias largas. La tercera era la dificultad de relacionar directamente dos tokens muy alejados, porque la información tenía que atravesar todos los estados intermedios.
 
-![Arquitectura Transformer — encoder-decoder con atención multi-cabeza (@vaswani2017attention, Figure 1)](../images/diagrama_transformer_original.webp){#fig-arquitectura-transformer}
+El Transformer (@vaswani2017attention) sustituyó la recurrencia por atención. La atención permite que cada posición combine información de otras posiciones mediante una operación matricial que se puede calcular en paralelo durante el entrenamiento. Esta ventaja no elimina el coste: la atención densa compara pares de posiciones y su coste crece cuadráticamente con la longitud de la secuencia.
 
-```{python}
-#| echo: true
-#| eval: true
+::: {.callout-tip}
+## La idea de fondo
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 3.5))
-fig.patch.set_facecolor('white')
+Una RNN transporta información paso a paso. Un Transformer construye cada representación consultando directamente otras posiciones, respetando la máscara de atención que corresponda.
+:::
 
-rnn_nodes = ['$t_1$', '$t_2$', '$t_3$', '$t_n$']
+### Cómo funciona un Transformer de un vistazo {#sec-vistazo-transformer}
 
-# RNN — procesamiento secuencial
-ax1.set_title("RNN — procesamiento secuencial", fontsize=12, fontweight='bold')
-ax1.axis('off')
-x_positions = [0.05, 0.3, 0.55, 0.8]
-for i, (label, x) in enumerate(zip(rnn_nodes, x_positions)):
-    ax1.text(x, 0.5, label, fontsize=13, ha='center', va='center',
-             bbox=dict(boxstyle='round,pad=0.3', facecolor='#e3f2fd', edgecolor='#1565c0'))
-    if i < len(rnn_nodes) - 1:
-        ax1.annotate('', xy=(x_positions[i+1] - 0.05, 0.5),
-                     xytext=(x + 0.05, 0.5),
-                     arrowprops=dict(arrowstyle='->', color='#1565c0', lw=2))
+Un Transformer es una arquitectura que transforma una secuencia de representaciones en otra secuencia de representaciones. Según la variante y la cabeza de salida, puede producir embeddings, etiquetas de clasificación o una distribución de probabilidad sobre el vocabulario. En un LLM decoder-only, el recorrido se puede resumir así: texto → tokens → IDs → embeddings → bloques Transformer → logits → texto.
 
-# Transformer — atención paralela
-ax2.set_title("Transformer — atención paralela", fontsize=12, fontweight='bold')
-ax2.axis('off')
-y_positions = [0.75, 0.55, 0.35, 0.15]
-for label, y in zip(rnn_nodes, y_positions):
-    ax2.text(0.05, y, label, fontsize=13, ha='center', va='center',
-             bbox=dict(boxstyle='round,pad=0.3', facecolor='#e8f5e9', edgecolor='#2e7d32'))
-    ax2.annotate('', xy=(0.38, 0.45), xytext=(0.13, y),
-                 arrowprops=dict(arrowstyle='->', color='#2e7d32', lw=1.5))
+::: {#fig-pipeline-transformer}
+```{mermaid}
+flowchart LR
+    A["Texto<br/>crudo"]:::input --> B[Tokenizer]:::proc
+    B --> C["Token<br/>IDs"]:::doc
+    C --> D["Embedding<br/>Layer"]:::proc
+    D --> E["Capas<br/>Transformer<br/>(× L)"]:::proc
+    E --> F["Logits<br/>sobre<br/>vocabulario"]:::doc
+    F --> G[Decode]:::proc
+    G --> H["Token<br/>generado"]:::out
+    H -.->|"se añade al input<br/>(bucle autorregresivo)"| A
 
-ax2.text(0.42, 0.45, 'Atención\nMulti-Cabeza', fontsize=11, ha='center', va='center',
-         bbox=dict(boxstyle='round,pad=0.4', facecolor='#fff3e0', edgecolor='#e65100'))
-ax2.annotate('', xy=(0.78, 0.45), xytext=(0.58, 0.45),
-             arrowprops=dict(arrowstyle='->', color='#e65100', lw=2))
-ax2.text(0.88, 0.45, 'Salida\nparalela', fontsize=11, ha='center', va='center',
-         bbox=dict(boxstyle='round,pad=0.3', facecolor='#fce4ec', edgecolor='#c62828'))
-
-plt.tight_layout()
-plt.show()
+    classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef proc  fill:#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px
+    classDef doc   fill:#FFD43B,stroke:#b8860b,color:#000,stroke-width:1.5px
+    classDef out   fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
 ```
+:::
+
+Durante la inferencia generativa, la salida se obtiene un token cada vez. La flecha discontinua muestra el bucle autorregresivo: el token recién generado se incorpora al contexto y el modelo calcula la siguiente distribución. Durante el entrenamiento, en cambio, una secuencia completa puede procesarse en paralelo mediante *teacher forcing* y una máscara causal.
+
+::: {.callout-note}
+## Las 4 etapas de la pipeline
+
+1. **Tokenización** — el texto se divide en unidades subpalabra (tokens). Por ejemplo, *"unhappiness"* puede descomponerse en `["un", "happiness"]` o `["unhapp", "iness"]`. Cada token recibe un **ID entero** del vocabulario del modelo.
+2. **Embedding** — cada ID se convierte en un **vector denso** de dimensión $d$ (típicamente $d = 4096$). Los vectores se eligen de modo que **conceptos similares caen cerca en el espacio vectorial**.
+3. **Procesamiento contextual** — $L$ capas de Transformer transforman todos los estados en paralelo. En un encoder cada posición puede consultar toda la secuencia; en un decoder-only solo puede consultar las posiciones anteriores y la actual. Tras $L$ capas, cada posición codifica información contextual.
+4. **Predicción** — el estado oculto final se proyecta a una distribución de probabilidad sobre todo el vocabulario, y una estrategia de *decoding* (temperatura, top-p, top-k) elige el siguiente token.
+
+Las secciones que siguen desglosan **cómo** funciona cada etapa, empezando por la pieza central: la **atención multi-cabeza**.
+:::
+
+::: {.callout-tip}
+## Lectura intuitiva: qué recordar
+
+- Un Transformer no opera directamente con palabras: opera con vectores aprendidos.
+- La atención permite mezclar información entre posiciones, pero la máscara determina qué posiciones están disponibles.
+- La generación produce un token cada vez (autorregresiva), aunque el entrenamiento puede procesar muchas posiciones en paralelo.
+:::
+
+### Del Transformer original al decoder-only moderno {#sec-original-vs-moderno}
+
+El artículo original de Vaswani et al. presentó un modelo encoder-decoder para tareas de secuencia a secuencia, como traducción y resumen. El encoder leía toda la entrada con atención bidireccional; el decoder generaba la salida de izquierda a derecha y utilizaba cross-attention para consultar las representaciones producidas por el encoder.
+
+![Arquitectura Transformer original: encoder, decoder causal y cross-attention (@vaswani2017attention, Figure 1).](../images/diagrama_transformer_original.webp){#fig-arquitectura-transformer}
+
+Los LLM generativos actuales suelen utilizar una variante decoder-only. En ella desaparecen el encoder y la cross-attention: una única pila de bloques con self-attention causal transforma el contexto disponible y produce los logits del siguiente token. Esto no significa que el decoder-only sea “el Transformer completo”; es una variante especializada para modelado de lenguaje causal.
+
+| Variante | Máscara principal | Salida habitual | Ejemplos de uso |
+|---|---|---|---|
+| Encoder-only | Bidireccional | Representación contextual | Clasificación, NER, embeddings |
+| Decoder-only | Causal | Logits del siguiente token | Generación, chat, código |
+| Encoder-decoder | Encoder bidireccional + decoder causal + cross-attention | Secuencia de salida | Traducción, resumen, transformación de texto |
+
+### Anatomía de un bloque moderno {#sec-bloque-transformer}
+
+La unidad que se repite $L$ veces no es solamente una capa de atención. Un bloque moderno combina normalización, self-attention, conexiones residuales y una red feed-forward. En una configuración Pre-Norm, una forma simplificada de escribir sus dos subcapas es:
+
+$$
+\mathbf{x}' = \mathbf{x} + \operatorname{MHA}(\operatorname{RMSNorm}(\mathbf{x}))
+$$
+
+$$
+\mathbf{x}_{\text{salida}} = \mathbf{x}' + \operatorname{MLP}(\operatorname{RMSNorm}(\mathbf{x}'))
+$$
+
+La figura @fig-bloque-decoder-only muestra el recorrido completo. La forma de la representación sigue siendo $B \times T \times d$ después de cada subcapa; la proyección al vocabulario aparece únicamente al final.
+
+![Bloque Transformer decoder-only moderno con RMSNorm, atención causal, conexiones residuales y MLP.](../images/01a-decoder-only-bloque.svg){#fig-bloque-decoder-only}
+
+Las conexiones residuales transportan una copia de la representación alrededor de cada subcapa. Esto facilita que la red aprenda una modificación de la representación en lugar de tener que reconstruirla completamente en cada capa. La normalización mantiene las activaciones en una escala manejable y la MLP transforma cada posición de forma independiente.
+
+La arquitectura original utilizaba normalmente Post-Norm, mientras que muchos LLM modernos utilizan Pre-Norm o RMSNorm. No son nombres de modelos distintos, sino órdenes diferentes de las mismas operaciones. La elección afecta a la estabilidad del entrenamiento y a la facilidad para optimizar redes muy profundas [@ba2016layernorm; @zhang2019rmsnorm].
 
 ### Atención multi-cabeza (Multi-Head Attention) {#sec-atencion-multi-cabeza}
 
-El núcleo del Transformer se encuentra en el mecanismo de **scaled dot-product attention** (atención basada en el producto escalar). En este proceso, para cada token se calculan tres vectores numéricos, que *presuponen* el siguiente contenido semántico:
+El núcleo del Transformer se encuentra en el mecanismo de *scaled dot-product attention* (atención basada en el producto escalar). Dada una matriz de estados $X \in \mathbb{R}^{B \times T \times d}$, el modelo aprende tres proyecciones:
+
+$$
+Q = XW_Q, \qquad K = XW_K, \qquad V = XW_V
+$$
+
+Las matrices $Q$, $K$ y $V$ no son tres copias del texto. Son tres lecturas distintas de los mismos estados:
 
 - **Q (Query):** qué información busca este token.
 - **K (Key):** qué información ofrece cada token.
 - **V (Value):** el contenido real de cada token.
 
-A partir de estos, la atención se calcula como:
+A partir de estas proyecciones, la atención se calcula como:
 
-$$\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
+$$
+\operatorname{Attention}(Q,K,V)
+= \operatorname{softmax}\left(\frac{QK^\mathsf{T}}{\sqrt{d_k}} + M\right)V
+$$
 
-donde el producto $Q·K^T$ mide la similitud entre cada par de tokens; el factor $\sqrt{d_k}$ sirve como escala normalizadora para evitar que los valores crezcan demasiado en módulo; la **multi-cabeza** ejecuta este proceso en paralelo con pesos distintos, permitiendo al modelo *atender* a diferentes relaciones simultáneamente (sintaxis, semántica, coreferencias, etc.).
+El producto $QK^\mathsf{T}$ produce una puntuación para cada par de posiciones. El factor $\sqrt{d_k}$ evita que los productos escalares crezcan demasiado cuando aumenta la dimensión de las claves. La matriz $M$ representa la máscara: contiene ceros en las posiciones permitidas y $-\infty$ en las posiciones bloqueadas, de modo que el *softmax* les asigna probabilidad cero.
+
+En un encoder bidireccional, normalmente no se bloquean posiciones por causalidad. En un decoder-only, la posición $t$ no puede consultar posiciones futuras. Esta diferencia determina si el modelo puede utilizar toda la secuencia para construir cada representación o si debe mantener el orden de generación.
+
+La atención multi-cabeza divide la dimensión en $H$ subespacios. Cada cabeza calcula su propia atención y después sus resultados se concatenan y se proyectan:
+
+$$
+\operatorname{MHA}(X)
+= \operatorname{Concat}(\operatorname{head}_1,\ldots,\operatorname{head}_H)W_O
+$$
+
+Las cabezas no vienen etiquetadas de antemano como “sintaxis” o “semántica”. Pueden aprender patrones diferentes, pero su interpretación debe hacerse con cautela.
+
+![Comparación entre una máscara bidireccional y una máscara causal.](../images/01a-mascaras-atencion.svg){#fig-mascaras-atencion}
+
+La figura @fig-mascaras-atencion muestra por qué la máscara es una restricción de información y no una operación adicional del bloque. El cálculo matricial puede ejecutarse en paralelo, pero cada posición solo recibe información de las celdas permitidas.
 
 ![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (@vaswani2017attention, Figure 2)](../images/multi-head-attention.webp){#fig-sdpa-vs-mha}
 
 #### Scaled Dot-Product Attention — Low Level (numpy) {#sec-sdpa-numpy}
 
+La primera implementación calcula atención sin máscara para que se vea la operación básica. Después aplicamos una máscara causal a la misma función.
+
 ```{python}
 #| echo: true
 #| eval: true
 
-def scaled_dot_product_attention_numpy(Q, K, V):
+def scaled_dot_product_attention_numpy(Q, K, V, mask=None):
     """Atención paso a paso con numpy. Muestra la matemática subyacente."""
     d_k = K.shape[-1]
     scores = np.matmul(Q, K.transpose(0, 2, 1))
     scores = scores / np.sqrt(d_k)
+    if mask is not None:
+        scores = np.where(mask, -np.inf, scores)
+    scores = scores - np.max(scores, axis=-1, keepdims=True)
     weights = np.exp(scores) / np.sum(np.exp(scores), axis=-1, keepdims=True)
     output = np.matmul(weights, V)
     return output, weights
@@ -129,6 +200,11 @@ out_np, attn_np = scaled_dot_product_attention_numpy(Q, K, V)
 print("Matriz de atención (numpy):")
 print(np.round(attn_np[0], 3))
 print("\nCada fila suma 1:", np.round(attn_np[0].sum(axis=1), 3))
+
+causal_mask = np.triu(np.ones((seq_len, seq_len), dtype=bool), k=1)
+_, attn_causal = scaled_dot_product_attention_numpy(Q, K, V, mask=causal_mask)
+print("\nAtención causal (las posiciones futuras quedan a cero):")
+print(np.round(attn_causal[0], 3))
 
 
 
@@ -253,9 +329,86 @@ plt.close(fig)
 
 ```
 
+::: {.callout-warning}
+## Atención no equivale a explicación
+
+Un mapa de atención muestra cómo se distribuyen determinados pesos dentro de una capa y una cabeza. No demuestra por sí solo que esos tokens sean la causa de la respuesta del modelo. Para atribuir influencia hay que combinarlo con gradientes, ablaciones u otros métodos causales [@jain2019attention].
+:::
+
+### La red feed-forward: transformar cada posición {#sec-feed-forward}
+
+La atención mezcla información entre posiciones, pero no sustituye a la transformación que se aplica dentro de cada posición. Esa segunda función es la red feed-forward, también llamada MLP o FFN:
+
+$$
+\operatorname{FFN}(\mathbf{x})
+= W_2\,\sigma(W_1\mathbf{x}+\mathbf{b}_1)+\mathbf{b}_2
+$$
+
+La misma MLP se aplica de forma independiente a cada token. Por eso la atención tiene una función relacional, mientras que la MLP transforma el contenido de cada estado sin mezclar directamente posiciones distintas. En los LLM modernos es frecuente utilizar SwiGLU:
+
+$$
+\operatorname{SwiGLU}(\mathbf{x})
+= W_2\left(\operatorname{SiLU}(W_1\mathbf{x})\odot W_3\mathbf{x}\right)
+$$
+
+Esta formulación utiliza una rama que modula a la otra mediante un producto elemento a elemento. Las FFN también se han interpretado como una forma de memoria asociativa: determinadas direcciones de entrada activan transformaciones que recuperan patrones aprendidos [@geva2021transformer]. Esta interpretación es útil como intuición, pero no significa que cada neurona almacene un hecho aislado.
+
+### Normalización y conexiones residuales {#sec-normalizacion-residuales}
+
+LayerNorm normaliza las características de un estado individual, no las observaciones de un lote:
+
+$$
+\operatorname{LayerNorm}(\mathbf{x})
+= \boldsymbol{\gamma}\odot
+\frac{\mathbf{x}-\mu}{\sqrt{\sigma^2+\epsilon}}
+ + \boldsymbol{\beta}
+$$
+
+En muchos LLM actuales se utiliza RMSNorm, que elimina el centrado por la media:
+
+$$
+\operatorname{RMSNorm}(\mathbf{x})
+= \boldsymbol{\gamma}\odot
+\frac{\mathbf{x}}{\sqrt{\frac{1}{d}\sum_{i=1}^{d}x_i^2+\epsilon}}
+$$
+
+Las conexiones residuales añaden la entrada de una subcapa a su salida. Esta ruta directa facilita el flujo de gradientes a través de muchas capas. La diferencia entre las dos disposiciones más habituales es:
+
+| Orden | Forma simplificada | Comentario |
+|---|---|---|
+| Post-Norm | `LayerNorm(x + SubLayer(x))` | Usado en el Transformer original; puede ser más difícil de estabilizar en redes profundas |
+| Pre-Norm | `x + SubLayer(LayerNorm(x))` | Habitual en LLM modernos; ofrece una ruta residual directa |
+
+En la práctica, los detalles exactos dependen del modelo. No todos los LLM emplean la misma normalización ni la misma variante de MLP [@ba2016layernorm; @zhang2019rmsnorm].
+
+### Coste de la atención {#sec-coste-atencion}
+
+La atención densa compara cada posición con todas las demás. Para una secuencia de longitud $T$, la matriz de puntuaciones tiene forma $T \times T$ y el coste aproximado de calcularla es:
+
+$$
+\text{tiempo} = O(T^2 d), \qquad
+\text{memoria de la matriz} = O(T^2)
+$$
+
+El crecimiento cuadrático explica por qué duplicar la ventana de contexto no duplica, sino que cuadruplica aproximadamente el tamaño de la matriz de atención. En la práctica, el coste total también depende del número de capas, cabezas, dimensión oculta, precisión numérica y tamaño del lote.
+
+::: {.callout-note}
+## FlashAttention no cambia la arquitectura
+
+FlashAttention reorganiza el cálculo en bloques para reducir movimientos de memoria y evitar materializar toda la matriz de atención en la memoria de la GPU [@dao2022flashattention]. Mejora la ejecución de la atención exacta, pero no convierte automáticamente el coste cuadrático en lineal. Las ventanas locales y las máscaras dispersas son decisiones diferentes.
+:::
+
+### MHA, MQA y GQA {#sec-mha-mqa-gqa}
+
+En la atención multi-cabeza estándar, cada cabeza tiene sus propias proyecciones de consultas, claves y valores. En *Multi-Query Attention* (MQA), varias cabezas de consulta comparten las mismas claves y valores. *Grouped-Query Attention* (GQA) ocupa una posición intermedia: agrupa varias cabezas de consulta para compartir un conjunto más pequeño de cabezas K/V.
+
+La ventaja aparece sobre todo durante la inferencia. El modelo debe conservar las claves y valores de los tokens anteriores en la caché KV; si hay menos cabezas K/V, esa caché ocupa menos memoria. Muchos LLM modernos utilizan GQA como compromiso entre calidad y coste [@grattafiori2024llama3].
+
+La atención local, GQA y FlashAttention resuelven problemas distintos. La primera limita qué posiciones se consultan; la segunda reduce el número de representaciones K/V almacenadas; la tercera optimiza cómo se ejecuta el cálculo.
+
 ### Codificación posicional
 
-La atención es **permutation-invariant**: si cambiamos el orden de los tokens, el resultado es el mismo. Para inyectar información de posición, el Transformer añade un vector de **codificación posicional** a cada embedding de token.
+Sin información posicional, la self-attention no distingue el orden de los tokens. Más precisamente, el mecanismo es equivariante a permutaciones: si permutamos la entrada y aplicamos la misma permutación a la salida, el resultado se transforma de forma coherente, pero no aparece ninguna noción de “antes” y “después”. Para inyectar esa información, el Transformer añade o incorpora una señal posicional.
 
 La codificación posicional sinusoidal usa frecuencias diferentes para cada dimensión:
 
@@ -325,15 +478,40 @@ print("La versión aprendida se adapta a los datos; la sinusoidal es fija pero e
 
 ```
 
+### Posiciones relativas: RoPE y ALiBi {#sec-posiciones-relativas}
+
+La codificación sinusoidal y la aprendida absoluta se incorporan normalmente a los embeddings. Los LLM modernos suelen utilizar alternativas que introducen la posición directamente en la atención. La más extendida es RoPE (*Rotary Position Embedding*), que rota las componentes de las consultas y las claves según su posición.
+
+Si $R_m$ representa la rotación asociada a la posición $m$, RoPE calcula:
+
+$$
+Q'_m = R_m Q_m, \qquad K'_n = R_n K_n
+$$
+
+La propiedad importante es que el producto $Q_m'K_n'^{\mathsf{T}}$ incorpora información sobre la posición relativa $m-n$. No hace falta memorizar la derivación completa para entender su utilidad: la atención puede distinguir dos tokens por su contenido y por la distancia que los separa [@su2021roformer].
+
+Otra alternativa es ALiBi, que no añade vectores posicionales, sino que incorpora un sesgo dependiente de la distancia directamente en los logits de atención. Favorece, de forma gradual, la atención a posiciones cercanas [@press2022train].
+
+| Método | Cómo introduce la posición | Ventaja principal | Limitación principal |
+|---|---|---|---|
+| Sinusoidal | Suma funciones seno y coseno a los embeddings | No añade parámetros aprendibles | La extrapolación práctica es limitada |
+| Absoluta aprendida | Aprende un vector para cada posición | Flexible en la longitud entrenada | Depende de una longitud máxima |
+| RoPE | Rota Q y K según la posición | Relación relativa y buena compatibilidad con KV cache | Requiere estrategias de extensión para contextos mucho mayores |
+| ALiBi | Añade un sesgo lineal a los scores | Sencillo y con buena extrapolación | Introduce una preferencia fuerte por la cercanía |
+
+La codificación posicional no es un detalle cosmético. Cambia la geometría de las puntuaciones de atención y, por tanto, la forma en que el modelo utiliza el contexto.
+
 ### Variantes de la arquitectura {#sec-variantes}
 
 : Comparativa de las tres variantes principales de la arquitectura Transformer {#tbl-variantes-transformer}
 
-| Variante | Arquitectura | Ejemplos | Uso principal |
+| Variante | Objetivo habitual | Ejemplos | Uso principal |
 |---|---|---|---|
-| **Encoder-only** | Solo encoder (atención bidireccional) | BERT, RoBERTa | Clasificación, NER, embeddings |
-| **Decoder-only** | Solo decoder (atención causal/masked) | GPT, Llama, Qwen, Gemma, DeepSeek | Generación de texto, chat |
-| **Encoder-decoder** | Encoder + decoder con cross-attention | T5, BART | Traducción, resumen, QA |
+| Encoder-only | Modelado enmascarado o clasificación | BERT, RoBERTa | Clasificación, NER, embeddings |
+| Decoder-only | Modelado causal del siguiente token | GPT, Llama, Qwen, Gemma | Generación de texto, chat y código |
+| Encoder-decoder | Transformación de una secuencia en otra | T5, BART | Traducción, resumen y QA |
+
+BERT es un ejemplo de encoder-only entrenado con objetivos bidireccionales [@devlin2019bert]. T5 representa la familia encoder-decoder que formula muchas tareas como transformación de texto a texto [@raffel2020t5]. Los LLM conversacionales actuales suelen pertenecer a la familia decoder-only, aunque sus etapas de instrucción y alineamiento se estudian por separado en [01e - Del estado oculto a la salida](01e-llm-por-dentro.qmd).
 
 ::: {#fig-variantes-transformer}
 ```{mermaid}
@@ -352,6 +530,32 @@ graph LR
         I --> J[Salida]
     end
 ```
+:::
+
+La elección no es una cuestión de antigüedad. Depende de la relación entre la entrada y la salida. Si necesitamos una representación contextual de toda la entrada, un encoder-only puede ser suficiente. Si queremos generar una continuación, un decoder-only ofrece una interfaz natural. Si la tarea tiene una entrada y una salida con papeles diferenciados, el encoder-decoder mantiene esa separación mediante cross-attention.
+
+### Entrenamiento paralelo e inferencia autorregresiva {#sec-entrenamiento-inferencia}
+
+En un modelo causal, la frase “predecir el siguiente token” describe el objetivo, no necesariamente el orden de las operaciones durante el entrenamiento. Dada una secuencia, se desplazan los objetivos una posición:
+
+```text
+Entrada:  [El, modelo, aprende, con, datos]
+Objetivo:  [modelo, aprende, con, datos, nuevos]
+```
+
+El modelo puede calcular las predicciones de todas las posiciones en un único *forward pass*, siempre que la máscara causal impida que una posición consulte el futuro. Este procedimiento se conoce como *teacher forcing*: cada posición recibe como contexto los tokens reales anteriores, no los tokens que el modelo haya generado en pasos anteriores.
+
+Durante la inferencia, la situación cambia. El modelo genera un token, lo añade al contexto y vuelve a producir una distribución. Los sistemas de producción suelen conservar las claves y valores ya calculados en una caché KV para no repetir todo el trabajo en cada paso. Así aparecen dos fases con perfiles distintos:
+
+| Fase | Qué ocurre | Cuello de botella habitual |
+|---|---|---|
+| Prefill | Se procesa el prompt completo y se construye la caché KV | Cómputo y paralelismo |
+| Decode | Se genera un token por secuencia y se consulta la caché | Memoria y ancho de banda |
+
+::: {.callout-warning}
+## Dos afirmaciones que no se contradicen
+
+El Transformer procesa muchas posiciones en paralelo durante el entrenamiento, pero genera una respuesta token a token durante la inferencia. La máscara causal mantiene la misma restricción de información en las dos fases.
 :::
 
 ::: {.callout-important}

@@ -121,7 +121,7 @@ class LlamusEmbedding(BaseEmbedding):
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env en la raíz del proyecto con:\n    LLM_API_KEY=tu_api_key\n    Las celdas siguientes mostrarán este mensaje hasta que configures la clave.")
 else:
-    Settings.llm = LlamusChatLLM(model="gemma4:e2b-mlx", api_base=LLM_URL, api_key=LLM_KEY, temperature=0)
+    Settings.llm = LlamusChatLLM(model="mlx-community/Qwen3.6-35B-A3B-8bit", api_base=LLM_URL, api_key=LLM_KEY, temperature=0)
     Settings.embed_model = LlamusEmbedding("qwen3-embedding:0.6b", api_key=LLM_KEY, api_base=LLM_URL)
     Settings.chunk_size = 512
     Settings.chunk_overlap = 50

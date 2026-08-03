@@ -22,7 +22,7 @@ engine: jupyter
 - Modelo embeddings: `intfloat/e5-small-v2`
 - Cross-encoder: `cross-encoder/ms-marco-MiniLM-L-6-v2`
 - Corpus mixto: 3 PDFs de informes trimestrales + 1 tabla SQLite de productos (generados inline)
-- LLM: API Llamus US (`https://llamus.cs.us.es/api/v1`, modelo `gemma4:e2b-mlx`) o local (Ollama)
+- LLM: API Llamus US (`https://llamus.cs.us.es/api/v1`, modelo `mlx-community/Qwen3.6-35B-A3B-8bit`) o local (Ollama)
 
 ## Pipeline
 1. **Corpus mixto:** generar PDFs de informes + tabla SQLite de productos
@@ -127,8 +127,8 @@ LLM_URL = "https://llamus.cs.us.es/api/v1"
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env con:\n    LLM_API_KEY=tu_api_key")
 else:
-    llm = ChatOpenAI(model="gemma4:e2b-mlx", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
-    print("✅ LLM configurado (gemma4:e2b-mlx).")
+    llm = ChatOpenAI(model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
+    print("✅ LLM configurado (mlx-community/Qwen3.6-35B-A3B-8bit).")
 ```
 
 ```{python}

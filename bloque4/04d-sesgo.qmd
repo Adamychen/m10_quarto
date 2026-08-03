@@ -90,7 +90,7 @@ PARES_TEST = [
 def probabilidad_logit(client, frase: str) -> float:
     """Aproxima la probabilidad pidiendo al LLM que puntúe la frase 0-1."""
     r = client.chat.completions.create(
-        model="gemma4:e2b-mlx",
+        model="mlx-community/Qwen3.6-35B-A3B-8bit",
         messages=[{"role": "user", "content":
             f"Del 0 (absurdo) al 1 (perfectamente natural), puntúa la frase "
             f"como algo que oirías en una conversación cotidiana en español.\n"

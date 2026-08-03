@@ -118,8 +118,8 @@ LLM_URL = "https://llamus.cs.us.es/api/v1"
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env con:\n    LLM_API_KEY=tu_api_key")
 else:
-    llm = ChatOpenAI(model="gemma4:e2b-mlx", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
-    print("✅ LLM configurado (gemma4:e2b-mlx).")
+    llm = ChatOpenAI(model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
+    print("✅ LLM configurado (mlx-community/Qwen3.6-35B-A3B-8bit).")
 ```
 
 ```{python}

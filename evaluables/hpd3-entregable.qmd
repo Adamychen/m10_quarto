@@ -465,7 +465,7 @@ if CAMINO == "A":
         ]
 
         response = client.chat.completions.create(
-            model="gemma4:e2b-mlx",
+            model="mlx-community/Qwen3.6-35B-A3B-8bit",
             messages=messages,
             tools=tools_def,
             tool_choice="auto",
@@ -486,7 +486,7 @@ if CAMINO == "A":
                 })
 
             final = client.chat.completions.create(
-                model="gemma4:e2b-mlx",
+                model="mlx-community/Qwen3.6-35B-A3B-8bit",
                 messages=messages,
                 tools=tools_def,
                 tool_choice="none",
@@ -919,7 +919,7 @@ if CAMINO == "B":
         ]
 
         response = client.chat.completions.create(
-            model="gemma4:e2b-mlx",
+            model="mlx-community/Qwen3.6-35B-A3B-8bit",
             messages=messages,
             tools=tools_def,
             tool_choice="auto",
@@ -940,7 +940,7 @@ if CAMINO == "B":
                 })
 
             final = client.chat.completions.create(
-                model="gemma4:e2b-mlx",
+                model="mlx-community/Qwen3.6-35B-A3B-8bit",
                 messages=messages,
                 tools=tools_def,
                 tool_choice="none",
@@ -1370,7 +1370,7 @@ if CAMINO == "C":
         ]
 
         response = client.chat.completions.create(
-            model="gemma4:e2b-mlx",
+            model="mlx-community/Qwen3.6-35B-A3B-8bit",
             messages=messages,
             tools=tools_def,
             tool_choice="auto",
@@ -1391,7 +1391,7 @@ if CAMINO == "C":
                 })
 
             final = client.chat.completions.create(
-                model="gemma4:e2b-mlx",
+                model="mlx-community/Qwen3.6-35B-A3B-8bit",
                 messages=messages,
                 tools=tools_def,
                 tool_choice="none",

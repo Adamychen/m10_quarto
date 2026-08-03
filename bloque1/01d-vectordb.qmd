@@ -7,6 +7,8 @@ engine: jupyter
 
 > Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto [01c-embeddings.qmd](01c-embeddings.qmd) primero.
 
+> Este tema representa el paso histórico de aprender un espacio semántico a operar sobre él. El [panorama histórico](00-panorama.qmd) presenta la evolución conceptual; aquí estudiamos la indexación y la búsqueda necesarias para utilizar embeddings en sistemas reales.
+
 ```{python}
 #| echo: true
 #| eval: false

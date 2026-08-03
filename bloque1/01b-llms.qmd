@@ -7,6 +7,8 @@ engine: jupyter
 
 > Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto primero [01a-transformer.qmd](01a-transformer.qmd).
 
+> El [panorama histórico](00-panorama.qmd) distingue la línea de las representaciones semánticas de la línea de los modelos generativos. En esta página seguimos la segunda: cómo un modelo utiliza tokens, estados ocultos y una LM head para predecir texto.
+
 ```{python}
 #| echo: true
 #| eval: false
@@ -129,6 +131,82 @@ print(f"\nDecodificado: {tokenizer.decode(ids)}")
 
 ```
 
+### Tokenización en detalle: BPE y variantes {#sec-tokenizacion-detalle}
+
+La tabla anterior resume cuatro algoritmos, pero detrás de cada elección hay un **trade-off** entre cobertura del vocabulario, longitud de secuencia y coste computacional. Esta sección desglosa el más usado —**Byte-Pair Encoding (BPE)**— paso a paso, y compara las alternativas.
+
+#### Por qué subwords y no caracteres ni palabras {#sec-por-que-subwords}
+
+El vocabulario de un LLM es **finito** (típicamente 32K-128K tokens), pero el texto que verá es **abierto** (cualquier palabra, en cualquier idioma, incluidas erratas, jerga, nombres propios...). Hay tres opciones para resolver este desajuste:
+
+: Trade-offs entre granularidades de tokenización {#tbl-granularidad}
+
+| Granularidad | Vocabulario | Secuencia | Problema |
+|---|---|---|---|
+| **Carácter** | $\sim 256$ | Muy larga | Atención $O(n^2)$; cuesta aprender semántica de largo alcance |
+| **Palabra** | $\sim 500$K+ | Corta | No cubre palabras raras; tabla de embeddings enorme |
+| **Subword** | 32K-128K | Moderada | Mejor balance: secuencias cortas + vocabulario abierto |
+
+La promesa de los subwords: las palabras frecuentes son un solo token (`the` → `[the]`), y las palabras raras se descomponen en piezas conocidas (`cryptocurrency` → `["crypt", "ocur", "rency"]`). Así nunca hay "fuera de vocabulario" — toda palabra se puede representar.
+
+#### Byte-Pair Encoding (BPE) paso a paso {#sec-bpe-paso-a-paso}
+
+BPE (@sennrich2016bpe) es el algoritmo dominante. La idea es sencilla: **fusionar iterativamente los pares de caracteres más frecuentes** del corpus de entrenamiento.
+
+::: {#fig-bpe-pipeline}
+```{mermaid}
+flowchart LR
+    A[Caracteres<br/>individuales]:::input --> B[Contar pares<br/>adyacentes]:::proc
+    B --> C[Merge del par<br/>más frecuente]:::proc
+    C --> D{¿Tamaño de<br/>vocabulario<br/>alcanzado?}
+    D -->|No| B
+    D -->|Sí| E[Vocabulario<br/>final]:::out
+    E --> F[Codificar<br/>texto nuevo]:::out
+
+    classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef proc  fill:#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px
+    classDef out   fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:1.5px
+```
+:::
+
+**Algoritmo** (versión simplificada):
+
+1. Empezar con un vocabulario de **caracteres individuales** (256 bytes en byte-level BPE).
+2. Contar todos los **pares adyacentes** en el corpus de entrenamiento.
+3. **Fusionar** el par más frecuente en un nuevo símbolo.
+4. Repetir 2-3 durante $k$ iteraciones (hasta alcanzar el tamaño de vocabulario deseado, p. ej. 50K).
+
+**Ejemplo numérico** — partiendo del corpus `low low low lower lower newest newest newest newest newest widest widest widest`, el vocabulario inicial es `{l, o, w, e, r, n, w, s, t, i, d, }` (caracteres). El algoritmo aprende progresivamente:
+
+| Iteración | Par más frecuente | Vocabulario tras el merge |
+|---|---|---|
+| 1 | `(l, o)` | + `lo` |
+| 2 | `(lo, w)` | + `low` |
+| 3 | `(e, r)` | + `er` |
+| 4 | `(n, e)` | + `ne` |
+| 5 | `(ne, w)` | + `new` |
+| ... | ... | ... |
+| Final | — | `low`, `lower`, `newest`, `widest` como tokens completos |
+
+Tras el entrenamiento, la palabra `lowest` se codifica como `["low", "est"]` — la parte frecuente (`low`) se reutiliza, y la infrecuente (`est`) se descompone.
+
+#### Comparativa de algoritmos de subword {#sec-comparativa-subword}
+
+: Algoritmos de tokenización más usados en LLMs modernos {#tbl-subword-comparativa}
+
+| Algoritmo | Usado por | Idea clave |
+|---|---|---|
+| **BPE** | GPT-2, GPT-4, Llama 3, Mistral, Qwen | *Bottom-up*: fusionar pares frecuentes; determinista |
+| **Byte-level BPE** | GPT-2 en adelante | BPE sobre **bytes** puros (256 símbolos base); garantiza que cualquier secuencia es representable, sin token "unknown" |
+| **WordPiece** | BERT, DistilBERT | Similar a BPE, pero escoge el par que **maximiza la verosimilitud** del corpus (no la frecuencia) |
+| **Unigram LM** | SentencePiece (T5, XLNet) | *Top-down*: empieza con un vocabulario grande y **lo recorta** eliminando los tokens con menor contribución marginal a la verosimilitud |
+
+**¿Por qué importa la elección?**
+
+- **Multilingüismo** — Byte-level BPE y SentencePiece manejan bien vocabularios multilingües porque no asumen pre-tokenización por espacios.
+- **Tamaño del vocabulario** — un vocabulario más grande (128K vs 32K) reduce la longitud media de secuencia, pero aumenta el tamaño de la tabla de embeddings y la última capa (output projection).
+- **Robustez a erratas** — Byte-level BPE no genera nunca tokens "unknown"; cualquier carácter extraño se representa como un byte.
+
 ### Ventana de contexto {#sec-ventana-contexto}
 
 La **ventana de contexto** es el número máximo de tokens que el modelo puede procesar en una sola pasada. Limitaciones prácticas:
@@ -168,7 +246,7 @@ from langchain_openai import ChatOpenAI
 # Usamos la API unificada de la Universidad de Sevilla (Llamus)
 # No necesita GPU — solo una API key que obtendrás en la asignatura
 llm = ChatOpenAI(
-    model="gemma4:e2b-mlx",
+    model="mlx-community/Qwen3.6-35B-A3B-8bit",
     base_url="https://llamus.cs.us.es/api/v1",
     api_key=os.getenv("LLM_API_KEY", "<API_KEY>")
 )
@@ -313,7 +391,7 @@ La Universidad de Sevilla proporciona un endpoint **OpenAI-compatible** para usa
 
 ```
 Endpoint: https://llamus.cs.us.es/api/v1
-Modelos disponibles: gemma4:e2b-mlx, gemma4:26b, llama3.3:70b, ...
+Modelos disponibles: mlx-community/Qwen3.6-35B-A3B-8bit, gemma4:26b, llama3.3:70b, ...
 ```
 
 Funciona con `ChatOpenAI` de LangChain, el cliente OpenAI de Python, o cualquier herramienta compatible con OpenAI. Solo necesitas tu **API key de la US** (se proporciona en la asignatura).
@@ -325,7 +403,7 @@ Funciona con `ChatOpenAI` de LangChain, el cliente OpenAI de Python, o cualquier
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
-    model="gemma4:e2b-mlx",   # Modelo principal del curso
+    model="mlx-community/Qwen3.6-35B-A3B-8bit",   # Modelo principal del curso
     base_url="https://llamus.cs.us.es/api/v1",
     api_key="<API_KEY>"
 )

@@ -1,4 +1,4 @@
-"""Test: gemma4:e2b-mlx + agent con create_agent."""
+"""Test: mlx-community/Qwen3.6-35B-A3B-8bit + agent con create_agent."""
 import os, io, pandas as pd, numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -16,7 +16,7 @@ if not LLM_KEY:
     print("❌ Configura LLM_API_KEY en .env"); exit(1)
 
 llm = ChatOpenAI(
-    model="gemma4:e2b-mlx", base_url="https://llamus.cs.us.es/api/v1",
+    model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url="https://llamus.cs.us.es/api/v1",
     api_key=LLM_KEY, temperature=0,
 )
 

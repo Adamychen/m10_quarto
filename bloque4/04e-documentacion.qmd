@@ -24,7 +24,7 @@ model_card = {
     "model_details": {
         "name":               "asistente-corporativo-v1",
         "version":            "1.0.0",
-        "base_model":         "gemma4:e2b-mlx",
+        "base_model":         "mlx-community/Qwen3.6-35B-A3B-8bit",
         "date_released":      str(date.today()),
         "license":            "Uso interno — Universidad de Sevilla",
         "authors":            ["Equipo Módulo 10"],

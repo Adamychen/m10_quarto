@@ -1,5 +1,7 @@
 project:
   type: website
+  resources:
+    - "laboratorio/"
   render:
     - "*.qmd"
     - "*.md"
@@ -26,6 +28,8 @@ website:
             text: Acerca de
       - section: "Bloque 1 — Fundamentos"
         contents:
+          - href: bloque1/00-panorama.qmd
+            text: Panorama histórico
           - href: bloque1/01-fundamentos.qmd
             text: Visión general
           - href: bloque1/01a-transformer.qmd
@@ -36,6 +40,8 @@ website:
             text: Embeddings
           - href: bloque1/01d-vectordb.qmd
             text: Bases de datos vectoriales
+          - href: bloque1/01e-llm-por-dentro.qmd
+            text: Cabezas de predicción
           - href: bloque1/hpd1-embeddings.qmd
             text: "HPD 1 — Embeddings"
           - href: evaluables/hpd1-entregable.qmd
@@ -54,6 +60,8 @@ website:
             text: MCP
           - href: bloque2/02e-agentes.qmd
             text: Agentes Inteligentes
+          - href: bloque2/02f-patrones-agentes.qmd
+            text: Patrones de diseño de agentes
           - href: bloque2/hpd2-agente-tool-calling.qmd
             text: "HPD 2 — Agente Tool Calling"
           - href: evaluables/hpd2-entregable.qmd

@@ -11,6 +11,8 @@ engine: jupyter
 >
 > **Dependencias:** `torch`, `transformers`, `sentence-transformers`, `chromadb`, `faiss-cpu`, `matplotlib`, `scikit-learn`, `numpy`
 
+> **Orientación previa:** comienza por el [panorama histórico: del texto a los embeddings](00-panorama.qmd). Es una introducción conceptual que no sustituye los temas técnicos de este bloque.
+
 ::: {.callout-tip}
 ## Ejecución en Colab
 Todas las celdas de código están diseñadas para ejecutarse en **Google Colab** con GPU T4 gratuita (12 GB RAM).
@@ -47,22 +49,32 @@ coinciden con la paleta oficial de **Python**.
 
 ::: {#fig-mapa-fundamentos}
 ```{mermaid}
-graph TD
-    subgraph "Fundamentos"
-        A[Transformer] --> B[LLM]
-        A --> C[Embeddings]
-        B --> D["RAG avanzado (Bloque 3)"]
-        C --> E[Vector DB]
-        E --> D
+flowchart TD
+    subgraph "Bloque 1 — Fundamentos"
+        P0[00<br/>Panorama historico<br/>representacion y generacion]:::input --> A
+        P0 --> C
+        A[01a<br/>Transformer<br/>+ atención + posicional]:::input --> B[01b<br/>LLMs e inferencia<br/>+ tokenización BPE]:::proc
+        A --> C[01c<br/>Embeddings<br/>+ espacio geométrico]:::doc
+        A --> E2[01e<br/>Salidas y objetivos<br/>LM · Value · Reward · SFT]:::obs
+        B --> E2
+        C --> D[01d<br/>Bases de datos<br/>vectoriales]:::doc
+        D --> F["HPD 1<br/>Pipeline de embeddings<br/>y búsqueda semántica"]:::out
+        E2 --> F
     end
-    style A fill:#4B8BBE,color:#fff
-    style B fill:#306998,color:#fff
-    style C fill:#FFD43B,color:#000
-    style E fill:#FFD43B,color:#000
+    D --> G["RAG avanzado<br/>(Bloque 3)"]:::out
+    F --> H["Proyecto<br/>integrador"]:::out
+
+    classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef proc  fill:#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px
+    classDef doc   fill:#FFD43B,stroke:#b8860b,color:#000,stroke-width:1.5px
+    classDef obs   fill:#e65100,stroke:#bf360c,color:#fff,stroke-width:1.5px
+    classDef out   fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
 ```
 :::
 
-Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos los fundamentos de la arquitectura Transformer, pasamos a exponer cómo esta arquitectura escala para construir los LLMs (en su forma más general), continuaremos con la representación de la información haciendo uso de vectores numéricos por medio de los embeddings y, finalmente, explicaremos algunos métodos para almacenar y recuperar esos vectores de representación de forma eficiente.
+Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos con la arquitectura Transformer (atención, codificación posicional, variantes), pasamos a los LLMs y la inferencia (incluyendo una profundización en tokenización BPE), continuamos con la representación vectorial del lenguaje (embeddings y su geometría) y terminamos con las bases de datos vectoriales que permiten búsqueda semántica eficiente. La página **01e** complementa este recorrido mostrando cómo un mismo backbone puede producir distintas salidas y cómo SFT, PPO y DPO modifican el entrenamiento según la tarea.
+
+El [panorama histórico](00-panorama.qmd) añade una perspectiva distinta a esta secuencia técnica. Allí se sigue la línea **one-hot → TF-IDF → word2vec/GloVe → representaciones contextuales → SBERT/E5 → RAG**, mientras que las páginas técnicas explican en detalle la línea **RNN/LSTM → Transformer → LLM → herramientas y agentes**. Mantener ambas líneas evita presentar los embeddings como una consecuencia exclusiva de los LLMs: los embeddings de palabras son anteriores al Transformer, pero los embeddings contextuales y de frases modernos aprovechan esta arquitectura.
 
 ## Contenido del bloque {#sec-contenido-bloque}
 
@@ -72,14 +84,16 @@ La siguiente tabla muestra el itinerario que sigue este bloque en su exposición
 
 | Tema | Archivo | Duración estimada |
 |---|---|---|
-| **Transformers** — Atención, codificación posicional, variantes | [01a-transformer.qmd](01a-transformer.qmd) | 2h |
-| **LLMs e inferencia** — Preentrenamiento, tokenización, parámetros, HF Hub, API Llamus | [01b-llms.qmd](01b-llms.qmd) | 2h |
-| **Embeddings** — word2vec, SBERT, modelos, comparativa | [01c-embeddings.qmd](01c-embeddings.qmd) | 1h |
+| **Panorama histórico** — De one-hot y TF-IDF a embeddings contextuales, búsqueda semántica y RAG | [00-panorama.qmd](00-panorama.qmd) | 45-60 min, orientación previa |
+| **Transformers** — Pipeline intuitiva, atención, codificación posicional, variantes | [01a-transformer.qmd](01a-transformer.qmd) | 2h |
+| **LLMs e inferencia** — Preentrenamiento, BPE paso a paso, parámetros, HF Hub, API Llamus | [01b-llms.qmd](01b-llms.qmd) | 2h |
+| **Embeddings** — word2vec, SBERT, espacio geométrico, anisotropía y whitening | [01c-embeddings.qmd](01c-embeddings.qmd) | 1h |
 | **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica | [01d-vectordb.qmd](01d-vectordb.qmd) | 1h |
+| **Salidas y objetivos de entrenamiento** — LM, value, reward, SFT, PPO y DPO (lectura recomendada) | [01e-llm-por-dentro.qmd](01e-llm-por-dentro.qmd) | — |
 | **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](hpd1-embeddings.qmd) | 4h |
 
 ::: {.callout-note}
-**Teoría obligatoria.** Los temas listados arriba son obligatorios. Puedes profundizar en cada uno según tu interés.
+**Teoría obligatoria.** Los temas 01a-01d son obligatorios. La página **01e** es **lectura recomendada** (no obligatoria) y entra en evaluación conceptual integrada en el proyecto final, no en un examen separado.
 :::
 
 ```{python}
@@ -115,8 +129,8 @@ print(f"NumPy: {np.__version__}")
 
 ## Referencias del bloque {#sec-referencias}
 
-- @devlin2019bert
 - @vaswani2017attention
+- @devlin2019bert
 - @kaplan2020scaling
 - @hoffmann2022chinchilla
 - @su2021roformer
@@ -126,6 +140,8 @@ print(f"NumPy: {np.__version__}")
 - @radford2021clip
 - @malkov2018hnsw
 - @johnson2019faiss
+- @sennrich2016bpe
+- @roitman2026hitchhiker
 
 ---
 
@@ -135,6 +151,8 @@ print(f"NumPy: {np.__version__}")
 ```{mermaid}
 graph TD
     subgraph "Bloque 1"
+        P0[Panorama historico] --> A[Transformer]
+        P0 --> C[Embeddings]
         A[Transformer] -->|Arquitectura base| B[LLMs]
         A -->|Representación| C[Embeddings]
         B -->|Tokens + parámetros| D[Inferencia]

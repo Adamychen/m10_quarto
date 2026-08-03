@@ -149,7 +149,7 @@ Pregunta: {pregunta}
 def responder_con_citation(pregunta, contexto, llm_client):
     contexto_txt = "\n\n".join(f"[Fragmento {i+1}]\n{c}" for i, c in enumerate(contexto))
     return llm_client.chat.completions.create(
-        model="gemma4:e2b-mlx",
+        model="mlx-community/Qwen3.6-35B-A3B-8bit",
         messages=[{"role": "user", "content": PROMPT_GROUNDED.format(
             contexto=contexto_txt, pregunta=pregunta
         )}],

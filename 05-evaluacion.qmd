@@ -16,7 +16,8 @@ title: "Evaluación"
 
 Antes de comenzar, cada alumno elige uno de los tres **caminos de aplicación** en
 la página [Elegir tu camino](evaluables/caminos.qmd). Esta elección determina los
-datasets y la narrativa de todos los entregables y del proyecto final.
+datasets y la narrativa de los entregables HPD 1-4. El **proyecto integrador final
+es libre**: problema y patrón agéntico propios (ver sección siguiente).
 
 | Camino | Dominio | Perfil |
 |---|---|---|
@@ -37,14 +38,18 @@ datasets y la narrativa de todos los entregables y del proyecto final.
 
 ## Proyecto integrador final {#sec-proyecto-integrador}
 
-El proyecto integrador final detallado, con sus tres caminos de aplicación (Finanzas, Salud y E-commerce), la rúbrica específica por camino, los criterios de éxito y el formato de entrega, se encuentra en la página dedicada:
+El proyecto integrador final es **100 % libre**: cada alumno elige su propio
+problema y aplica un **patrón de diseño de agentes** de la taxonomía de
+[02f — Patrones de Diseño de Agentes](bloque2/02f-patrones-agentes.qmd) (o propone
+uno propio, con bonus). Los detalles completos —propuesta, ruta de datos,
+rúbrica, criterios de éxito y formato de entrega— se encuentran en la página dedicada:
 
 [**Proyecto integrador final →**](evaluables/proyecto-final.qmd){.btn .btn-primary}
 
 Allí encontrarás:
 
-- La descripción completa de los **tres caminos** (A — Finanzas, B — Salud, C — E-commerce)
-- Los **requisitos de datos** y **componentes** específicos de cada camino
-- Las **rúbricas** con ejemplos adaptados a cada dominio
-- Los **criterios de éxito** y la **lista de entregables**
-- El **formato de entrega** y los consejos para abordar el proyecto
+- La **fase de propuesta** (`propuesta.md`): problema, criterios de éxito medibles, patrón candidato y ruta de datos
+- Las **tres rutas de datos**: dataset real abierto, datos sintéticos generados por ti, o corpus propio
+- La **rúbrica** con la dimensión "Patrón" como eje (justificación, aplicación y comparativa contra baseline)
+- El **bonus por idea novedosa**: proponer un patrón propio o variante
+- Los **criterios de éxito**, el **formato de entrega** y consejos para abordar el proyecto

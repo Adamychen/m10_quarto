@@ -81,7 +81,7 @@ LLM_URL = "https://llamus.cs.us.es/api/v1"
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env en la raíz del proyecto con:\n    LLM_API_KEY=tu_api_key\n    Las celdas siguientes mostrarán este mensaje hasta que configures la clave.")
 else:
-    llm = ChatOpenAI(model="gemma4:e2b-mlx", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
+    llm = ChatOpenAI(model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
     print("✅ ChatOpenAI configurado. Las celdas de ejemplo funcionarán correctamente.")
 ```
 
@@ -229,7 +229,7 @@ from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables.history import RunnableWithMessageHistory
 
-llm_chat = ChatOpenAI(model="gemma4:e2b-mlx", base_url=LLM_URL, api_key=LLM_KEY, temperature=0.7)
+llm_chat = ChatOpenAI(model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url=LLM_URL, api_key=LLM_KEY, temperature=0.7)
 
 prompt_con_memoria = ChatPromptTemplate.from_messages([
     ("system", "Eres un profesor de estadística amable. Responde en 2 frases máximo."),

@@ -2,23 +2,22 @@ __pycache__/
 .chroma_db/
 _site/
 .site/
-site_libs/
-notebooks/site_libs/
-*_files/
+**/site_libs/
+**/*_files/
+**/_freeze/
 *.ipynb
 !notebooks/**/*.ipynb
 .DS_Store
-.venv
-site_libs/
+*.pyc
+.venv/
 /.quarto/
-**/*.quarto_ipynb
+**/*.quarto_ipynb*
+**/.ipynb_checkpoints/
+notebooks/images/
 .env
 users/
-__pycache__/
-*.pyc
 static/
 data/
-.DS_Store
 auth/usuarios.csv
 auth/pins_generated.txt
 
@@ -34,3 +33,7 @@ Modulo10_IA_Generativa_DataScience.*
 
 # Fragmentos de quarto .html
 *.html
+
+libro/
+
+**/*.quarto_ipynb

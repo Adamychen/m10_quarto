@@ -440,7 +440,7 @@ else:
     query_original = "¿Cuál es el margen del Monitor 4K?"
 
     respuesta_hipotetica = client.chat.completions.create(
-        model="gemma4:e2b-mlx",
+        model="mlx-community/Qwen3.6-35B-A3B-8bit",
         messages=[{"role": "user", "content": f"Responde brevemente a esta pregunta como si fueras un informe de ventas:\n{query_original}"}],
         temperature=0.7,
     ).choices[0].message.content
@@ -620,7 +620,7 @@ if not LLM_KEY:
     print("⚠️  Configura LLM_API_KEY en .env para ejecutar la evaluación RAGAS.")
 else:
     ragas_llm = ChatOpenAI(
-        model="gemma4:e2b-mlx",
+        model="mlx-community/Qwen3.6-35B-A3B-8bit",
         base_url=LLM_URL,
         api_key=LLM_KEY,
         temperature=0,

@@ -108,6 +108,7 @@ os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import warnings
 warnings.filterwarnings("ignore")
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import io
@@ -128,7 +129,7 @@ LLM_URL = "https://llamus.cs.us.es/api/v1"
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env en la raíz con:\n    LLM_API_KEY=tu_api_key\n    Las celdas con LLM mostrarán este aviso.")
 else:
-    llm = ChatOpenAI(model="gemma4:e2b-mlx", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
+    llm = ChatOpenAI(model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
     print("✅ LLM configurado.")
 ```
 
@@ -238,6 +239,46 @@ print("3. Pasajeros por clase:")
 print("\n⚠️  Descomenta las líneas anteriores cuando hayas implementado la tool.")
 ```
 
+## Tool 2: describe_schema {#sec-hpd2-tool-schema}
+
+Fuente de verdad del esquema: el agente **no ve el DataFrame**, solo sabe lo que le dicen los
+docstrings. Si duda del nombre exacto de una columna (o no le queda claro qué contiene),
+debe llamar a `describe_schema` antes de consultar. Esta tool ya viene implementada:
+
+```{python}
+#| echo: true
+
+@tool
+def describe_schema() -> str:
+    """
+    Devuelve el esquema del DataFrame 'df' del Titanic: columnas, tipo de dato,
+    valores nulos y valores únicos (para variables categóricas).
+
+    Úsala siempre que necesites confirmar el nombre exacto de una columna
+    (van en minúsculas: age, fare, sex, pclass...) o su contenido antes de consultar.
+
+    Returns:
+        String con el esquema completo del dataset.
+
+    Ejemplo: describe_schema() → lista de columnas con tipo, nulos y valores únicos.
+    """
+    lineas = []
+    for col in df.columns:
+        nulos = df[col].isnull().sum()
+        valores = ""
+        if df[col].nunique() <= 10:
+            valores = f" | valores: {sorted(df[col].dropna().unique().tolist())}"
+        lineas.append(f"  {col}: {df[col].dtype}, {nulos} nulos{valores}")
+    return "Esquema del dataset Titanic:\n" + "\n".join(lineas)
+```
+
+```{python}
+#| echo: true
+
+# Probar describe_schema directamente (sin LLM)
+print(describe_schema.invoke({}))
+```
+
 ## Tools de visualización {#sec-hpd2-tools-viz}
 
 Permiten al LLM generar gráficos con matplotlib sobre los datos del Titanic.
@@ -248,7 +289,8 @@ Permiten al LLM generar gráficos con matplotlib sobre los datos del Titanic.
 # ─── COMPLETAR: implementa las herramientas de visualización ───
 @tool
 def histograma(columna: str, titulo: str = "") -> str:
-    """Genera un histograma de una columna numérica del Titanic (Age, Fare...)."""
+    """Genera un histograma de una columna numérica del Titanic (age, fare...).
+    Los nombres de columna van en minúsculas (age, fare...), NO capitalizados (Age, Fare)."""
     # TODO: df[columna].hist() + plt.title(titulo)
     # Pista: guardar con plt.savefig("grafico.png") y cerrar con plt.close()
     pass  # ← completar
@@ -256,14 +298,15 @@ def histograma(columna: str, titulo: str = "") -> str:
 @tool
 def barras(columna: str, agrupar_por: str = "") -> str:
     """Genera un gráfico de barras. 
-    agrupar_por es opcional (Sex, Pclass...) para agrupar la media."""
+    agrupar_por es opcional (sex, pclass...) para agrupar la media.
+    Los nombres de columna van en minúsculas (sex, pclass...), NO capitalizados (Sex, Pclass)."""
     # TODO: value_counts().plot.bar() o groupby().mean().plot.bar()
     pass  # ← completar
 
 @tool
 def boxplot(columna: str, agrupar_por: str = "") -> str:
-    """Genera un boxplot de una columna numérica. 
-    agrupar_por es opcional para comparar entre categorías."""
+    """Genera un boxplot de una columna numérica (age, fare...). 
+    agrupar_por es opcional para comparar entre categorías (sex, pclass...)."""
     # TODO: df.boxplot(columna) o df.boxplot(columna, by=agrupar_por)
     pass  # ← completar
 ```
@@ -273,9 +316,9 @@ def boxplot(columna: str, agrupar_por: str = "") -> str:
 
 # Probar las herramientas directamente (sin LLM)
 print("=== Probando herramientas de visualización (sin LLM) ===")
-# print(histograma.invoke({"columna": "Age", "titulo": "Distribución de edades"}))
-# print(barras.invoke({"columna": "Fare", "agrupar_por": "Pclass"}))
-# print(boxplot.invoke({"columna": "Age", "agrupar_por": "Sex"}))
+# print(histograma.invoke({"columna": "age", "titulo": "Distribución de edades"}))
+# print(barras.invoke({"columna": "fare", "agrupar_por": "pclass"}))
+# print(boxplot.invoke({"columna": "age", "agrupar_por": "sex"}))
 
 print("⚠️  Descomenta las líneas anteriores cuando hayas implementado las tools.")
 ```
@@ -306,7 +349,7 @@ def codigo_libre(codigo: str) -> str:
     - NO importes librerías (plt, pd, np ya disponibles)
 
     Ejemplo que FUNCIONA:
-    plt.scatter(df['Age'], df['Fare'], c=df['Survived'], cmap='viridis', alpha=0.5)
+    plt.scatter(df['age'], df['fare'], c=df['survived'], cmap='viridis', alpha=0.5)
     plt.colorbar(label='Supervivencia')
     plt.xlabel('Edad'); plt.ylabel('Tarifa')
     """
@@ -326,7 +369,7 @@ def codigo_libre(codigo: str) -> str:
 # Probar codigo_libre
 print("=== Probando codigo_libre (sin LLM) ===")
 resultado = codigo_libre.invoke({
-    "codigo": "plt.hist(df['Age'].dropna(), bins=20, color='skyblue', edgecolor='black')\\nplt.title('Distribución de Edades')\\nplt.xlabel('Edad'); plt.ylabel('Frecuencia')"
+    "codigo": "plt.hist(df['age'].dropna(), bins=20, color='skyblue', edgecolor='black')\nplt.title('Distribución de Edades')\nplt.xlabel('Edad'); plt.ylabel('Frecuencia')"
 })
 print(f"  {resultado}")
 ```
@@ -357,6 +400,8 @@ Definimos el system prompt que le dice al modelo su rol y cómo usar las herrami
 #   - Cuándo usar cada una
 #   - Formato de respuesta (conciso, profesional, en español)
 #   - Que SIEMPRE use herramientas para responder preguntas sobre los datos
+#   - Que consulte describe_schema() si no está seguro del nombre de las columnas
+#     (van en minúsculas: age, fare, sex, pclass...) antes de hacer consultas
 
 SYSTEM_PROMPT = """Eres un analista de datos experto en el dataset del Titanic.
 # TODO: completar el resto del prompt
@@ -378,7 +423,7 @@ if not LLM_KEY:
     print("⚠️  Configura LLM_API_KEY en .env para crear el agente.")
 else:
     # ─── COMPLETAR: crear el agente ───
-    tools = [consulta_pandas, histograma, barras, boxplot, codigo_libre]
+    tools = [describe_schema, consulta_pandas, histograma, barras, boxplot, codigo_libre]
     
     # TODO: Crea el agente con create_agent:
     #   agente = create_agent(model=llm, tools=tools, system_prompt=SYSTEM_PROMPT)
@@ -528,7 +573,12 @@ Modifica `consulta_pandas` para que, cuando `eval()` falle, el mensaje de error 
 
 **E2 — Memoria conversacional**
 
-Añade `ConversationBufferMemory` al agente. Haz 3 preguntas encadenadas donde la segunda y tercera dependan del contexto de las anteriores. Ejemplo: *"¿Cuántos pasajeros viajaban en primera clase?"* → *"¿Y cuántos de ellos sobrevivieron?"* → *"Compáralo con tercera clase."*
+`create_agent` no guarda estado entre llamadas: cada `invoke` parte de cero. Para dar memoria
+al agente, acumula el historial en el campo `messages` de la siguiente invocación (reutiliza el
+`result["messages"]` de la llamada anterior y añade tu nueva pregunta). Haz 3 preguntas
+encadenadas donde la segunda y tercera dependan del contexto de las anteriores. Ejemplo:
+*"¿Cuántos pasajeros viajaban en primera clase?"* → *"¿Y cuántos de ellos sobrevivieron?"* →
+*"Compáralo con tercera clase."*
 
 **E3 — Benchmark sin herramientas**
 

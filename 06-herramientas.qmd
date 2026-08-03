@@ -9,7 +9,7 @@ El módulo está diseñado para ser completado íntegramente con herramientas gr
 | Categoría | Herramienta recomendada | Alternativas / Notas |
 |---|---|---|
 | **LLM API** | Llamus US (`https://llamus.cs.us.es/api/v1`) | OpenAI, Anthropic, Google (API key propia) |
-| **Modelos Llamus** | `gemma4:e2b-mlx`, `gemma4:26b`, `llama3.3:70b` | `gemma4:e2b-mlx` para demos rápidas |
+| **Modelos Llamus** | `mlx-community/Qwen3.6-35B-A3B-8bit`, `gemma4:26b`, `llama3.3:70b` | `mlx-community/Qwen3.6-35B-A3B-8bit` para demos rápidas |
 | **LLM local** | Ollama + Qwen 3.6 / Llama 3.3 | LM Studio; recomendado para HPD 3 (privacidad) |
 | **Hub de modelos** | [Hugging Face Hub](https://huggingface.co/models) | Descubrimiento, model cards, Spaces |
 | **Embeddings** | Sentence-Transformers (`intfloat/e5-small-v2`) | `qwen3-embedding:0.6b`, `all-MiniLM-L6-v2` |
