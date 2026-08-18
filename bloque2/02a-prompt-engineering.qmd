@@ -5,7 +5,7 @@ engine: jupyter
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02a-prompt-engineering.ipynb)
 
-> Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber completado el [Bloque 1](../bloque1/01-fundamentos.qmd) primero.
+> Este tema forma parte del Bloque 2 — Orquestación. Se recomienda haber completado el [Bloque 1](../bloque1/01-fundamentos.qmd) primero.
 
 ```{python}
 #| echo: true
@@ -20,14 +20,14 @@ engine: jupyter
 import os
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
-Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
 
 Orden de resolución:
   1. .env local (python-dotenv)
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -103,7 +103,7 @@ else:
 
 ### ¿Qué es un prompt? {#sec-que-es-prompt}
 
-Un **prompt** es la instrucción textual que le damos a un LLM. Piensa en ello como la pregunta o la orden que le das a un asistente muy capaz pero muy literal: si la instrucción es ambigua, la respuesta será imprecisa. Si es clara y con contexto, la respuesta será mucho mejor.
+Un prompt es la instrucción textual que le damos a un LLM. Piensa en ello como la pregunta o la orden que le das a un asistente muy capaz pero muy literal: si la instrucción es ambigua, la respuesta será imprecisa. Si es clara y con contexto, la respuesta será mucho mejor.
 
 El Prompt Engineering consiste en diseñar estas instrucciones de forma sistemática para obtener respuestas fiables, estructuradas y útiles, no solo "texto bonito".
 
@@ -152,7 +152,7 @@ Este es el patrón base para todo lo que veremos: `model` + `messages` → respu
 
 ### Few-shot prompting {#sec-few-shot}
 
-El **few-shot** consiste en incluir ejemplos dentro del prompt para que el modelo entienda exactamente qué formato y estilo esperamos. Es como enseñarle con el ejemplo.
+El few-shot consiste en incluir ejemplos dentro del prompt para que el modelo entienda exactamente qué formato y estilo esperamos. Es como enseñarle con el ejemplo.
 
 ```{python}
 #| echo: true
@@ -179,7 +179,7 @@ else:
     print(respuesta.choices[0].message.content)
 ```
 
-**¿Por qué funciona?** Los LLMs son excelentes reconociendo patrones. Al darles 2-3 ejemplos, el modelo "aprende" el patrón en contexto (*in-context learning*) sin necesidad de fine-tuning.
+**¿Por qué funciona?** Los LLM son excelentes reconociendo patrones. Al darles 2-3 ejemplos, el modelo "aprende" el patrón en contexto (*in-context learning*) sin necesidad de fine-tuning.
 
 ::: {.callout-tip}
 ## Regla de oro del few-shot
@@ -226,7 +226,7 @@ else:
 
 ### Chain-of-Thought (CoT) {#sec-cot}
 
-El **Chain-of-Thought** consiste en pedir al modelo que razone paso a paso antes de dar la respuesta final. La clave está en añadir algo como _"pensemos paso a paso"_ o incluir ejemplos donde se muestra el razonamiento.
+El Chain-of-Thought consiste en pedir al modelo que razone paso a paso antes de dar la respuesta final. La clave está en añadir algo como _"pensemos paso a paso"_ o incluir ejemplos donde se muestra el razonamiento.
 
 ```{python}
 #| echo: true
@@ -275,7 +275,7 @@ graph TD
 
 ### Tree-of-Thought (ToT) {#sec-tot}
 
-El **Tree-of-Thought** extiende CoT: en lugar de un único camino de razonamiento, el modelo explora múltiples ramas y elige la mejor. Es útil para problemas con múltiples soluciones posibles (planificación, puzzles, creatividad).
+El Tree-of-Thought extiende CoT: en lugar de un único camino de razonamiento, el modelo explora múltiples ramas y elige la mejor. Es útil para problemas con múltiples soluciones posibles (planificación, puzles, creatividad).
 
 ::: {#fig-tot}
 ```{mermaid}
@@ -372,12 +372,12 @@ Devuelve ÚNICAMENTE un JSON válido con esta estructura exacta, sin texto adici
 ::: {.callout-important}
 ## JSON vía prompt vs. structured output nativo
 
-Pedir JSON en el prompt funciona con **cualquier modelo**, pero **no garantiza** que el JSON sea válido (por eso añadimos `try/except`). Algunos modelos como Qwen 3 ofrecen `response_format` nativo que fuerza la estructura desde el API. La ventaja del prompting es que es **model-agnostic**: funciona con Gemma, Llama, Mistral, etc.
+Pedir JSON en el prompt funciona con cualquier modelo, pero no garantiza que el JSON sea válido (por eso añadimos `try/except`). Algunos modelos como Qwen 3 ofrecen `response_format` nativo que fuerza la estructura desde la API. La ventaja del prompting es que es model-agnostic: funciona con Gemma, Llama, Mistral, etc.
 :::
 
 ### De JSON Schema a datos sintéticos: el enfoque intuitivo {#sec-json-schema-datos-sint}
 
-Lo que acabas de hacer —extraer 1 registro JSON de un texto— es el mismo mecanismo que permite **generar datasets sintéticos completos**. La diferencia es de escala: en lugar de pedir 1 registro, pides N. En lugar de extraer de un texto real, pides al modelo que *invente* datos verosímiles.
+Lo que acabas de hacer —extraer 1 registro JSON de un texto— es el mismo mecanismo que permite generar datasets sintéticos completos. La diferencia es de escala: en lugar de pedir 1 registro, pides N. En lugar de extraer de un texto real, pides al modelo que *invente* datos verosímiles.
 
 La receta es simple:
 
@@ -438,7 +438,7 @@ Reglas:
 ::: {.callout-tip}
 ## ¿Por qué funciona?
 
-El LLM no "conoce" clientes reales, pero ha visto millones de patrones en sus datos de entrenamiento: distribuciones de edad, rangos de ingresos típicos, provincias españolas. El **prompt con el schema**, el **few-shot** y la **temperatura** controlan estructura, dominio y diversidad. Algunos modelos (Qwen, OpenAI) ofrecen además `response_format` nativo para forzar la estructura desde el API.
+El LLM no "conoce" clientes reales, pero ha visto millones de patrones en sus datos de entrenamiento: distribuciones de edad, rangos de ingresos típicos, provincias españolas. El prompt con el schema, el few-shot y la temperatura controlan estructura, dominio y diversidad. Algunos modelos (Qwen, OpenAI) ofrecen además `response_format` nativo para forzar la estructura desde la API.
 
 **Este es el enfoque más intuitivo y accesible para datos sintéticos:**
 - Sin entrenar modelos adicionales
@@ -451,17 +451,17 @@ El LLM no "conoce" clientes reales, pero ha visto millones de patrones en sus da
 ::: {.callout-warning}
 ## Limitaciones del enfoque intuitivo
 
-- No garantiza **correlaciones realistas** entre columnas (ej. ingresos vs. edad pueden no seguir la relación esperada)
-- Puede generar **valores atípicos** no representativos
-- Depende de la **calidad del prompt** y los ejemplos
-- **No hay garantía de privacidad** diferencial
+- No garantiza correlaciones realistas entre columnas (p. ej. ingresos frente a edad pueden no seguir la relación esperada)
+- Puede generar valores atípicos no representativos
+- Depende de la calidad del prompt y los ejemplos
+- No hay garantía de privacidad diferencial
 
-Para datasets de producción donde la fidelidad estadística es crítica, necesitarás modelos generativos especializados (CTGAN, TVAE, TabDDPM) que veremos en el **Bloque 3** con SDV.
+Para datasets de producción donde la fidelidad estadística es crítica, necesitarás modelos generativos especializados (CTGAN, TVAE, TabDDPM) que veremos en el Bloque 3 con SDV.
 :::
 
 ### Role Prompting {#sec-role-prompting}
 
-Asignar un **rol** al modelo en el mensaje `system` cambia radicalmente su comportamiento. No es magia: el modelo, entrenado con textos de diversos perfiles, "activa" los patrones asociados a ese rol.
+Asignar un rol al modelo en el mensaje `system` cambia radicalmente su comportamiento. No es magia: el modelo, entrenado con textos de diversos perfiles, "activa" los patrones asociados a ese rol.
 
 ```{python}
 #| echo: true

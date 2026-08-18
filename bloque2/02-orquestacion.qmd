@@ -2,8 +2,6 @@
 title: "Bloque 2 — Orquestación: Prompt Engineering, Frameworks y Agentes"
 ---
 
-> **Carga:** HT: 6h | HPD: 4h
->
 > **Competencias asociadas:** [CE-2](../index.qmd#sec-competencias-especificas), [CE-3](../index.qmd#sec-competencias-especificas)
 
 ## Objetivos del bloque {#sec-b2-objetivos}
@@ -31,28 +29,30 @@ graph TD
 ```
 :::
 
-Este bloque te lleva de la interacción básica con un LLM hasta la construcción de sistemas autónomos capaces de razonar, usar herramientas y ejecutar tareas multi-paso. Empezamos refinando el arte del prompt, luego aprendemos a orquestar con frameworks, estandarizamos la conexión a datos con MCP y finalmente construimos agentes inteligentes.
+Este bloque te lleva de la interacción básica con un LLM hasta la construcción de sistemas autónomos capaces de razonar, usar herramientas y ejecutar tareas multipaso. Empezamos refinando el arte del prompt, luego aprendemos a orquestar con frameworks, estandarizamos la conexión a datos con MCP y finalmente construimos agentes inteligentes.
 
 ## Contenido del bloque {#sec-b2-contenido}
 
-: Itinerario del Bloque 2 con sus ficheros y duración estimada {#tbl-b2-itinerario}
+: Itinerario del Bloque 2 {#tbl-b2-itinerario}
 
-| Tema | Archivo | Duración estimada |
-|---|---|---|
-| **Prompt Engineering** — Few-shot, CoT/ToT, JSON Schema, role prompting | [02a-prompt-engineering.qmd](02a-prompt-engineering.qmd) | 1.5h |
-| **LangChain** — LCEL, memoria conversacional, retrievers, parsers, callbacks | [02b-langchain.qmd](02b-langchain.qmd) | 1.5h |
-| **LlamaIndex** — Índices, query engines, pipelines de ingesta, chunking | [02c-llamaindex.qmd](02c-llamaindex.qmd) | 1h |
-| **MCP** — Protocolo, servidores stdio, recursos/tools/prompts, seguridad | [02d-mcp.qmd](02d-mcp.qmd) | 1h |
-| **Agentes Inteligentes** — ReAct, Tool Calling, multi-step, multi-agente | [02e-agentes.qmd](02e-agentes.qmd) | 1h |
+| Tema | Archivo |
+|---|---|
+| **Prompt Engineering** — Few-shot, CoT/ToT, JSON Schema, role prompting | [02a-prompt-engineering.qmd](02a-prompt-engineering.qmd) |
+| **LangChain** — LCEL, memoria conversacional, retrievers, parsers, callbacks | [02b-langchain.qmd](02b-langchain.qmd) |
+| **LlamaIndex** — Índices, query engines, pipelines de ingesta, chunking | [02c-llamaindex.qmd](02c-llamaindex.qmd) |
+| **MCP** — Protocolo, servidores stdio, recursos/tools/prompts, seguridad | [02d-mcp.qmd](02d-mcp.qmd) |
+| **Agentes Inteligentes** — ReAct, Tool Calling, multi-step, multi-agente | [02e-agentes.qmd](02e-agentes.qmd) |
+| **Patrones de diseño de agentes** — Workflows frente a agentes, taxonomía, guía de selección | [02f-patrones-agentes.qmd](02f-patrones-agentes.qmd) |
 
 ## Talleres prácticos {#sec-b2-talleres}
 
-: Talleres prácticos del Bloque 2 (HPD 2 y HPD 3) {#tbl-b2-talleres}
+: Talleres prácticos del Bloque 2 (HPD 2, 3 y 4) {#tbl-b2-talleres}
 
-| HPD | Título | Enlace | Duración |
-|---|---|---|---|
-| **HPD 2** | Agente analítico con Tool Calling | [hpd2-agente-tool-calling.qmd](hpd2-agente-tool-calling.qmd) | 4h |
-| **HPD 3** | Servidor MCP y conexión segura a datos locales | [hpd3-servidor-mcp.qmd](hpd3-servidor-mcp.qmd) | 4h |
+| HPD | Título | Enlace |
+|---|---|---|
+| **HPD 2** | Agente analítico con Tool Calling | [hpd2-agente-tool-calling.qmd](hpd2-agente-tool-calling.qmd) |
+| **HPD 3** | Workflows y agentes con LangGraph | [hpd3-workflows-langgraph.qmd](hpd3-workflows-langgraph.qmd) |
+| **HPD 4** | Servidor MCP y conexión segura a datos locales | [hpd4-servidor-mcp.qmd](hpd4-servidor-mcp.qmd) |
 
 > **Lecturas obligatorias:**
 > - [Documentación oficial de LangChain LCEL](https://python.langchain.com/docs/concepts/lcel/)
@@ -70,11 +70,13 @@ graph LR
     B --> E["5. Agentes<br/>Inteligentes"]
     D --> E
     E --> F["HPD 2<br/>Tool Calling"]
-    D --> G["HPD 3<br/>Servidor MCP"]
+    E --> H["HPD 3<br/>Workflows LangGraph"]
+    D --> G["HPD 4<br/>Servidor MCP"]
     
     style A fill:#4B8BBE,color:#fff
     style E fill:#2e7d32,color:#fff
     style F fill:#e65100,color:#fff
+    style H fill:#306998,color:#fff
     style G fill:#e65100,color:#fff
 ```
 :::
@@ -83,7 +85,7 @@ graph LR
 2. Aprende **LangChain** o **LlamaIndex** (o ambos, son complementarios) para orquestar
 3. Entiende **MCP** para estandarizar la conexión a datos
 4. Construye **agentes** uniendo todos los conceptos
-5. Ponlo en práctica con los HPDs: un **agente con herramientas** (HPD 2) y un **servidor MCP** (HPD 3)
+5. Ponlo en práctica con los HPD: un **agente con herramientas** (HPD 2), los **patrones de 02f como grafos en LangGraph** (HPD 3) y un **servidor MCP** (HPD 4)
 
 # References
 

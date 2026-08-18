@@ -73,7 +73,7 @@ Para producción usa herramientas especializadas: [Microsoft Presidio](https://g
 
 ### 3.2 Datos sintéticos y privacidad {#sec-sinteticos-privacidad}
 
-Un error frecuente: *"Si genero datos sintéticos, ya no hay riesgo de privacidad"*. Falso. Los modelos generativos pueden memorizar registros del training set y emitirlos casi literalmente.
+Un error frecuente: *"Si genero datos sintéticos, ya no hay riesgo de privacidad"*. Falso. Los modelos generativos pueden memorizar registros del conjunto de entrenamiento y emitirlos casi literalmente.
 
 ```python
 #| echo: true
@@ -101,7 +101,7 @@ def distancia_al_mas_cercano(df_sint: np.ndarray, df_real: np.ndarray) -> dict:
     }
 
 
-# Mini-demo: comparar datos casi-idénticos vs. datos con ruido
+# Mini-demo: comparar datos casi idénticos vs. datos con ruido
 np.random.seed(42)
 df_real = np.random.randn(500, 4)
 df_copia       = df_real + np.random.randn(500, 4) * 1e-3   # casi idéntica
@@ -118,7 +118,7 @@ for k, v in distancia_al_mas_cercano(df_independiente, df_real).items():
 
 ### 3.3 Privacidad diferencial con SDV {#sec-privacidad-diferencial}
 
-SDV permite configurar un presupuesto de privacidad `epsilon`: cuanto menor, más ruido se añade y más seguros los datos sintéticos resultantes, pero menos útiles.
+SDV permite configurar un presupuesto de privacidad `epsilon`: cuanto menor, más ruido se añade y más seguros son los datos sintéticos resultantes, pero menos útiles.
 
 ```python
 #| echo: true
@@ -146,11 +146,11 @@ df_dp = synth_dp.sample(1000)
 ::: {.callout-tip}
 ## Buenas prácticas con datos sintéticos {#sec-buenas-practicas-sinteticos}
 
-- [ ] Calcular **DCR** (media y percentil 5) sobre datos sintéticos vs. reales.
+- [ ] Calcular DCR (media y percentil 5) sobre datos sintéticos vs. reales.
 - [ ] Si `dcr_p5 < 0.01` (registros casi idénticos) → riesgo alto, no publiques.
 - [ ] Configurar `epsilon` entre 1.0 (privacidad fuerte) y 10.0 (utilidad alta).
-- [ ] Documentar el esquema y los parámetros en la **Model Card** del dataset sintético [@mitchell2019modelcards].
-- [ ] Considerar ataques de **membership inference** como test adversarial. Para privacidad diferencial formal ver @dwork2014dp.
+- [ ] Documentar el esquema y los parámetros en la Model Card del dataset sintético [@mitchell2019modelcards].
+- [ ] Considerar ataques de membership inference como test adversarial. Para privacidad diferencial formal, véase @dwork2014dp.
 :::
 
 # References

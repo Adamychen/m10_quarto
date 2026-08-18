@@ -8,11 +8,11 @@ m10_quarto/
 ├── index.qmd                    # Presentación
 ├── about.qmd                    # Acerca de
 ├── mod10.md                     # Guía docente pública del módulo
-├── bloque1/                     # Fundamentos: Transformers, LLMs, embeddings, vector DB
+├── bloque1/                     # Fundamentos: Transformers, LLM, embeddings, vector DB
 │   ├── 00-panorama.qmd          # Panorama histórico: representaciones y embeddings
 │   ├── 01-fundamentos.qmd      # Índice del bloque
 │   ├── 01a-transformer.qmd      # Arquitectura Transformer
-│   ├── 01b-llms.qmd             # LLMs e inferencia
+│   ├── 01b-llms.qmd             # LLM e inferencia
 │   ├── 01c-embeddings.qmd       # Modelos de embeddings
 │   ├── 01d-vectordb.qmd         # Bases de datos vectoriales
 │   └── hpd1-embeddings.qmd      # HPD 1 — Taller: Pipeline de embeddings
@@ -25,7 +25,8 @@ m10_quarto/
 │   ├── 02e-agentes.qmd
 │   ├── 02f-patrones-agentes.qmd       # Patrones de diseño de agentes
 │   ├── hpd2-agente-tool-calling.qmd   # HPD 2
-│   └── hpd3-servidor-mcp.qmd         # HPD 3
+│   ├── hpd3-workflows-langgraph.qmd   # HPD 3 — Taller: Workflows y agentes con LangGraph (no evaluable)
+│   └── hpd4-servidor-mcp.qmd          # HPD 4 — Taller: Servidor MCP
 ├── bloque3/                     # Aplicaciones: RAG, datos sintéticos, fine-tuning
 │   ├── 03-aplicaciones.qmd      # Índice del bloque
 │   ├── 03a-datos-sinteticos.qmd
@@ -39,13 +40,13 @@ m10_quarto/
 │   ├── 04d-sesgo.qmd            # Tipos + auditoría de sesgo
 │   ├── 04e-documentacion.qmd    # Model Card + System Card
 │   └── 04f-despliegue.qmd       # On-prem + observabilidad + caching
-├── evaluables/                  # Entregables y proyecto (6 ficheros + taller)
+├── evaluables/                  # Entregables y proyecto (7 ficheros)
 │   ├── caminos.qmd                  # Elección de camino (A/B/C)
 │   ├── hpd1-entregable.qmd          # HPD 1 — Entregable: Pipeline de embeddings
 │   ├── hpd2-entregable.qmd          # HPD 2 — Entregable: Agente analítico con Tool Calling
-│   ├── hpd3-entregable.qmd          # HPD 3 — Entregable: Servidor MCP
-│   ├── hpd4-rag-mixto.qmd           # HPD 4 — Taller: RAG mixto (no evaluable)
-│   ├── hpd4-entregable.qmd          # HPD 4 — Entregable: RAG con evaluación
+│   ├── hpd4-entregable.qmd          # HPD 4 — Entregable: Servidor MCP
+│   ├── hpd5-rag-mixto.qmd           # HPD 5 — Taller: RAG mixto (no evaluable)
+│   ├── hpd5-entregable.qmd          # HPD 5 — Entregable: RAG con evaluación
 │   └── proyecto-final.qmd           # Proyecto integrador final
 ├── 05-evaluacion.qmd            # Evaluación y proyecto integrador
 ├── 06-herramientas.qmd          # Herramientas y stack recomendado
@@ -73,8 +74,8 @@ m10_quarto/
 |---|---|
 | **Inicio** | `index.qmd` (Presentación), `about.qmd` (Acerca de), `mod10.md` (Guía docente) |
 | **Bloque 1 — Fundamentos** | `bloque1/00-panorama.qmd` (Panorama histórico), `bloque1/01-fundamentos.qmd`, `01a-transformer.qmd`, `01b-llms.qmd`, `01c-embeddings.qmd`, `01d-vectordb.qmd`, `bloque1/hpd1-embeddings.qmd`, `evaluables/hpd1-entregable.qmd` |
-| **Bloque 2 — Orquestación** | `bloque2/02-orquestacion.qmd`, `02a-prompt-engineering.qmd`, `02b-langchain.qmd`, `02c-llamaindex.qmd`, `02d-mcp.qmd`, `02e-agentes.qmd`, `02f-patrones-agentes.qmd`, `bloque2/hpd2-agente-tool-calling.qmd`, `evaluables/hpd2-entregable.qmd`, `bloque2/hpd3-servidor-mcp.qmd`, `evaluables/hpd3-entregable.qmd` |
-| **Bloque 3 — Aplicaciones** | `bloque3/03-aplicaciones.qmd`, `03b-rag-avanzado.qmd`, `03a-datos-sinteticos.qmd`, `03c-fine-tuning.qmd`, `evaluables/hpd4-rag-mixto.qmd`, `evaluables/hpd4-entregable.qmd` |
+| **Bloque 2 — Orquestación** | `bloque2/02-orquestacion.qmd`, `02a-prompt-engineering.qmd`, `02b-langchain.qmd`, `02c-llamaindex.qmd`, `02d-mcp.qmd`, `02e-agentes.qmd`, `02f-patrones-agentes.qmd`, `bloque2/hpd2-agente-tool-calling.qmd`, `evaluables/hpd2-entregable.qmd`, `bloque2/hpd3-workflows-langgraph.qmd`, `bloque2/hpd4-servidor-mcp.qmd`, `evaluables/hpd4-entregable.qmd` |
+| **Bloque 3 — Aplicaciones** | `bloque3/03-aplicaciones.qmd`, `03b-rag-avanzado.qmd`, `03a-datos-sinteticos.qmd`, `03c-fine-tuning.qmd`, `evaluables/hpd5-rag-mixto.qmd`, `evaluables/hpd5-entregable.qmd` |
 | **Bloque 4 — Gobernanza** | `bloque4/04-gobernanza.qmd`, `04a-evaluacion.qmd`, `04b-alucinaciones.qmd`, `04c-privacidad.qmd`, `04d-sesgo.qmd`, `04e-documentacion.qmd`, `04f-despliegue.qmd` |
 | **Evaluación** | `evaluables/caminos.qmd`, `05-evaluacion.qmd`, `evaluables/proyecto-final.qmd` |
 | **Recursos** | `06-herramientas.qmd`, `07-bibliografia.qmd` |
@@ -101,7 +102,7 @@ QUARTO_PYTHON=.venv/bin/python3 quarto preview
 
 ## Bibliografía (`references.bib`)
 
-Todas las referencias del módulo (papers, Model/System Cards, documentación de herramientas) se centralizan en **`references.bib`** (raíz del proyecto), en formato BibTeX. La página [07-bibliografia.qmd](07-bibliografia.qmd) los muestra todos con `nocite: | @*`; cada `.qmd` adicional muestra solo las entradas que cita, gracias al heading `# References` que Quarto auto-rellena.
+Todas las referencias del módulo (papers, Model/System Cards, documentación de herramientas) se centralizan en `references.bib` (raíz del proyecto), en formato BibTeX. La página [07-bibliografia.qmd](07-bibliografia.qmd) los muestra todos con `nocite: | @*`; cada `.qmd` adicional muestra solo las entradas que cita, gracias al heading `# References` que Quarto auto-rellena.
 
 ### Configuración global (`_quarto.yml`)
 
@@ -131,7 +132,7 @@ project:
 | `[-@vaswani2017attention]` | 2017 (sin autor) — útil en "sección X (Smith, -@smith2020)" |
 | `[@karpukhin2020dpr; @lewis2020rag]` | (Karpukhin et al., 2020; Lewis et al., 2020) |
 
-En las **listas de "Lecturas recomendadas"** usar la forma con guión para que Pandoc renderice la entrada bibliográfica completa: `- @vaswani2017attention` (sin paréntesis).
+En las listas de "Lecturas recomendadas" usar la forma con guión para que Pandoc renderice la entrada bibliográfica completa: `- @vaswani2017attention` (sin paréntesis).
 
 ### Añadir una nueva referencia
 
@@ -139,7 +140,7 @@ En las **listas de "Lecturas recomendadas"** usar la forma con guión para que P
 2. Citarla en el `.qmd` con `@clave` o `[@clave]`.
 3. Verificar con `quarto render` que la entrada aparece al final de la página.
 
-Para una página que necesite mostrar **todas** las entradas (como la página principal de bibliografía), añadir `nocite: | @*` al frontmatter y un `# References` al final.
+Para una página que necesite mostrar todas las entradas (como la página principal de bibliografía), añadir `nocite: | @*` al frontmatter y un `# References` al final.
 
 ## Generar notebooks para Colab
 
@@ -155,7 +156,7 @@ El script elimina antes y después de cada render los intermediarios temporales 
 
 ## API key centralizada (Llamus)
 
-Todos los notebooks que usan Llamus comparten una única lógica de carga de la API key, centralizada en `includes/setup_keys.py`. La fuente de verdad es **un solo archivo**; los `.qmd` consumen un marcador y un pre-render lo expande.
+Todos los notebooks que usan Llamus comparten una única lógica de carga de la API key, centralizada en `includes/setup_keys.py`. La fuente de verdad es un solo archivo; los `.qmd` consumen un marcador y un pre-render lo expande.
 
 ### Orden de resolución de `LLM_API_KEY`
 
@@ -174,7 +175,7 @@ Orden de resolución:
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -244,7 +245,7 @@ Orden de resolución:
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -345,7 +346,7 @@ Orden de resolución:
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -424,7 +425,7 @@ Todos los `.qmd` usan cross-references nativas de Quarto en lugar de texto plano
 | Tipo | Prefijo | Cómo añadir el label | Cómo referenciarlo |
 |---|---|---|---|
 | Sección (heading) | `sec-` | `## 1.4 Embeddings e indexación {#sec-embeddings-chroma}` | `@sec-embeddings-chroma` |
-| Tabla | `tbl-` | Insertar `: Caption {#tbl-nombre}` **antes** de la tabla | `@tbl-nombre` |
+| Tabla | `tbl-` | Insertar `: Caption {#tbl-nombre}` antes de la tabla | `@tbl-nombre` |
 | Figura (imagen o Mermaid) | `fig-` | `![Caption](img.png){#fig-nombre}` o `::: {#fig-nombre} \`\`\`{mermaid}…\`\`\` :::` | `@fig-nombre` |
 
 **Reglas de naming (kebab-case, español, sin tildes):**
@@ -441,7 +442,7 @@ Todos los `.qmd` usan cross-references nativas de Quarto en lugar de texto plano
 
 Genera automáticamente "Sección 1 — Sección 3".
 
-**Anclas inter-página:** en sitios Quarto (no libros), las cross-refs entre páginas distintas siguen siendo enlaces Markdown, no `@sec-…`. Usar **siempre labels estables** en lugar de slugs auto-generados:
+**Anclas inter-página:** en sitios Quarto (no libros), las cross-refs entre páginas distintas siguen siendo enlaces Markdown, no `@sec-…`. Usar siempre labels estables en lugar de slugs auto-generados:
 
 ```markdown
 # ❌ Frágil (slug auto-generado)

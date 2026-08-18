@@ -5,7 +5,7 @@ engine: jupyter
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02e-agentes.ipynb)
 
-> Este tema forma parte del **Bloque 2 — Orquestación**. Aquí unimos todos los conceptos anteriores: prompts, herramientas, memoria y orquestación para construir agentes autónomos.
+> Este tema forma parte del Bloque 2 — Orquestación. Aquí unimos todos los conceptos anteriores: prompts, herramientas, memoria y orquestación para construir agentes autónomos.
 
 ```{python}
 #| echo: true
@@ -20,14 +20,14 @@ engine: jupyter
 import os
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
-Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
 
 Orden de resolución:
   1. .env local (python-dotenv)
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -89,13 +89,13 @@ else:
 
 ### ¿Qué es un agente? {#sec-que-es-agente}
 
-Un **agente** es un sistema que combina un LLM con un conjunto de herramientas y un **bucle de decisión autónomo**. La diferencia clave con un simple chatbot es:
+Un agente es un sistema que combina un LLM con un conjunto de herramientas y un bucle de decisión autónomo. La diferencia clave con un simple chatbot es:
 
 : Diferencias entre un chatbot simple y un agente con herramientas {#tbl-chatbot-vs-agente}
 
 | Chatbot | Agente |
 |---|---|
-| LLM responde con lo que sabe | LLM decide **si necesita** usar herramientas |
+| LLM responde con lo que sabe | LLM decide si necesita usar herramientas |
 | Sin acceso a datos externos | Busca en BBDD, APIs, archivos, calcula... |
 | Un solo turno | Múltiples pasos hasta resolver la tarea |
 | Sin planificación | Planifica, ejecuta, observa, corrige |
@@ -125,7 +125,7 @@ graph LR
 
 ### El patrón ReAct (Reasoning + Acting) {#sec-react}
 
-**ReAct** es el patrón de diseño de agentes más popular. El LLM alterna entre:
+ReAct es el patrón de diseño de agentes más popular. El LLM alterna entre:
 - **Reasoning (razonar):** escribir un plan o pensamiento en lenguaje natural
 - **Acting (actuar):** invocar una herramienta con parámetros concretos
 - **Observation (observar):** recibir el resultado de la herramienta y decidir el siguiente paso
@@ -275,8 +275,8 @@ print(repr(consultar_ventas_por_mes.name + ": " + consultar_ventas_por_mes.descr
 ### Pipeline RAG Supervisado con LangGraph {#sec-rag-langgraph}
 
 LangGraph permite construir flujos complejos donde el LLM decide qué hacer en cada paso.
-En este ejemplo, un **supervisor** recibe una pregunta sobre productos y decide si consultar
-una base de datos SQL, buscar en informes trimestrales (Chroma), o ambas fuentes. Luego
+En este ejemplo, un supervisor recibe una pregunta sobre productos y decide si consultar
+una base de datos SQL, buscar en informes trimestrales (Chroma) o ambas fuentes. Luego
 un generador produce la respuesta final con el contexto recuperado.
 
 ```{python}
@@ -413,7 +413,7 @@ else:
         print(f"\nRESPUESTA: {result['respuesta']}")
 ```
 
-### Agentes síncronos vs asíncronos {#sec-sync-vs-async}
+### Agentes síncronos frente a asíncronos {#sec-sync-vs-async}
 
 : Comparativa entre agentes síncronos y asíncronos {#tbl-sync-vs-async}
 
@@ -545,11 +545,11 @@ if LLM_KEY:
 
 Los agentes son potentes pero más caros (múltiples llamadas al LLM), más lentos y más impredecibles que una cadena simple. Usa un agente solo cuando:
 
-- ✅ La tarea requiere **decidir qué herramienta usar en tiempo real**
-- ✅ El número de pasos **no se conoce de antemano**
-- ✅ Necesitas **corregir errores** sobre la marcha (ReAct)
-- ❌ El flujo de trabajo es **fijo y conocido** (usa una cadena LCEL simple)
-- ❌ La tarea es **determinista** (una función Python clásica es más barata y fiable)
+- ✅ La tarea requiere decidir qué herramienta usar en tiempo real
+- ✅ El número de pasos no se conoce de antemano
+- ✅ Necesitas corregir errores sobre la marcha (ReAct)
+- ❌ El flujo de trabajo es fijo y conocido (usa una cadena LCEL simple)
+- ❌ La tarea es determinista (una función Python clásica es más barata y fiable)
 :::
 
 > **Lectura recomendada:** [LangChain Agents](https://python.langchain.com/docs/concepts/agents/) [@langchain]. Para el patrón de razonamiento + acción que implementan estos agentes, ver @yao2023react.

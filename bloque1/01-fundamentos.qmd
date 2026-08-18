@@ -1,12 +1,10 @@
 ---
-title: "Bloque 1 — Fundamentos: Transformers, LLMs y Representación Vectorial"
+title: "Bloque 1 — Fundamentos: Transformers, LLM y Representación Vectorial"
 engine: jupyter
 ---
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01-fundamentos.ipynb)
 
-> **Carga:** HT: 6h | HPD: 4h
->
 > **Competencias asociadas:** [CE-1](../index.qmd#sec-competencias-especificas)
 >
 > **Dependencias:** `torch`, `transformers`, `sentence-transformers`, `chromadb`, `faiss-cpu`, `matplotlib`, `scikit-learn`, `numpy`
@@ -15,7 +13,7 @@ engine: jupyter
 
 ::: {.callout-tip}
 ## Ejecución en Colab
-Todas las celdas de código están diseñadas para ejecutarse en **Google Colab** con GPU T4 gratuita (12 GB RAM).
+Todas las celdas de código están diseñadas para ejecutarse en Google Colab con GPU T4 gratuita (12 GB RAM).
 
 1. Haz clic en el badge "Open in Colab" de arriba
 2. Si es la primera vez, autoriza Colab en GitHub: **Settings → GitHub → Connect to GitHub**
@@ -26,7 +24,7 @@ Si el badge no funciona, abre [colab.research.google.com](https://colab.research
 
 ## Objetivos del bloque {#sec-objetivos}
 
-Comprender la arquitectura que subyace a los LLMs modernos y dominar la representación vectorial de texto y datos tabulares, así como las bases de datos vectoriales para búsqueda semántica y recuperación de información.
+Comprender la arquitectura que subyace a los LLM modernos y dominar la representación vectorial de texto y datos tabulares, así como las bases de datos vectoriales para búsqueda semántica y recuperación de información.
 
 ## Mapa conceptual del bloque {#sec-mapa-conceptual}
 
@@ -35,7 +33,7 @@ Comprender la arquitectura que subyace a los LLMs modernos y dominar la represen
 
 A lo largo del módulo, los diagramas usan una paleta consistente para que
 identifiques rápidamente el rol de cada elemento. Los azules y el amarillo
-coinciden con la paleta oficial de **Python**.
+coinciden con la paleta oficial de Python.
 
 | | Significado |
 |---|---|
@@ -53,7 +51,7 @@ flowchart TD
     subgraph "Bloque 1 — Fundamentos"
         P0[00<br/>Panorama historico<br/>representacion y generacion]:::input --> A
         P0 --> C
-        A[01a<br/>Transformer<br/>+ atención + posicional]:::input --> B[01b<br/>LLMs e inferencia<br/>+ tokenización BPE]:::proc
+        A[01a<br/>Transformer<br/>+ atención + posicional]:::input --> B[01b<br/>LLM e inferencia<br/>+ tokenización BPE]:::proc
         A --> C[01c<br/>Embeddings<br/>+ espacio geométrico]:::doc
         A --> E2[01e<br/>Salidas y objetivos<br/>LM · Value · Reward · SFT]:::obs
         B --> E2
@@ -72,28 +70,28 @@ flowchart TD
 ```
 :::
 
-Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos con la arquitectura Transformer (atención, codificación posicional, variantes), pasamos a los LLMs y la inferencia (incluyendo una profundización en tokenización BPE), continuamos con la representación vectorial del lenguaje (embeddings y su geometría) y terminamos con las bases de datos vectoriales que permiten búsqueda semántica eficiente. La página **01e** complementa este recorrido mostrando cómo un mismo backbone puede producir distintas salidas y cómo SFT, PPO y DPO modifican el entrenamiento según la tarea.
+Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos con la arquitectura Transformer (atención, codificación posicional, variantes), pasamos a los LLM y la inferencia (incluyendo una profundización en tokenización BPE), continuamos con la representación vectorial del lenguaje (embeddings y su geometría) y terminamos con las bases de datos vectoriales que permiten búsqueda semántica eficiente. La página 01e complementa este recorrido mostrando cómo un mismo backbone puede producir distintas salidas y cómo SFT, PPO y DPO modifican el entrenamiento según la tarea.
 
-El [panorama histórico](00-panorama.qmd) añade una perspectiva distinta a esta secuencia técnica. Allí se sigue la línea **one-hot → TF-IDF → word2vec/GloVe → representaciones contextuales → SBERT/E5 → RAG**, mientras que las páginas técnicas explican en detalle la línea **RNN/LSTM → Transformer → LLM → herramientas y agentes**. Mantener ambas líneas evita presentar los embeddings como una consecuencia exclusiva de los LLMs: los embeddings de palabras son anteriores al Transformer, pero los embeddings contextuales y de frases modernos aprovechan esta arquitectura.
+El [panorama histórico](00-panorama.qmd) añade una perspectiva distinta a esta secuencia técnica. Allí se sigue la línea one-hot → TF-IDF → word2vec/GloVe → representaciones contextuales → SBERT/E5 → RAG, mientras que las páginas técnicas explican en detalle la línea RNN/LSTM → Transformer → LLM → herramientas y agentes. Mantener ambas líneas evita presentar los embeddings como una consecuencia exclusiva de los LLM: los embeddings de palabras son anteriores al Transformer, pero los embeddings contextuales y de frases modernos aprovechan esta arquitectura.
 
 ## Contenido del bloque {#sec-contenido-bloque}
 
-La siguiente tabla muestra el itinerario que sigue este bloque en su exposición de objetivos, así como los ficheros interactivos asociados y el tiempo estimado necesario para la exposición de los mismos:
+La siguiente tabla muestra el itinerario que sigue este bloque en su exposición de objetivos, así como los ficheros interactivos asociados:
 
-: Itinerario del Bloque 1 con sus ficheros y duración estimada {#tbl-itinerario}
+: Itinerario del Bloque 1 {#tbl-itinerario}
 
-| Tema | Archivo | Duración estimada |
-|---|---|---|
-| **Panorama histórico** — De one-hot y TF-IDF a embeddings contextuales, búsqueda semántica y RAG | [00-panorama.qmd](00-panorama.qmd) | 45-60 min, orientación previa |
-| **Transformers** — Pipeline intuitiva, atención, codificación posicional, variantes | [01a-transformer.qmd](01a-transformer.qmd) | 2h |
-| **LLMs e inferencia** — Preentrenamiento, BPE paso a paso, parámetros, HF Hub, API Llamus | [01b-llms.qmd](01b-llms.qmd) | 2h |
-| **Embeddings** — word2vec, SBERT, espacio geométrico, anisotropía y whitening | [01c-embeddings.qmd](01c-embeddings.qmd) | 1h |
-| **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica | [01d-vectordb.qmd](01d-vectordb.qmd) | 1h |
-| **Salidas y objetivos de entrenamiento** — LM, value, reward, SFT, PPO y DPO (lectura recomendada) | [01e-llm-por-dentro.qmd](01e-llm-por-dentro.qmd) | — |
-| **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](hpd1-embeddings.qmd) | 4h |
+| Tema | Archivo |
+|---|---|
+| **Panorama histórico** — De one-hot y TF-IDF a embeddings contextuales, búsqueda semántica y RAG | [00-panorama.qmd](00-panorama.qmd) |
+| **Transformers** — Pipeline intuitiva, atención, codificación posicional, variantes | [01a-transformer.qmd](01a-transformer.qmd) |
+| **LLM e inferencia** — Preentrenamiento, BPE paso a paso, parámetros, HF Hub, API Llamus | [01b-llms.qmd](01b-llms.qmd) |
+| **Embeddings** — word2vec, SBERT, espacio geométrico, anisotropía y whitening | [01c-embeddings.qmd](01c-embeddings.qmd) |
+| **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica | [01d-vectordb.qmd](01d-vectordb.qmd) |
+| **Salidas y objetivos de entrenamiento** — LM, value, reward, SFT, PPO y DPO (lectura recomendada) | [01e-llm-por-dentro.qmd](01e-llm-por-dentro.qmd) |
+| **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](hpd1-embeddings.qmd) |
 
 ::: {.callout-note}
-**Teoría obligatoria.** Los temas 01a-01d son obligatorios. La página **01e** es **lectura recomendada** (no obligatoria) y entra en evaluación conceptual integrada en el proyecto final, no en un examen separado.
+**Teoría obligatoria.** Los temas 01a-01d son obligatorios. La página 01e es lectura recomendada (no obligatoria) y entra en evaluación conceptual integrada en el proyecto final, no en un examen separado.
 :::
 
 ```{python}
@@ -153,7 +151,7 @@ graph TD
     subgraph "Bloque 1"
         P0[Panorama historico] --> A[Transformer]
         P0 --> C[Embeddings]
-        A[Transformer] -->|Arquitectura base| B[LLMs]
+        A[Transformer] -->|Arquitectura base| B[LLM]
         A -->|Representación| C[Embeddings]
         B -->|Tokens + parámetros| D[Inferencia]
         C -->|Indexación| E[Vector DB]
@@ -167,7 +165,7 @@ graph TD
 
 Este primer bloque sienta las bases para el resto de bloques que componen el curso. Concretamente:
 
-- **Bloque 2:** uso de LLMs para construir agentes y prompts estructurados
+- **Bloque 2:** uso de LLM para construir agentes y prompts estructurados
 - **Bloque 3:** uso de embeddings + vector DB para construir sistemas RAG (recuperación de información)
 - **Bloque 4:** evaluación y despliegue de sistemas en producción
 

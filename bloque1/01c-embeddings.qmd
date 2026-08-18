@@ -5,7 +5,7 @@ engine: jupyter
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01c-embeddings.ipynb)
 
-> Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto [01b-llms.qmd](01b-llms.qmd) primero.
+> Este tema forma parte del Bloque 1 — Fundamentos. Se recomienda haber visto [01b-llms.qmd](01b-llms.qmd) primero.
 
 > Este tema profundiza en la línea histórica presentada en el [panorama del Bloque 1](00-panorama.qmd). Allí se introducen one-hot, TF-IDF, word2vec, representaciones contextuales y SBERT; aquí se estudian sus mecanismos, modelos actuales y consecuencias geométricas.
 
@@ -98,7 +98,7 @@ Las referencias originales de esta evolución se encuentran en @firth1957synopsi
 ::: {.callout-note}
 ## Idioma de los textos de ejemplo
 
-Los modelos de embeddings que usamos en este bloque (`all-MiniLM-L6-v2`) están entrenados principalmente en **inglés**. Por eso los ejemplos de código utilizan texto en inglés. Cada modelo lleva asociado un **tokenizador** entrenado en su idioma: usar un tokenizador inglés sobre texto español produce más subtokens por palabra y embeddings de menor calidad, porque el espacio semántico aprendido está calibrado para relaciones del inglés.
+Los modelos de embeddings que usamos en este bloque (`all-MiniLM-L6-v2`) están entrenados principalmente en inglés. Por eso los ejemplos de código utilizan texto en inglés. Cada modelo lleva asociado un tokenizador entrenado en su idioma: usar un tokenizador inglés sobre texto español produce más subtokens por palabra y embeddings de menor calidad, porque el espacio semántico aprendido está calibrado para relaciones del inglés.
 
 Si necesitas trabajar con español, usa modelos multilingües como `intfloat/multilingual-e5-small` o `BAAI/bge-m3`. La API es la misma; solo cambia el nombre del modelo.
 :::
@@ -125,7 +125,7 @@ La elección del pooling y del objetivo de entrenamiento puede cambiar sustancia
 
 ### Semántica distribucional {#sec-semantica-distribucional}
 
-El principio fundamental: **"You shall know a word by the company it keeps"** (@firth1957synopsis). Palabras con contextos similares tienen significados similares, y por tanto vectores cercanos en el espacio semántico.
+El principio fundamental: "You shall know a word by the company it keeps" (@firth1957synopsis). Palabras con contextos similares tienen significados similares, y por tanto vectores cercanos en el espacio semántico.
 
 ```{python}
 #| echo: true
@@ -178,7 +178,7 @@ print("while the weather phrase (3) is different from the rest.")
 
 ### Sentence-BERT {#sec-sbert}
 
-Sentence-BERT (SBERT) modifica BERT con una arquitectura **siamese** que permite generar embeddings de frases comparables directamente. Usa funciones de pérdida contrastiva (triplet loss, cosine similarity loss) para que frases semánticamente cercanas tengan vectores cercanos.
+Sentence-BERT (SBERT) modifica BERT con una arquitectura siamesa que permite generar embeddings de frases comparables directamente. Usa funciones de pérdida contrastiva (triplet loss, cosine similarity loss) para que frases semánticamente cercanas tengan vectores cercanos.
 
 ![Arquitectura siamese de SBERT para inferencia.](../images/sbert_figure_2.png){#fig-sbert-arch fig-cap="Arquitectura siamesa de SBERT para inferencia: dos torres BERT con pesos compartidos producen embeddings u y v que se comparan con cosine similarity. Adaptada de @reimers2019sbert, Figure 2 (https://aclanthology.org/D19-1410/), distribuida bajo CC-BY 4.0."}
 
@@ -205,19 +205,19 @@ Sentence-BERT (SBERT) modifica BERT con una arquitectura **siamese** que permite
 ::: {.callout-info}
 ## ¿Cuándo usar cada uno?
 
-    - **Texto:** Sentence-BERT / E5 → **Vector DB**
-    - **Texto + imágenes:** CLIP → **Búsqueda multimodal**
-    - **Datos tabulares:** TabNet / SCARF → **Búsqueda por perfil**
-    - **Código:** CodeBERT / GraphCodeBERT → **Búsqueda semántica de código**
+- **Texto:** Sentence-BERT / E5 → **Vector DB**
+- **Texto + imágenes:** CLIP → **Búsqueda multimodal**
+- **Datos tabulares:** TabNet / SCARF → **Búsqueda por perfil**
+- **Código:** CodeBERT / GraphCodeBERT → **Búsqueda semántica de código**
 :::
 
 ### La geometría del espacio semántico {#sec-geometria-semantica}
 
-La intuición central de los embeddings es que **la proximidad vectorial codifica proximidad semántica**. En un espacio bien entrenado:
+La intuición central de los embeddings es que la proximidad vectorial codifica proximidad semántica. En un espacio bien entrenado:
 
-- Conceptos similares caen **cerca** (rey, reina, príncipe).
-- Conceptos distintos caen **lejos** (rey, bicicleta, GPU).
-- Las **relaciones** entre conceptos se pueden capturar con **aritmética vectorial**:
+- Conceptos similares caen cerca (rey, reina, príncipe).
+- Conceptos distintos caen lejos (rey, bicicleta, GPU).
+- Las relaciones entre conceptos se pueden capturar con aritmética vectorial:
   $\vec{\text{king}} - \vec{\text{man}} + \vec{\text{woman}} \approx \vec{\text{queen}}$.
 
 ![Proyección 2D de un espacio de embeddings: los clusters por significado (royalty, animals, actions, tech) emergen de los patrones de co-ocurrencia en el corpus de entrenamiento. Adaptada de @roitman2026hitchhiker, Figure 6 (CC BY-SA 4.0).](../images/embedding_space_2d.png){#fig-embedding-space-2d}
@@ -241,7 +241,7 @@ flowchart LR
 ::: {.callout-note}
 ## Lectura de la imagen y el diagrama
 
-La imagen proyecta 4096 dimensiones del espacio de embeddings en un plano 2D —pierde información exacta— pero conserva la **estructura por clusters**: las palabras se agrupan por tema, no por sintaxis. El diagrama Mermaid ilustra la **analogía vectorial**: el vector `king − man + woman` aterriza cerca de `queen`, porque la dirección `man → woman` (género) se suma a la dirección de `royalty` implícita en `king`. Esta es la propiedad que un sistema RAG explota cuando busca el documento "más similar" a una consulta.
+La imagen proyecta 4096 dimensiones del espacio de embeddings en un plano 2D —pierde información exacta— pero conserva la estructura por clusters: las palabras se agrupan por tema, no por sintaxis. El diagrama Mermaid ilustra la analogía vectorial: el vector `king − man + woman` aterriza cerca de `queen`, porque la dirección `man → woman` (género) se suma a la dirección de `royalty` implícita en `king`. Esta es la propiedad que un sistema RAG explota cuando busca el documento "más similar" a una consulta.
 :::
 
 ---

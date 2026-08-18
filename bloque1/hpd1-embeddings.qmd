@@ -6,8 +6,6 @@ jupyter: python3
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/hpd1-embeddings.ipynb)
 
-> **Duración:** 4h
->
 > **Competencias:** [CE-1](../index.qmd#sec-competencias-especificas)
 
 ::: {.callout-tip icon=false}
@@ -36,7 +34,7 @@ jupyter: python3
 Imagina que trabajas en un despacho de abogados buscando cláusulas de confidencialidad
 en 500 contratos. O en una multinacional filtrando currículums por habilidades, no
 por palabras clave exactas. O en un hospital recuperando historiales clínicos con
-síntomas parecidos. Los tres problemas se resuelven con **la misma arquitectura**:
+síntomas parecidos. Los tres problemas se resuelven con la misma arquitectura:
 convertir documentos en vectores y buscar por similitud semántica.
 
 Al final de este taller sabrás construir ese pipeline de principio a fin. Y lo mejor:
@@ -263,15 +261,16 @@ print(f"Indexación completada: {collection.count()} vectores en Chroma")
 ::: {.callout-tip}
 ## ¿Chroma, FAISS o Qdrant? ¿Cuál elijo?
 
+: Comparativa de Chroma, FAISS y Qdrant para almacenar embeddings {#tbl-vector-stores}
+
 | | Chroma | FAISS | Qdrant |
 |---|---|---|---|
 | **Instalación** | `pip install chromadb` | `pip install faiss-cpu` | Docker o cloud |
 | **Escala máxima** | ~500k vectores | Miles de millones | Miles de millones |
 | **Privacidad** | Total (local, sin servidor) | Total (librería embebible) | Depende del despliegue |
-| **Ideal para...** | Prototipos, HPDs, proyectos pequeños | Producción on-premise, búsqueda a gran escala | Cloud multi-tenant, API REST nativa |
-: Comparativa de Chroma, FAISS y Qdrant para almacenar embeddings {#tbl-vector-stores}
+| **Ideal para...** | Prototipos, HPD, proyectos pequeños | Producción on-premise, búsqueda a gran escala | Cloud multi-tenant, API REST nativa |
 
-| **Lo usamos en...** | HPD 1, HPD 4 (RAG) | — | — |
+| **Lo usamos en...** | HPD 1, HPD 5 (RAG) | — | — |
 
 **Regla práctica:** empieza con Chroma (es lo que usamos aquí). Si tu proyecto crece
 a >100k documentos o necesitas servir consultas por API, migra a Qdrant. Si necesitas
@@ -339,7 +338,7 @@ Con embeddings normalizados (lo habitual), la similitud coseno equivale al produ
 
 ## 1.6 Más allá del texto: embeddings de datos tabulares {#sec-hpd1-1-6-tabular}
 
-Hasta ahora hemos hecho embeddings de PDFs. Pero, ¿y si tus datos están en un Excel?
+Hasta ahora hemos hecho embeddings de PDFs. Pero ¿y si tus datos están en un Excel?
 La buena noticia: el pipeline no cambia. Solo cambia cómo conviertes cada fila en texto.
 
 ```{python}
@@ -409,7 +408,7 @@ for doc, dist in zip(res["documents"][0], res["distances"][0]):
 |---|---|---|
 | **Texto** (PDFs, webs, emails) | `e5-small-v2`, `text-embedding-3-small` | No, vienen pre-entrenados |
 | **Tabular (rápido)** | Texto concatenado + `e5-small-v2` | No, usas el mismo modelo |
-| **Tabular (riguroso)** | TabNet, SCARF | **Sí**, requieren GPU y target supervisado |
+| **Tabular (riguroso)** | TabNet, SCARF | Sí, requieren GPU y target supervisado |
 | **Código fuente** | CodeBERT, UnixCoder | No, vienen pre-entrenados |
 | **Imágenes + texto** | CLIP | No, pre-entrenado multimodal |
 
@@ -421,8 +420,8 @@ de embeddings. Si cambias de dominio, cambias los documentos de entrada, no el c
 ## Limitación honesta del texto concatenado
 
 Este enfoque no sabe que 55000 está numéricamente más cerca de 52000 que de 12000.
-Para eso existen modelos especializados como **TabNet** (atención sobre columnas
-tabulares) y **SCARF** (contrastive learning tabular), que se mencionan en la
+Para eso existen modelos especializados como TabNet (atención sobre columnas
+tabulares) y SCARF (aprendizaje contrastivo tabular), que se mencionan en la
 teoría del Bloque 1. Ambos requieren entrenamiento supervisado con GPU.
 
 Para el 80% de los casos reales de búsqueda semántica sobre datos corporativos
@@ -696,8 +695,6 @@ for k in [1, 3, 5]:
 ## 2.5 Evaluación MTEB — Validación profesional del modelo {#sec-mteb-hpd1}
 
 ::: {.callout-note icon=false}
-## Tiempo estimado: 20-30 minutos
-
 Esta sección descarga benchmarks públicos y evalúa el modelo. No es necesaria
 para completar el entregable del HPD 1, pero te da criterio profesional para
 comparar modelos de embeddings en tu proyecto final.
@@ -707,18 +704,18 @@ comparar modelos de embeddings en tu proyecto final.
 
 ## ¿Cómo sabemos si el modelo de embeddings es bueno?
 
-**MTEB** (Massive Text Embedding Benchmark) es el examen estándar: una colección de tareas que miden distintas habilidades (clasificar, agrupar, recuperar, medir similitud).
+MTEB (Massive Text Embedding Benchmark) es el examen estándar: una colección de tareas que miden distintas habilidades (clasificar, agrupar, recuperar, medir similitud).
 
-Aquí nos centramos en **STS** (Semantic Textual Similarity): el modelo recibe pares de frases y les asigna una puntuación de parecido. El benchmark compara esas puntuaciones con las que daría un humano. Por ejemplo:
+Aquí nos centramos en STS (Semantic Textual Similarity): el modelo recibe pares de frases y les asigna una puntuación de parecido. El benchmark compara esas puntuaciones con las que daría un humano. Por ejemplo:
 
 | Par de frases | ¿Similares? |
 |---|---|
 | *El gato duerme en el sofá* ↔ *Un felino descansa en el sillón* | Muy similares |
 | *El gato duerme* ↔ *Mañana lloverá* | Nada similares |
 
-La métrica es **Spearman rank**: una correlación de rankings entre lo que dice el modelo y lo que dice el humano. Va de 0 (aleatorio) a 1 (perfecto). Un 0.89 significa que el modelo coincide muy bien con el criterio humano.
+La métrica es Spearman rank: una correlación de rankings entre lo que dice el modelo y lo que dice el humano. Va de 0 (aleatorio) a 1 (perfecto). Un 0,89 significa que el modelo coincide muy bien con el criterio humano.
 
-Usamos dos tareas complementarias: **BIOSSES** (100 pares, dominio biomédico, rapidísimo) y **STS12** (621 pares, dominio general). Juntas dan una foto fiable del modelo en menos de 1 minuto.
+Usamos dos tareas complementarias: BIOSSES (100 pares, dominio biomédico, rapidísima) y STS12 (621 pares, dominio general). Juntas dan una foto fiable del modelo en menos de 1 minuto.
 
 :::
 
@@ -773,7 +770,7 @@ print("✅ Limpieza completada (colecciones efímeras + corpus temporal eliminad
 
 ::: {.callout-tip icon=false}
 
-### Para afianzar lo aprendido (~40 min) {#sec-hpd1-ejercicios-afianzar}
+### Para afianzar lo aprendido {#sec-hpd1-ejercicios-afianzar}
 
 Estos ejercicios no se entregan, pero te preparan para las entregas HPD y para el proyecto integrador. Recomendable hacerlos tras la sesión presencial.
 
@@ -781,7 +778,7 @@ Estos ejercicios no se entregan, pero te preparan para las entregas HPD y para e
 
 **A1 — Añade tu propio documento al corpus**
 
-Escribe un texto de ~300 palabras sobre *fine-tuning con LoRA* y añádelo al diccionario `corpus` de la Parte 1 como `"04_lora.pdf"`. Re-ejecuta el pipeline y comprueba que una query como *"¿Cómo se reduce el número de parámetros?"* recupera chunks de tu nuevo documento.
+Escribe un texto de ~300 palabras sobre *fine-tuning con LoRA* y añádelo al diccionario `corpus` de la Parte 1 como `"04_lora.pdf"`. Re-ejecuta el pipeline y comprueba que una consulta como *"¿Cómo se reduce el número de parámetros?"* recupera chunks de tu nuevo documento.
 
 ::: {.callout-note}
 **Objetivo:** entender que el pipeline es genérico — si el corpus cambia, el sistema se adapta solo.
@@ -813,7 +810,7 @@ Sustituye `intfloat/e5-small-v2` por `all-MiniLM-L6-v2` (22M parámetros, dispon
 
 **A4 — Construye tu propio ground truth**
 
-Para el corpus real (ArXiv), lee el abstract de 2 papers de la lista y escribe 3 queries nuevas con sus chunks relevantes esperados. Ejecuta recall@k sobre tus queries y compara los resultados con el ground truth del profesor.
+Para el corpus real (ArXiv), lee el abstract de 2 papers de la lista y escribe 3 consultas nuevas con sus chunks relevantes esperados. Ejecuta recall@k sobre tus consultas y compara los resultados con el ground truth del profesor.
 
 ::: {.callout-note}
 **Objetivo:** entender que el ground truth no es automático — requiere juicio humano.
@@ -825,7 +822,7 @@ Para el corpus real (ArXiv), lee el abstract de 2 papers de la lista y escribe 3
 
 **E1 — Pipeline multilingüe**
 
-Sustituye `e5-small-v2` por `intfloat/multilingual-e5-small`. Traduce los abstracts al español y compara el recall@k entre consultas en inglés → docs en español vs inglés → inglés. ¿Se mantiene la calidad cross-lingüe?
+Sustituye `e5-small-v2` por `intfloat/multilingual-e5-small`. Traduce los abstracts al español y compara el recall@k entre consultas en inglés → docs en español vs inglés → inglés. ¿Se mantiene la calidad translingüe?
 
 **E2 — Chunking semántico avanzado**
 
@@ -833,24 +830,24 @@ Compara `RecursiveCharacterTextSplitter` con `SemanticChunker` de LangChain (que
 
 **E3 — Comparativa Chroma vs FAISS**
 
-Indexa los mismos embeddings en FAISS (`IndexFlatIP` para búsqueda exacta + `IndexIVFFlat` para aproximada). Compara velocidad de indexación, velocidad de query (con `%timeit`) y recall@k. ¿Cuándo conviene cada uno?
+Indexa los mismos embeddings en FAISS (`IndexFlatIP` para búsqueda exacta + `IndexIVFFlat` para aproximada). Compara velocidad de indexación, velocidad de consulta (con `%timeit`) y recall@k. ¿Cuándo conviene cada uno?
 
 **E4 — Mini-RAG con LLM local**
 
-Usa los top-3 chunks de una query como contexto para hacer una pregunta a un LLM local con Ollama (`llama3.2:1b`). El LLM debe responder basándose solo en los chunks. Evalúa a ojo si la respuesta es fiel a las fuentes. Esto es un RAG naïve — la base sobre la que construirás en HPD 4.
+Usa los top-3 chunks de una consulta como contexto para hacer una pregunta a un LLM local con Ollama (`llama3.2:1b`). El LLM debe responder basándose solo en los chunks. Evalúa a ojo si la respuesta es fiel a las fuentes. Esto es un RAG naïve — la base sobre la que construirás en HPD 5.
 
 **E5 — Pipeline sobre datos de tu sector**
 
 Elige un dominio cercano a tu ámbito profesional y construye un mini-corpus de 3
 "documentos" (párrafos de ~200 palabras cada uno) sobre ese tema. Por ejemplo:
-- **Legal:** extractos de GDPR, LOPD, y una sentencia de protección de datos
+- **Legal:** extractos de GDPR, LOPD y una sentencia de protección de datos
 - **Salud:** abstracts de PubMed sobre epidemiología o ensayos clínicos
 - **Finanzas:** informes anuales resumidos de 3 empresas del IBEX 35
 - **Marketing:** descripciones de campañas, segmentos de clientes y métricas
 - **Ingeniería:** especificaciones técnicas de 3 productos o componentes
 
 Ejecuta el pipeline completo sobre tu corpus (carga → chunking → embeddings →
-indexación → búsqueda). Evalúa con 3 queries en español sobre tu dominio y calcula
+indexación → búsqueda). Evalúa con 3 consultas en español sobre tu dominio y calcula
 recall@k sobre tu propio ground truth.
 
 ¿Qué observas? ¿El recall es similar al de los papers de ML? ¿El dominio afecta
@@ -864,7 +861,7 @@ a la calidad de la búsqueda semántica? ¿Por qué?
 
 ---
 
-**Diagrama de arquitectura**
+### Diagrama de arquitectura
 
 ::: {#fig-hpd1-arquitectura}
 ```{mermaid}

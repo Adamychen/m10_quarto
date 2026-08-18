@@ -5,7 +5,7 @@ engine: jupyter
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02c-llamaindex.ipynb)
 
-> Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber visto [LangChain](02b-langchain.qmd) primero.
+> Este tema forma parte del Bloque 2 — Orquestación. Se recomienda haber visto [LangChain](02b-langchain.qmd) primero.
 
 ```{python}
 #| echo: true
@@ -20,14 +20,14 @@ engine: jupyter
 import os
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
-Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
 
 Orden de resolución:
   1. .env local (python-dotenv)
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -131,18 +131,18 @@ else:
 ::: {.callout-note}
 ## Modelo de embeddings multilingüe
 
-`qwen3-embedding:0.6b` es un modelo de embeddings **multilingüe** disponible en Llamus, a diferencia de los modelos ingleses (`all-MiniLM-L6-v2`, `e5-small-v2`) usados en el Bloque 1. Esto permite que los ejemplos de esta página usen texto en **español** sin pérdida de calidad: el tokenizador de Qwen maneja correctamente caracteres acentuados y la distribución del espacio semántico está calibrada para múltiples idiomas.
+`qwen3-embedding:0.6b` es un modelo de embeddings multilingüe disponible en Llamus, a diferencia de los modelos ingleses (`all-MiniLM-L6-v2`, `e5-small-v2`) usados en el Bloque 1. Esto permite que los ejemplos de esta página usen texto en español sin pérdida de calidad: el tokenizador de Qwen maneja correctamente caracteres acentuados y la distribución del espacio semántico está calibrada para múltiples idiomas.
 
-Para usar embeddings en español en tu proyecto, `qwen3-embedding:0.6b` (o su versión mayor `qwen3-embedding:4b`) son la opción recomendada.
+Para usar embeddings en español en tu proyecto, `qwen3-embedding:0.6b` (o su versión mayor `qwen3-embedding:4b`) es la opción recomendada.
 :::
 
 ## LlamaIndex {#sec-llamaindex}
 
 ### ¿Qué es LlamaIndex? {#sec-que-es-llamaindex}
 
-LlamaIndex (antes GPT Index) es un **framework de indexación diseñado específicamente para RAG** (Retrieval-Augmented Generation) y aplicaciones de pregunta-respuesta sobre tus propios datos.
+LlamaIndex (antes GPT Index) es un framework de indexación diseñado específicamente para RAG (Retrieval-Augmented Generation) y aplicaciones de pregunta-respuesta sobre tus propios datos.
 
-Mientras LangChain es un framework generalista (cadenas, agentes, herramientas...), LlamaIndex está especializado en una cosa y la hace muy bien: **convertir tus documentos en un índice consultable por un LLM**.
+Mientras LangChain es un framework generalista (cadenas, agentes, herramientas...), LlamaIndex está especializado en una cosa y la hace muy bien: convertir tus documentos en un índice consultable por un LLM.
 
 ::: {#fig-llamaindex-pipeline}
 ```{mermaid}
@@ -161,19 +161,19 @@ graph TD
 ```
 :::
 
-**¿Cuándo elegir LlamaIndex vs LangChain?**
+**¿Cuándo elegir LlamaIndex frente a LangChain?**
 
 : Comparativa entre LlamaIndex y LangChain por criterio de uso {#tbl-llamaindex-vs-langchain}
 
 | Criterio | LlamaIndex | LangChain |
 |---|---|---|
 | **Foco principal** | Indexación y RAG | Orquestación general |
-| **Curva de aprendizaje** | Más suave (más opinado) | Más empinada (más flexible) |
+| **Curva de aprendizaje** | Más suave (más dogmático) | Más empinada (más flexible) |
 | **Carga de documentos** | `SimpleDirectoryReader` carga 20+ formatos | Necesitas cargadores específicos |
 | **Índices avanzados** | Árboles, grafos, keywords | Depende de VectorStore |
 | **Agentes** | Básico (con herramientas) | Muy potente (ReAct, multi-agente) |
 
-> En muchos proyectos se usan **ambos**: LlamaIndex para indexar y recuperar, LangChain para orquestar el agente.
+> En muchos proyectos se usan ambos: LlamaIndex para indexar y recuperar, LangChain para orquestar el agente.
 
 ### Primer contacto: indexar y preguntar {#sec-primer-contacto-llamaindex}
 
@@ -303,7 +303,7 @@ else:
 
 ### Query Engines {#sec-query-engines}
 
-Un **Query Engine** es el punto final de la API: recibe una pregunta en lenguaje natural y devuelve una respuesta.
+Un Query Engine es el punto final de la API: recibe una pregunta en lenguaje natural y devuelve una respuesta.
 
 ```{python}
 #| echo: true
@@ -408,7 +408,7 @@ graph LR
 
 ### Chunking estratégico {#sec-chunking-estrategico}
 
-El tamaño y solapamiento de los chunks afecta drásticamente a la calidad del RAG:
+El tamaño y solapamiento de los chunks afectan drásticamente a la calidad del RAG:
 
 ```{python}
 #| echo: true

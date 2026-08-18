@@ -66,10 +66,12 @@ website:
             text: "HPD 2 — Agente Tool Calling"
           - href: evaluables/hpd2-entregable.qmd
             text: "HPD 2 — Entregable: Agente analítico con Tool Calling"
-          - href: bloque2/hpd3-servidor-mcp.qmd
-            text: "HPD 3 — Servidor MCP"
-          - href: evaluables/hpd3-entregable.qmd
-            text: "HPD 3 — Entregable: Servidor MCP"
+          - href: bloque2/hpd3-workflows-langgraph.qmd
+            text: "HPD 3 — Workflows con LangGraph"
+          - href: bloque2/hpd4-servidor-mcp.qmd
+            text: "HPD 4 — Servidor MCP"
+          - href: evaluables/hpd4-entregable.qmd
+            text: "HPD 4 — Entregable: Servidor MCP"
       - section: "Bloque 3 — Aplicaciones"
         contents:
           - href: bloque3/03-aplicaciones.qmd
@@ -80,10 +82,10 @@ website:
             text: Datos Sintéticos
           - href: bloque3/03c-fine-tuning.qmd
             text: Fine-tuning eficiente
-          - href: evaluables/hpd4-rag-mixto.qmd
-            text: "HPD 4 — RAG Mixto"
-          - href: evaluables/hpd4-entregable.qmd
-            text: "HPD 4 — Entregable: RAG con evaluación"
+          - href: evaluables/hpd5-rag-mixto.qmd
+            text: "HPD 5 — RAG Mixto"
+          - href: evaluables/hpd5-entregable.qmd
+            text: "HPD 5 — Entregable: RAG con evaluación"
       - section: "Bloque 4 — Gobernanza"
         contents:
           - href: bloque4/04-gobernanza.qmd

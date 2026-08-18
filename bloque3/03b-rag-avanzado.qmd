@@ -5,7 +5,7 @@ engine: jupyter
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque3/03b-rag-avanzado.ipynb)
 
-> Este tema forma parte del **Bloque 3 — Aplicaciones**. Se recomienda haber completado los [Bloques 1](../bloque1/01-fundamentos.qmd) y [2](../bloque2/02-orquestacion.qmd) primero.
+> Este tema forma parte del Bloque 3 — Aplicaciones. Se recomienda haber completado los [Bloques 1](../bloque1/01-fundamentos.qmd) y [2](../bloque2/02-orquestacion.qmd) primero.
 
 ```{python}
 #| echo: true
@@ -20,14 +20,14 @@ engine: jupyter
 import os
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
-Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
 
 Orden de resolución:
   1. .env local (python-dotenv)
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -94,9 +94,9 @@ else:
 
 En el [HPD 1](../bloque1/hpd1-embeddings.qmd) construiste un pipeline RAG básico: cargar PDFs, trocearlos en chunks, generar embeddings, indexar en Chroma y buscar por similitud coseno. Funciona, pero tiene limitaciones:
 
-- El retriever semántico (bi-encoder) es **rápido pero impreciso**: confunde frases con palabras similares pero significado distinto
-- No hay forma de **medir la calidad** del sistema más allá de "a ojo"
-- Solo busca en **una fuente** de datos
+- El retriever semántico (bi-encoder) es rápido pero impreciso: confunde frases con palabras similares pero significado distinto
+- No hay forma de medir la calidad del sistema más allá de "a ojo"
+- Solo busca en una fuente de datos
 
 **RAG es como buscar en una biblioteca con un índice alfabético. RAG avanzado es como tener un bibliotecario que primero busca los capítulos relevantes y luego los relee con lupa antes de responderte.**
 
@@ -141,7 +141,7 @@ graph LR
 
 ### Retrievers combinados y RAG multi-fuente {#sec-rag-multifuente}
 
-Imagina que trabajas en una empresa y tu jefe pregunta: *"¿Qué productos del informe Q2 tienen margen inferior al 20%?"* La respuesta está en **dos sitios distintos**: el informe trimestral (PDF, texto narrativo) y la tabla de productos (SQL, datos numéricos). Un RAG multi-fuente busca en ambos y combina los resultados.
+Imagina que trabajas en una empresa y tu jefe pregunta: *"¿Qué productos del informe Q2 tienen margen inferior al 20%?"* La respuesta está en dos sitios distintos: el informe trimestral (PDF, texto narrativo) y la tabla de productos (SQL, datos numéricos). Un RAG multi-fuente busca en ambos y combina los resultados.
 
 ::: {#fig-rag-multifuente}
 ```{mermaid}
@@ -202,7 +202,7 @@ for t in df["texto"]:
     print(f"  → {t}")
 ```
 
-La búsqueda combinada busca en cada colección por separado y mergea los resultados ordenados por distancia:
+La búsqueda combinada consulta cada colección por separado y fusiona los resultados ordenados por distancia:
 
 ```{python}
 #| echo: true
@@ -266,16 +266,16 @@ for r in resultados:
 ::: {.callout-tip}
 ## Regla práctica
 
-Empieza con **una sola fuente**. Añade la segunda solo si las preguntas de tus usuarios realmente requieren cruzar datos de distintos orígenes. Cada fuente adicional añade complejidad al pipeline y puntos de fallo.
+Empieza con una sola fuente. Añade la segunda solo si las preguntas de tus usuarios realmente requieren cruzar datos de distintos orígenes. Cada fuente adicional añade complejidad al pipeline y puntos de fallo.
 :::
 
 ---
 
 ### Bi-encoder vs Cross-encoder {#sec-bi-cross-encoder}
 
-Los modelos de embeddings que has usado hasta ahora (`e5-small-v2`, `all-MiniLM-L6-v2`) son **bi-encoders**: codifican cada texto por separado y comparan los vectores resultantes. Son rápidos porque los embeddings se pueden precomputar y almacenar.
+Los modelos de embeddings que has usado hasta ahora (`e5-small-v2`, `all-MiniLM-L6-v2`) son bi-encoders: codifican cada texto por separado y comparan los vectores resultantes. Son rápidos porque los embeddings se pueden precomputar y almacenar.
 
-Un **cross-encoder** funciona de forma distinta: recibe los dos textos juntos y produce un único score de relevancia. Es más preciso pero mucho más lento, porque no se puede precomputar.
+Un cross-encoder funciona de forma distinta: recibe los dos textos juntos y produce una única puntuación de relevancia. Es más preciso pero mucho más lento, porque no se puede precomputar.
 
 **Un bi-encoder es como comparar dos fotos de lejos: rápido pero impreciso. Un cross-encoder es como compararlas con lupa: lento pero preciso.**
 
@@ -315,7 +315,7 @@ graph LR
 ::: {.callout-note}
 ## ¿Por qué no usar solo cross-encoder?
 
-Porque es **O(n)** en latencia: para comparar tu query con 10.000 chunks necesitarías 10.000 pasadas por el cross-encoder. El bi-encoder hace esa misma comparación en milisegundos gracias a los embeddings precomputados. La solución es usar ambos en dos fases.
+Porque es O(n) en latencia: para comparar tu query con 10.000 chunks necesitarías 10.000 pasadas por el cross-encoder. El bi-encoder hace esa misma comparación en milisegundos gracias a los embeddings precomputados. La solución es usar ambos en dos fases.
 :::
 
 ---
@@ -327,7 +327,7 @@ El re-ranking es la técnica más impactante y sencilla de implementar. Funciona
 1. **Fase 1 — Retriever (bi-encoder):** busca los top-20 candidatos más similares por embedding. Rápido, cubre todo el corpus.
 2. **Fase 2 — Re-ranker (cross-encoder):** relee esos 20 candidatos junto a la query y los reordena por relevancia real. Devuelve los top-3 finales.
 
-**El retriever es como un buscador que te da 20 resultados de Google. El re-ranker es como tú releyendo los 20 y reordenándolos por relevancia real.**
+**El retriever es como un buscador que te da 20 resultados de Google. El re-ranker es como si tú releyeras los 20 y los reordenaras por relevancia real.**
 
 ::: {#fig-reranking-flujo}
 ```{mermaid}
@@ -399,18 +399,18 @@ El re-ranker añade latencia (100-500ms extra) y complejidad. Antes de añadirlo
 ::: {.callout-tip}
 ## Regla práctica
 
-**Retriever top-20 + re-ranker top-3** es un buen punto de partida. Si tu corpus es pequeño (<1000 chunks), un retriever top-5 sin re-ranker puede bastar.
+Retriever top-20 + re-ranker top-3 es un buen punto de partida. Si tu corpus es pequeño (<1000 chunks), un retriever top-5 sin re-ranker puede bastar.
 :::
 
 ---
 
 ### Query expansion: HyDE y RAG-Fusion {#sec-query-expansion}
 
-A veces el problema no está en el retriever sino en la **query**. Una pregunta mal formulada produce embeddings que no coinciden con los documentos relevantes. Las técnicas de query expansion reformulan la pregunta para mejorar la recuperación.
+A veces el problema no está en el retriever sino en la query. Una pregunta mal formulada produce embeddings que no coinciden con los documentos relevantes. Las técnicas de query expansion reformulan la pregunta para mejorar la recuperación.
 
 #### HyDE (Hypothetical Document Embeddings) {#sec-hyde}
 
-En vez de buscar con tu pregunta tal cual, primero pides al LLM que **genere una respuesta hipotética** y buscas con el embedding de esa respuesta imaginaria.
+En vez de buscar con tu pregunta tal cual, primero pides al LLM que genere una respuesta hipotética y buscas con el embedding de esa respuesta imaginaria.
 
 **Es como buscar un restaurante no por su nombre sino describiendo la comida que quieres comer.**
 
@@ -466,7 +466,7 @@ else:
 
 #### RAG-Fusion {#sec-rag-fusion}
 
-En vez de buscar una vez, **reformulas la pregunta de 5 formas distintas**, buscas con cada una, y combinas los resultados con **Reciprocal Rank Fusion (RRF)**: los documentos que aparecen en varias búsquedas suben en el ranking.
+En vez de buscar una vez, reformulas la pregunta de 5 formas distintas, buscas con cada una y combinas los resultados con Reciprocal Rank Fusion (RRF): los documentos que aparecen en varias búsquedas suben en el ranking.
 
 ::: {#fig-rag-fusion}
 ```{mermaid}
@@ -511,7 +511,7 @@ graph TD
 ## Cuándo usar query expansion
 
 - **HyDE:** cuando la pregunta es corta o usa vocabulario distinto al de los documentos. El documento hipotético "traduce" la query al lenguaje del corpus.
-- **RAG-Fusion:** cuando la pregunta tiene múltiples aspectos (ej. "compara la evolución de ventas y márgenes"). Las variantes cubren cada aspecto por separado.
+- **RAG-Fusion:** cuando la pregunta tiene múltiples aspectos (p. ej. "compara la evolución de ventas y márgenes"). Las variantes cubren cada aspecto por separado.
 - **Ninguna:** cuando la pregunta ya es clara y específica. Añadir complejidad innecesaria puede empeorar los resultados.
 :::
 
@@ -519,7 +519,7 @@ graph TD
 
 ### Evaluación de RAG con RAGAS {#sec-evaluacion-ragas}
 
-Evaluar un RAG "a ojo" no basta. Necesitas métricas objetivas que te digan **qué componente falla** cuando el sistema da una mala respuesta.
+Evaluar un RAG "a ojo" no basta. Necesitas métricas objetivas que te digan qué componente falla cuando el sistema da una mala respuesta.
 
 **Evaluar un RAG a ojo es como probar un coche dando una vuelta a la manzana. RAGAS es como pasar la ITV: mide cosas concretas con criterios objetivos.**
 
@@ -555,16 +555,16 @@ graph TD
 ::: {.callout-note}
 ## ¿Cómo interpreta RAGAS cada métrica?
 
-**Faithfulness** te dice si el LLM **alucina**: si la respuesta dice "el margen es del 42%" pero ningún chunk menciona ese dato, faithfulness baja.
+Faithfulness te dice si el LLM alucina: si la respuesta dice "el margen es del 42%" pero ningún chunk menciona ese dato, faithfulness baja.
 
-**Answer Relevancy** te dice si el LLM **se va por las ramas**: si preguntas por el margen y responde sobre el stock, relevancy baja.
+Answer Relevancy te dice si el LLM se va por las ramas: si preguntas por el margen y responde sobre el stock, relevancy baja.
 
-**Context Precision** te dice si el retriever **encuentra lo correcto**: si los chunks relevantes están en la posición 8 de 10, precision baja.
+Context Precision te dice si el retriever encuentra lo correcto: si los chunks relevantes están en la posición 8 de 10, precision baja.
 :::
 
 #### Ground truth: el criterio humano {#sec-ground-truth}
 
-El **ground truth** es la respuesta que tú consideras correcta para cada pregunta. Es el criterio humano contra el que se mide el sistema.
+El ground truth es la respuesta que tú consideras correcta para cada pregunta. Es el criterio humano contra el que se mide el sistema.
 
 : Ejemplo de preguntas con su ground truth y chunks relevantes {#tbl-ground-truth-ejemplo}
 
@@ -583,9 +583,10 @@ Dos personas pueden definir respuestas válidas distintas para la misma pregunta
 
 ```{python}
 #| echo: true
-#| eval: true
+#| eval: false
 
 from ragas import evaluate
+from ragas.run_config import RunConfig
 from ragas.metrics import faithfulness, answer_relevancy, context_precision
 from datasets import Dataset
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -620,10 +621,12 @@ if not LLM_KEY:
     print("⚠️  Configura LLM_API_KEY en .env para ejecutar la evaluación RAGAS.")
 else:
     ragas_llm = ChatOpenAI(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model="gemma3:12b",   # Juez ligero: las evaluaciones no necesitan el modelo grande
         base_url=LLM_URL,
         api_key=LLM_KEY,
         temperature=0,
+        request_timeout=60,   # Evita que una llamada estancada bloquee la evaluación
+        max_retries=3,
     )
 
     ragas_embeddings = OpenAIEmbeddings(
@@ -639,6 +642,7 @@ else:
         metrics=[faithfulness, answer_relevancy, context_precision],
         llm=ragas_llm,
         embeddings=ragas_embeddings,
+        run_config=RunConfig(max_workers=9),
     )
 
     df_results = results.to_pandas()
@@ -660,14 +664,14 @@ else:
 | **Answer Relevancy** | > 0.7 | > 0.85 |
 | **Context Precision** | > 0.5 | > 0.7 |
 
-Si faithfulness es bajo, el problema está en el **LLM** (alucina). Si context precision es bajo, el problema está en el **retriever** (no encuentra los chunks correctos). Esto te dice exactamente qué componente mejorar.
+Si faithfulness es bajo, el problema está en el LLM (alucina). Si context precision es bajo, el problema está en el retriever (no encuentra los chunks correctos). Esto te dice exactamente qué componente mejorar.
 :::
 
 ---
 
 ### RAG sobre datos estructurados {#sec-rag-datos-estructurados}
 
-Hasta ahora hemos buscado en texto libre (PDFs, informes). Pero muchos datos corporativos están en **tablas SQL** o **DataFrames**. Tienes dos caminos:
+Hasta ahora hemos buscado en texto libre (PDFs, informes). Pero muchos datos corporativos están en tablas SQL o DataFrames. Tienes dos caminos:
 
 ::: {#fig-rag-datos-estructurados}
 ```{mermaid}
@@ -701,7 +705,7 @@ graph TD
 ::: {.callout-warning}
 ## Text-to-SQL: potente pero peligroso
 
-El LLM puede generar SQL incorrecto (columnas que no existen, JOINs mal formados) o incluso SQL malicioso si no sanitizas. Siempre:
+El LLM puede generar SQL incorrecto (columnas que no existen, JOINs mal formados) o incluso SQL malicioso si no depuras la entrada del usuario. Siempre:
 
 1. **Valida** que las columnas y tablas existen en el schema
 2. **Sanitiza** bloqueando DROP, DELETE, UPDATE, INSERT
@@ -709,7 +713,7 @@ El LLM puede generar SQL incorrecto (columnas que no existen, JOINs mal formados
 4. **Usa** una base de datos de solo lectura
 :::
 
-En el [HPD 4](../evaluables/hpd4-rag-mixto.qmd) combinarás ambos caminos: búsqueda semántica en PDFs de informes + datos estructurados de una tabla de productos.
+En el [HPD 5](../evaluables/hpd5-rag-mixto.qmd) combinarás ambos caminos: búsqueda semántica en PDFs de informes + datos estructurados de una tabla de productos.
 
 ---
 
@@ -780,7 +784,7 @@ graph TD
 
 > Continúa con **[03a — Datos Sintéticos](03a-datos-sinteticos.qmd)** o con **[03c — Fine-tuning Eficiente](03c-fine-tuning.qmd)**.
 >
-> Cuando estés listo, pasa al taller práctico: **[HPD 4 — Sistema RAG sobre datos mixtos](../evaluables/hpd4-rag-mixto.qmd)**.
+> Cuando estés listo, pasa al taller práctico: **[HPD 5 — Sistema RAG sobre datos mixtos](../evaluables/hpd5-rag-mixto.qmd)**.
 
 # References
 

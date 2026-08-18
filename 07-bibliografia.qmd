@@ -4,7 +4,7 @@ nocite: |
   @*
 ---
 
-Esta página agrupa los **recursos externos** que complementan los materiales del módulo: documentación de herramientas, lecturas de contexto y un índice curado de Model/System Cards. La **bibliografía completa** de los papers y fuentes citadas en el sitio se genera automáticamente al final de esta página desde el archivo `references.bib`.
+Esta página agrupa los recursos externos que complementan los materiales del módulo: documentación de herramientas, lecturas de contexto y un índice curado de Model/System Cards. La bibliografía completa de los papers y fuentes citadas en el sitio se genera automáticamente al final de esta página desde el archivo `references.bib`.
 
 ## Documentación técnica
 

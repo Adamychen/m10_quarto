@@ -2,8 +2,6 @@
 title: "Bloque 4 — Gobernanza: Evaluación, Riesgos, Privacidad y Despliegue"
 ---
 
-> **Carga:** Contenido integrado en proyecto | HPD: 0h — evaluado en proyecto final
->
 > **Competencias asociadas:** [CE-6](../index.qmd#sec-competencias-especificas)
 
 ## Objetivos {#sec-b4-objetivos}
@@ -99,16 +97,16 @@ Las cuatro áreas de este bloque son complementarias y se refuerzan mutuamente: 
 
 ## Contenido del bloque {#sec-b4-contenido}
 
-: Itinerario del Bloque 4 con sus ficheros y duración estimada {#tbl-b4-itinerario}
+: Itinerario del Bloque 4 {#tbl-b4-itinerario}
 
-| Tema | Archivo | Duración estimada |
-|---|---|---|
-| **Evaluación de LLMs** — Métricas automáticas, LLM-as-judge, frameworks (RAGAS, DeepEval) | [04a-evaluacion.qmd](04a-evaluacion.qmd) | 1.5h |
-| **Alucinaciones** — Taxonomía, detección, grounding y citation | [04b-alucinaciones.qmd](04b-alucinaciones.qmd) | 1h |
-| **Privacidad y PII** — Regex, datos sintéticos, privacidad diferencial | [04c-privacidad.qmd](04c-privacidad.qmd) | 1.5h |
-| **Sesgo en LLMs** — Tipos, auditoría de género-profesión, frameworks | [04d-sesgo.qmd](04d-sesgo.qmd) | 1h |
-| **Documentación** — Model Card y System Card | [04e-documentacion.qmd](04e-documentacion.qmd) | 1h |
-| **Patrones de despliegue** — On-prem vs. cloud, observabilidad, caching | [04f-despliegue.qmd](04f-despliegue.qmd) | 1h |
+| Tema | Archivo |
+|---|---|
+| **Evaluación de LLM** — Métricas automáticas, LLM-as-judge, frameworks (RAGAS, DeepEval) | [04a-evaluacion.qmd](04a-evaluacion.qmd) |
+| **Alucinaciones** — Taxonomía, detección, grounding y citation | [04b-alucinaciones.qmd](04b-alucinaciones.qmd) |
+| **Privacidad y PII** — Regex, datos sintéticos, privacidad diferencial | [04c-privacidad.qmd](04c-privacidad.qmd) |
+| **Sesgo en LLM** — Tipos, auditoría de género-profesión, frameworks | [04d-sesgo.qmd](04d-sesgo.qmd) |
+| **Documentación** — Model Card y System Card | [04e-documentacion.qmd](04e-documentacion.qmd) |
+| **Patrones de despliegue** — On-prem vs. cloud, observabilidad, caching | [04f-despliegue.qmd](04f-despliegue.qmd) |
 
 ::: {.callout-note}
 **Teoría integrada.** Este bloque no tiene HPD propio: todo su contenido se evalúa dentro del proyecto integrador (CE-6) junto con los conocimientos de los Bloques 1-3. La rúbrica del proyecto penaliza explícitamente la ausencia de análisis de gobernanza y ética.
@@ -137,7 +135,7 @@ graph LR
 ```
 :::
 
-1. Comienza con **Evaluación de LLMs**: sin métricas no puedes saber si tu sistema mejora o empeora.
+1. Comienza con **Evaluación de LLM**: sin métricas no puedes saber si tu sistema mejora o empeora.
 2. Aborda los **riesgos del modelo** (alucinaciones, sesgo) antes de tocar datos: son los fallos más visibles en producción.
 3. Continúa con **Privacidad y PII**: aplica anonimización y datos sintéticos donde corresponda.
 4. Cierra con **Documentación** y **Despliegue**: convierten un sistema que funciona en uno que puede auditarse, mantenerse y operar con responsabilidad.
@@ -172,7 +170,7 @@ flowchart LR
 
 Este bloque te da las herramientas para llevar tus sistemas IA a calidad de producción:
 
-- **CE-1 a CE-5** (Bloques 1-3): construyen un sistema que funciona.
+- **CE-1 a CE-5** (Bloques 1-3): construyes un sistema que funciona.
 - **CE-6** (Bloque 4): lo evalúas, lo documentas y lo gobiernas para que pueda desplegarse con criterio.
 
 El proyecto integrador evaluado en [05-evaluacion](../05-evaluacion.qmd) combina todas las competencias. La rúbrica penaliza explícitamente la ausencia de análisis de gobernanza y ética.
@@ -185,7 +183,7 @@ El proyecto integrador evaluado en [05-evaluacion](../05-evaluacion.qmd) combina
 
 ---
 
-> Has completado la teoría del **Módulo 10**. Para la evaluación final consulta la [rúbrica del proyecto integrador](../05-evaluacion.qmd#sec-rubrica-evaluacion).
+> Has completado la teoría del Módulo 10. Para la evaluación final consulta la [rúbrica del proyecto integrador](../05-evaluacion.qmd#sec-rubrica-evaluacion).
 
 # References
 

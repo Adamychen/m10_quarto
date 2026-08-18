@@ -5,7 +5,7 @@ engine: jupyter
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque3/03a-datos-sinteticos.ipynb)
 
-> Este tema forma parte del **Bloque 3 — Aplicaciones**. Se recomienda haber completado los [Bloques 1](../bloque1/01-fundamentos.qmd) y [2](../bloque2/02-orquestacion.qmd) primero, especialmente [Prompt Engineering](../bloque2/02a-prompt-engineering.qmd).
+> Este tema forma parte del Bloque 3 — Aplicaciones. Se recomienda haber completado los [Bloques 1](../bloque1/01-fundamentos.qmd) y [2](../bloque2/02-orquestacion.qmd) primero, especialmente [Prompt Engineering](../bloque2/02a-prompt-engineering.qmd).
 
 ```{python}
 #| echo: true
@@ -20,14 +20,14 @@ engine: jupyter
 import os
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
-Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
 
 Orden de resolución:
   1. .env local (python-dotenv)
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -92,7 +92,7 @@ else:
 
 ## ¿Por qué datos sintéticos? {#sec-porque-datos-sinteticos}
 
-Los datos sintéticos son datos generados artificialmente que imitan las propiedades estadísticas de datos reales **sin contener registros reales**. En Data Science resuelven problemas concretos:
+Los datos sintéticos son datos generados artificialmente que imitan las propiedades estadísticas de datos reales sin contener registros reales. En Data Science resuelven problemas concretos:
 
 : Problemas que resuelven los datos sintéticos en proyectos de Data Science {#tbl-problemas-datos-sinteticos}
 
@@ -101,8 +101,8 @@ Los datos sintéticos son datos generados artificialmente que imitan las propied
 | **Dataset desbalanceado** (fraude 0.1%, normales 99.9%) | Generar más ejemplos de la clase minoritaria (oversampling) |
 | **Dataset demasiado pequeño** para entrenar un modelo | Aumentar el dataset con muestras sintéticas verosímiles |
 | **No puedes compartir datos reales** (RGPD, secrets corporativos) | Compartir datos sintéticos estadísticamente equivalentes |
-| **Necesitas testear un pipeline** sin acceso a producción | Generar datos sintéticos con el mismo schema |
-| **Simular escenarios** "what-if" que no existen en los datos históricos | Generar datos con distribuciones modificadas |
+| **Necesitas probar un pipeline** sin acceso a producción | Generar datos sintéticos con el mismo esquema |
+| **Simular escenarios** "hipotéticos" que no existen en los datos históricos | Generar datos con distribuciones modificadas |
 
 ## Taxonomía de modelos generativos para datos tabulares {#sec-taxonomia-generativos}
 
@@ -134,13 +134,13 @@ graph TD
 
 ---
 
-## 1. Enfoque intuitivo: prompting a LLMs {#sec-enfoque-intuitivo-llm}
+## 1. Enfoque intuitivo: prompting a LLM {#sec-enfoque-intuitivo-llm}
 
 Ya lo viste en el [Bloque 2 — Prompt Engineering](../bloque2/02a-prompt-engineering.qmd#sec-json-schema-datos-sint). Con `response_format` + few-shot + temperatura controlas estructura, dominio y diversidad.
 
 **Fortalezas:**
 - Cero entrenamiento, sin GPU
-- Ideal para prototipos, testing, datasets pequeños (< 1000 filas)
+- Ideal para prototipos, pruebas, datasets pequeños (< 1000 filas)
 - Funciona especialmente bien con datos textuales y categóricos
 
 **Debilidades:**
@@ -156,8 +156,8 @@ Ya lo viste en el [Bloque 2 — Prompt Engineering](../bloque2/02a-prompt-engine
 
 Imagina dos redes neuronales compitiendo:
 
-- El **generador (G)**: un falsificador que crea datos sintéticos desde ruido aleatorio. Su objetivo es engañar al detector.
-- El **discriminador (D)**: un detective que recibe un dato y debe decidir si es real o falso.
+- El generador (G): un falsificador que crea datos sintéticos desde ruido aleatorio. Su objetivo es engañar al detector.
+- El discriminador (D): un detective que recibe un dato y debe decidir si es real o falso.
 
 Entrenan simultáneamente: G mejora sus falsificaciones, D afina su criterio. El equilibrio se alcanza cuando G produce datos indistinguibles de los reales.
 
@@ -181,7 +181,7 @@ graph LR
 
 CTGAN adapta las GANs a datos tabulares resolviendo dos problemas específicos:
 
-1. **Columnas mixtas (continuas + discretas):** aplica *mode-specific normalization* a cada columna numérica. Si una columna tiene distribución multimodal (ej. mezcla de salarios junior/senior), la normaliza por separado para cada modo.
+1. **Columnas mixtas (continuas + discretas):** aplica *mode-specific normalization* a cada columna numérica. Si una columna tiene distribución multimodal (p. ej. mezcla de salarios junior/senior), la normaliza por separado para cada modo.
 2. **Desequilibrio categórico:** usa *training-by-sampling* condicional: muestrea las categorías minoritarias con más frecuencia durante el entrenamiento para que el generador aprenda a producirlas.
 
 ```{python}
@@ -228,7 +228,7 @@ print(f"{df_sintetico_gan.head(8).to_string()}")
 :::{.callout-note}
 ## CopulaGAN: modelando dependencias
 
-**CopulaGAN** es una variante de CTGAN que añade una transformación de cópula antes del entrenamiento. Las cópulas capturan la estructura de dependencia entre columnas independientemente de sus distribuciones marginales. Es preferible cuando las correlaciones entre columnas son el aspecto más importante a preservar.
+CopulaGAN es una variante de CTGAN que añade una transformación de cópula antes del entrenamiento. Las cópulas capturan la estructura de dependencia entre columnas independientemente de sus distribuciones marginales. Es preferible cuando las correlaciones entre columnas son el aspecto más importante a preservar.
 :::
 
 ---
@@ -237,7 +237,7 @@ print(f"{df_sintetico_gan.head(8).to_string()}")
 
 ### Intuición: comprimir y reconstruir {#sec-intuicion-vae}
 
-Un **Variational Autoencoder (VAE)** aprende a comprimir cada fila de datos en un vector pequeño (espacio latente) y luego a reconstruirla. La magia está en que el espacio latente es **regular**: fuerzas a que siga una distribución normal, lo que te permite muestrear nuevos puntos y decodificarlos a datos sintéticos.
+Un Variational Autoencoder (VAE) aprende a comprimir cada fila de datos en un vector pequeño (espacio latente) y luego a reconstruirla. La magia está en que el espacio latente es regular: lo fuerzas a que siga una distribución normal, lo que te permite muestrear nuevos puntos y decodificarlos a datos sintéticos.
 
 ::: {#fig-vae-comprimir-reconstruir}
 ```{mermaid}
@@ -263,8 +263,8 @@ graph LR
 
 - **Encoder:** comprime `x` (fila de 10 columnas) a `z` (vector de 2-3 dimensiones) + una varianza
 - **Decoder:** reconstruye `x̂` a partir de `z`
-- **Pérdida:** error de reconstrucción + KL divergence (para que `z` sea $~N(0,I)$)
-- **Generar:** muestrea $z \sim N(0,I)$ y pásalo por el decoder
+- **Pérdida:** error de reconstrucción + divergencia KL (para que `z` sea $~N(0,I)$)
+- **Generar:** muestrear $z \sim N(0,I)$ y pasarlo por el decoder
 
 ### TVAE (Tabular VAE) {#sec-tvae-arquitectura}
 
@@ -315,14 +315,14 @@ graph LR
 ```
 :::
 
-**TabDDPM** adapta este paradigma a datos tabulares combinando:
+TabDDPM adapta este paradigma a datos tabulares combinando:
 - Un modelo de difusión para columnas numéricas
 - Un modelo multinomial para columnas categóricas (añadiendo ruido vía transiciones de Markov en lugar de ruido gaussiano)
 
 Es el enfoque más reciente y prometedor (2023), aunque computacionalmente más costoso que CTGAN/TVAE.
 
 ::: {.callout-note}
-TabDDPM no está integrado en SDV (requiere implementación propia con PyTorch). Lo mencionamos como referencia del estado del arte y para entender que el ecosistema de datos sintéticos tabulares sigue evolucionando.
+TabDDPM no está integrado en SDV (requiere implementación propia con PyTorch). Lo mencionamos como referencia del estado del arte y para que entiendas que el ecosistema de datos sintéticos tabulares sigue evolucionando.
 :::
 
 ---
@@ -354,7 +354,7 @@ graph LR
 
 ## 6. Validación estadística {#sec-validacion-estadistica}
 
-Generar datos sintéticos no basta. Hay que **demostrar** que son útiles, fieles y seguros.
+Generar datos sintéticos no basta. Hay que demostrar que son útiles, fieles y seguros.
 
 ### 6.1 Fidelidad: ¿se parecen a los datos reales? {#sec-validacion-fidelidad}
 
@@ -487,7 +487,7 @@ plt.show()
 1. **¿Necesitas algo ya?** → Prompting LLM. En 5 minutos tienes datos.
 2. **¿Calidad estadística?** → SDV con CTGAN/TVAE. Entrena, valida, itera.
 3. **¿Máxima fidelidad?** → Evalúa TabDDPM si tienes GPU y tiempo.
-4. **¿Privacidad?** → SDV con `epsilon` parameter. Ver Bloque 4.
+4. **¿Privacidad?** → SDV con el parámetro `epsilon`. Ver Bloque 4.
 :::
 
 ---
@@ -503,7 +503,7 @@ plt.show()
 
 ---
 
-> Continúa con la validación práctica en los **[ejercicios del entregable HPD 4](../evaluables/hpd4-entregable.qmd)**, donde aplicarás generación de datos sintéticos en tu camino elegido.
+> Continúa con la validación práctica en los **[ejercicios del entregable HPD 5](../evaluables/hpd5-entregable.qmd)**, donde aplicarás generación de datos sintéticos en tu camino elegido.
 
 # References
 

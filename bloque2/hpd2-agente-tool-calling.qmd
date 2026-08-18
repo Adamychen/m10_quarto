@@ -5,8 +5,6 @@ engine: jupyter
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/hpd2-agente-tool-calling.ipynb)
 
-> **Duración:** 4h
->
 > **Competencias:** [CE-2](../index.qmd#sec-competencias-especificas)
 
 ::: {.callout-tip icon=false}
@@ -36,7 +34,7 @@ Imagina que tu jefe te escribe por Slack: *"¿qué producto creció más este tr
 Un agente autónomo recibe esa pregunta en lenguaje natural, decide consultar el CSV
 de ventas con pandas, calcula la respuesta y la devuelve. Sin que tú toques el código.
 
-Esa es la diferencia entre un **chatbot** (solo repite lo que sabe) y un **agente**
+Esa es la diferencia entre un chatbot (solo repite lo que sabe) y un agente
 (razona, decide qué herramienta usar, ejecuta y responde). En este taller construyes
 tu primer agente con el dataset Titanic. Pero la arquitectura que aprenderás (LLM +
 herramientas + bucle de decisión) es la misma para cualquier dataset de tu sector:
@@ -60,14 +58,14 @@ Empezamos instalando las dependencias necesarias y configurando el LLM.
 import os
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
-Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
 
 Orden de resolución:
   1. .env local (python-dotenv)
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -241,7 +239,7 @@ print("\n⚠️  Descomenta las líneas anteriores cuando hayas implementado la 
 
 ## Tool 2: describe_schema {#sec-hpd2-tool-schema}
 
-Fuente de verdad del esquema: el agente **no ve el DataFrame**, solo sabe lo que le dicen los
+Fuente de verdad del esquema: el agente no ve el DataFrame, solo sabe lo que le dicen los
 docstrings. Si duda del nombre exacto de una columna (o no le queda claro qué contiene),
 debe llamar a `describe_schema` antes de consultar. Esta tool ya viene implementada:
 
@@ -297,7 +295,7 @@ def histograma(columna: str, titulo: str = "") -> str:
 
 @tool
 def barras(columna: str, agrupar_por: str = "") -> str:
-    """Genera un gráfico de barras. 
+    """Genera un gráfico de barras.
     agrupar_por es opcional (sex, pclass...) para agrupar la media.
     Los nombres de columna van en minúsculas (sex, pclass...), NO capitalizados (Sex, Pclass)."""
     # TODO: value_counts().plot.bar() o groupby().mean().plot.bar()
@@ -305,7 +303,7 @@ def barras(columna: str, agrupar_por: str = "") -> str:
 
 @tool
 def boxplot(columna: str, agrupar_por: str = "") -> str:
-    """Genera un boxplot de una columna numérica (age, fare...). 
+    """Genera un boxplot de una columna numérica (age, fare...).
     agrupar_por es opcional para comparar entre categorías (sex, pclass...)."""
     # TODO: df.boxplot(columna) o df.boxplot(columna, by=agrupar_por)
     pass  # ← completar
@@ -525,8 +523,8 @@ graph TD
 ## ¿Siempre necesitas un agente?
 
 No. Si tu flujo de trabajo es fijo (siempre los mismos pasos, mismo orden), una
-**cadena LCEL simple** es más rápida, más barata y más predecible. Usa un agente
-solo cuando el LLM necesite decidir qué herramienta usar **en tiempo real**. En
+cadena LCEL simple es más rápida, más barata y más predecible. Usa un agente
+solo cuando el LLM necesite decidir qué herramienta usar en tiempo real. En
 producción, cada llamada extra al LLM cuesta tokens y añade latencia. La regla:
 empieza con una cadena simple. Si no basta, añade un agente.
 :::
@@ -535,13 +533,13 @@ empieza con una cadena simple. Si no basta, añade un agente.
 
 ::: {.callout-tip icon=false}
 
-### Para afianzar lo aprendido (~45 min) {#sec-hpd2-ejercicios-afianzar}
+### Para afianzar lo aprendido {#sec-hpd2-ejercicios-afianzar}
 
 Estos ejercicios no se entregan, pero te preparan para el HPD 2 evaluable y el proyecto integrador.
 
 ---
 
-**A1 — Añade una tercera herramienta de análisis (~30 min)**
+**A1 — Añade una tercera herramienta de análisis**
 
 Crea `@tool resumen_estadistico(columna: str)` que devuelva media, mediana, desviación estándar, mínimo y máximo de una columna numérica del DataFrame. Si la columna no es numérica o no existe, debe devolver un mensaje de error descriptivo.
 
@@ -553,9 +551,9 @@ Prueba que tu agente la usa correctamente con preguntas como *"¿Cuál es el res
 
 ---
 
-**A2 — Cambia el rol del agente (~15 min)**
+**A2 — Cambia el rol del agente**
 
-Modifica el `SYSTEM_PROMPT` para que el agente actúe como **guía turístico del Titanic** en vez de analista de datos. Debe responder en tono divulgativo, con contexto histórico, y solo usar herramientas si se lo piden explícitamente.
+Modifica el `SYSTEM_PROMPT` para que el agente actúe como guía turístico del Titanic en vez de analista de datos. Debe responder en tono divulgativo, con contexto histórico, y solo usar herramientas si se lo piden explícitamente.
 
 Ejecuta las mismas 5 preguntas. ¿Cómo cambian las respuestas?
 
@@ -569,7 +567,7 @@ Ejecuta las mismas 5 preguntas. ¿Cómo cambian las respuestas?
 
 **E1 — Manejo de errores robusto**
 
-Modifica `consulta_pandas` para que, cuando `eval()` falle, el mensaje de error incluya una **sugerencia de corrección** (p.ej. si la columna no existe, sugiere las columnas disponibles). Prueba preguntas con errores intencionados para ver si el agente se autocorrige.
+Modifica `consulta_pandas` para que, cuando `eval()` falle, el mensaje de error incluya una sugerencia de corrección (p. ej. si la columna no existe, sugiere las columnas disponibles). Prueba preguntas con errores intencionados para ver si el agente se autocorrige.
 
 **E2 — Memoria conversacional**
 
@@ -582,7 +580,7 @@ encadenadas donde la segunda y tercera dependan del contexto de las anteriores. 
 
 **E3 — Benchmark sin herramientas**
 
-Compara la precisión del agente **con herramientas** vs el mismo LLM **sin herramientas** (zero-shot, usando solo su conocimiento interno). ¿En qué tipo de preguntas gana el agente? ¿En cuáles no hay diferencia?
+Compara la precisión del agente con herramientas frente al mismo LLM sin herramientas (zero-shot, usando solo su conocimiento interno). ¿En qué tipo de preguntas gana el agente? ¿En cuáles no hay diferencia?
 
 :::
 
@@ -599,8 +597,6 @@ Compara la precisión del agente **con herramientas** vs el mismo LLM **sin herr
 - Manejo de errores en ejecución de herramientas
 - Código modular y bien comentado
 - Las herramientas tienen docstrings completos (args, returns, ejemplo)
-
-## Tiempo estimado: 4h
 :::
 
 # References

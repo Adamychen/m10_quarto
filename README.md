@@ -1,8 +1,8 @@
 # Módulo 10 — IA Generativa para Data Science
 
-Sitio web del módulo 10 del **Máster en Data Science & Big Data** de la Universidad de Sevilla.
+Sitio web del módulo 10 del Máster en Data Science & Big Data de la Universidad de Sevilla.
 
-**IA Generativa para Data Science** — 3,0 ECTS | 75 horas
+**IA Generativa para Data Science** — 3,0 ECTS
 
 ## Para alumnos
 
@@ -12,7 +12,7 @@ El sitio está publicado en GitHub Pages. Accede desde la URL que se muestra en 
 
 ### Abrir notebooks en Colab
 
-Cada página tiene un badge **Open in Colab** en la parte superior. Si es la primera vez:
+Cada página tiene un badge Open in Colab en la parte superior. Si es la primera vez:
 1. Abre [colab.research.google.com](https://colab.research.google.com)
 2. Ve a **Settings → GitHub → Connect to GitHub** y autoriza la app
 3. Vuelve a la página y haz clic en el badge
@@ -21,15 +21,16 @@ Como alternativa: **File → Open Notebook → GitHub**, busca `Adamychen/m10_qu
 
 ### Entregables por caminos
 
-Cada alumno elige al inicio un **camino de aplicación** (Finanzas, Salud o E-commerce).
-Todos los entregables (HPD 1-4) y el proyecto final se adaptan al camino elegido.
+Cada alumno elige al inicio un camino de aplicación (Finanzas, Salud o E-commerce).
+Todos los entregables (HPD 1-5) y el proyecto final se adaptan al camino elegido.
 
 | HPD | Entregable | Peso |
 |---|---|---|
 | HPD 1 — Pipeline de embeddings | `evaluables/hpd1-entregable.qmd` | 7.5 % |
 | HPD 2 — Agente Tool Calling | `evaluables/hpd2-entregable.qmd` | 7.5 % |
-| HPD 3 — Servidor MCP | `evaluables/hpd3-entregable.qmd` | 7.5 % |
-| HPD 4 — RAG con evaluación | `evaluables/hpd4-entregable.qmd` | 7.5 % |
+| HPD 3 — Workflows LangGraph | Taller (no evaluable) | — |
+| HPD 4 — Servidor MCP | `evaluables/hpd4-entregable.qmd` | 7.5 % |
+| HPD 5 — RAG con evaluación | `evaluables/hpd5-entregable.qmd` | 7.5 % |
 | — | **Proyecto integrador final** (`evaluables/proyecto-final.qmd`) | 60 % |
 
 Los talleres presenciales (comunes para todos los caminos) están en `bloque1/`, `bloque2/` y `bloque3/`.
@@ -75,7 +76,7 @@ m10_quarto/
 ├── index.qmd                    # Presentación
 ├── about.qmd                    # Acerca de
 ├── mod10.md                     # Guía docente pública
-├── bloque1/                     # Fundamentos: Transformers, LLMs, embeddings, vector DB
+├── bloque1/                     # Fundamentos: Transformers, LLM, embeddings, vector DB
 │   ├── 01-fundamentos.qmd
 │   ├── 01a-transformer.qmd
 │   ├── 01b-llms.qmd
@@ -88,8 +89,10 @@ m10_quarto/
 │   ├── 02c-llamaindex.qmd
 │   ├── 02d-mcp.qmd
 │   ├── 02e-agentes.qmd
+│   ├── 02f-patrones-agentes.qmd
 │   ├── hpd2-agente-tool-calling.qmd
-│   └── hpd3-servidor-mcp.qmd
+│   ├── hpd3-workflows-langgraph.qmd
+│   └── hpd4-servidor-mcp.qmd
 ├── bloque3/                     # Aplicaciones: RAG avanzado, datos sintéticos, fine-tuning
 │   ├── 03-aplicaciones.qmd
 │   ├── 03a-datos-sinteticos.qmd
@@ -101,9 +104,9 @@ m10_quarto/
 │   ├── caminos.qmd
 │   ├── hpd1-entregable.qmd
 │   ├── hpd2-entregable.qmd
-│   ├── hpd3-entregable.qmd
-│   ├── hpd4-rag-mixto.qmd
 │   ├── hpd4-entregable.qmd
+│   ├── hpd5-rag-mixto.qmd
+│   ├── hpd5-entregable.qmd
 │   └── proyecto-final.qmd
 ├── 05-evaluacion.qmd            # Evaluación y proyecto
 ├── 06-herramientas.qmd          # Herramientas y stack recomendado

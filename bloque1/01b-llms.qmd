@@ -5,7 +5,7 @@ engine: jupyter
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01b-llms.ipynb)
 
-> Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto primero [01a-transformer.qmd](01a-transformer.qmd).
+> Este tema forma parte del Bloque 1 — Fundamentos. Se recomienda haber visto primero [01a-transformer.qmd](01a-transformer.qmd).
 
 > El [panorama histórico](00-panorama.qmd) distingue la línea de las representaciones semánticas de la línea de los modelos generativos. En esta página seguimos la segunda: cómo un modelo utiliza tokens, estados ocultos y una LM head para predecir texto.
 
@@ -25,14 +25,14 @@ engine: jupyter
 
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
-Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
 
 Orden de resolución:
   1. .env local (python-dotenv)
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -83,24 +83,24 @@ print("Librerías cargadas correctamente.")
 
 ```
 
-## Grandes Modelos de Lenguaje (LLMs) {#sec-llms}
+## Grandes Modelos de Lenguaje (LLM) {#sec-llms}
 
 ### Preentrenamiento {#sec-preentrenamiento}
 
-Los LLMs se preentrenan con un objetivo aparentemente simple: **predecir el siguiente token** (next token prediction). Dada una secuencia de tokens $t_1, t_2, ..., t_n$, el modelo aprende a maximizar la probabilidad de $t_{i+1}$ dados los tokens anteriores:
+Los LLM se preentrenan con un objetivo aparentemente simple: predecir el siguiente token (next token prediction). Dada una secuencia de tokens $t_1, t_2, ..., t_n$, el modelo aprende a maximizar la probabilidad de $t_{i+1}$ dados los tokens anteriores:
 
 $$P(t_{i+1} | t_1, ..., t_i)$$
 
-De este proceso emergen capacidades complejas: sintaxis, semántica, razonamiento, conocimiento factual. Las **scaling laws** (@kaplan2020scaling) demostraron que el rendimiento mejora de forma predecible al escalar:
+De este proceso emergen capacidades complejas: sintaxis, semántica, razonamiento, conocimiento factual. Las scaling laws (@kaplan2020scaling) demostraron que el rendimiento mejora de forma predecible al escalar:
 - Número de parámetros del modelo
 - Tamaño del dataset de entrenamiento
 - Cómputo total
 
 ### Tokenización {#sec-tokenizacion}
 
-Los modelos no procesan caracteres ni palabras directamente, sino **tokens**: unidades subpalabra que equilibran cobertura del vocabulario y eficiencia.
+Los modelos no procesan caracteres ni palabras directamente, sino tokens: unidades subpalabra que equilibran cobertura del vocabulario y eficiencia.
 
-: Algoritmos de tokenización más usados en LLMs modernos {#tbl-tokenizacion}
+: Algoritmos de tokenización más usados en LLM modernos {#tbl-tokenizacion}
 
 | Algoritmo | Cómo funciona | Usado en |
 |---|---|---|
@@ -133,11 +133,11 @@ print(f"\nDecodificado: {tokenizer.decode(ids)}")
 
 ### Tokenización en detalle: BPE y variantes {#sec-tokenizacion-detalle}
 
-La tabla anterior resume cuatro algoritmos, pero detrás de cada elección hay un **trade-off** entre cobertura del vocabulario, longitud de secuencia y coste computacional. Esta sección desglosa el más usado —**Byte-Pair Encoding (BPE)**— paso a paso, y compara las alternativas.
+La tabla anterior resume cuatro algoritmos, pero detrás de cada elección hay un trade-off entre cobertura del vocabulario, longitud de secuencia y coste computacional. Esta sección desglosa el más usado —Byte-Pair Encoding (BPE)— paso a paso y compara las alternativas.
 
 #### Por qué subwords y no caracteres ni palabras {#sec-por-que-subwords}
 
-El vocabulario de un LLM es **finito** (típicamente 32K-128K tokens), pero el texto que verá es **abierto** (cualquier palabra, en cualquier idioma, incluidas erratas, jerga, nombres propios...). Hay tres opciones para resolver este desajuste:
+El vocabulario de un LLM es finito (típicamente 32K-128K tokens), pero el texto que verá es abierto (cualquier palabra, en cualquier idioma, incluidas erratas, jerga, nombres propios...). Hay tres opciones para resolver este desajuste:
 
 : Trade-offs entre granularidades de tokenización {#tbl-granularidad}
 
@@ -151,7 +151,7 @@ La promesa de los subwords: las palabras frecuentes son un solo token (`the` →
 
 #### Byte-Pair Encoding (BPE) paso a paso {#sec-bpe-paso-a-paso}
 
-BPE (@sennrich2016bpe) es el algoritmo dominante. La idea es sencilla: **fusionar iterativamente los pares de caracteres más frecuentes** del corpus de entrenamiento.
+BPE (@sennrich2016bpe) es el algoritmo dominante. La idea es sencilla: fusionar iterativamente los pares de caracteres más frecuentes del corpus de entrenamiento.
 
 ::: {#fig-bpe-pipeline}
 ```{mermaid}
@@ -171,9 +171,9 @@ flowchart LR
 
 **Algoritmo** (versión simplificada):
 
-1. Empezar con un vocabulario de **caracteres individuales** (256 bytes en byte-level BPE).
-2. Contar todos los **pares adyacentes** en el corpus de entrenamiento.
-3. **Fusionar** el par más frecuente en un nuevo símbolo.
+1. Empezar con un vocabulario de caracteres individuales (256 bytes en byte-level BPE).
+2. Contar todos los pares adyacentes en el corpus de entrenamiento.
+3. Fusionar el par más frecuente en un nuevo símbolo.
 4. Repetir 2-3 durante $k$ iteraciones (hasta alcanzar el tamaño de vocabulario deseado, p. ej. 50K).
 
 **Ejemplo numérico** — partiendo del corpus `low low low lower lower newest newest newest newest newest widest widest widest`, el vocabulario inicial es `{l, o, w, e, r, n, w, s, t, i, d, }` (caracteres). El algoritmo aprende progresivamente:
@@ -192,14 +192,14 @@ Tras el entrenamiento, la palabra `lowest` se codifica como `["low", "est"]` —
 
 #### Comparativa de algoritmos de subword {#sec-comparativa-subword}
 
-: Algoritmos de tokenización más usados en LLMs modernos {#tbl-subword-comparativa}
+: Algoritmos de tokenización más usados en LLM modernos {#tbl-subword-comparativa}
 
 | Algoritmo | Usado por | Idea clave |
 |---|---|---|
 | **BPE** | GPT-2, GPT-4, Llama 3, Mistral, Qwen | *Bottom-up*: fusionar pares frecuentes; determinista |
-| **Byte-level BPE** | GPT-2 en adelante | BPE sobre **bytes** puros (256 símbolos base); garantiza que cualquier secuencia es representable, sin token "unknown" |
-| **WordPiece** | BERT, DistilBERT | Similar a BPE, pero escoge el par que **maximiza la verosimilitud** del corpus (no la frecuencia) |
-| **Unigram LM** | SentencePiece (T5, XLNet) | *Top-down*: empieza con un vocabulario grande y **lo recorta** eliminando los tokens con menor contribución marginal a la verosimilitud |
+| **Byte-level BPE** | GPT-2 en adelante | BPE sobre bytes puros (256 símbolos base); garantiza que cualquier secuencia es representable, sin token "unknown" |
+| **WordPiece** | BERT, DistilBERT | Similar a BPE, pero escoge el par que maximiza la verosimilitud del corpus (no la frecuencia) |
+| **Unigram LM** | SentencePiece (T5, XLNet) | *Top-down*: empieza con un vocabulario grande y lo recorta eliminando los tokens con menor contribución marginal a la verosimilitud |
 
 **¿Por qué importa la elección?**
 
@@ -209,12 +209,12 @@ Tras el entrenamiento, la palabra `lowest` se codifica como `["low", "est"]` —
 
 ### Ventana de contexto {#sec-ventana-contexto}
 
-La **ventana de contexto** es el número máximo de tokens que el modelo puede procesar en una sola pasada. Limitaciones prácticas:
+La ventana de contexto es el número máximo de tokens que el modelo puede procesar en una sola pasada. Limitaciones prácticas:
 - **Memoria:** la atención es O(n²) en memoria (sin optimizaciones)
 - **Modelos tempranos:** GPT-2 (1024), GPT-3 (2048), GPT-4 (8192)
 - **Modelos actuales:** Llama 3 (8K), Qwen 3.6 (128K), DeepSeek R1 (128K), Gemini (32K-1M), Claude (100K-200K)
 
-Técnicas de extensión: RoPE (Rotary Position Embedding), ALiBi, windowing, y atención dispersa.
+Técnicas de extensión: RoPE (Rotary Position Embedding), ALiBi, windowing y atención dispersa.
 
 ### Parámetros de inferencia {#sec-parametros-inferencia}
 
@@ -315,14 +315,14 @@ plt.show()
 ## Parámetros clave en producción
 
 - **Temperatura:** controla la creatividad. Baja (0.1-0.3) para tareas factuales, alta (0.7-0.9) para creatividad.
-- **Top-p (nucleus sampling):** selecciona del subconjunto de tokens cuya probabilidad acumulada suma p. típico: 0.9-0.95.
-- **Top-k:** limita la selección a los k tokens más probables. típico: 40-50.
+- **Top-p (nucleus sampling):** selecciona del subconjunto de tokens cuya probabilidad acumulada suma p. Típico: 0.9-0.95.
+- **Top-k:** limita la selección a los k tokens más probables. Típico: 40-50.
 - Combinación común: temp=0.7, top-p=0.9, top-k=40.
 :::
 
 ### Más allá del texto: el LLM como modelo generativo {#sec-llm-generativo}
 
-Un LLM no es más que un modelo que aprende una distribución de probabilidad $P(\text{token} \mid \text{contexto})$ y muestrea de ella. Esta misma idea —aprender la distribución subyacente de los datos y generar nuevas muestras— es el **principio unificador de todos los modelos generativos**:
+Un LLM no es más que un modelo que aprende una distribución de probabilidad $P(\text{token} \mid \text{contexto})$ y muestrea de ella. Esta misma idea —aprender la distribución subyacente de los datos y generar nuevas muestras— es el principio unificador de todos los modelos generativos:
 
 : Modelos generativos y el tipo de distribución que aprenden {#tbl-modelos-generativos}
 
@@ -339,11 +339,11 @@ Lo que acabas de entender sobre la temperatura es el equivalente conceptual a:
 - El muestreo del espacio latente en una GAN (controla realismo vs. variedad)
 - El nivel de ruido en un modelo de difusión (controla fidelidad)
 
-En el **Bloque 2** verás cómo usar LLMs para generar datos sintéticos de forma intuitiva (sin entrenar nada), y en el **Bloque 3** explorarás modelos especializados (GANs, VAEs, difusión) para cuando necesites rigor estadístico y garantías de privacidad.
+En el Bloque 2 verás cómo usar LLM para generar datos sintéticos de forma intuitiva (sin entrenar nada), y en el Bloque 3 explorarás modelos especializados (GANs, VAEs, difusión) para cuando necesites rigor estadístico y garantías de privacidad.
 
 ## El ecosistema Hugging Face {#sec-huggingface}
 
-[Hugging Face Hub](https://huggingface.co/models) es el repositorio más grande de modelos preentrenados del mundo. Puedes navegar por **task** (text generation, feature extraction, image classification), **framework** (PyTorch, TensorFlow), **licencia** (MIT, Apache 2.0, Llama 2 Community) y **popularidad**.
+[Hugging Face Hub](https://huggingface.co/models) es el repositorio más grande de modelos preentrenados del mundo. Puedes navegar por task (text generation, feature extraction, image classification), framework (PyTorch, TensorFlow), licencia (MIT, Apache 2.0, Llama 2 Community) y popularidad.
 
 Para cada modelo encontrarás:
 - **Model Card**: descripción, arquitectura, dataset de entrenamiento, benchmark esperado
@@ -356,7 +356,7 @@ Para cada modelo encontrarás:
 # El Hub permite filtrar por framework, licencia, idioma y popularidad
 ```
 
-> **Nota:** No necesitas descargar modelos localmente. En este módulo usarás la **API unificada de la Universidad de Sevilla** para hacer inferencia sobre modelos modernos sin necesidad de GPU.
+> **Nota:** No necesitas descargar modelos localmente. En este módulo usarás la API unificada de la Universidad de Sevilla para hacer inferencia sobre modelos modernos sin necesidad de GPU.
 
 ### Modelos privados vs. open-weight vs. open-source {#sec-licencias-modelos}
 
@@ -372,9 +372,9 @@ No todos los modelos "abiertos" lo son realmente. Existe una distinción clave e
 
 **Puntos clave:**
 
-- **Open-weight ≠ open-source.** Que puedas descargar los pesos no implica que puedas usarlos sin restricciones. La mayoría de modelos "abiertos" tienen limitaciones: prohibición de uso para grandes empresas (>700M MAU en Llama), restricciones comerciales, o cláusulas de no competencia.
+- **Open-weight ≠ open-source.** Que puedas descargar los pesos no implica que puedas usarlos sin restricciones. La mayoría de modelos "abiertos" tienen limitaciones: prohibición de uso para grandes empresas (>700M MAU en Llama), restricciones comerciales o cláusulas de no competencia.
 - **Hugging Face Hub** permite filtrar por licencia (`huggingface.co/models?license=apache-2.0,mit`), lo que facilita encontrar modelos realmente open-source.
-- **Modelos privados** (vía API): no requieren infraestructura, pero generan dependencia del proveedor, coste por token, y posibles problemas de privacidad de datos.
+- **Modelos privados** (vía API): no requieren infraestructura, pero generan dependencia del proveedor, coste por token y posibles problemas de privacidad de datos.
 - **Modelos open-weight/open-source:** puedes alojarlos tú mismo (Ollama, vLLM), inspeccionar los pesos, hacer fine-tuning, pero requieren infraestructura GPU y conocimiento técnico.
 
 ```bash
@@ -383,18 +383,18 @@ No todos los modelos "abiertos" lo son realmente. Existe una distinción clave e
 #   open-weight: huggingface.co/models?license=llama2,gemma
 ```
 
-> En este módulo usarás **modelos open-weight** (Qwen 3.6, Gemma 4, Llama 3.3) a través de la API de Llamus. Desde el código la diferencia es mínima, pero es crucial entender las implicaciones de licencias al elegir un modelo para un proyecto profesional.
+> En este módulo usarás modelos open-weight (Qwen 3.6, Gemma 4, Llama 3.3) a través de la API de Llamus. Desde el código la diferencia es mínima, pero es crucial entender las implicaciones de licencias al elegir un modelo para un proyecto profesional.
 
 ## Inferencia con la API unificada de la US (Llamus) {#sec-llamus}
 
-La Universidad de Sevilla proporciona un endpoint **OpenAI-compatible** para usar LLMs sin necesidad de GPU local:
+La Universidad de Sevilla proporciona un endpoint OpenAI-compatible para usar LLM sin necesidad de GPU local:
 
 ```
 Endpoint: https://llamus.cs.us.es/api/v1
 Modelos disponibles: mlx-community/Qwen3.6-35B-A3B-8bit, gemma4:26b, llama3.3:70b, ...
 ```
 
-Funciona con `ChatOpenAI` de LangChain, el cliente OpenAI de Python, o cualquier herramienta compatible con OpenAI. Solo necesitas tu **API key de la US** (se proporciona en la asignatura).
+Funciona con `ChatOpenAI` de LangChain, el cliente OpenAI de Python o cualquier herramienta compatible con OpenAI. Solo necesitas tu API key de la US (se proporciona en la asignatura).
 
 ```{python}
 #| echo: true
@@ -432,7 +432,7 @@ for m in models["data"]:
 
 ```
 
-:::{.callout-tip}
+::: {.callout-tip}
 ## Ventajas de usar Llamus
 
 - **Sin GPU:** todo corre en servidores de la US

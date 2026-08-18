@@ -17,7 +17,7 @@ Si prefieres descargar el `.ipynb` y subirlo manualmente: [Ver archivos en GitHu
 ::: {.callout-warning}
 ## Configura tu API key de Llamus antes de ejecutar las celdas
 
-Los notebooks que usan LLMs necesitan una API key de la Universidad de Sevilla. **Si la celda de setup te muestra `⚠️ LLM_API_KEY no encontrada`, configúrala antes de seguir:**
+Los notebooks que usan LLM necesitan una API key de la Universidad de Sevilla. **Si la celda de setup te muestra `⚠️ LLM_API_KEY no encontrada`, configúrala antes de seguir:**
 
 - **En Colab** (recomendado): abre el icono 🔑 (Secrets) en la barra lateral izquierda → "Add new secret" → nombre `LLAMUS_API_KEY` → pega tu clave → activa "Notebook access" → vuelve a ejecutar la celda de setup.
 - **En local**: crea un archivo `.env` en la raíz del proyecto con `LLM_API_KEY=tu_clave`.
@@ -25,37 +25,26 @@ Los notebooks que usan LLMs necesitan una API key de la Universidad de Sevilla. 
 La clave te la proporcionará el profesorado al inicio del módulo. Más detalles en [Herramientas → Configuración de la API key](06-herramientas.qmd#sec-config-api-key).
 :::
 
-## Distribución de la carga docente {#sec-carga-docente}
-
-: Distribución de horas por tipo de actividad {#tbl-carga-docente}
-
-| Tipo de actividad | Horas | % del total | Formato |
-|---|---|---|---|
-| Horas Teóricas (HT) | 18 | 24 % | Magistral + lectura técnica |
-| Horas Prácticas Docentes (HPD) | 12 | 16 % | Talleres guiados / notebooks |
-| Horas del Alumno (HA) | 45 | 60 % | Proyecto + estudio autónomo |
-| **TOTAL** | **75** | **100 %** | |
-
 ## 1. Descripción del módulo {#sec-descripcion-modulo}
 
 Este módulo introduce al alumno en el ecosistema de la IA Generativa desde una perspectiva de ingeniería aplicada a Data Science. El objetivo es que el alumno adquiera criterio técnico para seleccionar, integrar y desplegar modelos generativos en contextos reales: desde la consulta semántica sobre datos corporativos hasta la automatización de flujos de análisis mediante agentes.
 
 El módulo está diseñado con un enfoque *hands-on*: cada bloque teórico tiene un correlato práctico directo, y todas las actividades se articulan en torno a un proyecto integrador que el alumno construye de forma incremental a lo largo del módulo.
 
-El recorrido comienza con una pregunta transversal: **¿cómo pasamos del texto y los datos a representaciones que una máquina pueda comparar, transformar y utilizar?** La respuesta histórica va desde las representaciones dispersas de palabras hasta los embeddings contextuales, los LLMs, la recuperación semántica y los agentes. Puedes consultar este mapa antes de empezar el Bloque 1 en el [panorama histórico: del texto a los embeddings](bloque1/00-panorama.qmd).
+El recorrido comienza con una pregunta transversal: ¿cómo pasamos del texto y los datos a representaciones que una máquina pueda comparar, transformar y utilizar? La respuesta histórica va desde las representaciones dispersas de palabras hasta los embeddings contextuales, los LLM, la recuperación semántica y los agentes. Puedes consultar este mapa antes de empezar el Bloque 1 en el [panorama histórico: del texto a los embeddings](bloque1/00-panorama.qmd).
 
 > **Prerrequisitos:** haber superado los módulos anteriores del máster, con especial dominio de Python, manipulación de datos con pandas/NumPy y fundamentos de Machine Learning supervisado y no supervisado.
 
 ## Contenidos {#sec-contenidos}
 
-: Bloques del módulo con su carga teórica y práctica {#tbl-contenidos}
+: Bloques del módulo {#tbl-contenidos}
 
-| Bloque | Título | HT | HPD |
-|---|---|---|---|
-| 1 | Fundamentos: Transformers, LLMs y Representación Vectorial | 6h | 4h |
-| 2 | Orquestación: Prompt Engineering, Frameworks y Agentes | 6h | 4h |
-| 3 | Aplicaciones: RAG, Datos Sintéticos y Fine-tuning | 6h | 4h |
-| 4 | Despliegue y Gobernanza | — | — |
+| Bloque | Título |
+|---|---|
+| 1 | Fundamentos: Transformers, LLM y Representación Vectorial |
+| 2 | Orquestación: Prompt Engineering, Frameworks y Agentes |
+| 3 | Aplicaciones: RAG, Datos Sintéticos y Fine-tuning |
+| 4 | Despliegue y Gobernanza |
 
 ## Competencias específicas {#sec-competencias-especificas}
 
@@ -65,7 +54,7 @@ El recorrido comienza con una pregunta transversal: **¿cómo pasamos del texto 
 |---|---|---|
 | **CE-1** | Representación vectorial y búsqueda semántica | Diseñar pipelines de embeddings adecuados a la naturaleza del dato (texto, tabular, código) y seleccionar la base de datos vectorial más apropiada según requisitos de escala, latencia y privacidad. |
 | **CE-2** | Orquestación de modelos y agentes | Construir flujos complejos con LangChain/LlamaIndex y diseñar agentes autónomos con Tool Calling que integran herramientas externas de forma robusta y trazable. |
-| **CE-3** | Integración segura con entornos locales | Implementar servidores MCP que expongan fuentes de datos corporativas a LLMs, aplicando controles de acceso y evaluando superficies de ataque (prompt injection, data leakage). |
-| **CE-4** | Sistemas RAG orientados a negocio | Implementar y evaluar arquitecturas RAG sobre datos estructurados y desestructurados, midiendo su calidad con frameworks estándar (RAGAS) e iterando sobre componentes individuales. |
+| **CE-3** | Integración segura con entornos locales | Implementar servidores MCP que expongan fuentes de datos corporativas a LLM, aplicando controles de acceso y evaluando superficies de ataque (prompt injection, data leakage). |
+| **CE-4** | Sistemas RAG orientados a negocio | Implementar y evaluar arquitecturas RAG sobre datos estructurados y no estructurados, midiendo su calidad con frameworks estándar (RAGAS) e iterando sobre componentes individuales. |
 | **CE-5** | Ajuste fino y datos sintéticos | Aplicar técnicas PEFT (LoRA/QLoRA) para adaptar modelos open-source a dominios específicos y generar datos sintéticos validados estadísticamente para aumentar o anonimizar datasets. |
 | **CE-6** | Gobernanza y despliegue responsable | Evaluar modelos con métricas LLM-as-a-judge, detectar y mitigar alucinaciones y sesgos, y documentar sistemas generativos siguiendo estándares de transparencia algorítmica. |

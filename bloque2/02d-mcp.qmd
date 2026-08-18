@@ -5,7 +5,7 @@ engine: jupyter
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02d-mcp.ipynb)
 
-> Este tema forma parte del **Bloque 2 — Orquestación**. Aquí se aprende a exponer datos y herramientas a LLMs de forma estandarizada con MCP.
+> Este tema forma parte del Bloque 2 — Orquestación. Aquí se aprende a exponer datos y herramientas a LLM de forma estandarizada con MCP.
 
 ```{python}
 #| echo: true
@@ -28,11 +28,9 @@ print("Librerías cargadas correctamente.")
 
 ### El problema que resuelve {#sec-mcp-problema}
 
-
 Conectar un LLM a múltiples fuentes de datos (SQLite, APIs REST, CSV, Google Drive, un servicio meteorológico) requiere un adaptador por cada combinación de fuente y framework. Con 5 fuentes y 5 frameworks distintos, eso son 5 × 5 = 25 adaptadores. En la práctica, cada fuente expone varios métodos, por lo que el número crece todavía más. Es el problema $n \times m$.
 
-Para resolverlo, Anthropic impulsó el Model Context Protocol (MCP), un protocolo abierto que estandariza la conexión entre LLMs y fuentes externas. Funciona como un "USB-C para LLMs": una interfaz única para todo. Con MCP, el número de adaptadores se reduce a $n + m$, ya que las fuentes se conectan a través de un servidor MCP común y solo hace falta un adaptador por modelo.
-
+Para resolverlo, Anthropic impulsó el Model Context Protocol (MCP), un protocolo abierto que estandariza la conexión entre LLM y fuentes externas. Funciona como un "USB-C para LLM": una interfaz única para todo. Con MCP, el número de adaptadores se reduce a $n + m$, ya que las fuentes se conectan a través de un servidor MCP común y solo hace falta un adaptador por modelo.
 
 ::: {#fig-mcp-vs-sin-mcp}
 ```{mermaid}
@@ -82,7 +80,7 @@ graph TB
 
 ### Arquitectura de MCP {#sec-mcp-arquitectura}
 
-MCP sigue el modelo **cliente-servidor**. Cada servidor expone capacidades en 3 categorías:
+MCP sigue el modelo cliente-servidor. Cada servidor expone capacidades en 3 categorías:
 
 : Primitivas del Model Context Protocol y ejemplos {#tbl-mcp-primitivas}
 
@@ -134,7 +132,7 @@ graph LR
 | **stdio** | El cliente lanza el servidor como subproceso, comunicación por stdin/stdout | Local, sin red, máxima seguridad |
 | **HTTP (SSE)** | El servidor escucha en un puerto, el cliente se conecta por HTTP | Remoto, multi-cliente, cloud |
 
-En este curso usamos **stdio** porque es el más simple y seguro para entornos locales.
+En este curso usamos stdio porque es el más simple y seguro para entornos locales.
 
 ### FastMCP: el SDK simplificado {#sec-fastmcp}
 
@@ -170,12 +168,12 @@ print(f"contar_palabras('Hola mundo MCP') = {contar_palabras('Hola mundo MCP')}"
 ```
 
 ::: {.callout-tip}
-FastMCP **infiere automáticamente el JSON Schema** a partir de los type hints de Python. `a: float` se convierte en `{"type": "number"}`, `texto: str` en `{"type": "string"}`, etc. No necesitas escribir el schema manualmente.
+FastMCP infiere automáticamente el JSON Schema a partir de los type hints de Python. `a: float` se convierte en `{"type": "number"}`, `texto: str` en `{"type": "string"}`, etc. No necesitas escribir el schema manualmente.
 :::
 
 ### Recursos MCP {#sec-mcp-recursos}
 
-Los **Resources** exponen datos de solo lectura que el LLM puede consultar:
+Los Resources exponen datos de solo lectura que el LLM puede consultar:
 
 ```{python}
 #| echo: true
@@ -288,7 +286,7 @@ print(consultar_sql("DROP TABLE ventas"))
 
 ### Seguridad en MCP: el checklist imprescindible {#sec-mcp-seguridad}
 
-Cada servidor MCP es una **superficie de ataque**. El LLM escribe el input de las herramientas, y un atacante puede manipular el prompt para inyectar comandos maliciosos (**prompt injection**):
+Cada servidor MCP es una superficie de ataque. El LLM escribe la entrada de las herramientas y un atacante puede manipular el prompt para inyectar comandos maliciosos (prompt injection):
 
 ::: {#fig-mcp-seguridad}
 ```{mermaid}

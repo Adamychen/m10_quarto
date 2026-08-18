@@ -2,13 +2,11 @@
 title: "Bloque 3 — Aplicaciones: RAG Avanzado, Datos Sintéticos y Fine-tuning"
 ---
 
-> **Carga:** HT: 6h | HPD: 4h
->
 > **Competencias asociadas:** [CE-4](../index.qmd#sec-competencias-especificas), [CE-5](../index.qmd#sec-competencias-especificas)
 
 ## Objetivos del bloque {#sec-b3-objetivos}
 
-Implementar sistemas RAG de calidad producción con evaluación objetiva, generar datos sintéticos validados estadísticamente, y aplicar técnicas de ajuste fino eficientes (LoRA/QLoRA) para adaptar modelos a dominios específicos.
+Implementar sistemas RAG de calidad de producción con evaluación objetiva, generar datos sintéticos validados estadísticamente y aplicar técnicas de ajuste fino eficientes (LoRA/QLoRA) para adaptar modelos a dominios específicos.
 
 ## Mapa conceptual del bloque {#sec-b3-mapa}
 
@@ -31,22 +29,22 @@ graph TD
 ```
 :::
 
-Los tres pilares de este bloque son **complementarios y se refuerzan mutuamente**:
+Los tres pilares de este bloque son complementarios y se refuerzan mutuamente:
 
 - **RAG Avanzado** te enseña a construir sistemas de pregunta-respuesta robustos, con evaluación objetiva (RAGAS) y técnicas avanzadas (re-ranking, query expansion, multi-fuente).
-- **Datos Sintéticos** te permite generar datos de entrenamiento, testing o anonimización cuando los datos reales son insuficientes o sensibles.
-- **Fine-tuning** te permite adaptar modelos open-source a tu dominio específico cuando RAG y prompting no bastan.
+- **Datos Sintéticos** te permite generar datos de entrenamiento, pruebas o anonimización cuando los datos reales son insuficientes o sensibles.
+- **Fine-tuning** te permite adaptar modelos de código abierto a tu dominio específico cuando RAG y prompting no bastan.
 
 ## Contenido del bloque {#sec-b3-contenido}
 
-: Itinerario del Bloque 3 con sus ficheros y duración estimada {#tbl-b3-itinerario}
+: Itinerario del Bloque 3 {#tbl-b3-itinerario}
 
-| Tema | Archivo | Duración estimada |
-|---|---|---|
-| **RAG Avanzado** — Re-ranking, HyDE, RAG-Fusion, RAGAS, multi-fuente | [03b-rag-avanzado.qmd](03b-rag-avanzado.qmd) | 3h |
-| **Datos Sintéticos** — CTGAN, TVAE, TabDDPM, SDV, validación estadística | [03a-datos-sinteticos.qmd](03a-datos-sinteticos.qmd) | 1.5h |
-| **Fine-tuning eficiente** — LoRA, QLoRA, PEFT, cuándo adaptar modelos | [03c-fine-tuning.qmd](03c-fine-tuning.qmd) | 1.5h |
-| **HPD 4 — Sistema RAG sobre datos mixtos** | [hpd4-rag-mixto.qmd](../evaluables/hpd4-rag-mixto.qmd) | 4h |
+| Tema | Archivo |
+|---|---|
+| **RAG Avanzado** — Re-ranking, HyDE, RAG-Fusion, RAGAS, multi-fuente | [03b-rag-avanzado.qmd](03b-rag-avanzado.qmd) |
+| **Datos Sintéticos** — CTGAN, TVAE, TabDDPM, SDV, validación estadística | [03a-datos-sinteticos.qmd](03a-datos-sinteticos.qmd) |
+| **Fine-tuning eficiente** — LoRA, QLoRA, PEFT, cuándo adaptar modelos | [03c-fine-tuning.qmd](03c-fine-tuning.qmd) |
+| **HPD 5 — Sistema RAG sobre datos mixtos** | [hpd5-rag-mixto.qmd](../evaluables/hpd5-rag-mixto.qmd) |
 
 ## Ruta de aprendizaje recomendada {#sec-b3-ruta}
 
@@ -55,7 +53,7 @@ Los tres pilares de este bloque son **complementarios y se refuerzan mutuamente*
 graph LR
     A["1. RAG Avanzado"] --> B["2. Datos Sintéticos"]
     A --> C["3. Fine-tuning"]
-    B --> D[HPD 4<br/>RAG Mixto]
+    B --> D[HPD 5<br/>RAG Mixto]
     C --> D
     D --> E[Proyecto integrador]
 
@@ -67,18 +65,18 @@ graph LR
 ```
 :::
 
-1. Empieza con **RAG Avanzado**: es el tema central del bloque y la base del HPD 4. Aprenderás a mejorar la calidad de tus sistemas RAG con re-ranking, query expansion y evaluación objetiva con RAGAS.
-2. Continúa con **Datos Sintéticos**: aprenderás a generar datos verosímiles con LLMs (enfoque intuitivo) y con modelos especializados (CTGAN, TVAE).
+1. Empieza con **RAG Avanzado**: es el tema central del bloque y la base del HPD 5. Aprenderás a mejorar la calidad de tus sistemas RAG con re-ranking, query expansion y evaluación objetiva con RAGAS.
+2. Continúa con **Datos Sintéticos**: aprenderás a generar datos verosímiles con LLM (enfoque intuitivo) y con modelos especializados (CTGAN, TVAE).
 3. Cierra con **Fine-tuning**: entenderás cuándo y cómo adaptar modelos open-source a tu dominio con LoRA/QLoRA.
-4. Ponlo todo en práctica con el **HPD 4**: construirás un sistema RAG completo sobre datos mixtos (PDFs + SQL) con evaluación RAGAS.
+4. Ponlo todo en práctica con el **HPD 5**: construirás un sistema RAG completo sobre datos mixtos (PDFs + SQL) con evaluación RAGAS.
 
 ## Talleres prácticos {#sec-b3-talleres}
 
 : Talleres prácticos del Bloque 3 {#tbl-b3-talleres}
 
-| HPD | Título | Enlace | Duración |
-|---|---|---|---|
-| **HPD 4** | Sistema RAG sobre datos mixtos con evaluación | [hpd4-rag-mixto.qmd](../evaluables/hpd4-rag-mixto.qmd) | 4h |
+| HPD | Título | Enlace |
+|---|---|---|
+| **HPD 5** | Sistema RAG sobre datos mixtos con evaluación | [hpd5-rag-mixto.qmd](../evaluables/hpd5-rag-mixto.qmd) |
 
 ## Lecturas obligatorias
 
@@ -103,9 +101,9 @@ graph TD
 ```
 :::
 
-Este bloque te da las herramientas para llevar tus sistemas IA a **calidad de producción**:
+Este bloque te da las herramientas para llevar tus sistemas IA a calidad de producción:
 
-- **Bloque 4:** evaluarás y desplegarás estos sistemas con gobernanza, detectando alucinaciones, sesgos y documentando con Model Cards.
+- **Bloque 4:** evaluarás y desplegarás estos sistemas con gobernanza, detectando alucinaciones y sesgos, y documentando con Model Cards.
 - **Proyecto integrador:** combinarás RAG + datos sintéticos + fine-tuning en un sistema completo de tu dominio.
 
 Ahora pasa al primer tema: **[RAG Avanzado](03b-rag-avanzado.qmd)**.

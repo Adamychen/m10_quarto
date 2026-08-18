@@ -6,8 +6,8 @@ lang: es
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01a-transformer.ipynb)
 
-> Este tema forma parte del **Bloque 1 — Fundamentos**. 
-> Se recomienda seguir el orden propuesto: Transformer → LLMs → Embeddings → Vector DB.
+> Este tema forma parte del Bloque 1 — Fundamentos.
+> Se recomienda seguir el orden propuesto: Transformer → LLM → Embeddings → Vector DB.
 
 > Para situar esta arquitectura en la evolución de las representaciones, consulta antes el [panorama histórico: del texto a los embeddings](00-panorama.qmd). La sección explica por qué los embeddings de palabras son anteriores al Transformer y por qué BERT y SBERT aprovechan después esta arquitectura.
 
@@ -80,12 +80,12 @@ Durante la inferencia generativa, la salida se obtiene un token cada vez. La fle
 ::: {.callout-note}
 ## Las 4 etapas de la pipeline
 
-1. **Tokenización** — el texto se divide en unidades subpalabra (tokens). Por ejemplo, *"unhappiness"* puede descomponerse en `["un", "happiness"]` o `["unhapp", "iness"]`. Cada token recibe un **ID entero** del vocabulario del modelo.
-2. **Embedding** — cada ID se convierte en un **vector denso** de dimensión $d$ (típicamente $d = 4096$). Los vectores se eligen de modo que **conceptos similares caen cerca en el espacio vectorial**.
+1. **Tokenización** — el texto se divide en unidades subpalabra (tokens). Por ejemplo, *"unhappiness"* puede descomponerse en `["un", "happiness"]` o `["unhapp", "iness"]`. Cada token recibe un ID entero del vocabulario del modelo.
+2. **Embedding** — cada ID se convierte en un vector denso de dimensión $d$ (típicamente $d = 4096$). Los vectores se eligen de modo que conceptos similares caen cerca en el espacio vectorial.
 3. **Procesamiento contextual** — $L$ capas de Transformer transforman todos los estados en paralelo. En un encoder cada posición puede consultar toda la secuencia; en un decoder-only solo puede consultar las posiciones anteriores y la actual. Tras $L$ capas, cada posición codifica información contextual.
 4. **Predicción** — el estado oculto final se proyecta a una distribución de probabilidad sobre todo el vocabulario, y una estrategia de *decoding* (temperatura, top-p, top-k) elige el siguiente token.
 
-Las secciones que siguen desglosan **cómo** funciona cada etapa, empezando por la pieza central: la **atención multi-cabeza**.
+Las secciones que siguen desglosan cómo funciona cada etapa, empezando por la pieza central: la atención multi-cabeza.
 :::
 
 ::: {.callout-tip}
@@ -102,7 +102,7 @@ El artículo original de Vaswani et al. presentó un modelo encoder-decoder para
 
 ![Arquitectura Transformer original: encoder, decoder causal y cross-attention (@vaswani2017attention, Figure 1).](../images/diagrama_transformer_original.webp){#fig-arquitectura-transformer}
 
-Los LLM generativos actuales suelen utilizar una variante decoder-only. En ella desaparecen el encoder y la cross-attention: una única pila de bloques con self-attention causal transforma el contexto disponible y produce los logits del siguiente token. Esto no significa que el decoder-only sea “el Transformer completo”; es una variante especializada para modelado de lenguaje causal.
+Los LLM generativos actuales suelen utilizar una variante decoder-only. En ella desaparecen el encoder y la cross-attention: una única pila de bloques con self-attention causal transforma el contexto disponible y produce los logits del siguiente token. Esto no significa que el decoder-only sea "el Transformer completo"; es una variante especializada para modelado de lenguaje causal.
 
 | Variante | Máscara principal | Salida habitual | Ejemplos de uso |
 |---|---|---|---|
@@ -162,7 +162,7 @@ $$
 = \operatorname{Concat}(\operatorname{head}_1,\ldots,\operatorname{head}_H)W_O
 $$
 
-Las cabezas no vienen etiquetadas de antemano como “sintaxis” o “semántica”. Pueden aprender patrones diferentes, pero su interpretación debe hacerse con cautela.
+Las cabezas no vienen etiquetadas de antemano como "sintaxis" o "semántica". Pueden aprender patrones diferentes, pero su interpretación debe hacerse con cautela.
 
 ![Comparación entre una máscara bidireccional y una máscara causal.](../images/01a-mascaras-atencion.svg){#fig-mascaras-atencion}
 
@@ -408,7 +408,7 @@ La atención local, GQA y FlashAttention resuelven problemas distintos. La prime
 
 ### Codificación posicional
 
-Sin información posicional, la self-attention no distingue el orden de los tokens. Más precisamente, el mecanismo es equivariante a permutaciones: si permutamos la entrada y aplicamos la misma permutación a la salida, el resultado se transforma de forma coherente, pero no aparece ninguna noción de “antes” y “después”. Para inyectar esa información, el Transformer añade o incorpora una señal posicional.
+Sin información posicional, la self-attention no distingue el orden de los tokens. Más precisamente, el mecanismo es equivariante a permutaciones: si permutamos la entrada y aplicamos la misma permutación a la salida, el resultado se transforma de forma coherente, pero no aparece ninguna noción de "antes" y "después". Para inyectar esa información, el Transformer añade o incorpora una señal posicional.
 
 La codificación posicional sinusoidal usa frecuencias diferentes para cada dimensión:
 
@@ -536,7 +536,7 @@ La elección no es una cuestión de antigüedad. Depende de la relación entre l
 
 ### Entrenamiento paralelo e inferencia autorregresiva {#sec-entrenamiento-inferencia}
 
-En un modelo causal, la frase “predecir el siguiente token” describe el objetivo, no necesariamente el orden de las operaciones durante el entrenamiento. Dada una secuencia, se desplazan los objetivos una posición:
+En un modelo causal, la frase "predecir el siguiente token" describe el objetivo, no necesariamente el orden de las operaciones durante el entrenamiento. Dada una secuencia, se desplazan los objetivos una posición:
 
 ```text
 Entrada:  [El, modelo, aprende, con, datos]

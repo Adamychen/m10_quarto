@@ -5,7 +5,7 @@ engine: jupyter
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02b-langchain.ipynb)
 
-> Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber visto [Prompt Engineering](02a-prompt-engineering.qmd) primero.
+> Este tema forma parte del Bloque 2 — Orquestación. Se recomienda haber visto [Prompt Engineering](02a-prompt-engineering.qmd) primero.
 
 ```{python}
 #| echo: true
@@ -20,14 +20,14 @@ engine: jupyter
 import os
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
-Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
 
 Orden de resolución:
   1. .env local (python-dotenv)
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -89,7 +89,7 @@ else:
 
 ### ¿Qué es y para qué sirve? {#sec-que-es-langchain}
 
-LangChain es un **framework de orquestación** para aplicaciones con LLMs. Si usar la API de OpenAI directamente es como cocinar con un solo fuego, LangChain te da una cocina completa: fogones, temporizador, nevera con ingredientes y libro de recetas.
+LangChain es un framework de orquestación para aplicaciones con LLM. Si usar la API de OpenAI directamente es como cocinar con un solo fuego, LangChain te da una cocina completa: fogones, temporizador, nevera con ingredientes y libro de recetas.
 
 ::: {#fig-langchain-componentes}
 ```{mermaid}
@@ -275,7 +275,7 @@ else:
 
 ### Retrievers {#sec-retrievers}
 
-Un **retriever** busca documentos relevantes en una base de conocimiento (vectorial o clásica) y los inyecta en el prompt. Es el corazón del patrón RAG (Retrieval-Augmented Generation):
+Un retriever busca documentos relevantes en una base de conocimiento (vectorial o clásica) y los inyecta en el prompt. Es el corazón del patrón RAG (Retrieval-Augmented Generation):
 
 ```{python}
 #| echo: true
@@ -418,7 +418,7 @@ else:
 ```
 
 ::: {.callout-note}
-Los callbacks son la base del **tracing** (LangSmith), el **logging** y la **monitorización** en producción. Te permiten saber exactamente qué está pasando dentro de tus cadenas y cuánto te está costando.
+Los callbacks son la base del tracing (LangSmith), el logging y la monitorización en producción. Te permiten saber exactamente qué está pasando dentro de tus cadenas y cuánto te está costando.
 :::
 
 ### Resumen del flujo completo {#sec-resumen-flujo-langchain}

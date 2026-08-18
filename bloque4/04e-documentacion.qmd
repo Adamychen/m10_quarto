@@ -11,7 +11,7 @@ engine: jupyter
 
 ### 5.1 Model Card {#sec-model-card}
 
-Una **Model Card** es un documento estructurado que describe un modelo: uso previsto, datos, métricas, limitaciones. Originalmente propuesta por @mitchell2019modelcards, es ahora estándar en Hugging Face [@huggingface_hub], OpenAI, Anthropic [@anthropic2023claude3mc], Google [@googledeepmind_modelcards].
+Una Model Card es un documento estructurado que describe un modelo: uso previsto, datos, métricas, limitaciones. Originalmente propuesta por @mitchell2019modelcards, es ahora estándar en Hugging Face [@huggingface_hub], OpenAI, Anthropic [@anthropic2023claude3mc], Google [@googledeepmind_modelcards].
 
 ```python
 #| echo: true
@@ -87,20 +87,20 @@ print(model_card_a_markdown(model_card)[:1200] + "\n[...]")
 ::: {.callout-note}
 ## Ejemplo estructural, no auditoría real
 
-Los valores numéricos de la Model Card anterior (`ragas_faithfulness: 0.82`, `"12/15 respuestas correctas"`, etc.) son **ilustrativos** y solo sirven para mostrar la forma del documento. En tu proyecto integrador debes sustituirlos por los resultados de tu **propia evaluación**, dejando siempre claro el protocolo con que se obtuvieron: tamaño de muestra, número de revisores, fecha y versión del modelo bajo test. Presentar cifras inventadas como si fueran una auditoría real es lo contrario de la transparencia algorítmica que promueve este bloque.
+Los valores numéricos de la Model Card anterior (`ragas_faithfulness: 0.82`, `"12/15 respuestas correctas"`, etc.) son ilustrativos y solo sirven para mostrar la forma del documento. En tu proyecto integrador debes sustituirlos por los resultados de tu propia evaluación, dejando siempre claro el protocolo con el que se obtuvieron: tamaño de muestra, número de revisores, fecha y versión del modelo evaluado. Presentar cifras inventadas como si fueran una auditoría real es lo contrario de la transparencia algorítmica que promueve este bloque.
 :::
 
 ### 5.2 System Card {#sec-system-card}
 
-Una **System Card** va un paso más allá: documenta no solo el modelo, sino el **sistema completo** que lo envuelve (RAG, agentes, guardas, etc.). Los [System Cards de Anthropic](https://www.anthropic.com/system-cards) [@anthropic_systemcards] son los referentes.
+Una System Card va un paso más allá: documenta no solo el modelo, sino el sistema completo que lo envuelve (RAG, agentes, guardas, etc.). Los [System Cards de Anthropic](https://www.anthropic.com/system-cards) [@anthropic_systemcards] son los referentes.
 
-A diferencia de la Model Card (centrada en el modelo), una System Card documenta el **pipeline de extremo a extremo** y debe responder: ¿qué falla cuando el sistema falla? ¿qué se hace para que no falle? Las System Cards públicas más completas comparten cinco bloques:
+A diferencia de la Model Card (centrada en el modelo), una System Card documenta el pipeline de extremo a extremo y debe responder: ¿qué falla cuando el sistema falla? ¿qué se hace para que no falle? Las System Cards públicas más completas comparten cinco bloques:
 
-- **Componentes** del sistema: retrieval, LLM, tools, guardas, capas de moderación.
+- **Componentes del sistema**: retrieval, LLM, tools, guardas, capas de moderación.
 - **Hallazgos de red team**: qué ataques se probaron, qué jailbreaks se observaron, qué patrones de prompt injection se documentaron.
 - **Mitigaciones aplicadas**: sanitización de inputs, rate limiting, filtros de salida, audit log, listas de palabras prohibidas.
 - **Monitorización continua**: métricas en producción, alertas automáticas, revisión humana periódica, feedback de usuarios.
-- **Limitaciones y casos fuera de alcance**: lo que el sistema **no** debe usarse para hacer.
+- **Limitaciones y casos fuera de alcance**: aquello para lo que el sistema no debe usarse.
 
 ### System Cards de referencia en la industria {#sec-system-cards-referencia}
 

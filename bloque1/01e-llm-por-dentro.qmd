@@ -1,12 +1,10 @@
 ---
-title: "01e - Del estado oculto a la salida: cabezas y objetivos de entrenamiento"
+title: "01e — Del estado oculto a la salida: cabezas y objetivos de entrenamiento"
 lang: es
 ---
 
-> Este tema forma parte del Bloque 1 - Fundamentos.
-> Se recomienda leerlo después de [01a - Arquitectura Transformer](01a-transformer.qmd) y [01b - LLMs e inferencia](01b-llms.qmd).
->
-> Tiempo estimado: 1 h.
+> Este tema forma parte del Bloque 1 — Fundamentos.
+> Se recomienda leerlo después de [01a — Arquitectura Transformer](01a-transformer.qmd) y [01b — LLM e inferencia](01b-llms.qmd).
 
 ::: {.callout-note}
 ## Qué aprenderás
@@ -129,7 +127,7 @@ El formato conversacional también importa. Los tokens especiales, las plantilla
 ::: {.callout-important}
 ## SFT no es una cuarta cabeza
 
-La expresión “SFT head” resulta cómoda como abreviatura, pero es arquitectónicamente imprecisa. SFT describe una fase de entrenamiento de la *LM head*, no una capa de salida independiente.
+La expresión "SFT head" resulta cómoda como abreviatura, pero es arquitectónicamente imprecisa. SFT describe una fase de entrenamiento de la *LM head*, no una capa de salida independiente.
 :::
 
 ## 4. Value head: estimar el valor de un estado {#sec-value-head}

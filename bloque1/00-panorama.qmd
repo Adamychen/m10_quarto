@@ -6,11 +6,9 @@ lang: es
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/00-panorama.ipynb)
 
-> **Duración orientativa:** 45-60 min
->
 > **Propósito:** ofrecer un mapa histórico y conceptual antes de entrar en la arquitectura de los modelos actuales.
 >
-> Esta página no sustituye ninguno de los contenidos del Bloque 1. Sirve para entender por qué aparecen los embeddings, qué problema resuelven y cómo se relacionan con los LLMs y los sistemas RAG.
+> Esta página no sustituye ninguno de los contenidos del Bloque 1. Sirve para entender por qué aparecen los embeddings, qué problema resuelven y cómo se relacionan con los LLM y los sistemas RAG.
 
 ::: {.callout-tip}
 ## Idea guía
@@ -22,12 +20,12 @@ Un sistema de IA no puede trabajar directamente con el significado humano de una
 
 Al terminar este panorama deberías poder:
 
-- explicar por qué una palabra, una frase o un documento necesitan convertirse en números;
-- distinguir representaciones dispersas de representaciones densas;
-- diferenciar un embedding de entrada, un estado oculto contextual y un embedding de frase;
-- describir qué aportan word2vec, BERT, SBERT y E5 en la evolución de las representaciones;
-- relacionar embeddings, búsqueda vectorial y RAG con la generación de texto de un LLM;
-- entender que la historia de las representaciones y la historia de la generación son dos líneas relacionadas, pero no idénticas.
+- Explicar por qué una palabra, una frase o un documento necesitan convertirse en números
+- Distinguir representaciones dispersas de representaciones densas
+- Diferenciar un embedding de entrada, un estado oculto contextual y un embedding de frase
+- Describir qué aportan word2vec, BERT, SBERT y E5 en la evolución de las representaciones
+- Relacionar embeddings, búsqueda vectorial y RAG con la generación de texto de un LLM
+- Entender que la historia de las representaciones y la historia de la generación son dos líneas relacionadas, pero no idénticas
 
 ## El problema: el texto no es todavía una geometría {#sec-problema-representacion}
 
@@ -50,10 +48,10 @@ La respuesta ha ido cambiando con el tiempo. Primero se contaban palabras. Despu
 ::: {#fig-flujo-historico}
 ```{mermaid}
 flowchart LR
-    A[Texto humano]:::input --> B[Representacion numerica]:::proc
+    A[Texto humano]:::input --> B[Representación numérica]:::proc
     B --> C[Espacio de similitud]:::doc
-    C --> D[Busqueda y recuperacion]:::proc
-    C --> E[Clasificacion o prediccion]:::proc
+    C --> D[Búsqueda y recuperación]:::proc
+    C --> E[Clasificación o predicción]:::proc
     B --> F[Modelo generativo]:::proc
     D --> G[RAG]:::out
     F --> H[Agentes y herramientas]:::out
@@ -65,7 +63,7 @@ flowchart LR
 ```
 :::
 
-@fig-flujo-historico resume el hilo conductor del módulo: una representación numérica puede servir para recuperar información o para alimentar un modelo que genera una salida. Los embeddings son especialmente importantes en la primera rama, aunque también aparecen dentro de los propios LLMs.
+@fig-flujo-historico resume el hilo conductor del módulo: una representación numérica puede servir para recuperar información o para alimentar un modelo que genera una salida. Los embeddings son especialmente importantes en la primera rama, aunque también aparecen dentro de los propios LLM.
 
 ## Dos historias que se encuentran {#sec-dos-historias}
 
@@ -76,10 +74,10 @@ La evolución de la IA generativa no es una única escalera. Hay dos líneas his
 ```text
 one-hot -> Bag of Words / TF-IDF -> word2vec y GloVe
         -> representaciones contextuales -> SBERT y E5
-        -> vector DB -> recuperacion semantica -> RAG
+        -> vector DB -> recuperación semántica -> RAG
 ```
 
-Esta línea intenta que textos relacionados ocupen posiciones próximas en un espacio vectorial. Su pregunta principal es: **¿qué objetos son semánticamente parecidos o relevantes para una consulta?**
+Esta línea intenta que textos relacionados ocupen posiciones próximas en un espacio vectorial. Su pregunta principal es: ¿qué objetos son semánticamente parecidos o relevantes para una consulta?
 
 ### Línea B: generar lenguaje
 
@@ -89,7 +87,7 @@ modelos simbolicos -> RNN / LSTM -> Transformer
                    -> instrucciones -> herramientas -> agentes
 ```
 
-Esta línea intenta modelar una distribución de probabilidad para producir el siguiente token y, a partir de esa operación repetida, generar texto. Su pregunta principal es: **¿qué token puede venir a continuación dado el contexto?**
+Esta línea intenta modelar una distribución de probabilidad para producir el siguiente token y, a partir de esa operación repetida, generar texto. Su pregunta principal es: ¿qué token puede venir a continuación dado el contexto?
 
 El Transformer es un punto de encuentro, no el origen de toda la historia de los embeddings. Los embeddings de palabras son anteriores al Transformer; los embeddings de frases modernos se benefician de encoders Transformer y de objetivos contrastivos.
 
@@ -107,7 +105,7 @@ La representación más directa asigna una posición del vector a cada elemento 
 | alfombra | `[0, 0, 0, 1, 0]` |
 | bolsa | `[0, 0, 0, 0, 1]` |
 
-Esta representación permite identificar símbolos, pero no expresa relaciones semánticas. La distancia entre `gato` y `perro` es la misma que entre `gato` y `bolsa`. Además, el vector crece con el tamaño del vocabulario y contiene casi todo ceros.
+Esta representación permite identificar símbolos, pero no expresa relaciones semánticas. La distancia entre `gato` y `perro` es la misma que entre `gato` y `bolsa`. Además, el vector crece con el tamaño del vocabulario y contiene casi todos ceros.
 
 ### Bag of Words
 
@@ -124,8 +122,8 @@ Su virtud fue convertir colecciones de documentos en matrices que podían analiz
 
 TF-IDF combina dos ideas:
 
-- **TF**, frecuencia de un término dentro de un documento;
-- **IDF**, rareza del término dentro de la colección completa.
+- **TF:** Frecuencia de un término dentro de un documento
+- **IDF:** Rareza del término dentro de la colección completa
 
 Una forma habitual de escribirlo es:
 
@@ -147,7 +145,7 @@ Para TF-IDF, `vehículo`, `coche` y `automóvil` son columnas distintas. Si una 
 
 La hipótesis distribucional de la lingüística propone que las palabras que aparecen en contextos parecidos tienden a tener significados parecidos. Firth lo resumió en una frase que se convirtió en una referencia del área:
 
-> “You shall know a word by the company it keeps” [@firth1957synopsis].
+> "You shall know a word by the company it keeps" [@firth1957synopsis].
 
 En lugar de asignar manualmente propiedades a cada palabra, podemos observar grandes cantidades de texto y construir una matriz de coocurrencias:
 
@@ -168,8 +166,8 @@ Los primeros modelos neuronales de lenguaje ya utilizaban una tabla de vectores 
 
 Con word2vec, la idea se volvió especialmente accesible y eficiente [@mikolov2013word2vec]. Sus dos objetivos más conocidos son:
 
-- **CBOW:** predecir una palabra a partir de las palabras que la rodean;
-- **Skip-gram:** predecir palabras de contexto a partir de una palabra central.
+- **CBOW:** Predecir una palabra a partir de las palabras que la rodean
+- **Skip-gram:** Predecir palabras de contexto a partir de una palabra central
 
 En los dos casos, la tabla de parámetros aprendida se interpreta como un espacio vectorial de palabras. GloVe siguió una estrategia relacionada, pero utilizó estadísticas globales de coocurrencia [@pennington2014glove].
 
@@ -185,10 +183,10 @@ Esta operación no debe entenderse como una regla lógica garantizada. Es una il
 
 Los embeddings estáticos también hicieron posible:
 
-- calcular similitud entre palabras;
-- agrupar vocabulario por significado o uso;
-- alimentar clasificadores con menos dimensiones que una representación one-hot;
-- transferir información aprendida a tareas con pocos datos.
+- Calcular similitud entre palabras
+- Agrupar vocabulario por significado o uso
+- Alimentar clasificadores con menos dimensiones que una representación one-hot
+- Transferir información aprendida a tareas con pocos datos
 
 ### La limitación: un vector por palabra
 
@@ -210,7 +208,7 @@ Las redes recurrentes procesaban una secuencia manteniendo un estado oculto que 
 ELMo produjo representaciones contextuales a partir de modelos de lenguaje bidireccionales [@peters2018deep]. La misma palabra podía recibir vectores distintos según la frase en la que apareciera. Esto supuso un cambio conceptual importante:
 
 ```text
-embedding estatico: palabra -> vector fijo
+embedding estático: palabra -> vector fijo
 embedding contextual: palabra + contexto -> vector dependiente de la frase
 ```
 
@@ -240,10 +238,10 @@ BERT produce estados contextuales por token, pero no fue diseñado automáticame
 
 Sentence-BERT introdujo una arquitectura siamesa con pesos compartidos y objetivos de similitud para obtener embeddings de frases comparables de manera eficiente [@reimers2019sbert]. Durante la inferencia:
 
-1. se codifica cada documento una sola vez;
-2. se guarda su vector;
-3. se codifica la consulta;
-4. se buscan los vectores más cercanos.
+1. Se codifica cada documento una sola vez
+2. Se guarda su vector
+3. Se codifica la consulta
+4. Se buscan los vectores más cercanos
 
 Esta separación entre codificación e indexación hace que la búsqueda semántica sea práctica sobre colecciones grandes.
 
@@ -259,12 +257,12 @@ $$
 
 En la práctica, la calidad no depende únicamente de la arquitectura. También importan:
 
-- el corpus de preentrenamiento;
-- el idioma y el dominio;
-- el tipo de pares positivos y negativos;
-- la función de similitud;
-- la normalización y la estrategia de pooling;
-- la evaluación sobre consultas reales.
+- El corpus de preentrenamiento
+- El idioma y el dominio
+- El tipo de pares positivos y negativos
+- La función de similitud
+- La normalización y la estrategia de pooling
+- La evaluación sobre consultas reales
 
 ## Sexta etapa: del espacio semántico a la recuperación {#sec-espacio-recuperacion}
 
@@ -289,12 +287,12 @@ La recuperación densa también se convirtió en un componente de los sistemas R
 ```{mermaid}
 flowchart TD
     A[One-hot y simbolos]:::input --> B[BoW y TF-IDF]:::proc
-    B --> C[Coocurrencias y semantica distribucional]:::proc
+    B --> C[Coocurrencias y semántica distribucional]:::proc
     C --> D[Word2vec y GloVe]:::doc
     D --> E[ELMo y representaciones contextuales]:::doc
     E --> F[Transformer y BERT]:::proc
     F --> G[SBERT y embeddings de frase]:::out
-    G --> H[E5 y recuperacion densa]:::out
+    G --> H[E5 y recuperación densa]:::out
     H --> I[Vector DB y RAG]:::out
 
     classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
@@ -304,7 +302,7 @@ flowchart TD
 ```
 :::
 
-@fig-linea-historica no representa una sustitución total de una técnica por la siguiente. Las representaciones dispersas siguen siendo útiles para interpretabilidad y recuperación léxica; los embeddings densos pueden combinarse con índices híbridos; y los LLMs modernos continúan utilizando tablas de embeddings de tokens internamente.
+@fig-linea-historica no representa una sustitución total de una técnica por la siguiente. Las representaciones dispersas siguen siendo útiles para interpretabilidad y recuperación léxica; los embeddings densos pueden combinarse con índices híbridos; y los LLM modernos continúan utilizando tablas de embeddings de tokens internamente.
 
 ## Qué ocurre dentro de un LLM actual {#sec-embeddings-llm-actual}
 
@@ -318,7 +316,7 @@ texto -> tokens -> IDs -> embeddings de token
 
 Los embeddings de token son una pieza interna del modelo generativo, pero no son idénticos a los embeddings de frases que se usan para búsqueda semántica. Un modelo generativo puede producir buenos textos y no ser el mejor modelo para recuperar documentos. Del mismo modo, un modelo de embeddings puede ser excelente para similitud y no estar diseñado para generar respuestas.
 
-La página [01e - Del estado oculto a la salida](01e-llm-por-dentro.qmd) amplía la relación entre backbone, estados ocultos y cabezas de salida. La página [01b - LLMs e inferencia](01b-llms.qmd) explica la tokenización y la predicción del siguiente token.
+La página [01e - Del estado oculto a la salida](01e-llm-por-dentro.qmd) amplía la relación entre backbone, estados ocultos y cabezas de salida. La página [01b - LLM e inferencia](01b-llms.qmd) explica la tokenización y la predicción del siguiente token.
 
 ## Demostración: coincidencia literal frente a similitud semántica {#sec-demo-tfidf}
 
@@ -336,7 +334,7 @@ import numpy as np
 frases = [
     "El gato duerme sobre la alfombra.",
     "Un felino descansa en la moqueta.",
-    "La bolsa europea cerro al alza.",
+    "La bolsa europea cerró al alza.",
 ]
 
 vectorizer = TfidfVectorizer(lowercase=True, strip_accents="unicode")
@@ -381,7 +379,7 @@ model = SentenceTransformer("intfloat/multilingual-e5-small")
 consultas = [
     "query: El gato duerme sobre la alfombra.",
     "query: Un felino descansa en la moqueta.",
-    "query: La bolsa europea cerro al alza.",
+    "query: La bolsa europea cerró al alza.",
 ]
 
 embeddings = model.encode(consultas, normalize_embeddings=True)
@@ -405,12 +403,12 @@ La evolución completa puede resumirse en cuatro preguntas:
 En el resto del módulo, esta intuición se materializa en componentes concretos:
 
 ```text
-representacion -> embedding de frase o documento
-indexacion     -> Chroma, FAISS, HNSW o IVF
-recuperacion   -> top-k y re-ranking
-generacion     -> LLM condicionado por el contexto recuperado
-orquestacion   -> cadenas, herramientas, MCP y agentes
-evaluacion     -> recall, precision, faithfulness y RAGAS
+representación -> embedding de frase o documento
+indexación     -> Chroma, FAISS, HNSW o IVF
+recuperación   -> top-k y re-ranking
+generación     -> LLM condicionado por el contexto recuperado
+orquestación   -> cadenas, herramientas, MCP y agentes
+evaluación     -> recall, precision, faithfulness y RAGAS
 ```
 
 La representación vectorial no es un detalle de implementación. Es la decisión que determina qué significa que dos objetos sean parecidos y, por tanto, qué información llegará a las etapas posteriores del sistema.
@@ -419,11 +417,11 @@ La representación vectorial no es un detalle de implementación. Es la decisió
 
 Continúa con:
 
-1. [01-fundamentos.qmd](01-fundamentos.qmd), para ver el mapa completo del bloque.
-2. [01a-transformer.qmd](01a-transformer.qmd), para entender la arquitectura que produce estados contextuales.
-3. [01b-llms.qmd](01b-llms.qmd), para estudiar tokenización, preentrenamiento e inferencia.
-4. [01c-embeddings.qmd](01c-embeddings.qmd), para profundizar en SBERT, E5 y la geometría semántica.
-5. [01d-vectordb.qmd](01d-vectordb.qmd), para convertir el espacio semántico en un sistema de búsqueda.
+1. [01-fundamentos.qmd](01-fundamentos.qmd), para ver el mapa completo del bloque
+2. [01a-transformer.qmd](01a-transformer.qmd), para entender la arquitectura que produce estados contextuales
+3. [01b-llms.qmd](01b-llms.qmd), para estudiar tokenización, preentrenamiento e inferencia
+4. [01c-embeddings.qmd](01c-embeddings.qmd), para profundizar en SBERT, E5 y la geometría semántica
+5. [01d-vectordb.qmd](01d-vectordb.qmd), para convertir el espacio semántico en un sistema de búsqueda
 
 ---
 

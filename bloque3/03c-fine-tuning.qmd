@@ -5,7 +5,7 @@ engine: jupyter
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque3/03c-fine-tuning.ipynb)
 
-> Este tema forma parte del **Bloque 3 — Aplicaciones**. Se recomienda haber completado los [Bloques 1](../bloque1/01-fundamentos.qmd) y [2](../bloque2/02-orquestacion.qmd) primero.
+> Este tema forma parte del Bloque 3 — Aplicaciones. Se recomienda haber completado los [Bloques 1](../bloque1/01-fundamentos.qmd) y [2](../bloque2/02-orquestacion.qmd) primero.
 
 ```{python}
 #| echo: true
@@ -20,14 +20,14 @@ engine: jupyter
 import os
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
-Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.sh (pre-render).
+Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
 
 Orden de resolución:
   1. .env local (python-dotenv)
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -77,9 +77,9 @@ print("Librerías cargadas correctamente.")
 
 ### ¿Qué es fine-tuning y por qué es difícil? {#sec-que-es-fine-tuning}
 
-Un LLM preentrenado es como un **médico generalista**: sabe de todo un poco. Hacer fine-tuning es como enviarlo a una **especialización de 6 meses**: sale sabiendo mucho de un tema concreto sin olvidar lo general.
+Un LLM preentrenado es como un médico generalista: sabe de todo un poco. Hacer fine-tuning es como enviarlo a una especialización de 6 meses: sale sabiendo mucho de un tema concreto sin olvidar lo general.
 
-El fine-tuning consiste en tomar un modelo base preentrenado y **entrenarlo adicionalmente** con datos de tu dominio para que adapte su comportamiento: nuevo tono, nuevo formato de salida, nuevo vocabulario técnico, o nuevo conocimiento específico.
+El fine-tuning consiste en tomar un modelo base preentrenado y entrenarlo adicionalmente con datos de tu dominio para que adapte su comportamiento: nuevo tono, nuevo formato de salida, nuevo vocabulario técnico o nuevo conocimiento específico.
 
 ::: {#fig-fine-tuning-concepto}
 ```{mermaid}
@@ -101,7 +101,7 @@ graph LR
 ```
 :::
 
-El problema es la **escala**. Los modelos modernos tienen miles de millones de parámetros, y entrenarlos completamente requiere una cantidad de memoria GPU prohibitiva:
+El problema es la escala. Los modelos modernos tienen miles de millones de parámetros, y entrenarlos completamente requiere una cantidad de memoria GPU prohibitiva:
 
 : Comparativa de modelos por parámetros, RAM y coste GPU para fine-tuning {#tbl-modelos-ft}
 
@@ -114,14 +114,14 @@ El problema es la **escala**. Los modelos modernos tienen miles de millones de p
 ::: {.callout-warning}
 ## El problema de memoria
 
-Fine-tuning completo de un modelo 7B requiere ~56 GB de RAM: 14 GB para los pesos + 28 GB para los gradientes + 14 GB para los estados del optimizador Adam. Una GPU de consumidor (RTX 4090: 24 GB) no basta. Aquí entran las técnicas **PEFT** (Parameter-Efficient Fine-Tuning).
+Fine-tuning completo de un modelo 7B requiere ~56 GB de RAM: 14 GB para los pesos + 28 GB para los gradientes + 14 GB para los estados del optimizador Adam. Una GPU de consumidor (RTX 4090: 24 GB) no basta. Aquí entran las técnicas PEFT (Parameter-Efficient Fine-Tuning).
 :::
 
 ---
 
 ### La decisión clave: ¿Fine-tuning, RAG o Prompting? {#sec-decision-ft-rag-prompt}
 
-Antes de hacer fine-tuning, pregúntate si realmente lo necesitas. La mayoría de las veces, **RAG o prompting son suficientes**.
+Antes de hacer fine-tuning, pregúntate si realmente lo necesitas. La mayoría de las veces, RAG o prompting son suficientes.
 
 ::: {#fig-decision-ft-rag-prompt}
 ```{mermaid}
@@ -173,7 +173,7 @@ graph TD
 
 ### LoRA: Low-Rank Adaptation {#sec-lora}
 
-**LoRA** es la técnica PEFT más popular. En vez de reescribir todos los pesos del modelo, añade pequeñas "notas adhesivas" (matrices de bajo rango) que modifican el comportamiento sin tocar el modelo original.
+LoRA es la técnica PEFT más popular. En vez de reescribir todos los pesos del modelo, añade pequeñas "notas adhesivas" (matrices de bajo rango) que modifican el comportamiento sin tocar el modelo original.
 
 **En vez de reescribir todo el libro (fine-tuning completo), LoRA añade notas adhesivas en las páginas clave. El libro original no cambia, pero las notas modifican cómo se lee.**
 
@@ -202,11 +202,11 @@ graph TD
 ```
 :::
 
-La idea es que los **cambios necesarios** para adaptar el modelo son de "bajo rango": no necesitas modificar los millones de pesos de W, solo unas pocas direcciones principales. Las matrices A y B capturan esas direcciones con una fracción de los parámetros.
+La idea es que los cambios necesarios para adaptar el modelo son de "bajo rango": no necesitas modificar los millones de pesos de W, solo unas pocas direcciones principales. Las matrices A y B capturan esas direcciones con una fracción de los parámetros.
 
 #### Intuición del rango bajo {#sec-rango-bajo}
 
-Imagina una imagen de 1000×1000 píxeles (1 millón de valores). Si la describes con 10 factores principales (rango 10), solo necesitas 1000×10 + 10×1000 = 20.000 valores. Has comprimido **50×** sin perder la esencia.
+Imagina una imagen de 1000×1000 píxeles (1 millón de valores). Si la describes con 10 factores principales (rango 10), solo necesitas 1000×10 + 10×1000 = 20.000 valores. Has comprimido 50× sin perder la esencia.
 
 Lo mismo aplica a las matrices de pesos del Transformer: los cambios necesarios para adaptar el modelo a un nuevo dominio ocupan pocas direcciones principales.
 
@@ -215,7 +215,7 @@ Lo mismo aplica a las matrices de pesos del Transformer: los cambios necesarios 
 | Parámetro | Qué controla | Valor típico | Impacto |
 |---|---|---|---|
 | **r** (rank) | Tamaño de las matrices A y B | 8-64 | Más alto = más capacidad, más VRAM |
-| **alpha** | Factor de escala (alpha/r) | 16-128 | Controla cuánto influye LoRA vs el modelo base |
+| **alpha** | Factor de escala (alpha/r) | 16-128 | Controla cuánto influye LoRA frente al modelo base |
 | **target_modules** | Qué capas del Transformer se adaptan | `q_proj, v_proj` | Más módulos = más parámetros |
 | **dropout** | Regularización | 0.05-0.1 | Evita overfitting en datasets pequeños |
 
@@ -254,7 +254,7 @@ print(f"  Dropout: {config.lora_dropout}")
 
 ### QLoRA: fine-tuning en GPU de consumidor {#sec-qlora}
 
-**QLoRA** combina LoRA con **cuantización a 4 bits**: el modelo base se comprime para que ocupe menos memoria, y solo los adaptadores LoRA se entrenan en precisión completa.
+QLoRA combina LoRA con cuantización a 4 bits: el modelo base se comprime para que ocupe menos memoria, y solo los adaptadores LoRA se entrenan en precisión completa.
 
 **QLoRA es como hacer la mudanza en una furgoneta en vez de un camión: el modelo base viaja comprimido (4 bits) y solo las notas adhesivas (LoRA) ocupan espacio real.**
 
@@ -282,9 +282,9 @@ graph TD
 |---|---|---|
 | Fine-tuning completo (16-bit) | 14 GB pesos + 42 GB optimizador | ~56 GB |
 | LoRA (16-bit) | 14 GB pesos (congelados) + 0.1 GB LoRA | ~16 GB |
-| **QLoRA (4-bit)** | **4 GB pesos (congelados) + 0.1 GB LoRA** | **~6 GB** |
+| **QLoRA (4-bit)** | 4 GB pesos (congelados) + 0.1 GB LoRA | ~6 GB |
 
-Con QLoRA puedes hacer fine-tuning de un modelo 7B en una **GPU de Colab gratuita** (T4, 16 GB VRAM).
+Con QLoRA puedes hacer fine-tuning de un modelo 7B en una GPU de Colab gratuita (T4, 16 GB VRAM).
 
 ```{python}
 #| echo: true
@@ -311,16 +311,16 @@ print(f"  VRAM usada: ~{sum(p.numel() * p.element_size() for p in model.paramete
 ```
 
 ::: {.callout-warning}
-## QLoRA vs LoRA: ¿pierdes calidad?
+## QLoRA frente a LoRA: ¿pierdes calidad?
 
-QLoRA reduce la calidad ligeramente vs LoRA 16-bit. Para la mayoría de casos la diferencia es despreciable (<2% en benchmarks), pero si necesitas máxima precisión y tienes VRAM suficiente, usa LoRA sin cuantizar.
+QLoRA reduce la calidad ligeramente frente a LoRA 16-bit. Para la mayoría de casos la diferencia es despreciable (< 2 % en pruebas comparativas), pero si necesitas máxima precisión y tienes VRAM suficiente, usa LoRA sin cuantizar.
 :::
 
 ---
 
 ### Otras técnicas PEFT {#sec-otras-peft}
 
-LoRA y QLoRA cubren el 95% de los casos prácticos. Las demás técnicas son relevantes si lees papers o trabajas en investigación:
+LoRA y QLoRA cubren el 95 % de los casos prácticos. Las demás técnicas son relevantes si lees artículos científicos o trabajas en investigación:
 
 : Comparativa de técnicas PEFT más allá de LoRA/QLoRA {#tbl-otras-peft}
 
@@ -335,14 +335,14 @@ LoRA y QLoRA cubren el 95% de los casos prácticos. Las demás técnicas son rel
 ::: {.callout-tip}
 ## En la práctica
 
-Si estás empezando, usa **LoRA** (o **QLoRA** si tienes poca VRAM). Las demás técnicas tienen casos de uso muy específicos y menos soporte en las herramientas habituales (Hugging Face, TRL, etc.).
+Si estás empezando, usa LoRA (o QLoRA si tienes poca VRAM). Las demás técnicas tienen casos de uso muy específicos y menos soporte en las herramientas habituales (Hugging Face, TRL, etc.).
 :::
 
 ---
 
 ### Infraestructura y ejemplo en Colab {#sec-infraestructura-colab}
 
-El stack tecnológico para fine-tuning eficiente es:
+El conjunto de herramientas para fine-tuning eficiente es:
 
 ::: {#fig-stack-fine-tuning}
 ```{mermaid}
@@ -361,7 +361,7 @@ graph TD
 ```
 :::
 
-El siguiente ejemplo muestra un fine-tuning mínimo con TRL (Supervised Fine-Tuning) sobre un modelo pequeño. Está diseñado para ejecutarse en **Colab con GPU T4 gratuita**.
+El siguiente ejemplo muestra un fine-tuning mínimo con TRL (Supervised Fine-Tuning) sobre un modelo pequeño. Está diseñado para ejecutarse en Colab con GPU T4 gratuita.
 
 ```{python}
 #| echo: true
@@ -438,18 +438,18 @@ print(tokenizer.decode(outputs[0], skip_special_tokens=True))
 ## Sobre este ejemplo
 
 - El modelo `Qwen3-0.6B` es pequeño (600M parámetros) para que el ejemplo sea rápido. En tu proyecto puedes usar modelos mayores (7B) con QLoRA.
-- El dataset tiene solo 3 ejemplos para ilustrar el formato. En la práctica necesitas **cientos o miles** de ejemplos para un fine-tuning efectivo.
+- El dataset tiene solo 3 ejemplos para ilustrar el formato. En la práctica necesitas cientos o miles de ejemplos para un fine-tuning efectivo.
 - El formato `### Instrucción / ### Entrada / ### Respuesta` es el estándar para SFT (Supervised Fine-Tuning).
 :::
 
 ::: {.callout-warning}
 ## La calidad del dataset es lo más importante
 
-El fine-tuning con datos de baja calidad produce un modelo **peor** que el base. Antes de hacer fine-tuning:
+El fine-tuning con datos de baja calidad produce un modelo peor que el base. Antes de hacer fine-tuning:
 
 1. **Revisa** cada ejemplo manualmente
 2. **Asegura** consistencia en el formato
-3. **Incluye** casos edge (respuestas negativas, neutrales, ambiguas)
+3. **Incluye** casos límite (respuestas negativas, neutrales, ambiguas)
 4. **Empieza** con 100-500 ejemplos de alta calidad antes de escalar
 :::
 
@@ -469,10 +469,10 @@ El fine-tuning con datos de baja calidad produce un modelo **peor** que el base.
 ::: {.callout-tip}
 ## Árbol de decisión final
 
-1. ¿Tu problema se resuelve con **prompting**? → No hagas fine-tuning.
-2. ¿Necesitas **conocimiento actualizable**? → Usa **RAG**.
-3. ¿Necesitas **comportamiento/formato específico** y tienes datos de calidad? → **LoRA** (o **QLoRA** si tienes poca VRAM).
-4. ¿Necesitas **ambos** (conocimiento + comportamiento)? → **RAG + LoRA**.
+1. ¿Tu problema se resuelve con prompting? → No hagas fine-tuning.
+2. ¿Necesitas conocimiento actualizable? → Usa RAG.
+3. ¿Necesitas comportamiento/formato específico y tienes datos de calidad? → LoRA (o QLoRA si tienes poca VRAM).
+4. ¿Necesitas ambos (conocimiento + comportamiento)? → RAG + LoRA.
 :::
 
 ---
@@ -486,7 +486,7 @@ El fine-tuning con datos de baja calidad produce un modelo **peor** que el base.
 
 ---
 
-> Has completado la teoría del **Bloque 3**. Ahora pasa al taller práctico: **[HPD 4 — Sistema RAG sobre datos mixtos](../evaluables/hpd4-rag-mixto.qmd)**.
+> Has completado la teoría del Bloque 3. Ahora pasa al taller práctico: **[HPD 5 — Sistema RAG sobre datos mixtos](../evaluables/hpd5-rag-mixto.qmd)**.
 
 # References
 

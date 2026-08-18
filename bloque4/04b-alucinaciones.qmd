@@ -5,15 +5,15 @@ engine: jupyter
 
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque4/04b-alucinaciones.ipynb)
 
-> Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). Se recomienda leer antes la subsección [04a — Evaluación de LLMs](04a-evaluacion.qmd), donde se introducen las métricas que permiten detectar los fenómenos descritos aquí.
+> Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). Se recomienda leer antes la subsección [04a — Evaluación de LLM](04a-evaluacion.qmd), donde se introducen las métricas que permiten detectar los fenómenos descritos aquí.
 
 ## 2. Alucinaciones {#sec-alucinaciones}
 
-Las alucinaciones son el riesgo más visible de los LLMs en producción: el modelo afirma con total seguridad algo que es **falso, no respaldado o simplemente inexistente**. Distinguirlas bien es el primer paso para mitigarlas.
+Las alucinaciones son el riesgo más visible de los LLM en producción: el modelo afirma con total seguridad algo que es falso, no respaldado o simplemente inexistente. Distinguirlas bien es el primer paso para mitigarlas.
 
 ### 2.1 Taxonomía {#sec-alucinaciones-taxonomia}
 
-: Taxonomía de los tipos de alucinaciones en LLMs {#tbl-alucinaciones-tipos}
+: Taxonomía de los tipos de alucinaciones en LLM {#tbl-alucinaciones-tipos}
 
 | Tipo | Descripción | Ejemplo |
 |---|---|---|
@@ -28,7 +28,7 @@ Las alucinaciones son el riesgo más visible de los LLMs en producción: el mode
 
 def detectar_hallucination_factual(afirmacion: str, hechos: list[str]) -> dict:
     """
-    Detección de alucinación con verificación de claims.
+    Detección de alucinación con verificación de afirmaciones.
     Compara cada afirmación contra una lista de hechos conocidos.
     En producción, los 'hechos' vienen de RAG/búsqueda web.
     """
@@ -88,7 +88,7 @@ Orden de resolución:
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -160,9 +160,9 @@ def responder_con_citation(pregunta, contexto, llm_client):
 ::: {.callout-tip}
 ## Checklist anti-alucinación
 
-- [ ] Prompt instruye explícitamente a no inventar
-- [ ] Prompt obliga a decir "no sé" cuando el contexto no alcanza
-- [ ] El sistema cita las fuentes (fragments) en la respuesta
+- [ ] El prompt instruye explícitamente a no inventar
+- [ ] El prompt obliga a decir "no sé" cuando el contexto no alcanza
+- [ ] El sistema cita las fuentes (fragmentos) en la respuesta
 - [ ] Post-procesado: verificar que las citas referencian chunks reales
 - [ ] RAGAS `faithfulness` > 0.7 antes de producción [@es2024ragas]
 :::

@@ -1,5 +1,5 @@
 ---
-title: "HPD 4 — Entregable: Sistema RAG con evaluación"
+title: "HPD 4 — Entregable: Servidor MCP y conexión segura a datos"
 engine: jupyter
 ---
 
@@ -7,9 +7,9 @@ engine: jupyter
 
 > **Peso en la nota:** 7.5 %
 >
-> **Plazo:** 7 días tras la sesión presencial de HPD 4.
+> **Plazo:** 7 días tras la sesión presencial.
 >
-> **Prerrequisito:** Haber realizado [`evaluables/hpd4-rag-mixto.qmd`](hpd4-rag-mixto.qmd) (taller presencial).
+> **Prerrequisito:** [HPD 4 — Servidor MCP](../bloque2/hpd4-servidor-mcp.qmd).
 >
 > **Entrega:** Notebook `.ipynb` ejecutado con todas las celdas completas.
 >   Cada ejercicio especifica qué variable debe contener el resultado para la corrección automática.
@@ -18,7 +18,7 @@ engine: jupyter
 ## Cómo se corrige
 
 Cada ejercicio pide que asignes el resultado a una variable con un nombre concreto
-(`eval1_dataset`, `eval2_ragas`, `eval3_iteracion`, `eval4_informe`).
+(`eval1_server`, `eval2_respuesta`, `eval3_ataques`, `eval4_riesgos`).
 El script de corrección ejecutará tu notebook e inspeccionará esas variables.
 
 Además, la variable `CAMINO` debe estar definida al inicio del notebook.
@@ -37,13 +37,13 @@ CAMINO = "A"  # Cambiar a "B" o "C" según tu elección
 #| echo: true
 #| eval: false
 
-!pip install -q chromadb sentence-transformers langchain langchain-community langchain-text-splitters pypdf ragas datasets fpdf2 pandas matplotlib scikit-learn python-dotenv openai
+!pip install -q fastmcp openai python-dotenv pandas
 ```
 
 ```{python}
 #| echo: true
 
-import os, tempfile, shutil, sqlite3
+import os, sqlite3, tempfile, json
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
 Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
@@ -53,7 +53,7 @@ Orden de resolución:
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -91,21 +91,15 @@ else:
     print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
 
 
+
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import warnings
 warnings.filterwarnings("ignore")
 
 import numpy as np
+np.random.seed(42)
 import pandas as pd
-import matplotlib.pyplot as plt
-from fpdf import FPDF
-from sentence_transformers import SentenceTransformer
-from langchain_community.document_loaders import PyPDFLoader
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-import chromadb
-from langchain_openai import ChatOpenAI
 
-plt.rcParams["figure.dpi"] = 100
 print("Librerías cargadas correctamente.")
 ```
 
@@ -115,998 +109,1405 @@ print("Librerías cargadas correctamente.")
 LLM_KEY = os.getenv("LLM_API_KEY")
 LLM_URL = "https://llamus.cs.us.es/api/v1"
 
-if not LLM_KEY:
-    print("⚠️  Crea un archivo .env con:\n    LLM_API_KEY=tu_api_key")
+if LLM_KEY:
+    from openai import OpenAI
+    client = OpenAI(base_url=LLM_URL, api_key=LLM_KEY)
+    print("✅ Cliente OpenAI configurado.")
 else:
-    llm = ChatOpenAI(model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
-    print("✅ LLM configurado (mlx-community/Qwen3.6-35B-A3B-8bit).")
+    client = None
+    print("⚠️  LLM_API_KEY no encontrada. Los ejercicios E2 y E3 requieren la clave.")
 ```
 
 ```{python}
 #| echo: true
 
-MODEL_NAME = "intfloat/e5-small-v2"
-CHUNK_SIZE = 400
-CHUNK_OVERLAP = 60
+# Función auxiliar compartida: ejecutar herramienta del servidor MCP (simulación en notebook)
+from fastmcp import FastMCP
 
-model = SentenceTransformer(MODEL_NAME)
-client = chromadb.EphemeralClient()
+TOOLS_MCP = {}
 
-BASE_DIR = tempfile.mkdtemp()
-CORPUS_DIR = os.path.join(BASE_DIR, "corpus")
-os.makedirs(CORPUS_DIR, exist_ok=True)
+def registrar_tool(nombre, fn):
+    TOOLS_MCP[nombre] = fn
 
-print(f"Modelo: {MODEL_NAME} ({model.get_embedding_dimension()} dims)")
-print(f"Directorio temporal: {CORPUS_DIR}")
-```
+def ejecutar_tool(nombre: str, args: dict) -> str:
+    if nombre not in TOOLS_MCP:
+        return f"Error: tool '{nombre}' no encontrada. Disponibles: {list(TOOLS_MCP.keys())}"
+    try:
+        return TOOLS_MCP[nombre](**args)
+    except Exception as e:
+        return f"Error ejecutando {nombre}: {e}"
 
-### Funciones auxiliares
-
-```{python}
-#| echo: true
-
-class PDF(FPDF):
-    pass
-
-def crear_pdf(nombre, titulo, contenido):
-    pdf = PDF()
-    pdf.add_page()
-    pdf.set_font("Helvetica", "B", 16)
-    pdf.cell(0, 10, titulo.replace("—", "-").replace("€", "EUR"), new_x="LMARGIN", new_y="NEXT")
-    pdf.ln(5)
-    pdf.set_font("Helvetica", "", 11)
-    pdf.multi_cell(0, 6, contenido.replace("—", "-").replace("€", "EUR"))
-    pdf.output(os.path.join(CORPUS_DIR, nombre))
-
-def cargar_y_trocear_pdfs(dir_path, chunk_size=CHUNK_SIZE, chunk_overlap=CHUNK_OVERLAP):
-    documentos = []
-    for filename in sorted(os.listdir(dir_path)):
-        if not filename.endswith(".pdf"):
-            continue
-        loader = PyPDFLoader(os.path.join(dir_path, filename))
-        documentos.extend(loader.load())
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=chunk_size,
-        chunk_overlap=chunk_overlap,
-        separators=["\n\n", "\n", ". ", " ", ""]
-    )
-    return splitter.split_documents(documentos)
-
-def indexar_chunks(collection, chunks, prefix=""):
-    for i, chunk in enumerate(chunks):
-        embedding = model.encode(chunk.page_content).tolist()
-        fuente = os.path.basename(chunk.metadata.get("source", ""))
-        cid = f"{prefix}{i:04d}"
-        collection.add(
-            ids=[cid],
-            embeddings=[embedding],
-            documents=[chunk.page_content],
-            metadatas=[{"fuente": fuente, "idx": i}]
-        )
-
-def indexar_textos(collection, textos, metadatas_list, prefix=""):
-    for i, texto in enumerate(textos):
-        embedding = model.encode(texto).tolist()
-        cid = f"{prefix}{i:04d}"
-        meta = metadatas_list[i] if metadatas_list else {}
-        collection.add(
-            ids=[cid],
-            embeddings=[embedding],
-            documents=[texto],
-            metadatas=[meta]
-        )
-
-def buscar(collection, query, k=5):
-    qe = model.encode(query).tolist()
-    res = collection.query(query_embeddings=[qe], n_results=k)
-    resultados = []
-    if res["ids"] and res["ids"][0]:
-        for i in range(len(res["ids"][0])):
-            resultados.append({
-                "id": res["ids"][0][i],
-                "texto": res["documents"][0][i],
-                "distancia": res["distances"][0][i],
-                "metadata": res["metadatas"][0][i] if res["metadatas"] else {},
-            })
-    return resultados
-
-def rag(pregunta, collection_pdf, collection_sql, k_pdf=3, k_sql=3):
-    if not LLM_KEY:
-        return {"respuesta": "⚠️ Configura LLM_API_KEY en .env", "fuentes": [], "pregunta": pregunta}
-    resultados_pdf = buscar(collection_pdf, pregunta, k=k_pdf)
-    resultados_sql = buscar(collection_sql, pregunta, k=k_sql)
-    combinados = sorted(resultados_pdf + resultados_sql, key=lambda r: r["distancia"])[:3]
-    contexto = "\n\n".join(r["texto"] for r in combinados)
-    prompt = f"""Eres un analista de negocio que responde preguntas basándote EXCLUSIVAMENTE en los fragmentos proporcionados.
-
-Contexto:
-{contexto}
-
-Pregunta: {pregunta}
-
-Responde de forma concisa en español. Si el contexto no contiene información suficiente, di exactamente "No tengo datos suficientes para responder a esta pregunta" y no inventes nada."""
-    respuesta = llm.invoke(prompt).content
-    return {"respuesta": respuesta, "fuentes": [r["texto"] for r in combinados], "pregunta": pregunta}
-
-print("✅ Funciones auxiliares cargadas.")
+print("✅ Helper de ejecución de tools listo.")
 ```
 
 ::: {.panel-tabset}
 
 ## Camino A — Finanzas
 
-**Contexto:** Trabajas como Data Scientist en una consultora financiera. Tu cliente quiere un sistema RAG que responda preguntas sobre su cartera de activos financieros combinando informes narrativos en PDF con datos estructurados de una base de datos SQLite de activos.
+**Contexto:** Trabajas como Data Scientist en una consultora financiera. Tu equipo necesita un servidor MCP que exponga datos corporativos de contabilidad: cuentas contables, transacciones y presupuestos. Los analistas financieros consultarán estos datos mediante un asistente conversacional.
 
-### Corpus — 3 informes financieros
-
-```{python}
-#| echo: true
-
-if CAMINO == "A":
-    informes_a = {
-        "informe_anual_2025.pdf": (
-            "Informe Anual 2025 — Cartera de Activos del Grupo Financiero M10",
-            "El ejercicio 2025 ha sido favorable para la cartera de activos del Grupo "
-            "Financiero M10, con una rentabilidad media ponderada del 7.2 %. Los activos "
-            "de renta variable lideraron el crecimiento con un rendimiento conjunto del "
-            "11.4 %, destacando la participación en el sector tecnológico (NASDAQ-100) "
-            "que aportó 3.2 puntos porcentuales al resultado global. El IBEX 35 ETF "
-            "cerró el año con una revalorización del 8.5 %, mientras que el S&P 500 "
-            "Acciones Crecimiento rindió un 12.3 %, impulsado por el sector de IA.\n\n"
-            "La renta fija mantuvo un comportamiento estable. Los Bonos Estatales a 10 "
-            "años ofrecieron un rendimiento del 3.2 %, mientras que los Bonos Corporativos "
-            "Grado de Inversión rindieron un 4.1 %, ligeramente por encima de la media "
-            "del sector (3.8 %). Los Bonos Verdes, emitidos por primera vez en 2025, "
-            "tuvieron una acogida excelente con una demanda 2.3 veces la oferta.\n\n"
-            "En el segmento de inversión alternativa, los activos en capital privado "
-            "(Private Equity Tech Fund) rindieron un 15.8 %, aunque con menor liquidez. "
-            "Los activos en oro físico (GBP 100) se revalorizaron un 9.2 % en un entorno "
-            "de incertidumbre geopolítica. El Fondo de Infraestructuras cumplió "
-            "expectativas con un 6.7 %, ligeramente por debajo del objetivo del 7 %.\n\n"
-            "El perfil de riesgo global de la cartera se mantiene en nivel moderado, con "
-            "una exposición a riesgo alto del 18 % (dentro del límite del 20 %). La "
-            "liquidez media de la cartera es alta, con un 65 % de los activos clasificados "
-            "como de alta liquidez. Se recomienda mantener la asignación actual y revisar "
-            "la exposición a renta fija soberana si el BCE confirma los recortes de tipos."
-        ),
-        "analisis_mercado_2026.pdf": (
-            "Análisis de Mercado y Previsiones 2026 — División de Asset Management",
-            "El panorama para 2026 se presenta con tipos de interés a la baja tras las "
-            "señales del BCE de iniciar recortes graduales en el segundo semestre. Se "
-            "espera que el tipo de referencia pase del 4.0 % al 3.25 % a cierre de 2026, "
-            "lo que podría comprimir los rendimientos de la renta fija de nueva emisión "
-            "pero impulsaría las valoraciones de la renta variable.\n\n"
-            "Los sectores más prometedores para el próximo ejercicio son tecnología "
-            "(especialmente IA y semiconductores), energías renovables y salud digital. "
-            "Por el contrario, se recomienda infraponderar el sector inmobiliario "
-            "comercial, donde los ratios de morosidad podrían alcanzar el 4.5 %, y el "
-            "sector automotriz europeo, afectado por la competencia china.\n\n"
-            "En el mercado de divisas, se espera un euro fortalecido frente al dólar "
-            "(objetivo EUR/USD 1.12) y estable frente al franco suizo. La exposición a "
-            "mercados emergentes (actualmente 800 M€ en divisas no EUR) requiere "
-            "cobertura adicional, especialmente en real brasileño y rupia india.\n\n"
-            "Las previsiones de crecimiento para la cartera modelo se sitúan en un rango "
-            "del 5.5 % al 7.5 % para 2026, con un escenario base del 6.3 %. Los "
-            "principales riesgos identificados son una posible recesión en EE.UU. "
-            "(probabilidad estimada del 25 %), tensiones geopolíticas en el Este de "
-            "Asia, y un repunte inflacionario que retrase los recortes del BCE."
-        ),
-        "informe_sostenibilidad_2025.pdf": (
-            "Informe de Sostenibilidad e Inversión Responsable 2025",
-            "El Grupo Financiero M10 ha integrado criterios ESG en el 78 % de su cartera "
-            "de activos gestionados, superando el objetivo del 75 % fijado para 2025. "
-            "Los activos clasificados como artículo 8 (SFDR) representan 3.200 M€ y los "
-            "de artículo 9 (impacto positivo) alcanzan los 890 M€.\n\n"
-            "Los Bonos Verdes emitidos en 2025 por valor de 500 M€ se destinaron "
-            "íntegramente a proyectos de energía renovable (parques eólicos marinos en "
-            "Galicia y plantas fotovoltaicas en Extremadura). La rentabilidad de estos "
-            "bonos ha sido del 3.8 %, competitiva frente a bonos convencionales "
-            "equivalentes. La demanda institucional superó en 2.3 veces la oferta.\n\n"
-            "En el ámbito de exclusión, se han desinvertido 120 M€ en empresas con "
-            "exposición a carbón térmico y 45 M€ en fabricantes de armamento controvertido. "
-            "El fondo de inversión sostenible M10 ESG Leaders rindió un 9.4 % en 2025, "
-            "superando en 1.2 puntos a su benchmark no ESG.\n\n"
-            "La huella de carbono de la cartera (alcance 1 y 2) se redujo un 14 % "
-            "respecto a 2024, hasta 85 tCO2e/M€ invertido. El objetivo para 2026 es "
-            "alcanzar 75 tCO2e/M€. Se ha iniciado el proceso de medición del alcance 3 "
-            "(cadena de valor) para reportar en el informe de 2026."
-        ),
-    }
-    for nombre, (titulo, contenido) in informes_a.items():
-        crear_pdf(nombre, titulo, contenido)
-    print(f"✅ {len(informes_a)} PDFs financieros generados.")
-```
-
-### Base de datos SQLite — Activos financieros
+### Base de datos — Finanzas
 
 ```{python}
 #| echo: true
 
 if CAMINO == "A":
-    DB_PATH_A = os.path.join(tempfile.mkdtemp(), "activos.db")
-    conn_a = sqlite3.connect(DB_PATH_A)
-    conn_a.execute("""
-        CREATE TABLE activos_financieros (
+    db_a = sqlite3.connect(":memory:")
+
+    # Tabla cuentas contables
+    db_a.execute("""
+        CREATE TABLE cuentas (
             id INTEGER PRIMARY KEY,
             nombre TEXT NOT NULL,
-            tipo TEXT NOT NULL,
-            precio_actual REAL NOT NULL,
-            rendimiento_pct REAL NOT NULL,
-            riesgo TEXT NOT NULL,
-            liquidez TEXT NOT NULL
+            tipo TEXT NOT NULL CHECK(tipo IN ('activo', 'pasivo', 'patrimonio', 'ingreso', 'gasto')),
+            saldo REAL NOT NULL,
+            divisa TEXT NOT NULL DEFAULT 'EUR',
+            departamento TEXT NOT NULL
         )
     """)
 
-    activos_data = [
-        (1,  "IBEX 35 ETF",               "Renta Variable",        45.20,  8.5,  "Medio",   "Alta"),
-        (2,  "S&P 500 Acciones Crecim.",   "Renta Variable",       234.50, 12.3,  "Alto",    "Alta"),
-        (3,  "NASDAQ-100 Index Fund",      "Renta Variable",       567.80, 15.2,  "Alto",    "Alta"),
-        (4,  "Euro Stoxx 50 ETF",           "Renta Variable",       38.90,  7.1,  "Medio",   "Alta"),
-        (5,  "Bono Estatal 10y",           "Renta Fija",           98.50,  3.2,  "Bajo",    "Alta"),
-        (6,  "Bono Corporativo Grado Inv.","Renta Fija",          102.30,  4.1,  "Bajo",    "Media"),
-        (7,  "Bono Verde 2025-2035",       "Renta Fija",          101.00,  3.8,  "Bajo",    "Media"),
-        (8,  "Letras del Tesoro 6m",       "Renta Fija",           97.20,  2.5,  "Muy Bajo","Alta"),
-        (9,  "Bono Subordinado Financiero","Renta Fija",           89.40,  5.6,  "Medio",   "Baja"),
-        (10, "Private Equity Tech Fund",   "Inversión Alternativa",150.00, 15.8,  "Muy Alto","Baja"),
-        (11, "Fondo Infraestructuras",     "Inversión Alternativa",125.00,  6.7,  "Medio",   "Baja"),
-        (12, "Oro Físico GBP 100",         "Inversión Alternativa",189.20,  9.2,  "Medio",   "Alta"),
-        (13, "Fondo Inmobiliario Comercial","Inversión Alternativa",95.00,   4.3,  "Alto",    "Baja"),
-        (14, "M10 ESG Leaders Fund",       "Renta Variable",       112.40,  9.4,  "Medio",   "Media"),
-        (15, "Deuda Corporativa High Yield","Renta Fija",           78.60,  7.8,  "Alto",    "Baja"),
-        (16, "Fondo Monetario EUR",         "Renta Fija",          100.50,  2.1,  "Muy Bajo","Alta"),
-        (17, "Futuros S&P 500",            "Derivados",            445.00,  0.0,  "Muy Alto","Alta"),
-        (18, "ETF Energías Renovables",     "Renta Variable",       67.30, 11.2,  "Alto",    "Alta"),
-        (19, "Deuda Emergente USD",        "Renta Fija",           82.10,  6.5,  "Alto",    "Media"),
-        (20, "Cobertura Cambio EUR/USD",   "Derivados",            102.00,  0.0,  "Bajo",    "Alta"),
-        (21, "Bonos Municipales España",   "Renta Fija",           99.80,  2.8,  "Bajo",    "Media"),
-        (22, "Fondo Tecnología IA",        "Renta Variable",       178.30, 18.5,  "Muy Alto","Media"),
-    ]
+    # Tabla transacciones
+    db_a.execute("""
+        CREATE TABLE transacciones (
+            id INTEGER PRIMARY KEY,
+            cuenta_id INTEGER NOT NULL,
+            tipo TEXT NOT NULL CHECK(tipo IN ('ingreso', 'gasto', 'transferencia')),
+            monto REAL NOT NULL,
+            fecha TEXT NOT NULL,
+            descripcion TEXT,
+            categoria TEXT NOT NULL,
+            FOREIGN KEY (cuenta_id) REFERENCES cuentas(id)
+        )
+    """)
 
-    conn_a.executemany(
-        "INSERT INTO activos_financieros VALUES (?, ?, ?, ?, ?, ?, ?)",
-        activos_data
-    )
-    conn_a.commit()
+    # Tabla presupuestos
+    db_a.execute("""
+        CREATE TABLE presupuestos (
+            id INTEGER PRIMARY KEY,
+            departamento TEXT NOT NULL,
+            categoria TEXT NOT NULL,
+            presupuesto_anual REAL NOT NULL,
+            gastado REAL NOT NULL,
+            ejercicio INTEGER NOT NULL
+        )
+    """)
 
-    df_activos = pd.DataFrame(activos_data, columns=[
-        "id", "nombre", "tipo", "precio_actual", "rendimiento_pct", "riesgo", "liquidez"
-    ])
-    df_activos["texto"] = df_activos.apply(
-        lambda r: f"Activo: {r['nombre']}. Tipo: {r['tipo']}. Precio: {r['precio_actual']}€. "
-                  f"Rendimiento: {r['rendimiento_pct']}%. Riesgo: {r['riesgo']}. Liquidez: {r['liquidez']}.",
-        axis=1
-    )
-
-    print(f"✅ {len(activos_data)} activos financieros en SQLite")
-    print(f"   Tipos de activo: {df_activos['tipo'].nunique()}")
-    print(f"   Rendimiento medio: {df_activos['rendimiento_pct'].mean():.1f}%")
+    print("✅ Tablas creadas: cuentas, transacciones, presupuestos")
 ```
-
-### Indexación dual
 
 ```{python}
 #| echo: true
 
 if CAMINO == "A":
-    chunks_pdf_a = cargar_y_trocear_pdfs(CORPUS_DIR)
-    collection_pdf_a = client.get_or_create_collection(
-        name="hpd4_finanzas_pdf", metadata={"hnsw:space": "cosine"}
-    )
-    indexar_chunks(collection_pdf_a, chunks_pdf_a, prefix="fin_")
-
-    collection_sql_a = client.get_or_create_collection(
-        name="hpd4_finanzas_sql", metadata={"hnsw:space": "cosine"}
-    )
-    textos_sql_a = df_activos["texto"].tolist()
-    metas_sql_a = df_activos[["nombre", "tipo", "riesgo", "liquidez"]].to_dict("records")
-    indexar_textos(collection_sql_a, textos_sql_a, metas_sql_a, prefix="act_")
-
-    print(f"✅ PDFs indexados: {collection_pdf_a.count()} vectores")
-    print(f"✅ SQL indexados: {collection_sql_a.count()} vectores")
+    cuentas_data = [
+        (1, "Caja y Bancos", "activo", 1250000, "EUR", "Tesorería"),
+        (2, "Inversiones Corto Plazo", "activo", 450000, "EUR", "Tesorería"),
+        (3, "Inversiones Largo Plazo", "activo", 3200000, "EUR", "Tesorería"),
+        (4, "Cuentas a Cobrar Clientes", "activo", 890000, "EUR", "Comercial"),
+        (5, "Existencias", "activo", 560000, "EUR", "Logística"),
+        (6, "Proveedores", "pasivo", -340000, "EUR", "Compras"),
+        (7, "Deuda Bancaria CP", "pasivo", -500000, "EUR", "Tesorería"),
+        (8, "Deuda Bancaria LP", "pasivo", -2100000, "EUR", "Tesorería"),
+        (9, "Capital Social", "patrimonio", -1500000, "EUR", "Jurídico"),
+        (10, "Reservas", "patrimonio", -800000, "EUR", "Jurídico"),
+        (11, "Resultado del Ejercicio", "patrimonio", -450000, "EUR", "Contabilidad"),
+        (12, "Ventas Nacionales", "ingreso", -5200000, "EUR", "Comercial"),
+        (13, "Ventas Internacionales", "ingreso", -2800000, "USD", "Comercial"),
+        (14, "Prestación Servicios", "ingreso", -950000, "EUR", "Consultoría"),
+        (15, "Gastos de Personal", "gasto", 2100000, "EUR", "RRHH"),
+        (16, "Gastos Operativos", "gasto", 890000, "EUR", "Operaciones"),
+        (17, "Gastos Financieros", "gasto", 320000, "EUR", "Tesorería"),
+        (18, "Amortizaciones", "gasto", 450000, "EUR", "Contabilidad"),
+        (19, "Impuestos", "gasto", 680000, "EUR", "Jurídico"),
+        (20, "Gastos Marketing", "gasto", 520000, "EUR", "Comercial"),
+    ]
+    db_a.executemany("INSERT INTO cuentas VALUES (?, ?, ?, ?, ?, ?)", cuentas_data)
+    print(f"✅ {len(cuentas_data)} cuentas insertadas")
 ```
-
-#### Ejercicio 1 — Dataset de ground truth (2.5 ptos) {#sec-hpd4-e1-a}
-
-Crea un dataset de al menos 10 preguntas de evaluación con sus respuestas ground truth (esperadas). Para cada pregunta, ejecuta tu RAG, guarda la respuesta generada y los contextos recuperados. Usa este dataset para evaluar la calidad de tu retrievals.
-
-Asigna el resultado (lista de diccionarios con `question`, `answer`, `contexts`, `ground_truth`) a la variable `eval1_dataset`.
 
 ```{python}
 #| echo: true
 
 if CAMINO == "A":
-    preguntas_eval_a = [
-        "¿Qué activos de renta variable tienen un rendimiento superior al 10%?",
-        "¿Cuál es el rendimiento del Bono Estatal a 10 años?",
-        "¿Qué activos de inversión alternativa tienen riesgo Muy Alto?",
-        "¿Qué tipo de bono tuvo una demanda 2.3 veces la oferta en 2025?",
-        "¿Cuáles son los sectores más prometedores para 2026 según el análisis?",
-        "¿Qué activos tienen liquidez baja y riesgo alto o muy alto?",
-        "¿Cómo ha evolucionado la integración ESG en la cartera?",
-        "¿Qué activos de renta fija tienen un rendimiento superior al 4%?",
-        "¿Cuál es la rentabilidad del Fondo de Infraestructuras y cómo se compara con su objetivo?",
-        "¿Qué previsiones de crecimiento se esperan para la cartera en 2026?",
-        "¿Qué activos tienen un precio superior a 150€ y riesgo medio o inferior?",
-        "¿Qué se recomienda sobre la exposición a renta fija soberana?",
+    transacciones_data = [
+        (1, 12, "ingreso", 450000, "2026-01-15", "Venta trimestral cliente CorpA", "ventas"),
+        (2, 12, "ingreso", 320000, "2026-01-28", "Venta trimestral cliente CorpB", "ventas"),
+        (3, 13, "ingreso", 180000, "2026-02-03", "Venta internacional cliente GlobX", "ventas"),
+        (4, 14, "ingreso", 75000, "2026-02-10", "Consultoría fiscal Q1", "servicios"),
+        (5, 15, "gasto", 175000, "2026-02-15", "Nómina enero", "personal"),
+        (6, 16, "gasto", 42000, "2026-02-18", "Alquiler oficinas Madrid", "operaciones"),
+        (7, 16, "gasto", 18500, "2026-02-20", "Suministros eléctricos", "operaciones"),
+        (8, 17, "gasto", 12000, "2026-02-22", "Comisiones bancarias", "financiero"),
+        (9, 12, "ingreso", 510000, "2026-02-28", "Venta trimestral cliente CorpA", "ventas"),
+        (10, 20, "gasto", 38000, "2026-03-02", "Campaña Google Ads marzo", "marketing"),
+        (11, 20, "gasto", 22000, "2026-03-05", "Ferias y eventos sector", "marketing"),
+        (12, 15, "gasto", 175000, "2026-03-10", "Nómina febrero", "personal"),
+        (13, 16, "gasto", 31000, "2026-03-12", "Mantenimiento sistemas", "operaciones"),
+        (14, 13, "ingreso", 210000, "2026-03-15", "Venta internacional cliente GlobX", "ventas"),
+        (15, 18, "gasto", 37500, "2026-03-18", "Amortización equipos TI", "amortización"),
+        (16, 4, "ingreso", 95000, "2026-03-20", "Cobro facturas pendientes", "cobros"),
+        (17, 15, "gasto", 180000, "2026-04-01", "Nómina marzo + bonus", "personal"),
+        (18, 16, "gasto", 28000, "2026-04-03", "Seguros anuales", "operaciones"),
+        (19, 19, "gasto", 56000, "2026-04-05", "Pago fraccionado IS", "impuestos"),
+        (20, 12, "ingreso", 490000, "2026-04-15", "Venta trimestral cliente CorpA", "ventas"),
+        (21, 13, "ingreso", 165000, "2026-04-20", "Venta internacional cliente GlobX", "ventas"),
+        (22, 14, "ingreso", 82000, "2026-04-22", "Consultoría fiscal Q2", "servicios"),
+        (23, 15, "gasto", 175000, "2026-05-01", "Nómina abril", "personal"),
+        (24, 20, "gasto", 45000, "2026-05-05", "Campaña LinkedIn Ads", "marketing"),
+        (25, 17, "gasto", 14000, "2026-05-08", "Intereses deuda bancaria", "financiero"),
+        (26, 16, "gasto", 15000, "2026-05-10", "Servicios cloud AWS", "operaciones"),
+        (27, 12, "ingreso", 530000, "2026-05-15", "Venta trimestral cliente CorpA", "ventas"),
+        (28, 4, "ingreso", 120000, "2026-05-18", "Cobro facturas pendientes", "cobros"),
+        (29, 13, "ingreso", 195000, "2026-05-22", "Venta internacional cliente GlobX", "ventas"),
+        (30, 14, "ingreso", 68000, "2026-05-25", "Consultoría fiscal extraordinaria", "servicios"),
+        (31, 15, "gasto", 175000, "2026-06-01", "Nómina mayo", "personal"),
+        (32, 20, "gasto", 35000, "2026-06-04", "Campaña redes sociales", "marketing"),
+        (33, 18, "gasto", 37500, "2026-06-08", "Amortización mobiliario", "amortización"),
+        (34, 16, "gasto", 22000, "2026-06-12", "Material de oficina", "operaciones"),
+        (35, 12, "ingreso", 475000, "2026-06-15", "Venta trimestral cliente CorpA", "ventas"),
     ]
+    db_a.executemany("INSERT INTO transacciones VALUES (?, ?, ?, ?, ?, ?, ?)", transacciones_data)
+    print(f"✅ {len(transacciones_data)} transacciones insertadas")
+```
 
-    eval1_dataset = []
-    for pregunta in preguntas_eval_a:
-        res = rag(pregunta, collection_pdf_a, collection_sql_a)
-        eval1_dataset.append({
-            "question": pregunta,
-            "answer": res["respuesta"],
-            "contexts": res["fuentes"],
-            "ground_truth": "",  # ← completar con la respuesta esperada
-        })
+```{python}
+#| echo: true
 
-    print(f"✅ eval1_dataset creado: {len(eval1_dataset)} preguntas")
-    for i, item in enumerate(eval1_dataset):
-        print(f"  [{i+1}] {item['question'][:70]}...")
+if CAMINO == "A":
+    presupuestos_data = [
+        (1, "Comercial", "ventas", 6000000, 2850000, 2026),
+        (2, "RRHH", "personal", 2200000, 880000, 2026),
+        (3, "Operaciones", "infraestructura", 300000, 158500, 2026),
+        (4, "Marketing", "publicidad", 600000, 140000, 2026),
+        (5, "Tesorería", "financiero", 400000, 26000, 2026),
+        (6, "Comercial", "internacional", 3000000, 750000, 2026),
+        (7, "Consultoría", "servicios", 1200000, 225000, 2026),
+        (8, "Contabilidad", "amortización", 500000, 75000, 2026),
+        (9, "Jurídico", "impuestos", 800000, 56000, 2026),
+        (10, "Compras", "logística", 400000, 0, 2026),
+    ]
+    db_a.executemany("INSERT INTO presupuestos VALUES (?, ?, ?, ?, ?, ?)", presupuestos_data)
+    print(f"✅ {len(presupuestos_data)} presupuestos insertados")
+```
+
+### Ejercicio 1 — Servidor MCP (3 ptos) {#sec-hpd4-e1-a}
+
+Construye un servidor FastMCP que exponga las siguientes herramientas SQL sobre la base de datos financiera:
+
+- `listar_tablas()` — devuelve la lista de tablas disponibles
+- `describir_tabla(tabla: str)` — devuelve el DDL de la tabla
+- `consultar_sql(query: str)` — ejecuta una consulta SELECT y devuelve resultados
+- Resource `resumen://finanzas` — devuelve un resumen de la situación financiera (total activos, pasivos, ingresos, gastos, ejecución presupuestaria)
+
+Asigna el servidor a `eval1_server` (como string con los logs de creación y verificación).
+
+```{python}
+#| echo: true
+
+if CAMINO == "A":
+    from fastmcp import FastMCP
+
+    mcp_a = FastMCP("Servidor Finanzas MCP")
+    TOOLS_MCP.clear()
+
+    @mcp_a.tool()
+    def listar_tablas() -> str:
+        """Devuelve la lista de tablas disponibles en la base de datos financiera."""
+        cursor = db_a.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+        tablas = [row[0] for row in cursor.fetchall()]
+        return "Tablas disponibles:\n" + "\n".join(f"  - {t}" for t in tablas)
+
+    @mcp_a.tool()
+    def describir_tabla(tabla: str) -> str:
+        """Devuelve el DDL (CREATE TABLE) de una tabla.
+
+        Args:
+            tabla: nombre de la tabla.
+        """
+        tabla = tabla.strip().lower()
+        cursor = db_a.execute("SELECT sql FROM sqlite_master WHERE type='table' AND LOWER(name)=?", (tabla,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        return f"Error: tabla '{tabla}' no encontrada."
+
+    @mcp_a.tool()
+    def consultar_sql(query: str) -> str:
+        """Ejecuta una consulta SQL SELECT en la base de datos financiera.
+
+        Args:
+            query: consulta SQL (solo SELECT).
+        """
+        query_stripped = query.strip().upper()
+        if not query_stripped.startswith("SELECT"):
+            return "Error: solo se permiten consultas SELECT."
+        palabras_prohibidas = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE"]
+        for p in palabras_prohibidas:
+            if p in query_stripped:
+                return f"Error: la consulta contiene '{p}' no permitido."
+        try:
+            cursor = db_a.execute(query)
+            columnas = [d[0] for d in cursor.description]
+            filas = cursor.fetchmany(30)
+            if not filas:
+                return "No se encontraron resultados."
+            ancho = max(len(str(c)) for c in columnas)
+            lines = [" | ".join(f"{str(c):{ancho}}" for c in columnas)]
+            lines.append("-" * len(lines[0]))
+            for fila in filas:
+                lines.append(" | ".join(f"{str(v):{ancho}}" for v in fila))
+            resultado = "\n".join(lines)
+            if len(cursor.fetchall()) > 0:
+                resultado += f"\n... y más filas (mostrando primeras {len(filas)})"
+            if len(resultado) > 2000:
+                resultado = resultado[:2000] + "\n... (resultado truncado a 2000 caracteres)"
+            return resultado
+        except Exception as e:
+            return f"Error ejecutando consulta: {e}"
+
+    @mcp_a.resource("resumen://finanzas")
+    def resumen_finanzas() -> str:
+        """Resumen agregado de la situación financiera."""
+        activo = db_a.execute("SELECT COALESCE(SUM(saldo), 0) FROM cuentas WHERE tipo='activo'").fetchone()[0]
+        pasivo = db_a.execute("SELECT COALESCE(SUM(ABS(saldo)), 0) FROM cuentas WHERE tipo='pasivo'").fetchone()[0]
+        ingreso = db_a.execute("SELECT COALESCE(SUM(ABS(saldo)), 0) FROM cuentas WHERE tipo='ingreso'").fetchone()[0]
+        gasto = db_a.execute("SELECT COALESCE(SUM(saldo), 0) FROM cuentas WHERE tipo='gasto'").fetchone()[0]
+        total_presupuesto = db_a.execute("SELECT COALESCE(SUM(presupuesto_anual), 0) FROM presupuestos").fetchone()[0]
+        total_gastado = db_a.execute("SELECT COALESCE(SUM(gastado), 0) FROM presupuestos").fetchone()[0]
+
+        lines = [
+            "=== RESUMEN FINANCIERO ===",
+            f"Total Activos: {activo:,.2f} EUR",
+            f"Total Pasivos: {pasivo:,.2f} EUR",
+            f"Patrimonio Neto: {activo - pasivo:,.2f} EUR",
+            f"Total Ingresos (anualizados): {ingreso:,.2f} EUR",
+            f"Total Gastos (anualizados): {gasto:,.2f} EUR",
+            f"Margen Neto: {ingreso - gasto:,.2f} EUR",
+            "",
+            "=== EJECUCIÓN PRESUPUESTARIA ===",
+            f"Presupuesto total: {total_presupuesto:,.2f} EUR",
+            f"Gastado: {total_gastado:,.2f} EUR",
+            f"Ejecución: {total_gastado / total_presupuesto * 100:.1f}%",
+        ]
+        return "\n".join(lines)
+
+    registrar_tool("listar_tablas", listar_tablas)
+    registrar_tool("describir_tabla", describir_tabla)
+    registrar_tool("consultar_sql", consultar_sql)
+
+    eval1_server = "✅ Servidor MCP Finanzas creado con 3 tools + 1 resource\n"
+    eval1_server += "  Tools: listar_tablas, describir_tabla, consultar_sql\n"
+    eval1_server += "  Resource: resumen://finanzas\n"
+    eval1_server += "\n--- Prueba: listar_tablas ---\n"
+    eval1_server += listar_tablas()
+    eval1_server += "\n\n--- Prueba: resource resumen://finanzas ---\n"
+    eval1_server += resumen_finanzas()
+    print(eval1_server)
 else:
-    eval1_dataset = None
+    eval1_server = None
 ```
 
-#### Ejercicio 2 — Evaluación RAGAS (2.5 ptos) {#sec-hpd4-e2-a}
+### Ejercicio 2 — Consulta en lenguaje natural (2 ptos) {#sec-hpd4-e2-a}
 
-Usa RAGAS para evaluar tu pipeline con las métricas `faithfulness`, `answer_relevancy` y `context_precision`. Genera un DataFrame con las puntuaciones por pregunta y las medias globales.
+Conecta el cliente OpenAI al servidor MCP. Formula una pregunta de negocio en lenguaje natural, deja que el LLM decida qué tool usar y muestra la respuesta final.
 
-Asigna el resultado (dict con `por_pregunta` y `medias`) a `eval2_ragas`.
+Asigna el resultado (pregunta + respuesta completa) a `eval2_respuesta`.
 
 ```{python}
 #| echo: true
 
 if CAMINO == "A":
-    import json
-    from ragas import evaluate as ragas_evaluate
-    from ragas.metrics import faithfulness, answer_relevancy, context_precision
-    from datasets import Dataset
-    from ragas.llms import LangchainLLMWrapper
+    tools_definition_a = [
+        {
+            "type": "function",
+            "function": {
+                "name": "listar_tablas",
+                "description": "Devuelve la lista de tablas disponibles en la base de datos financiera.",
+                "parameters": {"type": "object", "properties": {}, "required": []}
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "describir_tabla",
+                "description": "Devuelve el DDL de una tabla específica.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"tabla": {"type": "string", "description": "Nombre de la tabla"}},
+                    "required": ["tabla"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "consultar_sql",
+                "description": "Ejecuta una consulta SQL SELECT. Tablas: cuentas(id, nombre, tipo, saldo, divisa, departamento), transacciones(id, cuenta_id, tipo, monto, fecha, descripcion, categoria), presupuestos(id, departamento, categoria, presupuesto_anual, gastado, ejercicio).",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"query": {"type": "string", "description": "Consulta SQL SELECT"}},
+                    "required": ["query"]
+                }
+            }
+        },
+    ]
 
-    if eval1_dataset and all(item["ground_truth"] for item in eval1_dataset):
-        dataset_hf = Dataset.from_dict({
-            "question": [item["question"] for item in eval1_dataset],
-            "answer": [item["answer"] for item in eval1_dataset],
-            "contexts": [item["contexts"] for item in eval1_dataset],
-            "ground_truth": [item["ground_truth"] for item in eval1_dataset],
-        })
+    def preguntar_al_llm(pregunta, tools_def, system_prompt=None):
+        if not client:
+            return "⚠️  Cliente OpenAI no disponible."
 
-        evaluator_llm = LangchainLLMWrapper(llm)
-        result = ragas_evaluate(
-            dataset=dataset_hf,
-            metrics=[faithfulness, answer_relevancy, context_precision],
-            llm=evaluator_llm,
+        if system_prompt is None:
+            system_prompt = "Eres un asistente financiero. Tienes acceso a una base de datos con cuentas, transacciones y presupuestos. Usa las herramientas disponibles para responder preguntas. Responde en español, de forma concisa."
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": pregunta}
+        ]
+
+        response = client.chat.completions.create(
+            model="mlx-community/Qwen3.6-35B-A3B-8bit",
+            messages=messages,
+            tools=tools_def,
+            tool_choice="auto",
+            max_tokens=1024,
         )
 
-        df_ragas = result.to_pandas()
-        eval2_ragas = {
-            "por_pregunta": df_ragas[["faithfulness", "answer_relevancy", "context_precision"]].to_dict("records"),
-            "medias": {
-                "faithfulness": float(df_ragas["faithfulness"].mean()),
-                "answer_relevancy": float(df_ragas["answer_relevancy"].mean()),
-                "context_precision": float(df_ragas["context_precision"].mean()),
-            }
-        }
+        message = response.choices[0].message
 
-        print("📊 Resultados RAGAS (medias):")
-        for metrica, valor in eval2_ragas["medias"].items():
-            print(f"  {metrica}: {valor:.4f}")
-        print(f"\nPuntuaciones por pregunta:")
-        print(df_ragas[["faithfulness", "answer_relevancy", "context_precision"]])
+        if message.tool_calls:
+            messages.append(message)
+            for tc in message.tool_calls:
+                args = json.loads(tc.function.arguments)
+                result = ejecutar_tool(tc.function.name, args)
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "content": result
+                })
+
+            final = client.chat.completions.create(
+                model="mlx-community/Qwen3.6-35B-A3B-8bit",
+                messages=messages,
+                tools=tools_def,
+                tool_choice="none",
+                max_tokens=512,
+            )
+            return final.choices[0].message.content
+        else:
+            return message.content
+
+    pregunta_a = "¿Cuál es el total de ingresos por ventas nacionales y cuánto hemos gastado en personal este año?"
+
+    if client:
+        respuesta_a = preguntar_al_llm(pregunta_a, tools_definition_a)
+        eval2_respuesta = f"PREGUNTA: {pregunta_a}\n\nRESPUESTA: {respuesta_a}"
     else:
-        eval2_ragas = {"error": "Completa los ground_truth en eval1_dataset primero."}
-        print(eval2_ragas["error"])
+        eval2_respuesta = "⚠️  Cliente OpenAI no disponible. Pregunta: " + pregunta_a
+
+    print(eval2_respuesta)
 else:
-    eval2_ragas = None
+    eval2_respuesta = None
 ```
 
-#### Ejercicio 3 — Iteración y mejora (2.5 ptos) {#sec-hpd4-e3-a}
+### Ejercicio 3 — Pruebas de inyección (1.5 ptos) {#sec-hpd4-e3-a}
 
-Modifica UN componente del pipeline (chunk_size, número de chunks recuperados, prompt, modelo de embeddings, añade un re-ranker, etc.) y vuelve a evaluar con RAGAS. Compara los resultados con la versión base y explica por qué el cambio mejoró o empeoró las métricas.
+Prueba al menos 3 intentos de ataque (prompt injection o SQL injection) contra tu servidor MCP. Documenta qué intentaste, qué respuesta obtuvo y si la defensa funcionó.
 
-Asigna el resultado (lista de diccionarios con `version`, `cambio`, `faithfulness`, `answer_relevancy`, `context_precision`, `analisis`) a `eval3_iteracion`.
+Asigna los resultados a `eval3_ataques` (lista de diccionarios con ataque, resultado, defendido).
 
 ```{python}
 #| echo: true
 
 if CAMINO == "A":
-    eval3_iteracion = [
-        # Completar con al menos 2 versiones (base + mejora)
-        # {
-        #     "version": "Base",
-        #     "cambio": "CHUNK_SIZE=400, k_pdf=3, k_sql=3, sin re-ranker",
-        #     "faithfulness": 0.0,
-        #     "answer_relevancy": 0.0,
-        #     "context_precision": 0.0,
-        #     "analisis": "Configuración inicial del pipeline."
-        # },
+    ataques_a = [
+        {
+            "ataque": "DROP TABLE cuentas",
+            "tipo": "SQL Injection directo",
+            "query": "DROP TABLE cuentas"
+        },
+        {
+            "ataque": "DELETE FROM transacciones WHERE id = 1; SELECT * FROM transacciones",
+            "tipo": "SQL Injection con múltiples sentencias",
+            "query": "DELETE FROM transacciones WHERE id = 1; SELECT * FROM transacciones"
+        },
+        {
+            "ataque": "Inyección en consulta: 'SELECT * FROM cuentas; DROP TABLE presupuestos; --'",
+            "tipo": "SQL Injection con comentario",
+            "query": "SELECT * FROM cuentas; DROP TABLE presupuestos; --"
+        },
     ]
-    print(f"⚠️  Completa eval3_iteracion con al menos 2 versiones comparadas.")
+
+    eval3_ataques = []
+    for ataque in ataques_a:
+        resultado = consultar_sql(ataque["query"])
+        defendido = "Error" in resultado or "no permitido" in resultado
+        entry = {
+            "ataque": ataque["ataque"],
+            "tipo": ataque["tipo"],
+            "resultado": resultado[:200],
+            "defendido": defendido,
+            "defensa_efectiva": "✅ Bloqueado" if defendido else "❌ Vulnerable"
+        }
+        eval3_ataques.append(entry)
+
+    for e in eval3_ataques:
+        print(f"\n--- {e['tipo']} ---")
+        print(f"  Ataque: {e['ataque']}")
+        print(f"  Resultado: {e['defensa_efectiva']}")
+        print(f"  Detalle: {e['resultado']}")
 else:
-    eval3_iteracion = None
+    eval3_ataques = None
 ```
 
-#### Ejercicio 4 — Informe de evaluación (2.5 ptos) {#sec-hpd4-e4-a}
+### Ejercicio 4 — Análisis de riesgos (1.5 ptos) {#sec-hpd4-e4-a}
 
-Redacta un informe estructurado de evaluación que incluya: métricas obtenidas, fortalezas y debilidades del pipeline, análisis de errores (preguntas donde el RAG falló), impacto de la mejora implementada en E3, y propuestas de mejora adicionales.
+Redacta un análisis de riesgos para el servidor MCP en un entorno financiero real. Debes cubrir al menos:
 
-Asigna tu respuesta a `eval4_informe`.
+- Riesgos de privacidad (datos financieros sensibles expuestos)
+- Inyección SQL y prompt injection
+- Data leakage (fuga de información por respuestas demasiado detalladas)
+- Mitigaciones específicas para cada riesgo
+
+Asigna tu respuesta a `eval4_riesgos`.
 
 ```{python}
 #| echo: true
 
 if CAMINO == "A":
-    eval4_informe = """Escribir aquí el informe estructurado. Por ejemplo:
+    eval4_riesgos = """Escribir aquí el análisis de riesgos. Por ejemplo:
 
-    ## Resultados de evaluación
-    - Faithfulness medio: X.XXXX
-    - Answer Relevancy medio: X.XXXX
-    - Context Precision medio: X.XXXX
+    RIESGOS DE PRIVACIDAD:
+    - Los saldos de cuentas y transacciones son datos financieros sensibles.
+      Un usuario no autorizado podría consultar información confidencial de la empresa.
+    - Mitigación: implementar autenticación por API key en el servidor MCP,
+      logs de auditoría de todas las consultas, y cifrado en tránsito (TLS).
 
-    ## Fortalezas
-    ...
+    INYECCIÓN SQL / PROMPT INJECTION:
+    - Un atacante puede manipular el prompt del LLM para que ejecute consultas
+      destructivas (DROP, DELETE) o acceda a datos que no debería.
+    - Mitigación: sanitización de queries (solo SELECT, palabras prohibidas),
+      límite de filas (máx. 30), timeout de consultas, y system prompt restrictivo.
 
-    ## Debilidades y errores identificados
-    ...
+    DATA LEAKAGE:
+    - El LLM podría exponer información sensible en su respuesta si la query
+      devuelve datos que no deberían compartirse (ej. salarios, reservas).
+    - Mitigación: filtrar columnas sensibles a nivel de tool, usar vistas SQL
+      que expongan solo los datos necesarios, policy de mínimo privilegio.
 
-    ## Impacto de la mejora
-    ...
-
-    ## Propuestas adicionales
-    ..."""
-    print("✅ eval4_informe asignada. Completa el contenido.")
+    RIESGOS ADICIONALES:
+    - Denegación de servicio: queries sin límite podrían saturar la BD.
+    - Escalada de privilegios: asegurar que cada tool acceda solo a los datos
+      estrictamente necesarios para su función."""
+    print("✅ eval4_riesgos asignada.")
 else:
-    eval4_informe = None
+    eval4_riesgos = None
 ```
 
 ## Camino B — Salud
 
-**Contexto:** Trabajas como Data Scientist en un hospital de investigación. Necesitas un sistema RAG que combine artículos de investigación biomédica en PDF con datos estructurados de pacientes de una base de datos SQLite para responder preguntas clínicas.
+**Contexto:** Trabajas como Data Scientist en un hospital universitario. Tu equipo necesita un servidor MCP que exponga datos clínicos anonimizados para investigación: pacientes, diagnósticos y medicación. Los investigadores consultarán estos datos mediante un asistente conversacional.
 
-### Corpus — 3 documentos biomédicos
-
-```{python}
-#| echo: true
-
-if CAMINO == "B":
-    informes_b = {
-        "ensayo_clinico_M10-342.pdf": (
-            "Ensayo Clínico Fase III — Oxford BioPharma: Compuesto M10-342",
-            "El ensayo clínico fase III del compuesto M10-342 evalúa la eficacia y seguridad "
-            "en pacientes con fibrosis pulmonar idiopática (FPI). El estudio multicéntrico "
-            "incluyó 1.240 pacientes en 35 centros de 12 países, con seguimiento medio de "
-            "18 meses. Los resultados primarios muestran una reducción significativa del 32 % "
-            "en la progresión de la enfermedad medida por CVF (p < 0.001). El 67 % de los "
-            "pacientes tratados no presentaron empeoramiento clínico a los 12 meses, frente "
-            "al 41 % del grupo control.\n\n"
-            "Los efectos adversos más frecuentes fueron leves-moderados: náuseas (12 %), "
-            "fatiga (9 %) y cefalea (7 %). Se registraron 3 eventos adversos graves "
-            "relacionados con el fármaco (0.5 %), todos reversibles. Los análisis de "
-            "subgrupos sugieren eficacia superior en fibrosis leve-moderada (estadio GAP "
-            "I-II) y en pacientes con antecedentes de tabaquismo. La calidad de vida (SGRQ) "
-            "mejoró 8.4 puntos frente a 2.1 en placebo.\n\n"
-            "Los criterios de inclusión requerían pacientes entre 40 y 80 años, con "
-            "diagnóstico confirmado de FPI y CVF entre 50 % y 90 % del valor teórico. "
-            "Se excluyeron pacientes con enfermedad hepática severa, insuficiencia renal "
-            "crónica (eGFR < 30) o cáncer activo. El perfil de seguridad respalda la "
-            "solicitud de autorización a EMA y FDA prevista para Q2 2026."
-        ),
-        "diagnostico_IA_2025.pdf": (
-            "Diagnóstico Asistido por IA en Imagen Médica — Revisión 2025",
-            "Esta revisión analiza 45 sistemas comerciales y 112 prototipos académicos de IA "
-            "en diagnóstico por imagen (radiología, patología digital y oftalmología). En "
-            "radiología torácica, los sistemas basados en deep learning alcanzan AUC > 0.92 "
-            "en detección de nódulos pulmonares malignos, superando la sensibilidad media "
-            "del radiólogo general (0.85 vs 0.78). En mamografía, la detección asistida "
-            "reduce falsos negativos en un 21 % y falsos positivos en un 14 %.\n\n"
-            "En patología digital, los modelos de atención múltiple sobre whole-slide images "
-            "logran precisión del 94 % en clasificación de cáncer de próstata (Gleason "
-            "grading). En oftalmología, los sistemas de clasificación de retinopatía "
-            "diabética alcanzan sensibilidad del 96 % y especificidad del 93 %.\n\n"
-            "Los desafíos actuales incluyen generalización entre poblaciones y equipos, "
-            "explicabilidad (XAI) e integración en flujos clínicos reales. Se estima que "
-            "en 2027 el 30 % de los informes radiológicos incluirán hallazgos generados "
-            "por IA. La FDA ha aprobado 521 dispositivos médicos basados en IA a cierre "
-            "de 2025, un 67 % más que en 2024."
-        ),
-        "farmacos_IA_2025.pdf": (
-            "Descubrimiento de Fármacos Asistido por IA — Revisión Sistemática 2025",
-            "Esta revisión sistemática analiza 87 estudios (2020-2025) sobre IA en "
-            "descubrimiento de fármacos. La IA ha reducido el tiempo medio de la fase de "
-            "descubrimiento de 4.5 a 1.8 años y los costes en un 45 %. Las técnicas más "
-            "utilizadas son GNN para predicción de interacciones proteína-ligando, "
-            "transformers para generación de moléculas de novo, y aprendizaje por refuerzo "
-            "para optimización de propiedades ADMET.\n\n"
-            "Tres áreas de mayor impacto: identificación de nuevas dianas terapéuticas "
-            "(24 estudios), predicción de afinidad de binding (31 estudios) y optimización "
-            "de cabezas de serie (22 estudios). Los modelos más citados son AlphaFold "
-            "(predicción de estructura de proteínas), DiffDock (docking molecular) y "
-            "ChemBERTa (representaciones de moléculas).\n\n"
-            "Limitaciones señaladas: falta de datos de alta calidad en enfermedades raras, "
-            "dificultad de generalización entre dianas, y necesidad de validación "
-            "experimental (tasa de acierto real del 12-18 % en moléculas que llegan a "
-            "ensayos preclínicos). La IA es ya una herramienta indispensable pero no "
-            "sustitutiva del juicio experto en farmacología."
-        ),
-    }
-    for nombre, (titulo, contenido) in informes_b.items():
-        crear_pdf(nombre, titulo, contenido)
-    print(f"✅ {len(informes_b)} PDFs biomédicos generados.")
-```
-
-### Base de datos SQLite — Pacientes
+### Base de datos — Salud
 
 ```{python}
 #| echo: true
 
 if CAMINO == "B":
-    DB_PATH_B = os.path.join(tempfile.mkdtemp(), "pacientes.db")
-    conn_b = sqlite3.connect(DB_PATH_B)
-    conn_b.execute("""
+    db_b = sqlite3.connect(":memory:")
+
+    # Tabla pacientes
+    db_b.execute("""
         CREATE TABLE pacientes (
             id INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
             edad INTEGER NOT NULL,
             genero TEXT NOT NULL,
-            diagnostico TEXT NOT NULL,
-            tratamiento TEXT NOT NULL,
-            fecha_ingreso TEXT NOT NULL,
-            ultima_revision TEXT NOT NULL
+            grupo_sanguineo TEXT NOT NULL,
+            historial TEXT
         )
     """)
 
+    # Tabla diagnósticos
+    db_b.execute("""
+        CREATE TABLE diagnosticos (
+            id INTEGER PRIMARY KEY,
+            paciente_id INTEGER NOT NULL,
+            diagnostico TEXT NOT NULL,
+            codigo_cie TEXT NOT NULL,
+            fecha TEXT NOT NULL,
+            medico TEXT NOT NULL,
+            estado TEXT NOT NULL CHECK(estado IN ('activo', 'resuelto', 'cronico')),
+            FOREIGN KEY (paciente_id) REFERENCES pacientes(id)
+        )
+    """)
+
+    # Tabla medicamentos
+    db_b.execute("""
+        CREATE TABLE medicamentos (
+            id INTEGER PRIMARY KEY,
+            paciente_id INTEGER NOT NULL,
+            medicamento TEXT NOT NULL,
+            dosis TEXT NOT NULL,
+            frecuencia TEXT NOT NULL,
+            fecha_inicio TEXT NOT NULL,
+            fecha_fin TEXT,
+            FOREIGN KEY (paciente_id) REFERENCES pacientes(id)
+        )
+    """)
+
+    print("✅ Tablas creadas: pacientes, diagnosticos, medicamentos")
+```
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
     pacientes_data = [
-        (1,  67, "M", "Fibrosis Pulmonar Idiopática",     "Pirfenidona 600mg",       "2024-03-12", "2025-06-15"),
-        (2,  54, "F", "Diabetes Tipo 2",                  "Metformina 850mg",        "2023-11-05", "2025-05-20"),
-        (3,  72, "M", "EPOC Severo",                      "Tiotropio + Salmeterol",  "2024-01-18", "2025-04-10"),
-        (4,  45, "F", "Cáncer de Mama HER2+",             "Trastuzumab 6mg/kg",      "2025-02-01", "2025-07-01"),
-        (5,  61, "M", "Insuficiencia Cardíaca Crónica",   "Enalapril 10mg",          "2024-06-22", "2025-03-15"),
-        (6,  38, "F", "Artritis Reumatoide",              "Adalimumab 40mg",         "2023-09-14", "2025-06-22"),
-        (7,  59, "M", "Enfermedad Renal Crónica Estadio 3","Losartán 50mg",          "2024-04-30", "2025-02-28"),
-        (8,  78, "F", "Alzheimer Temprano",               "Donepezilo 10mg",         "2025-01-10", "2025-06-30"),
-        (9,  42, "M", "Colitis Ulcerosa",                 "Infliximab 5mg/kg",       "2024-08-19", "2025-05-05"),
-        (10, 50, "F", "Hipertensión Pulmonar",            "Bosentán 125mg",          "2025-03-03", "2025-07-10"),
-        (11, 66, "M", "Parkinson Estadio II",             "Levodopa/Carbidopa",      "2024-07-15", "2025-04-20"),
-        (12, 35, "F", "Lupus Eritematoso Sistémico",      "Hidroxicloroquina 400mg", "2023-12-01", "2025-06-12"),
-        (13, 71, "M", "Estenosis Aórtica Severa",         "TAVI programado",         "2025-05-20", "2025-07-05"),
-        (14, 48, "F", "Esclerosis Múltiple Remitente",    "Fingolimod 0.5mg",        "2024-10-08", "2025-06-18"),
-        (15, 63, "M", "Cirrosis Hepática Compensada",     "Espironolactona 100mg",   "2024-02-14", "2025-01-30"),
-        (16, 29, "F", "Asma Grave Eosinofílica",          "Mepolizumab 100mg",       "2025-04-07", "2025-07-12"),
-        (17, 55, "M", "Infarto Agudo de Miocardio (2024)", "Bisoprolol 5mg",        "2024-09-11", "2025-03-22"),
-        (18, 41, "F", "Migraña Crónica",                  "Onabotulinumtoxina 155U", "2023-07-25", "2025-05-30"),
-        (19, 77, "M", "DPOC Exacerbador Frecuente",       "Roflumilast 500µg",       "2025-01-28", "2025-07-08"),
-        (20, 33, "F", "Enfermedad de Crohn",              "Ustekinumab 90mg",       "2024-05-06", "2025-06-25"),
-        (21, 60, "M", "Mieloma Múltiple",                 "Lenalidomida 25mg",       "2025-02-20", "2025-07-15"),
-        (22, 46, "F", "Hipotiroidismo Autoimmune",         "Levotiroxina 125µg",     "2024-11-03", "2025-04-18"),
+        (1, "Ana Martínez", 58, "F", "A+", "Hipertensión controlada. Alergia a penicilina"),
+        (2, "Carlos López", 72, "M", "O+", "Diabetes tipo 2. IAM 2023. Anticoagulado"),
+        (3, "Beatriz Jiménez", 34, "F", "B+", "Asma bronquial. Sin alergias conocidas"),
+        (4, "David Rodríguez", 45, "M", "A-", "Hipercolesterolemia. Celiaco"),
+        (5, "Elena Sánchez", 67, "F", "O-", "Artritis reumatoide. Osteoporosis"),
+        (6, "Fernando García", 29, "M", "AB+", "Sin patologías crónicas. Deportista"),
+        (7, "Gloria Fernández", 51, "F", "A+", "Fibromialgia. Migraña crónica"),
+        (8, "Héctor Díaz", 63, "M", "B-", "EPOC. Exfumador (35 paquetes/año)"),
+        (9, "Isabel Ruiz", 40, "F", "O+", "Hipotiroidismo. Síndrome de fatiga crónica"),
+        (10, "Javier Torres", 55, "M", "A+", "Cardiopatía isquémica. Stent 2024"),
+        (11, "Laura Moreno", 26, "F", "B+", "Trastorno ansiedad-depresivo. TDAH"),
+        (12, "Mariano Castro", 78, "M", "O+", "Parkinson. HBP. Insuficiencia renal crónica"),
     ]
-
-    conn_b.executemany(
-        "INSERT INTO pacientes VALUES (?, ?, ?, ?, ?, ?, ?)",
-        pacientes_data
-    )
-    conn_b.commit()
-
-    df_pacientes = pd.DataFrame(pacientes_data, columns=[
-        "id", "edad", "genero", "diagnostico", "tratamiento", "fecha_ingreso", "ultima_revision"
-    ])
-    df_pacientes["texto"] = df_pacientes.apply(
-        lambda r: f"Paciente {r['id']}: {r['edad']} años, {r['genero']}. Diagnóstico: {r['diagnostico']}. "
-                  f"Tratamiento: {r['tratamiento']}. Ingreso: {r['fecha_ingreso']}. Última revisión: {r['ultima_revision']}.",
-        axis=1
-    )
-
-    print(f"✅ {len(pacientes_data)} pacientes en SQLite")
-    print(f"   Edad media: {df_pacientes['edad'].mean():.0f} años")
-    print(f"   Diagnósticos únicos: {df_pacientes['diagnostico'].nunique()}")
+    db_b.executemany("INSERT INTO pacientes VALUES (?, ?, ?, ?, ?, ?)", pacientes_data)
+    print(f"✅ {len(pacientes_data)} pacientes insertados")
 ```
-
-### Indexación dual
 
 ```{python}
 #| echo: true
 
 if CAMINO == "B":
-    chunks_pdf_b = cargar_y_trocear_pdfs(CORPUS_DIR)
-    collection_pdf_b = client.get_or_create_collection(
-        name="hpd4_salud_pdf", metadata={"hnsw:space": "cosine"}
-    )
-    indexar_chunks(collection_pdf_b, chunks_pdf_b, prefix="sal_")
-
-    collection_sql_b = client.get_or_create_collection(
-        name="hpd4_salud_sql", metadata={"hnsw:space": "cosine"}
-    )
-    textos_sql_b = df_pacientes["texto"].tolist()
-    metas_sql_b = df_pacientes[["diagnostico", "tratamiento", "edad", "genero"]].to_dict("records")
-    indexar_textos(collection_sql_b, textos_sql_b, metas_sql_b, prefix="pac_")
-
-    print(f"✅ PDFs indexados: {collection_pdf_b.count()} vectores")
-    print(f"✅ SQL indexados: {collection_sql_b.count()} vectores")
+    diagnosticos_data = [
+        (1, 1, "Hipertensión esencial", "I10", "2020-03-15", "Dra. Moreno", "cronico"),
+        (2, 2, "Diabetes mellitus tipo 2", "E11", "2018-06-20", "Dr. Alonso", "cronico"),
+        (3, 2, "Infarto agudo de miocardio", "I21", "2023-11-05", "Dr. Vega", "resuelto"),
+        (4, 3, "Asma bronquial persistente", "J45", "2019-09-12", "Dra. Puig", "cronico"),
+        (5, 4, "Hipercolesterolemia familiar", "E78", "2021-01-25", "Dr. Romero", "activo"),
+        (6, 5, "Artritis reumatoide seropositiva", "M05", "2017-04-08", "Dra. Soria", "cronico"),
+        (7, 5, "Osteoporosis postmenopáusica", "M81", "2022-10-14", "Dra. Soria", "activo"),
+        (8, 7, "Fibromialgia", "M79", "2020-07-22", "Dr. Pastor", "cronico"),
+        (9, 7, "Migraña sin aura", "G43", "2019-12-01", "Dr. Pastor", "cronico"),
+        (10, 8, "Enfermedad pulmonar obstructiva crónica", "J44", "2016-03-30", "Dra. Molina", "cronico"),
+        (11, 9, "Hipotiroidismo primario", "E03", "2021-05-11", "Dra. Rivas", "activo"),
+        (12, 10, "Cardiopatía isquémica crónica", "I25", "2024-02-19", "Dr. Vega", "activo"),
+        (13, 10, "Angina de pecho estable", "I20", "2024-02-19", "Dr. Vega", "activo"),
+        (14, 11, "Trastorno depresivo mayor", "F32", "2023-08-05", "Dra. Campos", "activo"),
+        (15, 11, "Trastorno por déficit de atención", "F90", "2023-08-05", "Dra. Campos", "activo"),
+        (16, 12, "Enfermedad de Parkinson", "G20", "2019-06-17", "Dr. Pastor", "cronico"),
+        (17, 12, "Hiperplasia prostática benigna", "N40", "2020-11-09", "Dr. Rojas", "activo"),
+        (18, 12, "Insuficiencia renal crónica estadio 3", "N18", "2021-09-28", "Dr. Rojas", "cronico"),
+        (19, 4, "Enfermedad celiaca", "K90", "2010-06-15", "Dra. Sáez", "cronico"),
+        (20, 6, "Fractura de clavícula derecha", "S42", "2025-02-03", "Dr. Marco", "resuelto"),
+        (21, 3, "Rinitis alérgica estacional", "J30", "2020-04-20", "Dra. Puig", "activo"),
+    ]
+    db_b.executemany("INSERT INTO diagnosticos VALUES (?, ?, ?, ?, ?, ?, ?)", diagnosticos_data)
+    print(f"✅ {len(diagnosticos_data)} diagnósticos insertados")
 ```
-
-#### Ejercicio 1 — Dataset de ground truth (2.5 ptos) {#sec-hpd4-e1-b}
 
 ```{python}
 #| echo: true
 
 if CAMINO == "B":
-    preguntas_eval_b = [
-        "¿Qué eficacia mostró el compuesto M10-342 en la fibrosis pulmonar?",
-        "¿Qué efectos adversos se registraron en el ensayo clínico?",
-        "¿Qué pacientes tienen más de 70 años y diagnóstico respiratorio?",
-        "¿Qué AUC alcanzan los sistemas de IA en radiología torácica?",
-        "¿Cuántos pacientes tienen diagnóstico oncológico en la base de datos?",
-        "¿Qué técnicas de IA se usan en descubrimiento de fármacos?",
-        "¿Qué pacientes están en tratamiento con fármacos biológicos?",
-        "¿Cuál es la tasa de acierto real de moléculas propuestas por IA que llegan a ensayos preclínicos?",
-        "¿Qué pacientes tienen entre 40 y 60 años y enfermedad autoinmune?",
-        "¿Cuáles son los desafíos actuales del diagnóstico por imagen con IA?",
-        "¿Qué paciente tiene el ingreso más reciente?",
-        "¿Qué porcentaje de reducción en tiempo de descubrimiento de fármacos se atribuye a la IA?",
+    medicamentos_data = [
+        (1, 1, "Enalapril", "10 mg", "1 comprimido al día", "2020-03-15", None),
+        (2, 2, "Metformina", "850 mg", "2 comprimidos al día", "2018-06-20", None),
+        (3, 2, "AAS", "100 mg", "1 comprimido al día", "2023-11-05", None),
+        (4, 2, "Atorvastatina", "20 mg", "1 comprimido al día", "2023-11-05", None),
+        (5, 3, "Salbutamol inhalador", "200 mcg", "2 inhalaciones cada 8h", "2019-09-12", None),
+        (6, 3, "Budesonida inhalador", "400 mcg", "1 inhalación cada 12h", "2020-03-01", None),
+        (7, 4, "Rosuvastatina", "10 mg", "1 comprimido al día", "2021-01-25", None),
+        (8, 5, "Metotrexato", "15 mg semanal", "1 dosis semanal", "2017-04-08", None),
+        (9, 5, "Ácido fólico", "5 mg", "1 comprimido al día", "2017-04-08", None),
+        (10, 5, "Alendronato", "70 mg semanal", "1 comprimido semanal", "2022-10-14", None),
+        (11, 7, "Amitriptilina", "25 mg", "1 comprimido al acostarse", "2020-07-22", None),
+        (12, 7, "Sumatriptán", "50 mg", "1 comprimido en crisis (máx 2/día)", "2019-12-01", None),
+        (13, 8, "Tiotropio inhalador", "18 mcg", "1 inhalación al día", "2016-03-30", None),
+        (14, 8, "Salbutamol inhalador", "200 mcg", "2 inhalaciones a demanda", "2016-03-30", None),
+        (15, 9, "Levotiroxina", "75 mcg", "1 comprimido al día", "2021-05-11", None),
+        (16, 10, "Bisoprolol", "5 mg", "1 comprimido al día", "2024-02-19", None),
+        (17, 10, "Clopidogrel", "75 mg", "1 comprimido al día", "2024-02-19", None),
+        (18, 11, "Sertralina", "100 mg", "1 comprimido al día", "2023-08-05", None),
+        (19, 11, "Metilfenidato", "18 mg", "1 comprimido por la mañana", "2023-08-05", None),
+        (20, 12, "Levodopa/Carbidopa", "250/25 mg", "1 comprimido cada 6h", "2019-06-17", None),
+        (21, 12, "Tamsulosina", "0.4 mg", "1 comprimido al día", "2020-11-09", None),
+        (22, 6, "Ibuprofeno", "600 mg", "1 comprimido cada 8h (7 días)", "2025-02-03", "2025-02-10"),
     ]
+    db_b.executemany("INSERT INTO medicamentos VALUES (?, ?, ?, ?, ?, ?, ?)", medicamentos_data)
+    print(f"✅ {len(medicamentos_data)} registros de medicación insertados")
+```
 
-    eval1_dataset = []
-    for pregunta in preguntas_eval_b:
-        res = rag(pregunta, collection_pdf_b, collection_sql_b)
-        eval1_dataset.append({
-            "question": pregunta,
-            "answer": res["respuesta"],
-            "contexts": res["fuentes"],
-            "ground_truth": "",  # ← completar
-        })
+### Ejercicio 1 — Servidor MCP (3 ptos) {#sec-hpd4-e1-b}
 
-    print(f"✅ eval1_dataset creado: {len(eval1_dataset)} preguntas")
+Construye un servidor FastMCP que exponga las siguientes herramientas SQL sobre la base de datos clínica:
+
+- `listar_tablas()` — devuelve la lista de tablas disponibles
+- `describir_tabla(tabla: str)` — devuelve el DDL de la tabla
+- `consultar_sql(query: str)` — ejecuta una consulta SELECT y devuelve resultados
+- Resource `resumen://clinica` — devuelve estadísticas agregadas (total pacientes, diagnósticos activos, medicamentos prescritos, distribución por grupo sanguíneo)
+
+Asigna el servidor a `eval1_server` (como string con los logs de creación y verificación).
+
+```{python}
+#| echo: true
+
+if CAMINO == "B":
+    from fastmcp import FastMCP
+
+    mcp_b = FastMCP("Servidor Clínico MCP")
+    TOOLS_MCP.clear()
+
+    @mcp_b.tool()
+    def listar_tablas() -> str:
+        """Devuelve la lista de tablas disponibles en la base de datos clínica."""
+        cursor = db_b.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+        tablas = [row[0] for row in cursor.fetchall()]
+        return "Tablas disponibles:\n" + "\n".join(f"  - {t}" for t in tablas)
+
+    @mcp_b.tool()
+    def describir_tabla(tabla: str) -> str:
+        """Devuelve el DDL (CREATE TABLE) de una tabla.
+
+        Args:
+            tabla: nombre de la tabla.
+        """
+        tabla = tabla.strip().lower()
+        cursor = db_b.execute("SELECT sql FROM sqlite_master WHERE type='table' AND LOWER(name)=?", (tabla,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        return f"Error: tabla '{tabla}' no encontrada."
+
+    @mcp_b.tool()
+    def consultar_sql(query: str) -> str:
+        """Ejecuta una consulta SQL SELECT en la base de datos clínica.
+
+        Args:
+            query: consulta SQL (solo SELECT).
+        """
+        query_stripped = query.strip().upper()
+        if not query_stripped.startswith("SELECT"):
+            return "Error: solo se permiten consultas SELECT."
+        palabras_prohibidas = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE"]
+        for p in palabras_prohibidas:
+            if p in query_stripped:
+                return f"Error: la consulta contiene '{p}' no permitido."
+        try:
+            cursor = db_b.execute(query)
+            columnas = [d[0] for d in cursor.description]
+            filas = cursor.fetchmany(30)
+            if not filas:
+                return "No se encontraron resultados."
+            ancho = max(len(str(c)) for c in columnas)
+            lines = [" | ".join(f"{str(c):{ancho}}" for c in columnas)]
+            lines.append("-" * len(lines[0]))
+            for fila in filas:
+                lines.append(" | ".join(f"{str(v):{ancho}}" for v in fila))
+            resultado = "\n".join(lines)
+            if len(cursor.fetchall()) > 0:
+                resultado += f"\n... y más filas (mostrando primeras {len(filas)})"
+            if len(resultado) > 2000:
+                resultado = resultado[:2000] + "\n... (resultado truncado a 2000 caracteres)"
+            return resultado
+        except Exception as e:
+            return f"Error ejecutando consulta: {e}"
+
+    @mcp_b.resource("resumen://clinica")
+    def resumen_clinico() -> str:
+        """Resumen agregado de la base de datos clínica."""
+        total_pac = db_b.execute("SELECT COUNT(*) FROM pacientes").fetchone()[0]
+        edad_media = db_b.execute("SELECT AVG(edad) FROM pacientes").fetchone()[0]
+        diag_activos = db_b.execute("SELECT COUNT(*) FROM diagnosticos WHERE estado='activo'").fetchone()[0]
+        diag_cronicos = db_b.execute("SELECT COUNT(*) FROM diagnosticos WHERE estado='cronico'").fetchone()[0]
+        total_meds = db_b.execute("SELECT COUNT(*) FROM medicamentos").fetchone()[0]
+        meds_activos = db_b.execute("SELECT COUNT(*) FROM medicamentos WHERE fecha_fin IS NULL").fetchone()[0]
+
+        grupos = db_b.execute("SELECT grupo_sanguineo, COUNT(*) FROM pacientes GROUP BY grupo_sanguineo ORDER BY grupo_sanguineo").fetchall()
+        grupo_str = "\n".join(f"  - {g}: {c} pacientes" for g, c in grupos)
+
+        lines = [
+            "=== RESUMEN CLÍNICO ===",
+            f"Pacientes totales: {total_pac}",
+            f"Edad media: {edad_media:.1f} años",
+            f"Diagnósticos activos: {diag_activos}",
+            f"Diagnósticos crónicos: {diag_cronicos}",
+            f"Medicamentos totales: {total_meds}",
+            f"Medicamentos activos: {meds_activos}",
+            "",
+            "Distribución grupo sanguíneo:",
+            grupo_str,
+        ]
+        return "\n".join(lines)
+
+    registrar_tool("listar_tablas", listar_tablas)
+    registrar_tool("describir_tabla", describir_tabla)
+    registrar_tool("consultar_sql", consultar_sql)
+
+    eval1_server = "✅ Servidor MCP Clínico creado con 3 tools + 1 resource\n"
+    eval1_server += "  Tools: listar_tablas, describir_tabla, consultar_sql\n"
+    eval1_server += "  Resource: resumen://clinica\n"
+    eval1_server += "\n--- Prueba: listar_tablas ---\n"
+    eval1_server += listar_tablas()
+    eval1_server += "\n\n--- Prueba: resource resumen://clinica ---\n"
+    eval1_server += resumen_clinico()
+    print(eval1_server)
 else:
-    eval1_dataset = None
+    eval1_server = None
 ```
 
-#### Ejercicio 2 — Evaluación RAGAS (2.5 ptos) {#sec-hpd4-e2-b}
+### Ejercicio 2 — Consulta en lenguaje natural (2 ptos) {#sec-hpd4-e2-b}
+
+Conecta el cliente OpenAI al servidor MCP. Formula una pregunta clínica en lenguaje natural, deja que el LLM decida qué tool usar y muestra la respuesta final.
+
+Asigna el resultado (pregunta + respuesta completa) a `eval2_respuesta`.
 
 ```{python}
 #| echo: true
 
 if CAMINO == "B":
-    from ragas import evaluate as ragas_evaluate
-    from ragas.metrics import faithfulness, answer_relevancy, context_precision
-    from datasets import Dataset
-    from ragas.llms import LangchainLLMWrapper
+    tools_definition_b = [
+        {
+            "type": "function",
+            "function": {
+                "name": "listar_tablas",
+                "description": "Devuelve la lista de tablas disponibles en la base de datos clínica.",
+                "parameters": {"type": "object", "properties": {}, "required": []}
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "describir_tabla",
+                "description": "Devuelve el DDL de una tabla específica.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"tabla": {"type": "string", "description": "Nombre de la tabla"}},
+                    "required": ["tabla"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "consultar_sql",
+                "description": "Ejecuta una consulta SQL SELECT. Tablas: pacientes(id, nombre, edad, genero, grupo_sanguineo, historial), diagnosticos(id, paciente_id, diagnostico, codigo_cie, fecha, medico, estado), medicamentos(id, paciente_id, medicamento, dosis, frecuencia, fecha_inicio, fecha_fin).",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"query": {"type": "string", "description": "Consulta SQL SELECT"}},
+                    "required": ["query"]
+                }
+            }
+        },
+    ]
 
-    if eval1_dataset and all(item["ground_truth"] for item in eval1_dataset):
-        dataset_hf = Dataset.from_dict({
-            "question": [item["question"] for item in eval1_dataset],
-            "answer": [item["answer"] for item in eval1_dataset],
-            "contexts": [item["contexts"] for item in eval1_dataset],
-            "ground_truth": [item["ground_truth"] for item in eval1_dataset],
-        })
+    def preguntar_al_llm(pregunta, tools_def, system_prompt=None):
+        if not client:
+            return "⚠️  Cliente OpenAI no disponible."
 
-        evaluator_llm = LangchainLLMWrapper(llm)
-        result = ragas_evaluate(
-            dataset=dataset_hf,
-            metrics=[faithfulness, answer_relevancy, context_precision],
-            llm=evaluator_llm,
+        if system_prompt is None:
+            system_prompt = "Eres un asistente clínico. Tienes acceso a una base de datos con pacientes, diagnósticos y medicamentos. Usa las herramientas disponibles para responder preguntas. Responde en español, de forma concisa."
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": pregunta}
+        ]
+
+        response = client.chat.completions.create(
+            model="mlx-community/Qwen3.6-35B-A3B-8bit",
+            messages=messages,
+            tools=tools_def,
+            tool_choice="auto",
+            max_tokens=1024,
         )
 
-        df_ragas = result.to_pandas()
-        eval2_ragas = {
-            "por_pregunta": df_ragas[["faithfulness", "answer_relevancy", "context_precision"]].to_dict("records"),
-            "medias": {
-                "faithfulness": float(df_ragas["faithfulness"].mean()),
-                "answer_relevancy": float(df_ragas["answer_relevancy"].mean()),
-                "context_precision": float(df_ragas["context_precision"].mean()),
-            }
-        }
+        message = response.choices[0].message
 
-        print("📊 Resultados RAGAS (medias):")
-        for metrica, valor in eval2_ragas["medias"].items():
-            print(f"  {metrica}: {valor:.4f}")
-        print(f"\nPuntuaciones por pregunta:")
-        print(df_ragas[["faithfulness", "answer_relevancy", "context_precision"]])
+        if message.tool_calls:
+            messages.append(message)
+            for tc in message.tool_calls:
+                args = json.loads(tc.function.arguments)
+                result = ejecutar_tool(tc.function.name, args)
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "content": result
+                })
+
+            final = client.chat.completions.create(
+                model="mlx-community/Qwen3.6-35B-A3B-8bit",
+                messages=messages,
+                tools=tools_def,
+                tool_choice="none",
+                max_tokens=512,
+            )
+            return final.choices[0].message.content
+        else:
+            return message.content
+
+    pregunta_b = "¿Cuántos pacientes tienen diabetes o cardiopatía y qué medicamentos toman?"
+
+    if client:
+        respuesta_b = preguntar_al_llm(pregunta_b, tools_definition_b)
+        eval2_respuesta = f"PREGUNTA: {pregunta_b}\n\nRESPUESTA: {respuesta_b}"
     else:
-        eval2_ragas = {"error": "Completa los ground_truth en eval1_dataset primero."}
-        print(eval2_ragas["error"])
+        eval2_respuesta = "⚠️  Cliente OpenAI no disponible. Pregunta: " + pregunta_b
+
+    print(eval2_respuesta)
 else:
-    eval2_ragas = None
+    eval2_respuesta = None
 ```
 
-#### Ejercicio 3 — Iteración y mejora (2.5 ptos) {#sec-hpd4-e3-b}
+### Ejercicio 3 — Pruebas de inyección (1.5 ptos) {#sec-hpd4-e3-b}
+
+Prueba al menos 3 intentos de ataque (prompt injection o SQL injection) contra tu servidor MCP. Documenta qué intentaste, qué respuesta obtuvo y si la defensa funcionó.
+
+Asigna los resultados a `eval3_ataques` (lista de diccionarios con ataque, resultado, defendido).
 
 ```{python}
 #| echo: true
 
 if CAMINO == "B":
-    eval3_iteracion = [
-        # Completar con al menos 2 versiones (base + mejora)
+    ataques_b = [
+        {
+            "ataque": "Intento de borrar tabla diagnosticos",
+            "tipo": "SQL Injection",
+            "query": "DROP TABLE diagnosticos"
+        },
+        {
+            "ataque": "Actualizar sueldos inventados a través de inyección",
+            "tipo": "SQL Injection con UPDATE",
+            "query": "UPDATE pacientes SET edad = 99 WHERE id = 1; SELECT * FROM pacientes"
+        },
+        {
+            "ataque": "Consulta SELECT encubriendo DROP con comentario",
+            "tipo": "SQL Injection con comentario SQL",
+            "query": "SELECT * FROM pacientes; DROP TABLE medicamentos; --"
+        },
     ]
-    print(f"⚠️  Completa eval3_iteracion con al menos 2 versiones comparadas.")
+
+    eval3_ataques = []
+    for ataque in ataques_b:
+        resultado = consultar_sql(ataque["query"])
+        defendido = "Error" in resultado or "no permitido" in resultado
+        entry = {
+            "ataque": ataque["ataque"],
+            "tipo": ataque["tipo"],
+            "resultado": resultado[:200],
+            "defendido": defendido,
+            "defensa_efectiva": "✅ Bloqueado" if defendido else "❌ Vulnerable"
+        }
+        eval3_ataques.append(entry)
+
+    for e in eval3_ataques:
+        print(f"\n--- {e['tipo']} ---")
+        print(f"  Ataque: {e['ataque']}")
+        print(f"  Resultado: {e['defensa_efectiva']}")
+        print(f"  Detalle: {e['resultado']}")
 else:
-    eval3_iteracion = None
+    eval3_ataques = None
 ```
 
-#### Ejercicio 4 — Informe de evaluación (2.5 ptos) {#sec-hpd4-e4-b}
+### Ejercicio 4 — Análisis de riesgos (1.5 ptos) {#sec-hpd4-e4-b}
+
+Redacta un análisis de riesgos para el servidor MCP en un entorno clínico real. Debes cubrir al menos:
+
+- Riesgos de privacidad (datos clínicos sujetos a GDPR/LOPD)
+- Inyección SQL y prompt injection
+- Data leakage (exposición de diagnósticos, medicación o datos identificativos)
+- Mitigaciones específicas para cada riesgo
+
+Asigna tu respuesta a `eval4_riesgos`.
 
 ```{python}
 #| echo: true
 
 if CAMINO == "B":
-    eval4_informe = """Escribir aquí el informe estructurado. Incluir:
-    - Métricas RAGAS obtenidas
-    - Fortalezas y debilidades del pipeline
-    - Análisis de errores
-    - Impacto de la mejora implementada
-    - Propuestas de mejora adicionales"""
-    print("✅ eval4_informe asignada. Completa el contenido.")
+    eval4_riesgos = """Escribir aquí el análisis de riesgos. Por ejemplo:
+
+    RIESGOS DE PRIVACIDAD (GDPR/LOPD):
+    - Los datos clínicos son categoría especial (art. 9 GDPR). La tabla pacientes
+      contiene nombre, edad, grupo sanguíneo e historial médico completo.
+    - Mitigación: anonimización/pseudonimización antes de exponer vía MCP,
+      logs de auditoría con acceso restringido, consentimiento informado digital.
+
+    INYECCIÓN SQL / PROMPT INJECTION:
+    - Un atacante podría inyectar comandos SQL para acceder o modificar
+      historiales clínicos, o manipular el prompt del LLM para eludir controles.
+    - Mitigación: sanitización estricta (solo SELECT, whitelist de palabras),
+      límite de filas, timeout, system prompt con restricciones explícitas.
+
+    DATA LEAKAGE:
+    - El LLM podría revelar información de un paciente en respuesta a una
+      pregunta sobre otro, o exponer diagnósticos sensibles (VIH, salud mental).
+    - Mitigación: implementar filtros de respuesta (post-processing), revisión
+      humana de las respuestas del LLM, uso de vistas SQL que limiten columnas.
+
+    RIESGOS ESPECÍFICOS DEL DOMINIO CLÍNICO:
+    - Riesgo de sesgo: si los datos de entrenamiento tienen sesgos demográficos,
+      el LLM podría dar respuestas inequitativas.
+    - Trazabilidad: cada consulta debe quedar registrada con timestamp y usuario
+      para auditorías sanitarias."""
+    print("✅ eval4_riesgos asignada.")
 else:
-    eval4_informe = None
+    eval4_riesgos = None
 ```
 
 ## Camino C — E-commerce
 
-**Contexto:** Trabajas como Data Scientist en un marketplace digital. Necesitas un sistema RAG que combine análisis de reviews y catálogos en PDF con datos estructurados de inventario en SQLite para responder preguntas sobre productos y tendencias.
+**Contexto:** Trabajas como Data Scientist en un marketplace digital. Tu equipo necesita un servidor MCP que exponga datos de producto: productos, pedidos y clientes. El equipo de producto consultará estos datos mediante un asistente conversacional para tomar decisiones rápidas.
 
-### Corpus — 3 documentos de e-commerce
-
-```{python}
-#| echo: true
-
-if CAMINO == "C":
-    informes_c = {
-        "catalogo_primavera_2025.pdf": (
-            "Catálogo de Productos — Primavera 2025 — MarketPlace M10",
-            "El catálogo de primavera 2025 incluye 1.240 productos nuevos en 12 categorías. "
-            "Las categorías con mayor incremento de oferta son Tecnología (+22 %) y Hogar "
-            "(+22 %), seguidas de Deportes (+15 %) y Moda (+15 %). El precio medio del "
-            "catálogo es 47.50 €, con un incremento interanual del 3.2 %, por debajo de "
-            "la inflación general (4.1 %).\n\n"
-            "En Tecnología, los auriculares inalámbricos representan el 28 % de las ventas, "
-            "con NovaBuds Pro como líder (4.7 estrellas, 12.400 valoraciones). Los "
-            "smartwatches crecen un 35 %, impulsados por la línea FitTrack con "
-            "monitorización de glucosa. En Hogar, los robots aspiradores con LiDAR crecen "
-            "un 42 % con un ticket medio de 349 €.\n\n"
-            "Deportes destaca por la línea EcoSport (materiales reciclados) con 8.500 "
-            "pedidos en su primer mes. En Moda, las chaquetas técnicas con tejido "
-            "transpirable tienen el mejor ratio de conversión (12.3 %). Los productos con "
-            "mayor tasa de retorno son los calzados de running (14 %), principalmente por "
-            "talla incorrecta. La colección Hogar Inteligente (domótica) ha duplicado su "
-            "facturación respecto a 2024."
-        ),
-        "analisis_reviews_2025.pdf": (
-            "Análisis de Reviews de Clientes — Tendencias y Sentimiento 2025",
-            "El informe procesa 245.000 valoraciones del primer semestre de 2025. El "
-            "sentimiento global es positivo (4.1/5 estrellas), con variación por categoría: "
-            "Tecnología (4.3), Hogar (4.2), Deportes (4.0), Moda (3.8) y Alimentación "
-            "(4.4). El análisis NLP revela los principales factores de satisfacción: "
-            "relación calidad-precio (62 % de reviews positivas), rapidez de entrega "
-            "(45 %) y facilidad de uso (38 %).\n\n"
-            "Factores de insatisfacción: talla incorrecta en ropa/calzado (28 % de "
-            "reviews negativas), diferencia entre foto y producto real (22 %), y problemas "
-            "de compatibilidad en electrónica (15 %). Las devoluciones por talla "
-            "representan el 35 % del total de retornos.\n\n"
-            "Tendencias emergentes: demanda de productos sostenibles (+65 % menciones vs "
-            "2024), envases sin plástico (+42 %) y funcionalidades IA (+38 %). Los "
-            "productos con tecnología incorporada tienen valoración media superior "
-            "(4.5 vs 4.1). El Net Promoter Score (NPS) del marketplace se sitúa en +42, "
-            "considerado excelente en el sector."
-        ),
-        "tendencias_consumo_2026.pdf": (
-            "Tendencias de Consumo y Perspectivas 2025-2026",
-            "Las ventas online en Europa crecieron un 14 % en 2025 (890 mil M€). Se espera "
-            "crecimiento moderado del 9-11 % en 2026, con penetración del e-commerce del "
-            "32 % sobre el comercio minorista total. La compra por voz representa ya el "
-            "8 % de las órdenes en electrónica y crece al 25 % anual.\n\n"
-            "Tres tendencias clave: suscripciones recurrentes (23 % de consumidores, +18 % "
-            "anual), personalización masiva mediante IA, y social commerce (TikTok Shop e "
-            "Instagram Checkout crecen un 34 %). El 41 % de compradores declara disposición "
-            "a pagar más por productos sostenibles, aunque solo el 17 % lo hace realmente "
-            "(intention-action gap).\n\n"
-            "Desafíos para 2026: gestión de devoluciones (coste del 21 % sobre valor del "
-            "pedido), logística de última milla en zonas de baja densidad, y detección de "
-            "fraude con IA generativa (deepfakes en reviews, suplantación de vendedores). "
-            "Se recomienda invertir en herramientas de verificación de identidad y "
-            "autenticación biométrica para vendedores."
-        ),
-    }
-    for nombre, (titulo, contenido) in informes_c.items():
-        crear_pdf(nombre, titulo, contenido)
-    print(f"✅ {len(informes_c)} PDFs de e-commerce generados.")
-```
-
-### Base de datos SQLite — Inventario
+### Base de datos — E-commerce
 
 ```{python}
 #| echo: true
 
 if CAMINO == "C":
-    DB_PATH_C = os.path.join(tempfile.mkdtemp(), "inventario.db")
-    conn_c = sqlite3.connect(DB_PATH_C)
-    conn_c.execute("""
-        CREATE TABLE inventario (
+    db_c = sqlite3.connect(":memory:")
+
+    # Tabla productos
+    db_c.execute("""
+        CREATE TABLE productos (
             id INTEGER PRIMARY KEY,
             nombre TEXT NOT NULL,
             categoria TEXT NOT NULL,
             precio REAL NOT NULL,
             stock INTEGER NOT NULL,
-            valoracion_media REAL NOT NULL,
-            vendidos INTEGER NOT NULL
+            valoracion REAL NOT NULL,
+            proveedor TEXT NOT NULL
         )
     """)
 
-    inventario_data = [
-        (1,  "NovaBuds Pro",                  "Tecnología",     89.00,  250, 4.7, 12400),
-        (2,  "Monitor 4K 27\"",               "Tecnología",    349.00,  120, 4.5,  3200),
-        (3,  "Teclado Mecánico RGB",          "Tecnología",     79.00,  180, 4.3,  5600),
-        (4,  "Smartwatch FitTrack Pro",       "Tecnología",    199.00,   95, 4.6,  2100),
-        (5,  "Robot Aspirador LiDAR X500",    "Hogar",         349.00,   45, 4.4,   980),
-        (6,  "Lámpara LED Smart",             "Hogar",          49.00,  200, 4.2,  4500),
-        (7,  "Silla Ergonómica Pro",          "Hogar",         249.00,   32, 4.1,  1800),
-        (8,  "Purificador Aire HEPA",         "Hogar",         129.00,   55, 4.5,  1200),
-        (9,  "Escritorio Ajustable Electrico","Hogar",         299.00,   18, 4.6,   650),
-        (10, "Chaqueta Técnica EcoSport",     "Moda",          129.00,  110, 4.3,  2800),
-        (11, "Zapatillas Trail Running",      "Deportes",       89.00,  140, 4.2,  3900),
-        (12, "Mochila Hidratación 10L",       "Deportes",       45.00,  200, 4.0,  2200),
-        (13, "Tienda Campaña Ultralight 2P",  "Deportes",      199.00,    0, 4.7,  1500),
-        (14, "Bicicleta Eléctrica Urbana",    "Deportes",      899.00,   25, 4.1,   420),
-        (15, "Cámara Seguridad Wi-Fi 2K",    "Tecnología",      59.00,  300, 4.0,  6700),
-        (16, "Altavoz Bluetooth Portátil",    "Tecnología",      39.00,  500, 4.4,  8900),
-        (17, "Set Jardinería Automatizado",   "Hogar",          79.00,   65, 4.3,   780),
-        (18, "Cafetera Superautomática",      "Hogar",         599.00,   12, 4.6,   340),
-        (19, "Auriculares Deportivos Bluetooth","Deportes",     59.00,  180, 4.5,  4200),
-        (20, "Camiseta Térmica Merino",       "Moda",           49.00,  220, 4.1,  3100),
-        (21, "Chaqueta Impermeable Trail",    "Deportes",      159.00,   85, 4.4,  1100),
-        (22, "Hub USB-C 7 Puertos",           "Tecnología",      34.00,  400, 4.2,  5200),
-    ]
+    # Tabla pedidos
+    db_c.execute("""
+        CREATE TABLE pedidos (
+            id INTEGER PRIMARY KEY,
+            producto_id INTEGER NOT NULL,
+            cliente_id INTEGER NOT NULL,
+            cantidad INTEGER NOT NULL,
+            fecha TEXT NOT NULL,
+            estado TEXT NOT NULL CHECK(estado IN ('pendiente', 'enviado', 'entregado', 'cancelado', 'devuelto')),
+            total REAL NOT NULL,
+            FOREIGN KEY (producto_id) REFERENCES productos(id)
+        )
+    """)
 
-    conn_c.executemany(
-        "INSERT INTO inventario VALUES (?, ?, ?, ?, ?, ?, ?)",
-        inventario_data
-    )
-    conn_c.commit()
+    # Tabla clientes
+    db_c.execute("""
+        CREATE TABLE clientes (
+            id INTEGER PRIMARY KEY,
+            nombre TEXT NOT NULL,
+            email TEXT NOT NULL,
+            pais TEXT NOT NULL,
+            fecha_registro TEXT NOT NULL,
+            total_compras REAL NOT NULL DEFAULT 0
+        )
+    """)
 
-    df_inventario = pd.DataFrame(inventario_data, columns=[
-        "id", "nombre", "categoria", "precio", "stock", "valoracion_media", "vendidos"
-    ])
-    df_inventario["texto"] = df_inventario.apply(
-        lambda r: f"Producto: {r['nombre']}. Categoría: {r['categoria']}. Precio: {r['precio']}€. "
-                  f"Stock: {r['stock']} uds. Valoración: {r['valoracion_media']}/5. Vendidos: {r['vendidos']}.",
-        axis=1
-    )
-
-    print(f"✅ {len(inventario_data)} productos en SQLite")
-    print(f"   Categorías: {df_inventario['categoria'].unique()}")
-    print(f"   Precio medio: {df_inventario['precio'].mean():.1f}€")
+    print("✅ Tablas creadas: productos, pedidos, clientes")
 ```
-
-### Indexación dual
 
 ```{python}
 #| echo: true
 
 if CAMINO == "C":
-    chunks_pdf_c = cargar_y_trocear_pdfs(CORPUS_DIR)
-    collection_pdf_c = client.get_or_create_collection(
-        name="hpd4_ecommerce_pdf", metadata={"hnsw:space": "cosine"}
-    )
-    indexar_chunks(collection_pdf_c, chunks_pdf_c, prefix="eco_")
-
-    collection_sql_c = client.get_or_create_collection(
-        name="hpd4_ecommerce_sql", metadata={"hnsw:space": "cosine"}
-    )
-    textos_sql_c = df_inventario["texto"].tolist()
-    metas_sql_c = df_inventario[["nombre", "categoria", "valoracion_media"]].to_dict("records")
-    indexar_textos(collection_sql_c, textos_sql_c, metas_sql_c, prefix="inv_")
-
-    print(f"✅ PDFs indexados: {collection_pdf_c.count()} vectores")
-    print(f"✅ SQL indexados: {collection_sql_c.count()} vectores")
+    productos_data = [
+        (1, "NovaBuds Pro", "Auriculares", 149.99, 340, 4.7, "TechAudio"),
+        (2, "FitTrack Gluco Watch", "Smartwatches", 289.00, 125, 4.5, "WearHealth"),
+        (3, "RobotClean X500", "Hogar", 449.99, 78, 4.8, "HomeRobo"),
+        (4, "EcoSport Running Shoes", "Deportes", 89.99, 560, 4.3, "GreenFoot"),
+        (5, "SmartLight Ambient", "Hogar", 34.99, 1020, 4.1, "LightCorp"),
+        (6, "PowerBank 20000mAh", "Tecnología", 45.50, 450, 4.4, "BatteryPro"),
+        (7, "Teclado Mecánico RGB", "Tecnología", 79.99, 280, 4.6, "KeyTech"),
+        (8, "Monitor 27\" 4K HDR", "Tecnología", 459.00, 65, 4.8, "ViewPerfect"),
+        (9, "Chaqueta Técnica Alpina", "Moda", 129.99, 190, 4.5, "MountainWear"),
+        (10, "Set Sartenes Antiadherentes", "Hogar", 69.99, 310, 4.2, "KitchenPro"),
+        (11, "EcoSport Yoga Mat", "Deportes", 39.99, 890, 4.6, "GreenFoot"),
+        (12, "Cafetera Programable", "Hogar", 89.99, 145, 4.4, "BrewMaster"),
+        (13, "Auriculares In-Ear Sport", "Auriculares", 59.99, 420, 4.2, "TechAudio"),
+        (14, "Pack Sostenible 3 uds", "Moda", 54.99, 230, 4.7, "GreenWear"),
+        (15, "Altavoz Bluetooth Portátil", "Tecnología", 39.99, 670, 4.0, "SoundMax"),
+    ]
+    db_c.executemany("INSERT INTO productos VALUES (?, ?, ?, ?, ?, ?, ?)", productos_data)
+    print(f"✅ {len(productos_data)} productos insertados")
 ```
-
-#### Ejercicio 1 — Dataset de ground truth (2.5 ptos) {#sec-hpd4-e1-c}
 
 ```{python}
 #| echo: true
 
 if CAMINO == "C":
-    preguntas_eval_c = [
-        "¿Qué productos de Tecnología tienen una valoración superior a 4.5?",
-        "¿Cuáles son los principales factores de satisfacción según las reviews?",
-        "¿Qué productos tienen stock inferior a 20 unidades y deberían reabastecerse?",
-        "¿Qué tendencias de consumo emergentes se identifican en las reviews de 2025?",
-        "¿Qué categoría tiene la valoración media más alta según el análisis de reviews?",
-        "¿Qué productos han vendido más de 5.000 unidades?",
-        "¿Cuáles son los principales desafíos del e-commerce para 2026?",
-        "¿Qué porcentaje de las órdenes en electrónica se generan por compra por voz?",
-        "¿Qué productos de Hogar tienen un precio superior a 250€?",
-        "¿Cuál es el Net Promoter Score del marketplace?",
-        "¿Qué producto tiene el mayor número de unidades vendidas?",
-        "¿Qué productos de Deportes tienen valoración superior a 4.3 y stock disponible?",
+    clientes_data = [
+        (1, "Laura García", "laura.garcia@email.com", "España", "2024-01-15", 1245.80),
+        (2, "Miguel Ángel Ruiz", "mangel.ruiz@email.com", "España", "2024-02-22", 2890.45),
+        (3, "Sophie Dupont", "sophie.dupont@email.com", "Francia", "2024-03-10", 1876.30),
+        (4, "John Smith", "john.smith@email.com", "Reino Unido", "2024-04-05", 3450.20),
+        (5, "Carmen Vargas", "carmen.vargas@email.com", "Argentina", "2024-05-18", 920.60),
+        (6, "Luca Bianchi", "luca.bianchi@email.com", "Italia", "2024-06-01", 2150.00),
+        (7, "Ana Sousa", "ana.sousa@email.com", "Portugal", "2024-07-12", 1567.90),
+        (8, "Pedro Castillo", "pedro.castillo@email.com", "México", "2024-08-25", 2980.15),
     ]
+    db_c.executemany("INSERT INTO clientes VALUES (?, ?, ?, ?, ?, ?)", clientes_data)
+    print(f"✅ {len(clientes_data)} clientes insertados")
+```
 
-    eval1_dataset = []
-    for pregunta in preguntas_eval_c:
-        res = rag(pregunta, collection_pdf_c, collection_sql_c)
-        eval1_dataset.append({
-            "question": pregunta,
-            "answer": res["respuesta"],
-            "contexts": res["fuentes"],
-            "ground_truth": "",  # ← completar
-        })
+```{python}
+#| echo: true
 
-    print(f"✅ eval1_dataset creado: {len(eval1_dataset)} preguntas")
+if CAMINO == "C":
+    pedidos_data = [
+        (1, 1, 1, 2, "2025-01-10", "entregado", 299.98),
+        (2, 2, 1, 1, "2025-01-12", "entregado", 289.00),
+        (3, 3, 2, 1, "2025-01-15", "entregado", 449.99),
+        (4, 4, 3, 3, "2025-01-20", "entregado", 269.97),
+        (5, 5, 4, 5, "2025-02-01", "entregado", 174.95),
+        (6, 6, 2, 2, "2025-02-05", "entregado", 91.00),
+        (7, 7, 5, 1, "2025-02-10", "entregado", 79.99),
+        (8, 8, 4, 1, "2025-02-15", "entregado", 459.00),
+        (9, 9, 6, 2, "2025-02-20", "enviado", 259.98),
+        (10, 10, 3, 1, "2025-03-01", "entregado", 69.99),
+        (11, 11, 7, 4, "2025-03-05", "entregado", 159.96),
+        (12, 12, 8, 1, "2025-03-10", "entregado", 89.99),
+        (13, 13, 6, 2, "2025-03-15", "enviado", 119.98),
+        (14, 14, 5, 1, "2025-03-18", "entregado", 54.99),
+        (15, 15, 7, 3, "2025-03-22", "entregado", 119.97),
+        (16, 1, 8, 1, "2025-04-01", "enviado", 149.99),
+        (17, 2, 2, 1, "2025-04-03", "enviado", 289.00),
+        (18, 4, 4, 2, "2025-04-05", "pendiente", 179.98),
+        (19, 6, 1, 3, "2025-04-08", "pendiente", 136.50),
+        (20, 7, 3, 1, "2025-04-10", "pendiente", 79.99),
+        (21, 8, 7, 1, "2025-04-12", "pendiente", 459.00),
+        (22, 9, 5, 1, "2025-04-15", "entregado", 129.99),
+        (23, 11, 6, 2, "2025-04-18", "pendiente", 79.98),
+        (24, 13, 8, 3, "2025-04-20", "cancelado", 179.97),
+        (25, 15, 1, 5, "2025-04-22", "pendiente", 199.95),
+        (26, 3, 4, 1, "2025-05-01", "devuelto", 449.99),
+        (27, 5, 2, 4, "2025-05-03", "pendiente", 139.96),
+        (28, 10, 3, 2, "2025-05-05", "pendiente", 139.98),
+        (29, 14, 6, 3, "2025-05-08", "pendiente", 164.97),
+        (30, 8, 1, 1, "2025-05-10", "pendiente", 459.00),
+        (31, 12, 5, 1, "2025-05-12", "pendiente", 89.99),
+        (32, 4, 7, 2, "2025-05-15", "pendiente", 179.98),
+    ]
+    db_c.executemany("INSERT INTO pedidos VALUES (?, ?, ?, ?, ?, ?, ?)", pedidos_data)
+    print(f"✅ {len(pedidos_data)} pedidos insertados")
+```
+
+### Ejercicio 1 — Servidor MCP (3 ptos) {#sec-hpd4-e1-c}
+
+Construye un servidor FastMCP que exponga las siguientes herramientas SQL sobre la base de datos de e-commerce:
+
+- `listar_tablas()` — devuelve la lista de tablas disponibles
+- `describir_tabla(tabla: str)` — devuelve el DDL de la tabla
+- `consultar_sql(query: str)` — ejecuta una consulta SELECT y devuelve resultados
+- Resource `resumen://tienda` — devuelve un resumen de la tienda (total productos, pedidos, clientes, ingresos totales, valoración media)
+
+Asigna el servidor a `eval1_server` (como string con los logs de creación y verificación).
+
+```{python}
+#| echo: true
+
+if CAMINO == "C":
+    from fastmcp import FastMCP
+
+    mcp_c = FastMCP("Servidor E-commerce MCP")
+    TOOLS_MCP.clear()
+
+    @mcp_c.tool()
+    def listar_tablas() -> str:
+        """Devuelve la lista de tablas disponibles en la base de datos de e-commerce."""
+        cursor = db_c.execute("SELECT name FROM sqlite_master WHERE type='table' ORDER BY name")
+        tablas = [row[0] for row in cursor.fetchall()]
+        return "Tablas disponibles:\n" + "\n".join(f"  - {t}" for t in tablas)
+
+    @mcp_c.tool()
+    def describir_tabla(tabla: str) -> str:
+        """Devuelve el DDL (CREATE TABLE) de una tabla.
+
+        Args:
+            tabla: nombre de la tabla.
+        """
+        tabla = tabla.strip().lower()
+        cursor = db_c.execute("SELECT sql FROM sqlite_master WHERE type='table' AND LOWER(name)=?", (tabla,))
+        row = cursor.fetchone()
+        if row:
+            return row[0]
+        return f"Error: tabla '{tabla}' no encontrada."
+
+    @mcp_c.tool()
+    def consultar_sql(query: str) -> str:
+        """Ejecuta una consulta SQL SELECT en la base de datos de e-commerce.
+
+        Args:
+            query: consulta SQL (solo SELECT).
+        """
+        query_stripped = query.strip().upper()
+        if not query_stripped.startswith("SELECT"):
+            return "Error: solo se permiten consultas SELECT."
+        palabras_prohibidas = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER", "CREATE", "TRUNCATE"]
+        for p in palabras_prohibidas:
+            if p in query_stripped:
+                return f"Error: la consulta contiene '{p}' no permitido."
+        try:
+            cursor = db_c.execute(query)
+            columnas = [d[0] for d in cursor.description]
+            filas = cursor.fetchmany(30)
+            if not filas:
+                return "No se encontraron resultados."
+            ancho = max(len(str(c)) for c in columnas)
+            lines = [" | ".join(f"{str(c):{ancho}}" for c in columnas)]
+            lines.append("-" * len(lines[0]))
+            for fila in filas:
+                lines.append(" | ".join(f"{str(v):{ancho}}" for v in fila))
+            resultado = "\n".join(lines)
+            if len(cursor.fetchall()) > 0:
+                resultado += f"\n... y más filas (mostrando primeras {len(filas)})"
+            if len(resultado) > 2000:
+                resultado = resultado[:2000] + "\n... (resultado truncado a 2000 caracteres)"
+            return resultado
+        except Exception as e:
+            return f"Error ejecutando consulta: {e}"
+
+    @mcp_c.resource("resumen://tienda")
+    def resumen_tienda() -> str:
+        """Resumen agregado de la tienda online."""
+        total_prod = db_c.execute("SELECT COUNT(*) FROM productos").fetchone()[0]
+        total_ped = db_c.execute("SELECT COUNT(*) FROM pedidos").fetchone()[0]
+        total_clientes = db_c.execute("SELECT COUNT(*) FROM clientes").fetchone()[0]
+        ingresos = db_c.execute("SELECT COALESCE(SUM(total), 0) FROM pedidos WHERE estado IN ('entregado', 'enviado')").fetchone()[0]
+        valoracion_media = round(db_c.execute("SELECT AVG(valoracion) FROM productos").fetchone()[0], 2)
+        stock_total = db_c.execute("SELECT SUM(stock) FROM productos").fetchone()[0]
+        prod_bajo_stock = db_c.execute("SELECT COUNT(*) FROM productos WHERE stock < 100").fetchone()[0]
+        pedidos_pendientes = db_c.execute("SELECT COUNT(*) FROM pedidos WHERE estado='pendiente'").fetchone()[0]
+
+        lines = [
+            "=== RESUMEN TIENDA ===",
+            f"Productos: {total_prod} (stock total: {stock_total})",
+            f"  - Productos con bajo stock: {prod_bajo_stock}",
+            f"Valoración media: {valoracion_media} / 5.0",
+            f"Pedidos totales: {total_ped}",
+            f"  - Pendientes: {pedidos_pendientes}",
+            f"Clientes registrados: {total_clientes}",
+            f"Ingresos totales: {ingresos:,.2f} EUR",
+        ]
+        return "\n".join(lines)
+
+    registrar_tool("listar_tablas", listar_tablas)
+    registrar_tool("describir_tabla", describir_tabla)
+    registrar_tool("consultar_sql", consultar_sql)
+
+    eval1_server = "✅ Servidor MCP E-commerce creado con 3 tools + 1 resource\n"
+    eval1_server += "  Tools: listar_tablas, describir_tabla, consultar_sql\n"
+    eval1_server += "  Resource: resumen://tienda\n"
+    eval1_server += "\n--- Prueba: listar_tablas ---\n"
+    eval1_server += listar_tablas()
+    eval1_server += "\n\n--- Prueba: resource resumen://tienda ---\n"
+    eval1_server += resumen_tienda()
+    print(eval1_server)
 else:
-    eval1_dataset = None
+    eval1_server = None
 ```
 
-#### Ejercicio 2 — Evaluación RAGAS (2.5 ptos) {#sec-hpd4-e2-c}
+### Ejercicio 2 — Consulta en lenguaje natural (2 ptos) {#sec-hpd4-e2-c}
+
+Conecta el cliente OpenAI al servidor MCP. Formula una pregunta de negocio en lenguaje natural, deja que el LLM decida qué tool usar y muestra la respuesta final.
+
+Asigna el resultado (pregunta + respuesta completa) a `eval2_respuesta`.
 
 ```{python}
 #| echo: true
 
 if CAMINO == "C":
-    from ragas import evaluate as ragas_evaluate
-    from ragas.metrics import faithfulness, answer_relevancy, context_precision
-    from datasets import Dataset
-    from ragas.llms import LangchainLLMWrapper
+    tools_definition_c = [
+        {
+            "type": "function",
+            "function": {
+                "name": "listar_tablas",
+                "description": "Devuelve la lista de tablas disponibles en la base de datos de e-commerce.",
+                "parameters": {"type": "object", "properties": {}, "required": []}
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "describir_tabla",
+                "description": "Devuelve el DDL de una tabla específica.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"tabla": {"type": "string", "description": "Nombre de la tabla"}},
+                    "required": ["tabla"]
+                }
+            }
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "consultar_sql",
+                "description": "Ejecuta una consulta SQL SELECT. Tablas: productos(id, nombre, categoria, precio, stock, valoracion, proveedor), pedidos(id, producto_id, cliente_id, cantidad, fecha, estado, total), clientes(id, nombre, email, pais, fecha_registro, total_compras).",
+                "parameters": {
+                    "type": "object",
+                    "properties": {"query": {"type": "string", "description": "Consulta SQL SELECT"}},
+                    "required": ["query"]
+                }
+            }
+        },
+    ]
 
-    if eval1_dataset and all(item["ground_truth"] for item in eval1_dataset):
-        dataset_hf = Dataset.from_dict({
-            "question": [item["question"] for item in eval1_dataset],
-            "answer": [item["answer"] for item in eval1_dataset],
-            "contexts": [item["contexts"] for item in eval1_dataset],
-            "ground_truth": [item["ground_truth"] for item in eval1_dataset],
-        })
+    def preguntar_al_llm(pregunta, tools_def, system_prompt=None):
+        if not client:
+            return "⚠️  Cliente OpenAI no disponible."
 
-        evaluator_llm = LangchainLLMWrapper(llm)
-        result = ragas_evaluate(
-            dataset=dataset_hf,
-            metrics=[faithfulness, answer_relevancy, context_precision],
-            llm=evaluator_llm,
+        if system_prompt is None:
+            system_prompt = "Eres un asistente de e-commerce. Tienes acceso a una base de datos con productos, pedidos y clientes. Usa las herramientas disponibles para responder preguntas. Responde en español, de forma concisa."
+
+        messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": pregunta}
+        ]
+
+        response = client.chat.completions.create(
+            model="mlx-community/Qwen3.6-35B-A3B-8bit",
+            messages=messages,
+            tools=tools_def,
+            tool_choice="auto",
+            max_tokens=1024,
         )
 
-        df_ragas = result.to_pandas()
-        eval2_ragas = {
-            "por_pregunta": df_ragas[["faithfulness", "answer_relevancy", "context_precision"]].to_dict("records"),
-            "medias": {
-                "faithfulness": float(df_ragas["faithfulness"].mean()),
-                "answer_relevancy": float(df_ragas["answer_relevancy"].mean()),
-                "context_precision": float(df_ragas["context_precision"].mean()),
-            }
-        }
+        message = response.choices[0].message
 
-        print("📊 Resultados RAGAS (medias):")
-        for metrica, valor in eval2_ragas["medias"].items():
-            print(f"  {metrica}: {valor:.4f}")
+        if message.tool_calls:
+            messages.append(message)
+            for tc in message.tool_calls:
+                args = json.loads(tc.function.arguments)
+                result = ejecutar_tool(tc.function.name, args)
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tc.id,
+                    "content": result
+                })
+
+            final = client.chat.completions.create(
+                model="mlx-community/Qwen3.6-35B-A3B-8bit",
+                messages=messages,
+                tools=tools_def,
+                tool_choice="none",
+                max_tokens=512,
+            )
+            return final.choices[0].message.content
+        else:
+            return message.content
+
+    pregunta_c = "¿Cuál es el producto más valorado con mejor stock y cuántos pedidos tiene?"
+
+    if client:
+        respuesta_c = preguntar_al_llm(pregunta_c, tools_definition_c)
+        eval2_respuesta = f"PREGUNTA: {pregunta_c}\n\nRESPUESTA: {respuesta_c}"
     else:
-        eval2_ragas = {"error": "Completa los ground_truth en eval1_dataset primero."}
-        print(eval2_ragas["error"])
+        eval2_respuesta = "⚠️  Cliente OpenAI no disponible. Pregunta: " + pregunta_c
+
+    print(eval2_respuesta)
 else:
-    eval2_ragas = None
+    eval2_respuesta = None
 ```
 
-#### Ejercicio 3 — Iteración y mejora (2.5 ptos) {#sec-hpd4-e3-c}
+### Ejercicio 3 — Pruebas de inyección (1.5 ptos) {#sec-hpd4-e3-c}
+
+Prueba al menos 3 intentos de ataque (prompt injection o SQL injection) contra tu servidor MCP. Documenta qué intentaste, qué respuesta obtuvo y si la defensa funcionó.
+
+Asigna los resultados a `eval3_ataques` (lista de diccionarios con ataque, resultado, defendido).
 
 ```{python}
 #| echo: true
 
 if CAMINO == "C":
-    eval3_iteracion = [
-        # Completar con al menos 2 versiones (base + mejora)
+    ataques_c = [
+        {
+            "ataque": "Intentar eliminar productos con DROP",
+            "tipo": "SQL Injection",
+            "query": "DROP TABLE productos"
+        },
+        {
+            "ataque": "Modificar precios via inyección",
+            "tipo": "SQL Injection con UPDATE",
+            "query": "UPDATE productos SET precio = 0.01 WHERE id = 1; SELECT * FROM productos"
+        },
+        {
+            "ataque": "Inyección con sentencia múltiple y comentario",
+            "tipo": "SQL Injection con comentario SQL",
+            "query": "SELECT * FROM pedidos; DELETE FROM clientes WHERE id = 1; --"
+        },
     ]
-    print(f"⚠️  Completa eval3_iteracion con al menos 2 versiones comparadas.")
+
+    eval3_ataques = []
+    for ataque in ataques_c:
+        resultado = consultar_sql(ataque["query"])
+        defendido = "Error" in resultado or "no permitido" in resultado
+        entry = {
+            "ataque": ataque["ataque"],
+            "tipo": ataque["tipo"],
+            "resultado": resultado[:200],
+            "defendido": defendido,
+            "defensa_efectiva": "✅ Bloqueado" if defendido else "❌ Vulnerable"
+        }
+        eval3_ataques.append(entry)
+
+    for e in eval3_ataques:
+        print(f"\n--- {e['tipo']} ---")
+        print(f"  Ataque: {e['ataque']}")
+        print(f"  Resultado: {e['defensa_efectiva']}")
+        print(f"  Detalle: {e['resultado']}")
 else:
-    eval3_iteracion = None
+    eval3_ataques = None
 ```
 
-#### Ejercicio 4 — Informe de evaluación (2.5 ptos) {#sec-hpd4-e4-c}
+### Ejercicio 4 — Análisis de riesgos (1.5 ptos) {#sec-hpd4-e4-c}
+
+Redacta un análisis de riesgos para el servidor MCP en un entorno de e-commerce real. Debes cubrir al menos:
+
+- Riesgos de privacidad (datos de clientes, emails, historial de compras)
+- Inyección SQL y prompt injection
+- Data leakage (exposición de precios, costes, información competitiva)
+- Mitigaciones específicas para cada riesgo
+
+Asigna tu respuesta a `eval4_riesgos`.
 
 ```{python}
 #| echo: true
 
 if CAMINO == "C":
-    eval4_informe = """Escribir aquí el informe estructurado. Incluir:
-    - Métricas RAGAS obtenidas
-    - Fortalezas y debilidades del pipeline
-    - Análisis de errores
-    - Impacto de la mejora implementada
-    - Propuestas de mejora adicionales"""
-    print("✅ eval4_informe asignada. Completa el contenido.")
+    eval4_riesgos = """Escribir aquí el análisis de riesgos. Por ejemplo:
+
+    RIESGOS DE PRIVACIDAD:
+    - Los datos de clientes (nombre, email, país, total compras) son datos
+      personales sujetos a GDPR. El historial de compras individuales permite
+      construir perfiles de consumo detallados.
+    - Mitigación: seudonimización de emails, agregación de datos de compra
+      por cliente, política de retención de datos con borrado automático.
+
+    INYECCIÓN SQL / PROMPT INJECTION:
+    - Un atacante podría inyectar comandos para modificar precios, cancelar
+      pedidos o acceder a datos de otros clientes.
+    - Mitigación: sanitización estricta de queries (solo SELECT, palabras
+      prohibidas), límite de filas, timeout de ejecución, rate limiting.
+
+    DATA LEAKAGE:
+    - El LLM podría revelar información competitiva sensible: precios de
+      proveedores, costes de producto, niveles de stock exactos.
+    - Mitigación: crear vistas SQL específicas para el asistente que agreguen
+      datos (ej. rangos de stock en lugar de número exacto), filtrar columnas
+      sensibles, limitar la información devuelta a la mínima necesaria.
+
+    RIESGOS ADICIONALES:
+    - Fraude: un atacante podría usar el asistente para identificar productos
+      con bajo stock y manipular el mercado.
+    - Manipulación de reseñas si el sistema permite modificar valoraciones."""
+    print("✅ eval4_riesgos asignada.")
 else:
-    eval4_informe = None
+    eval4_riesgos = None
 ```
 
 :::
@@ -1118,13 +1519,28 @@ else:
 
 print(f"Camino seleccionado: {CAMINO}")
 print(f"\nVariables de corrección:")
-for var in ["eval1_dataset", "eval2_ragas", "eval3_iteracion", "eval4_informe"]:
+for var in ["eval1_server", "eval2_respuesta", "eval3_ataques", "eval4_riesgos"]:
     val = globals().get(var, None)
     status = "✅ definida" if val is not None else "⚠️ no definida"
     print(f"  {var}: {status}")
 ```
 
+::: {.callout-tip icon=false}
+## Entregable
+- Servidor MCP funcional con 3 tools (listar_tablas, describir_tabla, consultar_sql) + 1 resource específico del dominio
+- Consulta en lenguaje natural ejecutada con respuesta del LLM
+- 3 pruebas de inyección documentadas con resultados
+- Análisis de riesgos con mitigaciones concretas
+
+## Criterios de evaluación
+- **E1 (3 ptos):** Servidor MCP operativo con todas las tools y resource implementados
+- **E2 (2 ptos):** Cliente LLM conectado correctamente y respuesta coherente a la pregunta
+- **E3 (1.5 ptos):** Pruebas de seguridad con defensas efectivas documentadas
+- **E4 (1.5 ptos):** Análisis de riesgos completo con mitigaciones específicas del dominio
+- **Total: 7.5 % de la nota final**
+:::
+
 # References
 
-:::{#refs}
+::: {#refs}
 :::

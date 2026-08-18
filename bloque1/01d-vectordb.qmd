@@ -5,7 +5,7 @@ engine: jupyter
 
 [![](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01d-vectordb.ipynb)
 
-> Este tema forma parte del **Bloque 1 — Fundamentos**. Se recomienda haber visto [01c-embeddings.qmd](01c-embeddings.qmd) primero.
+> Este tema forma parte del Bloque 1 — Fundamentos. Se recomienda haber visto [01c-embeddings.qmd](01c-embeddings.qmd) primero.
 
 > Este tema representa el paso histórico de aprender un espacio semántico a operar sobre él. El [panorama histórico](00-panorama.qmd) presenta la evolución conceptual; aquí estudiamos la indexación y la búsqueda necesarias para utilizar embeddings en sistemas reales.
 
@@ -44,7 +44,7 @@ print("Librerías cargadas correctamente.")
 
 ## Bases de Datos Vectoriales {#sec-bases-datos-vectoriales}
 
-Una vez que tenemos embeddings, necesitamos almacenarlos y buscarlos eficientemente. Aquí entran las **bases de datos vectoriales**.
+Una vez que tenemos embeddings, necesitamos almacenarlos y buscarlos eficientemente. Aquí entran las bases de datos vectoriales.
 
 ::: {.callout-note}
 ## Idioma de los ejemplos
@@ -128,7 +128,7 @@ graph TD
 ::: {.callout-warning}
 ## Regla práctica
 
-Siempre **normaliza los embeddings** (||v|| = 1). Con embeddings normalizados, coseno y producto escalar son equivalentes, y la búsqueda es más estable.
+Siempre normaliza los embeddings (||v|| = 1). Con embeddings normalizados, coseno y producto escalar son equivalentes, y la búsqueda es más estable.
 :::
 
 ```{python}
@@ -312,12 +312,12 @@ graph TD
 ::: {.callout-tip}
 ## Consejo práctico
 
-Para el **proyecto del módulo** empieza con **Chroma**: es local, no requiere servidor, y escala bien para el alcance del curso. Si luego necesitas más rendimiento, migrar a FAISS o Qdrant es directo porque la API de búsqueda semántica es equivalente.
+Para el proyecto del módulo empieza con Chroma: es local, no requiere servidor y escala bien para el alcance del curso. Si luego necesitas más rendimiento, migrar a FAISS o Qdrant es directo porque la API de búsqueda semántica es equivalente.
 :::
 
 ---
 
-> Has completado la teoría del **Bloque 1**. Ahora pasa al taller práctico: **[HPD 1 — Pipeline de embeddings y búsqueda semántica](hpd1-embeddings.qmd)**.
+> Has completado la teoría del Bloque 1. Ahora pasa al taller práctico: **[HPD 1 — Pipeline de embeddings y búsqueda semántica](hpd1-embeddings.qmd)**.
 
 # References
 

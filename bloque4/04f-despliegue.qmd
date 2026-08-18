@@ -19,7 +19,7 @@ engine: jupyter
 | **Privacidad** | Total: los datos no salen de tu red | Depende del proveedor y contrato |
 | **Latencia** | Baja y estable (red local) | Variable, depende de la región |
 | **Mantenimiento** | Tú gestionas actualizaciones, GPU, fallos | Sin mantenimiento |
-| **Modelos disponibles** | Solo open-weight descargados | Acceso a modelos de frontera |
+| **Modelos disponibles** | Solo modelos open-weight descargados | Acceso a modelos de frontera |
 | **Escalado** | Limitado al hardware | Elástico bajo demanda |
 | **Caso de uso típico** | Datos sensibles, RGPD, costes predecibles | Picos de tráfico, prototipado rápido |
 
@@ -75,7 +75,7 @@ Orden de resolución:
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -154,7 +154,7 @@ trace.score(name="user_feedback", value=1)  # 1 = positivo
 
 ### 6.4 Caching semántico {#sec-caching-semantico}
 
-Cuando dos consultas son muy similares, no tiene sentido gastar tokens en una segunda llamada al LLM. El **caching semántico** compara embeddings y reutiliza respuestas anteriores.
+Cuando dos consultas son muy similares, no tiene sentido gastar tokens en una segunda llamada al LLM. El caching semántico compara embeddings y reutiliza respuestas anteriores.
 
 ```python
 #| echo: true

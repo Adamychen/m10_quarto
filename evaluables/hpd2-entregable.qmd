@@ -9,7 +9,7 @@ engine: jupyter
 >
 > **Plazo:** 7 días tras la sesión presencial.
 >
-> **Prerrequisito:** [HPD 2 — Agente analítico con Tool Calling](../bloque2/hpd2-agente-tool-calling.qmd)
+> **Prerrequisito:** [HPD 2 — Agente analítico con Tool Calling](../bloque2/hpd2-agente-tool-calling.qmd).
 >
 > **Entrega:** Notebook `.ipynb` ejecutado con todas las celdas completas.
 >   Cada ejercicio especifica qué variable debe contener el resultado para la corrección automática.
@@ -62,7 +62,7 @@ Orden de resolución:
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os

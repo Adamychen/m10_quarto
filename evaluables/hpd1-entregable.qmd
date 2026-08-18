@@ -51,7 +51,7 @@ Orden de resolución:
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
@@ -156,7 +156,7 @@ print("Helper PDF listo.")
 
 ## Camino A — Finanzas
 
-**Contexto:** Trabajas como Data Scientist en una consultora financiera. Tu cliente te pide un sistema de búsqueda semántica sobre documentación financiera real del benchmark **FIQA** (Financial Question Answering), un estándar del ámbito BEIR. El sistema debe permitir a los analistas buscar información por concepto, no por palabra clave.
+**Contexto:** Trabajas como Data Scientist en una consultora financiera. Tu cliente te pide un sistema de búsqueda semántica sobre documentación financiera real del benchmark FIQA (Financial Question Answering), un benchmark del ecosistema BEIR. El sistema debe permitir a los analistas buscar información por concepto, no por palabra clave.
 
 ### Corpus — Documentos financieros reales (FIQA)
 
@@ -343,7 +343,7 @@ else:
 
 #### Ejercicio 4 — Justificación del modelo (1.5 ptos) {#sec-hpd1-e4-a}
 
-Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de **MTEB** para las tareas **BIOSSES** y **STS12**, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica sobre un corpus financiero real como FIQA.
+Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de MTEB para las tareas BIOSSES y STS12, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica sobre un corpus financiero real como FIQA.
 
 Asigna tu respuesta a `eval4_justificacion`.
 
@@ -365,7 +365,7 @@ else:
 
 ## Camino B — Salud
 
-**Contexto:** Trabajas como Data Scientist en un laboratorio de investigación biomédica. Necesitas indexar literatura científica real del benchmark **NFCorpus** (biomedical information retrieval), un estándar del ámbito BEIR. El sistema debe permitir a los investigadores buscar por concepto, no solo por palabras clave.
+**Contexto:** Trabajas como Data Scientist en un laboratorio de investigación biomédica. Necesitas indexar literatura científica real del benchmark NFCorpus (biomedical information retrieval), un benchmark del ecosistema BEIR. El sistema debe permitir a los investigadores buscar por concepto, no solo por palabras clave.
 
 ### Corpus — Documentos biomédicos reales (NFCorpus)
 
@@ -553,7 +553,7 @@ else:
 
 #### Ejercicio 4 — Justificación del modelo (1.5 ptos) {#sec-hpd1-e4-b}
 
-Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de **MTEB** para las tareas **BIOSSES** y **STS12**, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica sobre un corpus biomédico real como NFCorpus.
+Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de MTEB para las tareas BIOSSES y STS12, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica sobre un corpus biomédico real como NFCorpus.
 
 Asigna tu respuesta a `eval4_justificacion`.
 
@@ -576,7 +576,7 @@ else:
 
 ## Camino C — E-commerce
 
-**Contexto:** Trabajas como Data Scientist en un marketplace digital. Tu equipo necesita un sistema de búsqueda semántica sobre productos reales de Amazon del benchmark **ESCI** (Amazon Shopping Queries). El sistema debe permitir a los compradores encontrar productos por concepto y necesidad, no solo por palabras clave.
+**Contexto:** Trabajas como Data Scientist en un marketplace digital. Tu equipo necesita un sistema de búsqueda semántica sobre productos reales de Amazon del benchmark ESCI (Amazon Shopping Queries). El sistema debe permitir a los compradores encontrar productos por concepto y necesidad, no solo por palabras clave.
 
 ### Corpus — Productos reales de Amazon (ESCI)
 
@@ -773,7 +773,7 @@ else:
 
 #### Ejercicio 4 — Justificación del modelo (1.5 ptos) {#sec-hpd1-e4-c}
 
-Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de **MTEB** para las tareas **BIOSSES** y **STS12**, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica sobre productos reales de Amazon (ESCI).
+Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de MTEB para las tareas BIOSSES y STS12, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica sobre productos reales de Amazon (ESCI).
 
 Asigna tu respuesta a `eval4_justificacion`.
 

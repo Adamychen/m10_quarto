@@ -1,5 +1,5 @@
 ---
-title: "04d — Sesgo en LLMs"
+title: "04d — Sesgo en LLM"
 engine: jupyter
 ---
 
@@ -7,13 +7,13 @@ engine: jupyter
 
 > Este tema forma parte del [Bloque 4 — Gobernanza](04-gobernanza.qmd). Los riesgos tratados aquí complementan a los de [04b — Alucinaciones](04b-alucinaciones.qmd).
 
-## 4. Sesgo en LLMs {#sec-sesgo}
+## 4. Sesgo en LLM {#sec-sesgo}
 
 Los sesgos sistemáticos de un modelo son riesgos de reputación y legales: en producción pueden traducirse en discriminaciones, pérdida de confianza y sanciones regulatorias. Auditar sesgo no es opcional.
 
 ### 4.1 Tipos de sesgo {#sec-sesgo-tipos}
 
-: Tipos de sesgo en LLMs con su ejemplo y origen {#tbl-sesgo-tipos}
+: Tipos de sesgo en LLM con su ejemplo y origen {#tbl-sesgo-tipos}
 
 | Sesgo | Ejemplo | Origen |
 |---|---|---|
@@ -40,7 +40,7 @@ Orden de resolución:
   2. os.environ ya configurado externamente
   3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"
 
-Las celdas posteriores pueden leer la key con os.environ.get("LLM_API_KEY").
+Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
