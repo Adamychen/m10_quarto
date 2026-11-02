@@ -113,15 +113,15 @@ print("Librerías cargadas correctamente.")
 #| echo: true
 
 LLM_KEY = os.getenv("LLM_API_KEY")
-LLM_URL = "https://llamus.cs.us.es/api/v1"
+LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
 
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env con:\n    LLM_API_KEY=tu_api_key")
 else:
-    llm = ChatOpenAI(model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
-    juez_llm = ChatOpenAI(model="gemma3:12b", base_url=LLM_URL, api_key=LLM_KEY, temperature=0, request_timeout=60, max_retries=3)
-    print("✅ LLM configurado (mlx-community/Qwen3.6-35B-A3B-8bit).")
-    print("✅ Juez de evaluación configurado (gemma3:12b).")
+    llm = ChatOpenAI(model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"), base_url=LLM_URL, api_key=LLM_KEY, temperature=0, max_tokens=2048)
+    juez_llm = ChatOpenAI(model=os.getenv("LLM_JUDGE_MODEL", "gemma3:12b"), base_url=LLM_URL, api_key=LLM_KEY, temperature=0, request_timeout=60, max_retries=3)
+    print(f"✅ LLM configurado ({os.getenv('LLM_MODEL', 'gemma4:26b-mlx')}).")
+    print(f"✅ Juez de evaluación configurado ({os.getenv('LLM_JUDGE_MODEL', 'gemma3:12b')}).")
 ```
 
 ```{python}

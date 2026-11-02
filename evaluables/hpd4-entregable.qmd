@@ -107,7 +107,7 @@ print("Librerías cargadas correctamente.")
 #| echo: true
 
 LLM_KEY = os.getenv("LLM_API_KEY")
-LLM_URL = "https://llamus.cs.us.es/api/v1"
+LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
 
 if LLM_KEY:
     from openai import OpenAI
@@ -465,11 +465,11 @@ if CAMINO == "A":
         ]
 
         response = client.chat.completions.create(
-            model="mlx-community/Qwen3.6-35B-A3B-8bit",
+            model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
             messages=messages,
             tools=tools_def,
             tool_choice="auto",
-            max_tokens=1024,
+            max_tokens=2048,
         )
 
         message = response.choices[0].message
@@ -486,11 +486,11 @@ if CAMINO == "A":
                 })
 
             final = client.chat.completions.create(
-                model="mlx-community/Qwen3.6-35B-A3B-8bit",
+                model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
                 messages=messages,
                 tools=tools_def,
                 tool_choice="none",
-                max_tokens=512,
+                max_tokens=2048,
             )
             return final.choices[0].message.content
         else:
@@ -919,11 +919,11 @@ if CAMINO == "B":
         ]
 
         response = client.chat.completions.create(
-            model="mlx-community/Qwen3.6-35B-A3B-8bit",
+            model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
             messages=messages,
             tools=tools_def,
             tool_choice="auto",
-            max_tokens=1024,
+            max_tokens=2048,
         )
 
         message = response.choices[0].message
@@ -940,11 +940,11 @@ if CAMINO == "B":
                 })
 
             final = client.chat.completions.create(
-                model="mlx-community/Qwen3.6-35B-A3B-8bit",
+                model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
                 messages=messages,
                 tools=tools_def,
                 tool_choice="none",
-                max_tokens=512,
+                max_tokens=2048,
             )
             return final.choices[0].message.content
         else:
@@ -1370,11 +1370,11 @@ if CAMINO == "C":
         ]
 
         response = client.chat.completions.create(
-            model="mlx-community/Qwen3.6-35B-A3B-8bit",
+            model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
             messages=messages,
             tools=tools_def,
             tool_choice="auto",
-            max_tokens=1024,
+            max_tokens=2048,
         )
 
         message = response.choices[0].message
@@ -1391,11 +1391,11 @@ if CAMINO == "C":
                 })
 
             final = client.chat.completions.create(
-                model="mlx-community/Qwen3.6-35B-A3B-8bit",
+                model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
                 messages=messages,
                 tools=tools_def,
                 tool_choice="none",
-                max_tokens=512,
+                max_tokens=2048,
             )
             return final.choices[0].message.content
         else:

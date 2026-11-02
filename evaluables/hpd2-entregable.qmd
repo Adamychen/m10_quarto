@@ -116,13 +116,13 @@ from langchain.agents import create_agent
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder, PromptTemplate
 
 LLM_KEY = os.getenv("LLM_API_KEY")
-LLM_URL = "https://llamus.cs.us.es/api/v1"
+LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
 
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env con LLM_API_KEY=tu_clave para activar el agente.")
 else:
-    llm = ChatOpenAI(model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url=LLM_URL, api_key=LLM_KEY, temperature=0)
-    print("✅ LLM configurado (mlx-community/Qwen3.6-35B-A3B-8bit).")
+    llm = ChatOpenAI(model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"), base_url=LLM_URL, api_key=LLM_KEY, temperature=0, max_tokens=2048)
+    print(f"✅ LLM configurado ({os.getenv('LLM_MODEL', 'gemma4:26b-mlx')}).")
 ```
 
 ::: {.panel-tabset}
