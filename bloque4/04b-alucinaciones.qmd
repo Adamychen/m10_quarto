@@ -126,7 +126,7 @@ else:
     print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
 
 LLM_KEY = os.getenv("LLM_API_KEY")
-LLM_URL = "https://llamus.cs.us.es/api/v1"
+LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
 
 client = OpenAI(base_url=LLM_URL, api_key=LLM_KEY)
 
@@ -149,7 +149,8 @@ Pregunta: {pregunta}
 def responder_con_citation(pregunta, contexto, llm_client):
     contexto_txt = "\n\n".join(f"[Fragmento {i+1}]\n{c}" for i, c in enumerate(contexto))
     return llm_client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[{"role": "user", "content": PROMPT_GROUNDED.format(
             contexto=contexto_txt, pregunta=pregunta
         )}],

@@ -90,14 +90,14 @@ PARES_TEST = [
 def probabilidad_logit(client, frase: str) -> float:
     """Aproxima la probabilidad pidiendo al LLM que puntúe la frase 0-1."""
     r = client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
         messages=[{"role": "user", "content":
             f"Del 0 (absurdo) al 1 (perfectamente natural), puntúa la frase "
             f"como algo que oirías en una conversación cotidiana en español.\n"
             f"Responde SOLO con el número, sin texto adicional.\n"
             f"Frase: '{frase}'"}],
         temperature=0,
-        max_tokens=5,
+        max_tokens=2048,   # los modelos que razonan gastan tokens en el pensamiento: con topes cortos devuelven content vacío
     ).choices[0].message.content.strip()
     try:
         return float(r.replace(",", "."))

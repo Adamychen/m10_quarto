@@ -286,7 +286,7 @@ else:
     print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
 
 LLM_KEY = os.getenv("LLM_API_KEY")
-LLM_URL = "https://llamus.cs.us.es/api/v1"
+LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
 
 client = OpenAI(base_url=LLM_URL, api_key=LLM_KEY)
 
@@ -317,7 +317,7 @@ RESPUESTA DEL MODELO:
 
 Evalúa la respuesta."""
     raw = client.chat.completions.create(
-        model="gemma3:12b",   # Juez ligero: evaluar no necesita el modelo grande
+        model=os.getenv("LLM_JUDGE_MODEL", "gemma3:12b"),   # Juez ligero: evaluar no necesita el modelo grande
         messages=[
             {"role": "system", "content": JUEZ_PROMPT},
             {"role": "user",   "content": user_msg},
@@ -457,7 +457,7 @@ def llm_as_judge_pairwise(pregunta, respuesta_a, respuesta_b, contexto, llm_clie
         respuesta_b=respuesta_b,
     )
     raw = llm_client.chat.completions.create(
-        model="gemma3:12b",   # Juez ligero para A/B
+        model=os.getenv("LLM_JUDGE_MODEL", "gemma3:12b"),   # Juez ligero para A/B
         messages=[{"role": "user", "content": user_msg}],
         temperature=0,
     ).choices[0].message.content.strip().upper()

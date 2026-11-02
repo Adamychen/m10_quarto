@@ -79,7 +79,7 @@ print("Librerías cargadas correctamente.")
 from openai import OpenAI
 
 LLM_KEY = os.getenv("LLM_API_KEY")
-LLM_URL = "https://llamus.cs.us.es/api/v1"
+LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
 
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env en la raíz del proyecto con:\n    LLM_API_KEY=tu_api_key\n    Las celdas que usan LLM mostrarán este mensaje hasta que configures la clave.")
@@ -91,6 +91,8 @@ else:
 ## RAG Avanzado {#sec-rag-avanzado}
 
 ### De RAG naive a RAG avanzado {#sec-rag-naive-vs-avanzado}
+
+> **Demo interactiva:** [troceado para RAG](../demos/chunking.qmd). Ajusta el tamaño de chunk y el solapamiento y comprueba si la respuesta queda partida.
 
 En el [HPD 1](../bloque1/hpd1-embeddings.qmd) construiste un pipeline RAG básico: cargar PDFs, trocearlos en chunks, generar embeddings, indexar en Chroma y buscar por similitud coseno. Funciona, pero tiene limitaciones:
 
@@ -440,7 +442,8 @@ else:
     query_original = "¿Cuál es el margen del Monitor 4K?"
 
     respuesta_hipotetica = client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[{"role": "user", "content": f"Responde brevemente a esta pregunta como si fueras un informe de ventas:\n{query_original}"}],
         temperature=0.7,
     ).choices[0].message.content
@@ -621,7 +624,7 @@ if not LLM_KEY:
     print("⚠️  Configura LLM_API_KEY en .env para ejecutar la evaluación RAGAS.")
 else:
     ragas_llm = ChatOpenAI(
-        model="gemma3:12b",   # Juez ligero: las evaluaciones no necesitan el modelo grande
+        model=os.getenv("LLM_JUDGE_MODEL", "gemma3:12b"),   # Juez ligero: las evaluaciones no necesitan el modelo grande
         base_url=LLM_URL,
         api_key=LLM_KEY,
         temperature=0,
@@ -630,7 +633,7 @@ else:
     )
 
     ragas_embeddings = OpenAIEmbeddings(
-        model="qwen3-embedding:0.6b",
+        model=os.getenv("LLM_EMBED_MODEL", "qwen3-embedding:0.6b"),
         base_url=LLM_URL,
         api_key=LLM_KEY,
         tiktoken_enabled=False,

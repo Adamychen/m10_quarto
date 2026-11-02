@@ -81,7 +81,7 @@ print("Librerías cargadas correctamente.")
 from openai import OpenAI
 
 LLM_KEY = os.getenv("LLM_API_KEY")
-LLM_URL = "https://llamus.cs.us.es/api/v1"
+LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
 
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env en la raíz del proyecto con:\n    LLM_API_KEY=tu_api_key\n    Las celdas que usan LLM mostrarán este mensaje hasta que configures la clave.")
