@@ -133,6 +133,8 @@ print(f"\nDecodificado: {tokenizer.decode(ids)}")
 
 ### Tokenización en detalle: BPE y variantes {#sec-tokenizacion-detalle}
 
+> **Demo interactiva:** [entrena tu propio BPE](../demos/bpe.qmd) sobre un corpus y mira cómo se trocea una palabra nueva.
+
 La tabla anterior resume cuatro algoritmos, pero detrás de cada elección hay un trade-off entre cobertura del vocabulario, longitud de secuencia y coste computacional. Esta sección desglosa el más usado —Byte-Pair Encoding (BPE)— paso a paso y compara las alternativas.
 
 #### Por qué subwords y no caracteres ni palabras {#sec-por-que-subwords}
@@ -220,6 +222,8 @@ Técnicas de extensión: RoPE (Rotary Position Embedding), ALiBi, windowing y at
 
 Controlan cómo el modelo selecciona el siguiente token entre las probabilidades de salida.
 
+> **Demo interactiva:** [temperatura y muestreo](../demos/temperatura.qmd). Genera la siguiente palabra diez veces, sube la temperatura y comprueba cuándo el modelo pasa de repetitivo a caótico.
+
 ::: {#fig-parametros-inferencia}
 ```{mermaid}
 graph LR
@@ -246,8 +250,9 @@ from langchain_openai import ChatOpenAI
 # Usamos la API unificada de la Universidad de Sevilla (Llamus)
 # No necesita GPU — solo una API key que obtendrás en la asignatura
 llm = ChatOpenAI(
-    model="mlx-community/Qwen3.6-35B-A3B-8bit",
-    base_url="https://llamus.cs.us.es/api/v1",
+    model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+    max_tokens=2048,
+    base_url=os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1"),
     api_key=os.getenv("LLM_API_KEY", "<API_KEY>")
 )
 
@@ -391,10 +396,17 @@ La Universidad de Sevilla proporciona un endpoint OpenAI-compatible para usar LL
 
 ```
 Endpoint: https://llamus.cs.us.es/api/v1
-Modelos disponibles: mlx-community/Qwen3.6-35B-A3B-8bit, gemma4:26b, llama3.3:70b, ...
+Modelos disponibles: gemma4:26b-mlx (default del curso), gpt-oss:20b,
+                  nemotron-3.5-lightning:30b-mlx, qwen3:8b, llama3.3:70b, ...
+Modelo de embeddings: qwen3-embedding:0.6b
 ```
 
 Funciona con `ChatOpenAI` de LangChain, el cliente OpenAI de Python o cualquier herramienta compatible con OpenAI. Solo necesitas tu API key de la US (se proporciona en la asignatura).
+
+::: {.callout-warning}
+## El nombre del modelo tiene que ser exacto
+
+`gemma4:26b` no existe: el identificador real es `gemma4:26b-mlx`. Si te equivocas, la API no devuelve un modelo parecido, devuelve `404 Model not found`. Puedes comprobar qué hay en tu cuenta con `client.models.list()` o `curl -H "Authorization: Bearer $LLM_API_KEY" https://llamus.cs.us.es/api/v1/models`.
 
 ```{python}
 #| echo: true
@@ -403,8 +415,9 @@ Funciona con `ChatOpenAI` de LangChain, el cliente OpenAI de Python o cualquier 
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
-    model="mlx-community/Qwen3.6-35B-A3B-8bit",   # Modelo principal del curso
-    base_url="https://llamus.cs.us.es/api/v1",
+    model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),   # Modelo principal del curso
+    max_tokens=2048,
+    base_url=os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1"),
     api_key="<API_KEY>"
 )
 

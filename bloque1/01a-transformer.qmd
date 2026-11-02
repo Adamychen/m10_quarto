@@ -132,6 +132,8 @@ La arquitectura original utilizaba normalmente Post-Norm, mientras que muchos LL
 
 ### Atención multi-cabeza (Multi-Head Attention) {#sec-atencion-multi-cabeza}
 
+> **Demo interactiva:** [¿en qué se fija cada palabra?](../demos/atencion.qmd) Pulsa una palabra, mira de cuáles del resto de la frase depende y comprueba qué pierde un LLM que solo puede mirar hacia atrás.
+
 El núcleo del Transformer se encuentra en el mecanismo de *scaled dot-product attention* (atención basada en el producto escalar). Dada una matriz de estados $X \in \mathbb{R}^{B \times T \times d}$, el modelo aprende tres proyecciones:
 
 $$
