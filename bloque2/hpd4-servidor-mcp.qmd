@@ -523,7 +523,7 @@ Ahora conectamos un LLM real al servidor MCP. El LLM recibirá la lista de tools
 from openai import OpenAI
 
 LLM_KEY = os.getenv("LLM_API_KEY")
-LLM_URL = "https://llamus.cs.us.es/api/v1"
+LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
 
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env con:\n    LLM_API_KEY=tu_api_key")
@@ -621,7 +621,7 @@ def preguntar_al_llm(pregunta: str) -> str:
 
     # ─── COMPLETAR: implementa el bucle de tool calling ───
     # TODO: Llamar a client.chat.completions.create con:
-    #   model="mlx-community/Qwen3.6-35B-A3B-8bit", messages=messages, tools=tools_definition, tool_choice="auto"
+    #   model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"), messages=messages, tools=tools_definition, tool_choice="auto"
     # TODO: Si la respuesta tiene tool_calls, ejecutar cada tool con ejecutar_tool_mcp()
     # TODO: Añadir el resultado al historial y volver a llamar al LLM
     # TODO: Devolver la respuesta final del LLM (response.choices[0].message.content)

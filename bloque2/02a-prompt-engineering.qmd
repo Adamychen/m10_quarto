@@ -77,7 +77,7 @@ print("Librerías cargadas correctamente.")
 from openai import OpenAI
 
 LLM_KEY = os.getenv("LLM_API_KEY")
-LLM_URL = "https://llamus.cs.us.es/api/v1"
+LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
 
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env en la raíz del proyecto con:\n    LLM_API_KEY=tu_api_key\n    Las celdas siguientes mostrarán este mensaje hasta que configures la clave.")
@@ -134,7 +134,8 @@ if not LLM_KEY:
     print("⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda.")
 else:
     respuesta = client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[{"role": "user", "content": "Explica qué es la desviación estándar en una frase."}]
     )
     print(respuesta.choices[0].message.content)
@@ -173,7 +174,8 @@ else:
     """
 
     respuesta = client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[{"role": "user", "content": prompt_few_shot}]
     )
     print(respuesta.choices[0].message.content)
@@ -206,13 +208,15 @@ if not LLM_KEY:
 else:
     # ZERO-SHOT: sin ejemplos
     respuesta_zero = client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[{"role": "user", "content": "Traduce al inglés: 'El gato está en el tejado'"}]
     )
 
     # ONE-SHOT: un ejemplo
     respuesta_one = client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[{"role": "user", "content": """
     Traduce español → inglés.
     Ejemplo: "Hola mundo" → "Hello world"
@@ -251,7 +255,8 @@ else:
     """
 
     respuesta_cot = client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[{"role": "user", "content": prompt_cot}]
     )
     print(respuesta_cot.choices[0].message.content)
@@ -317,7 +322,8 @@ else:
     """
 
     respuesta = client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[{"role": "user", "content": prompt_tot}]
     )
     print(respuesta.choices[0].message.content)
@@ -354,7 +360,8 @@ Devuelve ÚNICAMENTE un JSON válido con esta estructura exacta, sin texto adici
 }}"""
 
     respuesta = client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": texto_a_analizar}
@@ -415,7 +422,8 @@ Reglas:
 - Genera variedad realista"""
 
     respuesta = client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         temperature=0.8,
         messages=[
             {"role": "system", "content": system_prompt},
@@ -468,7 +476,8 @@ Asignar un rol al modelo en el mensaje `system` cambia radicalmente su comportam
 
 def consultar_como(rol, pregunta):
     return client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[
             {"role": "system", "content": rol},
             {"role": "user", "content": pregunta}
@@ -527,7 +536,8 @@ else:
     """
 
     print(client.chat.completions.create(
-        model="mlx-community/Qwen3.6-35B-A3B-8bit",
+        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        max_tokens=2048,
         messages=[{"role": "user", "content": prompt_step_back}]
     ).choices[0].message.content)
 ```
