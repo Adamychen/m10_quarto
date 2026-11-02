@@ -1,4 +1,4 @@
-"""Test: mlx-community/Qwen3.6-35B-A3B-8bit + agent con create_agent."""
+"""Test: modelo de curso (variable LLM_MODEL, por defecto gemma4:26b-mlx) + agent con create_agent."""
 import os, io, pandas as pd, numpy as np
 import matplotlib
 matplotlib.use("Agg")
@@ -16,7 +16,8 @@ if not LLM_KEY:
     print("❌ Configura LLM_API_KEY en .env"); exit(1)
 
 llm = ChatOpenAI(
-    model="mlx-community/Qwen3.6-35B-A3B-8bit", base_url="https://llamus.cs.us.es/api/v1",
+    model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"), base_url="https://llamus.cs.us.es/api/v1",
+    max_tokens=2048,
     api_key=LLM_KEY, temperature=0,
 )
 
