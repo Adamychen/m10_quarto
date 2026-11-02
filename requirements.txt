@@ -334,3 +334,6 @@ yarl==1.24.2
 zipp==4.1.0
 zstandard==0.25.0
 rouge-score
+
+# Demos interactivas (Shinylive): render de demos/*.qmd
+shinylive==0.8.12

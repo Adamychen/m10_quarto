@@ -2,9 +2,11 @@ project:
   type: website
   resources:
     - "laboratorio/"
+    - "demos/data/"
   render:
     - "*.qmd"
     - "*.md"
+    - "demos/*.qmd"
     - "!guias/"
     - "!solutions/"
     - "!scripts/"
@@ -102,6 +104,20 @@ website:
             text: Documentación
           - href: bloque4/04f-despliegue.qmd
             text: Patrones de despliegue
+      - section: "Demos interactivas"
+        contents:
+          - href: demos/atencion.qmd
+            text: "Atención (1): la idea"
+          - href: demos/atencion-modelo-real.qmd
+            text: "Atención (2): un modelo real"
+          - href: demos/bpe.qmd
+            text: "Tokenización BPE"
+          - href: demos/embeddings.qmd
+            text: "Vecinos semánticos (embeddings)"
+          - href: demos/chunking.qmd
+            text: "Troceado para RAG"
+          - href: demos/temperatura.qmd
+            text: "Temperatura y muestreo"
       - section: "Evaluación"
         contents:
           - href: evaluables/caminos.qmd
@@ -116,6 +132,9 @@ website:
             text: Herramientas
           - href: 07-bibliografia.qmd
             text: Bibliografía
+
+filters:
+  - shinylive
 
 execute:
   freeze: false
