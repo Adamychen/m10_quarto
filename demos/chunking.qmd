@@ -1,0 +1,158 @@
+---
+title: "Demo — Trocear documentos para RAG"
+description: "Ajusta el tamaño de chunk y el solapamiento y comprueba si el recuperador encuentra la respuesta completa."
+engine: markdown
+---
+
+> Demo que acompaña a [RAG avanzado](../bloque3/03b-rag-avanzado.qmd). Se ejecuta en el navegador con Shinylive y no necesita clave de API.
+
+En RAG el documento se parte en **chunks** antes de indexarlo. Si el chunk es demasiado pequeño, la respuesta puede quedar partida entre dos fragmentos. Si es demasiado grande, el recuperador trae mucho texto irrelevante y el LLM se distrae.
+
+El solapamiento repite una parte del final de cada chunk al inicio del siguiente, para no perder las frases que caen en la frontera.
+
+La recuperación aquí usa TF-IDF y similitud coseno, así que es léxica y muy simple. Lo que se estudia es el efecto del troceado, que es independiente del recuperador.
+
+```{shinylive-python}
+#| standalone: true
+#| viewerHeight: 760
+
+import math
+import re
+from collections import Counter
+
+from shiny import reactive
+from shiny.express import input, ui, render
+
+DOC = (
+    "Política de devoluciones de Mercurio Tienda. Tienes 30 días naturales desde la entrega "
+    "para devolver cualquier producto sin dar explicaciones. El producto debe estar sin usar, "
+    "en su embalaje original y con la factura incluida. Para iniciar la devolución, entra en tu "
+    "cuenta y selecciona el pedido. El cliente paga los gastos de envío de la devolución salvo "
+    "si el producto llegó defectuoso; en ese caso, Mercurio se hace cargo del transporte. Una vez "
+    "recibido y revisado el paquete en nuestro almacén, procedemos al reembolso. El reembolso se "
+    "hace en un máximo de 14 días hábiles por el mismo medio de pago usado en la compra. Los "
+    "productos personalizados no admiten devolución, salvo que lleguen dañados. Para cualquier "
+    "duda, escribe a atencion@mercurio.example."
+)
+
+# (pregunta, fragmento del documento que contiene la respuesta)
+QUESTIONS = [
+    ("¿Cuánto tiempo tengo para devolver un producto?",
+     "Tienes 30 días naturales desde la entrega para devolver cualquier producto"),
+    ("¿Quién paga el envío de la devolución?",
+     "El cliente paga los gastos de envío de la devolución salvo si el producto llegó defectuoso"),
+    ("¿Cuándo recibo el reembolso?",
+     "El reembolso se hace en un máximo de 14 días hábiles"),
+]
+
+STOP = {"el", "la", "los", "las", "de", "del", "que", "y", "a", "en", "un", "una", "por", "para",
+        "con", "se", "su", "sus", "al", "es", "lo", "o", "tu", "tus", "mi", "si", "cuando",
+        "quien", "cuanto", "cuánto", "quién", "cuándo", "mi", "me", "hay", "sin"}
+
+
+def normalize(text):
+    return " ".join(text.split())
+
+
+def tokens(text):
+    return [w for w in re.findall(r"\w+", text.lower()) if w not in STOP]
+
+
+def make_chunks(size, overlap_pct):
+    words = normalize(DOC).split(" ")
+    overlap = round(size * overlap_pct / 100)
+    step = max(1, size - overlap)
+    chunks = []
+    for start in range(0, len(words), step):
+        chunks.append(" ".join(words[start:start + size]))
+        if start + size >= len(words):
+            break
+    return chunks
+
+
+def retrieve_scores(query, chunks):
+    """Similitud coseno con pesos TF-IDF calculados sobre los chunks."""
+    docs = [Counter(tokens(c)) for c in chunks]
+    n = len(chunks)
+    df = Counter(t for d in docs for t in d)
+    idf = {t: math.log((n + 1) / (df[t] + 1)) + 1 for t in df}
+
+    q = {t: c * idf[t] for t, c in Counter(tokens(query)).items() if t in idf}
+    q_norm = math.sqrt(sum(v * v for v in q.values())) or 1.0
+
+    scores = []
+    for d in docs:
+        dv = {t: c * idf[t] for t, c in d.items()}
+        d_norm = math.sqrt(sum(v * v for v in dv.values())) or 1.0
+        dot = sum(v * dv.get(t, 0.0) for t, v in q.items())
+        scores.append(dot / (q_norm * d_norm))
+    return scores
+
+
+@reactive.calc
+def chunks():
+    return make_chunks(input.size(), input.overlap())
+
+
+ui.input_select(
+    "q", "Pregunta",
+    {str(i): q for i, (q, _) in enumerate(QUESTIONS)}, selected="0", width="100%",
+)
+ui.input_slider("size", "Tamaño del chunk (palabras)", 8, 80, 25)
+ui.input_slider("overlap", "Solapamiento (%)", 0, 50, 0, step=5)
+ui.input_slider("k", "Chunks recuperados (top-k)", 1, 4, 2)
+
+
+@render.ui
+def verdict():
+    cs = chunks()
+    question, answer = QUESTIONS[int(input.q())]
+    answer = normalize(answer)
+    scores = retrieve_scores(question, cs)
+    top = sorted(range(len(cs)), key=lambda i: -scores[i])[: input.k()]
+
+    if any(answer in cs[i] for i in top):
+        msg, color = "✔ La respuesta completa está en los chunks recuperados.", "#2e7d32"
+    elif any(answer in c for c in cs):
+        msg, color = "✘ La respuesta existe en un chunk, pero el recuperador no lo trae.", "#e65100"
+    else:
+        msg, color = "✘ La respuesta está partida entre dos chunks: ninguno la contiene entera.", "#c62828"
+
+    return ui.HTML(
+        f"<p><b>{len(cs)} chunks</b> de {input.size()} palabras "
+        f"(solapamiento {input.overlap()}%).</p>"
+        f"<p style='color:{color};font-weight:600'>{msg}</p>"
+    )
+
+
+@render.ui
+def chunk_view():
+    cs = chunks()
+    question, answer = QUESTIONS[int(input.q())]
+    answer = normalize(answer)
+    scores = retrieve_scores(question, cs)
+    top = set(sorted(range(len(cs)), key=lambda i: -scores[i])[: input.k()])
+
+    blocks = []
+    for i, c in enumerate(cs):
+        text = c.replace(answer, f"<mark>{answer}</mark>") if answer in c else c
+        border = "#2e7d32" if i in top else "#9ca3af"
+        weight = "3px" if i in top else "1px"
+        tag = f"chunk {i + 1} · score {scores[i]:.2f}" + (" · recuperado" if i in top else "")
+        blocks.append(
+            f"<div style='border:{weight} solid {border};border-radius:8px;padding:8px 10px;"
+            f"margin:6px 0;font-size:0.9em'>"
+            f"<div style='font-size:0.75em;color:#6b7280'>{tag}</div>{text}</div>"
+        )
+    return ui.HTML("".join(blocks))
+```
+
+## Qué observar
+
+- Con chunks de 8 o 10 palabras, la respuesta a la pregunta sobre el envío queda partida. Ningún fragmento contiene la frase completa, y el LLM nunca la verá.
+- Subir el solapamiento hace que la frase cortada aparezca entera en algún chunk, pero también aumenta el número de chunks y el coste de indexar.
+- Con chunks muy grandes (80 palabras), cada fragmento contiene casi todo el documento. La respuesta aparece entera, pero el recuperador deja de discriminar y el LLM recibe mucho texto que no necesita.
+
+Con los valores por defecto (25 palabras, sin solapamiento), la pregunta del plazo sale completa, pero la del envío aparece partida: cambia la pregunta a *«¿Quién paga el envío de la devolución?»* para verlo. Después sube el solapamiento a 25 % y comprueba cómo se arregla.
+
+No existe un tamaño ideal. Por eso en la práctica se evalúa con un conjunto de preguntas y respuestas de referencia (ver [evaluación de RAG](../evaluables/hpd5-entregable.qmd)).

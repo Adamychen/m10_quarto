@@ -1,0 +1,295 @@
+---
+title: "Demo — Temperatura: ¿cuánta creatividad le pides al modelo?"
+description: "Genera la siguiente palabra varias veces y mira cómo la temperatura convierte un modelo repetitivo en uno creativo, y después en uno caótico."
+engine: markdown
+---
+
+> Demo que acompaña a [LLM e inferencia](../bloque1/01b-llms.qmd#sec-parametros-inferencia). Las probabilidades se midieron una vez con `Qwen3-0.6B` y se guardaron como datos estáticos, así que la demo se ejecuta en el navegador sin API ni clave.
+
+Un LLM no «decide» la siguiente palabra: calcula una **probabilidad para cada candidata** y saca una al azar. La **temperatura** controla cuánto se respetan esas probabilidades. Con temperatura baja casi siempre gana la favorita; con temperatura alta el abanico se aplana y las palabras raras tienen opción.
+
+Elige una frase, mueve la temperatura y pulsa **Generar 10 veces**. Compara cuántas palabras distintas salen.
+
+```{shinylive-python}
+#| standalone: true
+#| viewerHeight: 860
+
+## file: app.py
+import numpy as np
+from shiny import reactive
+from shiny.express import input, ui, render
+
+from data import DATA
+
+PROMPTS = DATA["prompts"]
+BLUE, ORANGE, GRAY = "#4B8BBE", "#e65100", "#9e9e9e"
+RARE = 0.02  # una palabra es «poco plausible» si el modelo le da menos del 2 %
+
+CUTS = {
+    "none": "Sin recorte (todas las candidatas)",
+    "k3": "Solo las 3 más probables (top-k = 3)",
+    "p90": "Solo las que suman el 90 % (top-p = 0,9)",
+}
+
+samples = reactive.value([])
+
+
+def distribution(i, temp, cut):
+    """Probabilidades tras aplicar temperatura y recorte, y máscara de las que sobreviven."""
+    p = np.array(PROMPTS[i]["probs"], dtype=float)
+    if temp <= 0:
+        q = np.zeros_like(p)
+        q[np.argmax(p)] = 1.0
+    else:
+        logits = np.log(np.maximum(p, 1e-12)) / temp
+        q = np.exp(logits - logits.max())
+        q /= q.sum()
+    order = np.argsort(-q)
+    keep = np.ones(len(q), dtype=bool)
+    if cut == "k3":
+        keep[order[3:]] = False
+    elif cut == "p90":
+        cum = np.cumsum(q[order])
+        n = int(np.searchsorted(cum, 0.9) + 1)
+        keep[order[n:]] = False
+    q = np.where(keep, q, 0.0)
+    return q / q.sum(), keep
+
+
+ui.input_select(
+    "prompt", "Frase a continuar",
+    {str(i): p["prompt"] + " …" for i, p in enumerate(PROMPTS)}, selected="0", width="100%",
+)
+ui.input_slider("temp", "Temperatura (0 = siempre la más probable)", 0, 2, 1, step=0.1, width="100%")
+ui.input_select("cut", "Recortar el abanico (opcional)", CUTS, selected="none", width="100%")
+ui.input_action_button("gen", "Generar 10 veces")
+
+
+@reactive.effect
+@reactive.event(input.prompt, input.temp, input.cut)
+def _reset():
+    samples.set([])
+
+
+@reactive.effect
+@reactive.event(input.gen)
+def _generate():
+    q, _ = distribution(int(input.prompt()), input.temp(), input.cut())
+    draws = np.random.default_rng().choice(len(q), size=10, p=q)
+    samples.set([int(d) for d in draws])
+
+
+@render.ui
+def fan():
+    i = int(input.prompt())
+    words = PROMPTS[i]["words"]
+    base = PROMPTS[i]["probs"]
+    q, keep = distribution(i, input.temp(), input.cut())
+    rows = []
+    for j, w in enumerate(words):
+        if not keep[j]:
+            color, label, style = GRAY, "descartada", "text-decoration:line-through;opacity:0.5"
+        else:
+            color = ORANGE if base[j] < RARE else BLUE
+            label, style = f"{q[j]:.0%}" if q[j] >= 0.005 else "<1 %", ""
+        width = 300 * q[j] if keep[j] else 4
+        rows.append(
+            f"<div style='display:flex;align-items:center;gap:8px;margin:2px 0;{style}'>"
+            f"<span style='width:110px;text-align:right'>{w}</span>"
+            f"<span style='display:inline-block;height:14px;width:{width:.0f}px;min-width:2px;"
+            f"background:{color};border-radius:3px'></span><span>{label}</span></div>"
+        )
+    legend = (
+        f"<p style='font-size:0.85em;opacity:0.85'>"
+        f"<span style='color:{BLUE}'>■</span> candidata plausible · "
+        f"<span style='color:{ORANGE}'>■</span> candidata poco plausible (el modelo le daba menos del 2 %)</p>"
+    )
+    detail = "".join(
+        f"<tr><td>{w}</td><td>{base[j]:.1%}</td><td>{q[j]:.1%}</td></tr>" for j, w in enumerate(words)
+    )
+    table = (
+        "<details style='margin-top:8px'><summary>Ver los números</summary>"
+        "<table style='font-size:0.85em'><thead><tr><th>Palabra</th><th>Prob. original</th>"
+        f"<th>Prob. ahora</th></tr></thead><tbody>{detail}</tbody></table></details>"
+    )
+    return ui.HTML(f"<p><b>Abanico de la siguiente palabra:</b></p>{''.join(rows)}{legend}{table}")
+
+
+@render.ui
+def results():
+    i = int(input.prompt())
+    s = samples()
+    if not s:
+        return ui.HTML("<p style='opacity:0.7'>Pulsa «Generar 10 veces» para ver qué escribe el modelo.</p>")
+    words = PROMPTS[i]["words"]
+    base = PROMPTS[i]["probs"]
+    lines = "".join(
+        f"<li>{PROMPTS[i]['prompt']} <b style='color:{ORANGE if base[d] < RARE else 'inherit'}'>"
+        f"{words[d]}</b></li>"
+        for d in s
+    )
+    distinct = len(set(s))
+    rare = sum(base[d] < RARE for d in s)
+    msg = f"<b>{distinct}</b> palabra{'s' if distinct != 1 else ''} distinta{'s' if distinct != 1 else ''} en 10"
+    if rare:
+        msg += f" · <span style='color:{ORANGE}'><b>{rare}</b> poco plausible{'s' if rare != 1 else ''}</span>"
+    return ui.HTML(f"<p>{msg}</p><ol style='margin:4px 0'>{lines}</ol>")
+
+## file: data.py
+# DATA-START
+DATA = {
+ "model": "Qwen/Qwen3-0.6B",
+ "prompts": [
+  {
+   "prompt": "El gato se subió al",
+   "words": [
+    "coche",
+    "sofá",
+    "árbol",
+    "suelo",
+    "camión",
+    "muro",
+    "balcón",
+    "techo",
+    "cielo",
+    "armario",
+    "tejado",
+    "ordenador"
+   ],
+   "probs": [
+    0.35132,
+    0.23103,
+    0.19831,
+    0.05209,
+    0.05153,
+    0.03962,
+    0.02643,
+    0.02618,
+    0.01643,
+    0.00563,
+    0.00108,
+    0.00035
+   ]
+  },
+  {
+   "prompt": "Los fines de semana suelo ir al",
+   "words": [
+    "mar",
+    "mercado",
+    "centro",
+    "trabajo",
+    "campo",
+    "cine",
+    "bosque",
+    "parque",
+    "museo",
+    "hospital",
+    "teatro",
+    "tribunal"
+   ],
+   "probs": [
+    0.28835,
+    0.27167,
+    0.13232,
+    0.11174,
+    0.06082,
+    0.05176,
+    0.02716,
+    0.01974,
+    0.01741,
+    0.01418,
+    0.00459,
+    0.00026
+   ]
+  },
+  {
+   "prompt": "Mi comida favorita es la",
+   "words": [
+    "pizza",
+    "ensalada",
+    "sopa",
+    "pasta",
+    "carne",
+    "paella",
+    "hamburguesa",
+    "fruta",
+    "tortilla",
+    "lasaña",
+    "democracia",
+    "electricidad"
+   ],
+   "probs": [
+    0.55052,
+    0.25165,
+    0.11013,
+    0.04213,
+    0.0194,
+    0.01046,
+    0.00711,
+    0.00488,
+    0.00359,
+    8e-05,
+    3e-05,
+    2e-05
+   ]
+  },
+  {
+   "prompt": "Para el desayuno me gusta tomar un café con",
+   "words": [
+    "leche",
+    "chocolate",
+    "azúcar",
+    "hielo",
+    "mantequilla",
+    "aceite",
+    "sal",
+    "nata",
+    "canela",
+    "pimienta",
+    "tostadas",
+    "miel"
+   ],
+   "probs": [
+    0.89601,
+    0.05219,
+    0.02517,
+    0.01793,
+    0.00442,
+    0.00259,
+    0.00095,
+    0.00054,
+    0.00017,
+    3e-05,
+    0.0,
+    0.0
+   ]
+  }
+ ]
+}
+# DATA-END
+```
+
+## Qué observar
+
+1. Con la frase del **gato** y temperatura **0**, pulsa «Generar 10 veces» varias veces: sale siempre la misma palabra. Es el modo determinista, el que se usa cuando quieres respuestas reproducibles.
+2. Sube a **1,0**. Ahora aparecen varias palabras, pero casi todas razonables. Es el abanico tal como lo calcula el modelo.
+3. Sube a **2,0**. El abanico se aplana: las barras naranjas (palabras que el modelo consideraba absurdas) empiezan a salir. Ese es el momento en que el texto deja de tener sentido.
+4. Cambia a la frase del **café**. El modelo está casi seguro de que sigue «leche», así que la temperatura apenas cambia nada hasta valores altos. La temperatura solo da libertad donde el modelo duda.
+5. Vuelve a 1,5 y elige **«Solo las 3 más probables»**. Las palabras raras desaparecen aunque la temperatura sea alta: recortar el abanico es la forma de tener variedad sin los disparates.
+
+## Qué has visto
+
+- El modelo no decide: **saca una palabra de un abanico de probabilidades**. La temperatura reparte esa probabilidad de forma más igualitaria (alta) o más concentrada (baja).
+- A temperatura 0 siempre sale lo mismo. A temperaturas altas aparece lo absurdo. Para tareas factuales o estructuradas conviene temperatura baja; para escritura creativa, media.
+- **Top-k** y **top-p** recortan el abanico antes de sortear, y por eso se combinan con la temperatura en producción.
+
+::: {.callout-warning}
+## Qué es real y qué está simplificado
+
+- Las probabilidades son reales, de `Qwen3-0.6B`, un modelo pequeño: sus preferencias (por ejemplo, que un gato se suba «al coche» antes que «al sofá») son menos sensatas que las de un LLM grande.
+- Las candidatas son **doce palabras elegidas a mano**, incluidas algunas absurdas para que se vea la cola. Un modelo real reparte probabilidad entre decenas de miles de tokens, y su siguiente token puede ser un fragmento de palabra.
+- Las probabilidades se **renormalizaron entre esas doce candidatas**, no son las absolutas del modelo.
+- Una palabra de varios tokens se puntúa multiplicando las probabilidades de sus tokens.
+:::
+
+Para ver cómo se fijan estos parámetros al llamar a un modelo, vuelve a [LLM e inferencia](../bloque1/01b-llms.qmd#sec-parametros-inferencia).

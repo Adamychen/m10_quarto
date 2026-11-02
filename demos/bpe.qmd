@@ -1,0 +1,199 @@
+---
+title: "Demo — Entrena tu propio BPE"
+description: "Aprende reglas de fusión sobre un corpus, mira cómo se trocea una palabra nueva y compárala con un tokenizador real que corre en tu navegador."
+engine: markdown
+---
+
+> Demo interactiva que acompaña a [Grandes Modelos de Lenguaje e Inferencia](../bloque1/01b-llms.qmd#sec-tokenizacion-detalle). Todo corre en tu navegador: no necesitas clave de API.
+
+El algoritmo **Byte Pair Encoding (BPE)** empieza con un vocabulario de caracteres y, en cada paso, fusiona el par de símbolos adyacentes más frecuente. Cada fusión queda registrada como una regla que luego se aplica en ese mismo orden.
+
+Prueba a:
+
+- Subir el número de fusiones y ver cómo aparecen subpalabras como `low` o `est`.
+- Cambiar el corpus: si una palabra no aparece en el entrenamiento, BPE la descompone en piezas más pequeñas.
+- Tokenizar palabras que no estén en el corpus, como `unhappiness`.
+
+```{shinylive-python}
+#| standalone: true
+#| viewerHeight: 760
+
+## file: app.py
+import html
+from collections import Counter
+
+from shiny import reactive
+from shiny.express import input, ui, render
+
+CORPUS = "low lower lowest newer newer newest wider widest new new low low"
+END = "</w>"
+COLORS = ["#dbeafe", "#fde68a", "#dcfce7", "#fbcfe8", "#e9d5ff"]
+
+
+def merge_word(word, pair):
+    """Aplica una fusión a una secuencia de símbolos."""
+    out, i = [], 0
+    while i < len(word):
+        if i < len(word) - 1 and (word[i], word[i + 1]) == pair:
+            out.append(word[i] + word[i + 1])
+            i += 2
+        else:
+            out.append(word[i])
+            i += 1
+    return tuple(out)
+
+
+def train_bpe(text, n_merges):
+    """Devuelve la lista de reglas (par fusionado) en orden de aprendizaje."""
+    words = Counter()
+    for w in text.lower().split():
+        words[tuple(w) + (END,)] += 1
+
+    merges = []
+    for _ in range(n_merges):
+        pairs = Counter()
+        for word, freq in words.items():
+            for pair in zip(word, word[1:]):
+                pairs[pair] += freq
+        if not pairs:
+            break
+        best = max(pairs, key=lambda p: (pairs[p], p))
+        merges.append(best)
+        new_words = Counter()
+        for word, freq in words.items():
+            new_words[merge_word(word, best)] += freq
+        words = new_words
+    return merges
+
+
+def tokenize(word, merges):
+    """Trocea una palabra aplicando las reglas en orden."""
+    toks = tuple(word) + (END,)
+    for pair in merges:
+        toks = merge_word(toks, pair)
+    return list(toks)
+
+
+@reactive.calc
+def model():
+    return train_bpe(input.corpus(), input.n_merges())
+
+
+ui.input_text_area("corpus", "Corpus de entrenamiento", CORPUS, rows=3, width="100%")
+ui.input_slider("n_merges", "Número de fusiones", 0, 40, 12)
+ui.input_text("probe", "Texto a tokenizar", "lowest newest unhappiness", width="100%")
+
+
+ui.h5("Reglas aprendidas (en orden)")
+
+
+@render.ui
+def merges_out():
+    ms = model()
+    if not ms:
+        return ui.HTML("<p>Sin fusiones: solo caracteres.</p>")
+    def show(s):
+        return html.escape(s.replace(END, "_"))
+
+    cards = "".join(
+        f'<div style="background:{COLORS[i % len(COLORS)]};color:#111;border-radius:8px;'
+        f'padding:6px 10px;font-size:0.95em;white-space:nowrap">'
+        f'<span style="opacity:0.6">{i + 1}.</span> '
+        f'<code style="background:none;color:#111">{show(a)} + {show(b)}</code> → '
+        f'<b><code style="background:none;color:#111">{show(a + b)}</code></b></div>'
+        for i, (a, b) in enumerate(ms)
+    )
+    return ui.HTML(
+        f'<div style="display:flex;flex-wrap:wrap;gap:8px;margin:8px 0">{cards}</div>'
+    )
+
+
+ui.h5("Tokenización")
+
+
+@render.ui
+def tokens_out():
+    ms = model()
+    chunks = []
+    for w in input.probe().lower().split():
+        spans = []
+        for i, t in enumerate(tokenize(w, ms)):
+            label = html.escape(t.replace(END, "_"))
+            spans.append(
+                f'<span style="background:{COLORS[i % len(COLORS)]};color:#111;'
+                f'padding:2px 6px;margin:2px;border-radius:4px;'
+                f'font-family:monospace">{label}</span>'
+            )
+        chunks.append("".join(spans))
+    return ui.HTML("&nbsp;&nbsp;│&nbsp;&nbsp;".join(chunks))
+
+
+@render.text
+def stats():
+    ms = model()
+    words = input.probe().split()
+    n_tokens = sum(len(tokenize(w.lower(), ms)) for w in words)
+    return f"{len(words)} palabras → {n_tokens} tokens (con {len(ms)} fusiones aprendidas)"
+```
+
+## Y un tokenizador real, ya entrenado
+
+Lo de arriba es un BPE de juguete, entrenado sobre doce palabras. Ahora escribe cualquier texto y mira cómo lo trocea el tokenizador de **Qwen3-0.6B**, con un vocabulario de más de 150 000 tokens. Corre en tu navegador: se descarga una vez (unos 11 MB) y después tokeniza al instante, sin servidor.
+
+```{=html}
+<div class="qwen-live">
+  <label for="qwen-input"><b>Texto a tokenizar con Qwen3</b></label>
+  <textarea id="qwen-input" rows="3" style="width:100%;font-size:1rem;margin-top:4px">Los transformers procesan secuencias.</textarea>
+  <p id="qwen-status" style="font-style:italic;color:#6b7280;margin:6px 0">Cargando tokenizador…</p>
+  <div id="qwen-out"></div>
+</div>
+
+<script type="module">
+  import { AutoTokenizer, env } from "https://cdn.jsdelivr.net/npm/@huggingface/transformers@4.2.0/dist/transformers.min.js";
+
+  const COLORS = ["#dbeafe", "#fde68a", "#dcfce7", "#fbcfe8", "#e9d5ff"];
+  const input = document.getElementById("qwen-input");
+  const status = document.getElementById("qwen-status");
+  const out = document.getElementById("qwen-out");
+  const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+  env.allowLocalModels = true;
+  env.localModelPath = new URL("data/", document.baseURI).pathname;
+
+  let tok = null;
+
+  function render() {
+    if (!tok) return;
+    const ids = tok.encode(input.value);
+    const pills = ids
+      .map((id, i) => {
+        const piece = tok.decode([id]).replace(/ /g, "·") || "∅";
+        return `<span style="background:${COLORS[i % COLORS.length]};color:#111;padding:2px 6px;margin:2px;border-radius:4px;font-family:monospace">${esc(piece)}</span>`;
+      })
+      .join(" ");
+    out.innerHTML = `<p><b>${ids.length}</b> tokens</p><div>${pills}</div>`;
+  }
+
+  try {
+    tok = await AutoTokenizer.from_pretrained("qwen3");
+    status.textContent = "Tokenizador listo.";
+    render();
+    input.addEventListener("input", render);
+  } catch (e) {
+    status.textContent = "No se pudo cargar el tokenizador: " + e.message;
+  }
+</script>
+```
+
+## Qué observar
+
+- Con 0 fusiones, cada palabra es una secuencia de caracteres. Al aumentar las fusiones, el número de tokens baja.
+- El símbolo `_` marca el final de palabra (`</w>` en la notación del paper de Sennrich et al.). Permite distinguir `est` al final de una palabra de `est` dentro de otra.
+- Una palabra rara como `unhappiness` se parte en piezas que el modelo ya conoce. Por eso BPE no tiene el problema de palabras fuera de vocabulario.
+- Compara el BPE de juguete con Qwen3: el tokenizador real aprendió sobre una cantidad enorme de texto, por eso frases comunes como *«Los transformers procesan»* salen en muy pocos tokens.
+- El símbolo `·` marca un espacio al inicio de la palabra. Qwen3 lo incluye dentro del token, como hace la mayoría de tokenizadores modernos.
+
+::: {.callout-note}
+## Limitación
+Esta es una implementación didáctica sobre un corpus mínimo. Los tokenizadores reales (GPT, Llama, Qwen) entrenan con miles de millones de palabras, manejan bytes en lugar de caracteres y tienen decenas de miles de tokens.
+:::

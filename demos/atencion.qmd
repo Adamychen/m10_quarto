@@ -1,0 +1,244 @@
+---
+title: "Demo — La atención: ¿en qué se fija cada palabra?"
+description: "Pulsa una palabra y mira en cuáles del resto de la frase se apoya para interpretarse. Después comprueba qué pasa cuando solo puede mirar hacia atrás, como en un LLM generativo."
+engine: markdown
+---
+
+> Demo que acompaña a [Arquitectura Transformer](../bloque1/01a-transformer.qmd#sec-atencion-multi-cabeza). Se ejecuta en el navegador con Shinylive y no necesita clave de API.
+
+::: {.callout-note}
+## Esto es una ilustración, no un modelo real
+
+Los pesos de esta demo están **diseñados a mano** para que se vea la idea de la atención con claridad. Un modelo real tiene muchas cabezas de atención y ninguna se comporta de forma tan limpia ni tan fácil de leer.
+:::
+
+Una misma palabra puede significar cosas muy distintas según las que la rodean: no es lo mismo el *banco* donde te sientas que el *banco* que quiebra. La **atención** es el mecanismo con el que un Transformer le permite a cada palabra consultar al resto de la frase para decidir cómo interpretarse.
+
+Pulsa cualquier palabra y verás en cuáles se apoya: cuanto más grueso el arco, más atención le presta.
+
+```{shinylive-python}
+#| standalone: true
+#| viewerHeight: 820
+
+from shiny import reactive
+from shiny.express import input, ui, render
+
+# Pesos de atención ilustrativos: SENTENCES[i]["att"][palabra] = {otra_palabra: peso}.
+# Los pesos se normalizan al 100 %. Las palabras sin entrada usan un patrón de vecindad.
+SENTENCES = [
+    {
+        "label": "Me senté en el banco del parque",
+        "words": ["Me", "senté", "en", "el", "banco", "del", "parque"],
+        "default": 4,
+        "att": {
+            4: {6: 5, 1: 3, 2: 1, 3: 1.5, 5: 1.5, 0: 0.5},
+            6: {4: 4, 5: 3, 1: 1},
+            1: {0: 3, 4: 3, 2: 2},
+        },
+        "why": {
+            4: "«banco» busca pistas: «senté» y «parque» apuntan a un asiento, no a una entidad financiera.",
+        },
+    },
+    {
+        "label": "El banco cerró porque estaba en quiebra",
+        "words": ["El", "banco", "cerró", "porque", "estaba", "en", "quiebra"],
+        "default": 1,
+        "att": {
+            1: {6: 4, 2: 4, 4: 2, 0: 1.5, 3: 1},
+            2: {1: 5, 3: 2, 6: 1},
+            6: {5: 3, 4: 3, 1: 3},
+        },
+        "why": {
+            1: "Aquí «banco» se apoya en «cerró» y «quiebra»: es una empresa, no un asiento.",
+        },
+    },
+    {
+        "label": "El trofeo no cabía en la maleta porque era demasiado grande",
+        "words": ["El", "trofeo", "no", "cabía", "en", "la", "maleta", "porque", "era", "demasiado", "grande"],
+        "default": 8,
+        "att": {
+            8: {1: 6, 10: 3, 6: 1.5, 7: 1.5, 9: 1},
+            10: {9: 4, 8: 3, 1: 3},
+            3: {1: 4, 2: 3, 6: 2},
+        },
+        "why": {
+            8: "«era» es un pronombre sin significado propio: para saber a qué se refiere busca en la frase. Si algo es «demasiado grande» y no cabe, es el trofeo.",
+        },
+    },
+    {
+        "label": "El trofeo no cabía en la maleta porque era demasiado pequeña",
+        "words": ["El", "trofeo", "no", "cabía", "en", "la", "maleta", "porque", "era", "demasiado", "pequeña"],
+        "default": 8,
+        "att": {
+            8: {6: 6, 10: 3, 1: 1.5, 7: 1.5, 9: 1},
+            10: {9: 4, 8: 3, 6: 3},
+            3: {1: 4, 2: 3, 6: 2},
+        },
+        "why": {
+            8: "Cambia una sola palabra («pequeña») y «era» pasa a referirse a la maleta: la atención sigue el sentido de toda la frase, no la posición.",
+        },
+    },
+]
+
+BLUE, DARK, YELLOW, ORANGE, GRAY = "#4B8BBE", "#306998", "#FFD43B", "#e65100", "#9ca3af"
+
+
+def attention(s, sel, causal):
+    """Pesos normalizados {palabra: porcentaje} de la palabra seleccionada."""
+    n = len(s["words"])
+    raw = dict(s["att"].get(sel) or {})
+    if not raw:
+        for j in range(n):
+            if j != sel:
+                raw[j] = {1: 3.0, 2: 1.5}.get(abs(j - sel), 0.5)
+    if causal:
+        raw = {j: w for j, w in raw.items() if j < sel}
+    total = sum(raw.values())
+    return {j: w / total for j, w in raw.items()} if total else {}
+
+
+def layout(words):
+    xs, x = [], 10
+    for w in words:
+        width = 11 * len(w) + 24
+        xs.append((x, width))
+        x += width + 8
+    return xs, x + 2
+
+
+current = reactive.value(None)
+
+
+@reactive.effect
+def _reset():
+    current.set(SENTENCES[int(input.sent())]["default"])
+
+
+@reactive.effect
+@reactive.event(input.w)
+def _click():
+    current.set(int(input.w()))
+
+
+ui.input_radio_buttons(
+    "sent", "Frase",
+    {str(i): s["label"] for i, s in enumerate(SENTENCES)}, selected="0", width="100%",
+)
+ui.input_switch("causal", "Ver como un LLM generativo (solo puede mirar hacia atrás)", value=False)
+
+
+@render.ui
+def figure():
+    s = SENTENCES[int(input.sent())]
+    words, causal = s["words"], input.causal()
+    sel = current()
+    if sel is None or sel >= len(words):
+        return ui.HTML("")
+    att = attention(s, sel, causal)
+    xs, total_w = layout(words)
+    base_y, h = 110, 44
+
+    def cx(i):
+        return xs[i][0] + xs[i][1] / 2
+
+    parts = []
+    for j, w in sorted(att.items(), key=lambda kv: kv[1]):
+        dist = abs(cx(j) - cx(sel))
+        top = base_y - min(125, 25 + dist * 0.22)
+        parts.append(
+            f"<path d='M{cx(sel)},{base_y} Q{(cx(sel) + cx(j)) / 2},{top - 40} {cx(j)},{base_y}' "
+            f"fill='none' stroke='{DARK}' stroke-width='{1 + 11 * w:.1f}' "
+            f"stroke-opacity='{0.25 + 0.75 * w:.2f}' stroke-linecap='round'/>"
+        )
+    for i, word in enumerate(words):
+        x, wd = xs[i]
+        future = causal and i > sel
+        if i == sel:
+            fill, fop, tcol, deco = DARK, 1, "#fff", "none"
+        elif i in att:
+            fill, fop, tcol, deco = YELLOW, 0.3 + 0.7 * att[i], "#000", "none"
+        else:
+            fill, fop, tcol, deco = "none", 1, "currentColor", "line-through" if future else "none"
+        opacity = 0.4 if future else 1
+        parts.append(
+            f"<g style='cursor:pointer' opacity='{opacity}' "
+            f"onclick=\"Shiny.setInputValue('w', {i}, {{priority: 'event'}})\">"
+            f"<rect x='{x}' y='{base_y}' width='{wd}' height='{h}' rx='8' fill='{fill}' "
+            f"fill-opacity='{fop}' stroke='{DARK if i == sel else GRAY}' stroke-width='1.5'/>"
+            f"<text x='{x + wd / 2}' y='{base_y + 28}' text-anchor='middle' font-size='17' "
+            f"fill='{tcol}' text-decoration='{deco}'>{word}</text></g>"
+        )
+    svg = (
+        f"<svg viewBox='0 0 {total_w} {base_y + h + 8}' width='100%' "
+        f"style='max-width:{max(total_w, 480)}px;display:block;margin:8px 0' "
+        f"font-family='system-ui,sans-serif'>{''.join(parts)}</svg>"
+    )
+
+    word = words[sel]
+    if att:
+        ranked = sorted(att.items(), key=lambda kv: -kv[1])
+        bars = "".join(
+            f"<div style='display:flex;align-items:center;gap:8px;margin:3px 0'>"
+            f"<span style='width:90px'>{words[j]}</span>"
+            f"<span style='display:inline-block;height:14px;width:{w * 260:.0f}px;"
+            f"background:{BLUE};border-radius:3px'></span><span>{w:.0%}</span></div>"
+            for j, w in ranked[:3]
+        )
+        rest = "".join(f"<li>{words[j]}: {w:.1%}</li>" for j, w in ranked)
+        summary = (
+            f"<p>Al interpretar <b>«{word}»</b>, presta más atención a:</p>{bars}"
+            f"<details style='margin-top:8px'><summary>Ver los números</summary>"
+            f"<ul style='margin:4px 0'>{rest}</ul>"
+            f"<p style='font-size:0.85em;opacity:0.8'>Los pesos suman 100 % y son ilustrativos.</p></details>"
+        )
+    else:
+        summary = (
+            f"<p><b>«{word}»</b> es la primera palabra: un LLM generativo todavía no tiene "
+            f"ninguna palabra anterior en la que apoyarse.</p>"
+        )
+
+    why = s["why"].get(sel)
+    lost = [words[j] for j in sorted(s["att"].get(sel, {})) if j > sel]
+    note = ""
+    if causal and lost and why:
+        note = (
+            f"<p style='border-left:4px solid {ORANGE};padding-left:10px'>"
+            f"Un LLM generativo no puede ver lo que viene después: se pierde "
+            f"<b>{', '.join('«' + w + '»' for w in lost)}</b>, justo las pistas que aclaraban el sentido. "
+            f"Con lo que sí ve, la interpretación queda mucho menos clara.</p>"
+        )
+    elif why:
+        note = f"<p style='border-left:4px solid {ORANGE};padding-left:10px'>{why}</p>"
+    mode = (
+        "<b>Modo LLM generativo:</b> las palabras tachadas aún no existen."
+        if causal
+        else "<b>Modo codificador (tipo BERT):</b> cada palabra mira antes y después."
+    )
+    return ui.HTML(
+        f"<p style='font-size:0.9em;opacity:0.85'>{mode} · Pulsa otra palabra para cambiar.</p>"
+        f"{svg}{summary}{note}"
+    )
+```
+
+## Qué observar
+
+1. Con la primera frase, **pulsa «banco»**: se apoya sobre todo en «parque» y «senté». Pasa a la segunda frase y vuelve a pulsar «banco»: ahora son «cerró» y «quiebra». Es la misma palabra, pero se interpreta de forma distinta porque el contexto es distinto.
+2. En las dos frases del trofeo, **pulsa «era»**. Es un pronombre: no significa nada por sí mismo y necesita buscar a quién se refiere. Con «grande» mira al trofeo; con «pequeña», a la maleta. Cambia una palabra y cambia a quién mira.
+3. **Activa el interruptor «Ver como un LLM generativo»** y vuelve a pulsar «banco» en la frase del parque. «parque» queda tachada: un LLM que genera texto palabra a palabra todavía no la ha visto, así que no puede usarla para interpretar «banco».
+4. Con el interruptor activo, pulsa «era» en la frase del trofeo. Aquí no cambia casi nada, porque las pistas ya están antes.
+
+## Qué has visto
+
+- La atención permite que **cada palabra se interprete según las demás**, no de forma aislada.
+- Los modelos tipo BERT (codificadores) miran a ambos lados. Los **LLM generativos** (ChatGPT, Qwen, Llama…) son decodificadores y solo miran hacia atrás, porque generan palabra a palabra. Por eso funcionan bien con pronombres, cuyas pistas suelen estar antes, pero no pueden usar lo que todavía no han escrito.
+- Esto es una simplificación: en un modelo real hay muchas cabezas de atención a la vez, y cada una se fija en cosas distintas.
+
+::: {.callout-warning}
+## Una precaución sobre el interruptor
+
+Aquí el modo «LLM generativo» simplemente tapa las palabras posteriores para que se vea la restricción. Un decodificador real no funciona tapando a posteriori: se entrena con esa restricción desde el principio y aprende a trabajar con ella.
+:::
+
+**¿Y en un modelo real?** Continúa con la [segunda parte](atencion-modelo-real.qmd): pesos reales de un BERT, con seis cabezas de atención que se fijan en cosas distintas.
+
+Para ver cómo se define esta restricción en el modelo (máscara causal) y qué cambia entre las variantes de la arquitectura, consulta [Del Transformer original al decoder-only moderno](../bloque1/01a-transformer.qmd#sec-original-vs-moderno).
