@@ -316,11 +316,11 @@ texto -> tokens -> IDs -> embeddings de token
 
 Los embeddings de token son una pieza interna del modelo generativo, pero no son idénticos a los embeddings de frases que se usan para búsqueda semántica. Un modelo generativo puede producir buenos textos y no ser el mejor modelo para recuperar documentos. Del mismo modo, un modelo de embeddings puede ser excelente para similitud y no estar diseñado para generar respuestas.
 
-La página [01e - Del estado oculto a la salida](01e-llm-por-dentro.qmd) amplía la relación entre backbone, estados ocultos y cabezas de salida. La página [01b - LLM e inferencia](01b-llms.qmd) explica la tokenización y la predicción del siguiente token.
+La página [Del estado oculto a la salida](../bloque3/03c-previo-cabezas.qmd) (Bloque 3) amplía la relación entre backbone, estados ocultos y cabezas de salida. La página [01b - LLM e inferencia](01b-llms.qmd) explica la tokenización y la predicción del siguiente token.
 
 ## Demostración: coincidencia literal frente a similitud semántica {#sec-demo-tfidf}
 
-La siguiente demostración utiliza únicamente TF-IDF para hacer visible el problema de la coincidencia léxica. La frase sobre el felino y la frase sobre el gato hablan de una situación similar, pero no comparten exactamente todas sus palabras.
+**Antes de ejecutar, predice:** ¿qué similitud esperas entre la frase del gato y la del felino con TF-IDF: alta, media o casi cero? La siguiente demostración utiliza únicamente TF-IDF para hacer visible el problema de la coincidencia léxica. La frase sobre el felino y la frase sobre el gato hablan de una situación similar, pero no comparten exactamente todas sus palabras.
 
 ```{python}
 #| echo: true
@@ -413,6 +413,20 @@ evaluación     -> recall, precision, faithfulness y RAGAS
 
 La representación vectorial no es un detalle de implementación. Es la decisión que determina qué significa que dos objetos sean parecidos y, por tanto, qué información llegará a las etapas posteriores del sistema.
 
+## Comprueba lo aprendido {#sec-comprueba-panorama}
+
+::: {.callout-note collapse="true" title="1. Una consulta dice «coche barato» y el documento «automóvil económico». ¿Por qué TF-IDF los considera casi inconexos y qué aporta word2vec?"}
+TF-IDF compara palabras exactas: `coche` y `automóvil` son columnas distintas, y `barato` y `económico` también, así que no comparten ningún término. word2vec aprende vectores a partir de los contextos en que aparece cada palabra; como `coche` y `automóvil` aparecen entre palabras parecidas, acaban cerca en el espacio.
+:::
+
+::: {.callout-note collapse="true" title="2. Quieres comparar dos frases completas para un buscador. ¿Usarías el embedding de token, un estado oculto de BERT o un embedding de frase de SBERT/E5? ¿Por qué?"}
+Un embedding de frase. Está entrenado específicamente para que la distancia entre frases tenga sentido y devuelve un único vector por frase. Los embeddings de token no incorporan contexto, y los estados ocultos de BERT son un vector por token y no están calibrados para comparar frases con coseno.
+:::
+
+::: {.callout-note collapse="true" title="3. Si los embeddings son «mejores» que TF-IDF, ¿por qué siguen usándose los métodos léxicos?"}
+Porque no son mejores en todo. La coincidencia exacta funciona muy bien con nombres propios, siglas y códigos de error, es explicable (sabes qué palabra provocó el acierto) y no necesita modelo. En producción se suelen combinar ambos enfoques; lo verás en [De documentos a recuperación](01e-recuperacion.qmd).
+:::
+
 ## Ruta hacia el Bloque 1 {#sec-ruta-panorama}
 
 Continúa con:
@@ -422,6 +436,7 @@ Continúa con:
 3. [01b-llms.qmd](01b-llms.qmd), para estudiar tokenización, preentrenamiento e inferencia
 4. [01c-embeddings.qmd](01c-embeddings.qmd), para profundizar en SBERT, E5 y la geometría semántica
 5. [01d-vectordb.qmd](01d-vectordb.qmd), para convertir el espacio semántico en un sistema de búsqueda
+6. [01e-recuperacion.qmd](01e-recuperacion.qmd), para trocear documentos, combinar búsqueda léxica y semántica y medir si funciona
 
 ---
 

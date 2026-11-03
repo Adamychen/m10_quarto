@@ -85,6 +85,130 @@ print("Librerías cargadas correctamente.")
 
 ## Grandes Modelos de Lenguaje (LLM) {#sec-llms}
 
+### ¿Qué es un token? {#sec-que-es-token}
+
+Un modelo de lenguaje no lee letras ni palabras. Antes de procesar nada, el texto se convierte en una lista de números. Ese paso se llama **tokenización**, y cada pieza que sale de él es un **token**.
+
+Piensa en el tokenizador como en un diccionario de trozos. Tiene una lista fija de piezas (entre unas 50.000 y unas 150.000, según el modelo) y cada pieza tiene asignado un número, su **ID**. Cualquier texto se escribe con esas piezas: las palabras frecuentes ocupan una sola pieza y las raras se construyen juntando varias.
+
+Veamos un ejemplo con el tokenizador de Qwen2.5:
+
+| Frase | Tokens | IDs |
+|---|---|---|
+| La tokenización trocea el texto. | `La` · ` token` · `ización` · ` tro` · `cea` · ` el` · ` texto` · `.` | 8747 · 3950 · 41500 · 8185 · 72938 · 655 · 32025 · 13 |
+
+Tres ideas para leer esa tabla:
+
+- **Un token no es una palabra.** «tokenización» ocupa dos piezas, y «trocea» también.
+- **El espacio va pegado al token que le sigue.** Por eso ` texto` (con espacio delante) y `texto` no son el mismo token.
+- **El modelo solo ve IDs.** Recibe números, no letras. Lo que puede aprender sobre una palabra depende de cómo se haya troceado.
+
+#### Experimento 1: tokeniza tu propia frase
+
+```{python}
+#| echo: true
+#| eval: true
+
+from transformers import AutoTokenizer
+
+tok = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B")
+frase = "La tokenización trocea el texto."
+ids = tok.encode(frase)
+
+print(f"{'Token':>12}  ID")
+for i in ids:
+    print(f"{tok.decode([i])!r:>12}  {i}")
+print(f"\nTokens: {len(ids)} · Palabras: {len(frase.split())}")
+print("Reconstruido:", tok.decode(ids))
+```
+
+Cada línea de la salida es un token: el trozo de texto que representa y su número. Al final, `decode` vuelve a unir los trozos y recupera la frase original. Puedes cambiar la variable `frase` por cualquier texto y comprobar cuántos tokens ocupa.
+
+### ¿Por qué importan los tokens?
+
+Hay dos motivos prácticos que aparecerán a lo largo de todo el curso:
+
+1. **Se cobra y se limita por tokens.** Las APIs cobran por token, y la [ventana de contexto](#sec-ventana-contexto) se mide en tokens, no en palabras.
+2. **El idioma influye.** El vocabulario se construye a partir de datos de entrenamiento. Los idiomas menos representados en esos datos suelen ocupar más tokens.
+
+#### Experimento 2: el mismo mensaje en inglés y en español
+
+**Antes de ejecutar, predice:** si dices lo mismo en español que en inglés, ¿cuántos tokens más crees que gasta el español: un 5 %, un 30 % o un 100 %? Anota tu respuesta y compárala con la tabla.
+
+```{python}
+#| echo: true
+#| eval: true
+
+import statistics
+from transformers import AutoTokenizer
+
+gpt2 = AutoTokenizer.from_pretrained("distilgpt2")
+qwen = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B")
+
+pares = [
+    ("The weather is very nice today and we are going to the park.", "El tiempo está muy bonito hoy y vamos a ir al parque."),
+    ("I would like a cup of coffee with milk, please.", "Me gustaría una taza de café con leche, por favor."),
+    ("The doctor asked the patient about his medical history.", "El médico preguntó al paciente por su historial médico."),
+    ("Unfortunately the train was delayed because of the storm.", "Por desgracia el tren se retrasó a causa de la tormenta."),
+    ("Data science combines statistics, programming and domain knowledge.", "La ciencia de datos combina estadística, programación y conocimiento del dominio."),
+]
+
+print(f"{'Tokenizador':<12}{'Inglés':>10}{'Español':>10}{'Recargo':>10}")
+for nombre, t in [("GPT-2", gpt2), ("Qwen2.5", qwen)]:
+    en = statistics.mean(len(t.encode(e)) / len(e.split()) for e, _ in pares)
+    es = statistics.mean(len(t.encode(s)) / len(s.split()) for _, s in pares)
+    print(f"{nombre:<12}{en:>10.2f}{es:>10.2f}{es/en-1:>+10.0%}")
+```
+
+La tabla muestra tokens por palabra. Con GPT-2, el español ocupa un 80 % más de tokens que el inglés para decir lo mismo; con Qwen2.5, un 30 % más. GPT-2 se entrenó sobre todo con textos en inglés, y Qwen2.5 tiene un vocabulario mucho más amplio y multilingüe. Son solo cinco frases: sirven para ver la tendencia, no como medida exacta.
+
+### Lo que el modelo no ve con claridad
+
+Los tokens explican algunas de las rarezas más conocidas de los LLM.
+
+```{python}
+#| echo: true
+#| eval: true
+
+from transformers import AutoTokenizer
+
+tok = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B")
+for texto in ["casa", " casa", "strawberry", "2024", "1234567"]:
+    piezas = [tok.decode([i]) for i in tok.encode(texto)]
+    print(f"{texto!r:>14} → {piezas}")
+```
+
+- **Letras.** `strawberry` se parte en `str`, `aw` y `berry`. Si el modelo no ve las letras una a una, contar cuántas *r* tiene una palabra no es trivial. Por eso los LLM fallan a menudo en tareas de deletreo.
+- **Números.** Qwen2.5 separa cada dígito en una pieza. Otros tokenizadores agrupan varios dígitos, y eso cambia la forma en que el modelo puede hacer cuentas.
+- **Espacios.** `casa` sin espacio se parte en `c` y `asa`, pero ` casa` con espacio es una sola pieza. La misma palabra cambia de tokens según el contexto.
+
+### Tokens especiales
+
+Los modelos de chat no reciben solo el texto que escribes. Lo envuelven en una plantilla con tokens especiales que marcan quién habla y dónde empieza y termina cada turno. Esos tokens no corresponden a palabras; son marcadores.
+
+```{python}
+#| echo: true
+#| eval: true
+
+from transformers import AutoTokenizer
+
+tok = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-0.5B")
+mensajes = [{"role": "user", "content": "¿Qué es un token?"}]
+print(tok.apply_chat_template(mensajes, tokenize=False, add_generation_prompt=True))
+```
+
+Las líneas `<|im_start|>` y `<|im_end|>` son tokens especiales de un solo ID cada uno. El modelo aprende a interpretarlos como fronteras, por eso usar la plantilla que espera cada modelo es importante: si se omite o se escribe mal, la respuesta puede empeorar.
+
+::: {.callout-tip}
+## Lo que conviene recordar
+
+- Un token es un trozo de texto con un número asignado: puede ser una palabra, una parte de palabra o un espacio pegado a una letra.
+- Los costes y los límites se miden en tokens, no en palabras, y dependen del idioma y del tokenizador.
+- El modelo solo ve números. Muchas de sus rarezas con letras, dígitos o espacios vienen de cómo se trocea el texto.
+
+Para ver cómo se decide qué piezas forman el vocabulario, sigue con [algoritmos de tokenización](#sec-tokenizacion) y prueba la [demo de BPE](../demos/bpe.qmd).
+:::
+
 ### Preentrenamiento {#sec-preentrenamiento}
 
 Los LLM se preentrenan con un objetivo aparentemente simple: predecir el siguiente token (next token prediction). Dada una secuencia de tokens $t_1, t_2, ..., t_n$, el modelo aprende a maximizar la probabilidad de $t_{i+1}$ dados los tokens anteriores:
@@ -96,40 +220,9 @@ De este proceso emergen capacidades complejas: sintaxis, semántica, razonamient
 - Tamaño del dataset de entrenamiento
 - Cómputo total
 
-### Tokenización {#sec-tokenizacion}
+### Algoritmos de tokenización {#sec-tokenizacion}
 
-Los modelos no procesan caracteres ni palabras directamente, sino tokens: unidades subpalabra que equilibran cobertura del vocabulario y eficiencia.
-
-: Algoritmos de tokenización más usados en LLM modernos {#tbl-tokenizacion}
-
-| Algoritmo | Cómo funciona | Usado en |
-|---|---|---|
-| **BPE** (Byte-Pair Encoding) | Fusiona iterativamente los pares de caracteres más frecuentes | GPT, GPT-2 |
-| **WordPiece** | Similar a BPE pero fusiona por máxima verosimilitud | BERT |
-| **SentencePiece** | Trata el texto como bytes, no requiere pre-tokenización | Llama, T5, Gemma |
-| **BPE (Qwen)** | Variante de BPE con vocabulario extendido para multilingüismo | Qwen 3.6, Qwen 3 |
-
-```{python}
-#| echo: true
-#| eval: false
-
-from transformers import AutoTokenizer
-
-tokenizer = AutoTokenizer.from_pretrained("distilgpt2")
-texto = "La IA Generativa está transformando el Data Science"
-
-tokens = tokenizer.tokenize(texto)
-ids = tokenizer.encode(texto)
-
-print(f"Texto original: {texto}")
-print(f"Número de tokens: {len(tokens)}")
-print(f"\nTokens: {tokens}")
-print(f"IDs:     {ids}")
-print(f"\nDecodificado: {tokenizer.decode(ids)}")
-
-
-
-```
+Ya sabemos qué es un token. Falta saber **quién decide qué piezas forman el vocabulario**. Esa decisión se toma una sola vez, antes de entrenar el modelo, con un algoritmo que mira un corpus enorme y se queda con las piezas más útiles. Los tres que verás citados con más frecuencia son BPE, WordPiece y Unigram (este último, a través de SentencePiece). La comparativa está al final de la sección siguiente.
 
 ### Tokenización en detalle: BPE y variantes {#sec-tokenizacion-detalle}
 
@@ -178,23 +271,45 @@ flowchart LR
 3. Fusionar el par más frecuente en un nuevo símbolo.
 4. Repetir 2-3 durante $k$ iteraciones (hasta alcanzar el tamaño de vocabulario deseado, p. ej. 50K).
 
-**Ejemplo numérico** — partiendo del corpus `low low low lower lower newest newest newest newest newest widest widest widest`, el vocabulario inicial es `{l, o, w, e, r, n, w, s, t, i, d, }` (caracteres). El algoritmo aprende progresivamente:
+**Ejemplo numérico.** Partimos de un corpus diminuto: `low` ×3, `lower` ×2, `newest` ×5 y `widest` ×3. El vocabulario inicial son sus diez letras: `d e i l n o r s t w`. En cada vuelta se cuentan los pares de símbolos vecinos y se fusiona el más frecuente. Antes de mirar la tabla, **predice**: ¿qué par crees que se fusionará primero?
 
-| Iteración | Par más frecuente | Vocabulario tras el merge |
-|---|---|---|
-| 1 | `(l, o)` | + `lo` |
-| 2 | `(lo, w)` | + `low` |
-| 3 | `(e, r)` | + `er` |
-| 4 | `(n, e)` | + `ne` |
-| 5 | `(ne, w)` | + `new` |
-| ... | ... | ... |
-| Final | — | `low`, `lower`, `newest`, `widest` como tokens completos |
+```{python}
+#| echo: true
+#| eval: true
 
-Tras el entrenamiento, la palabra `lowest` se codifica como `["low", "est"]` — la parte frecuente (`low`) se reutiliza, y la infrecuente (`est`) se descompone.
+from collections import Counter
+
+corpus = {"low": 3, "lower": 2, "newest": 5, "widest": 3}      # palabra -> frecuencia
+palabras = {tuple(p): f for p, f in corpus.items()}            # cada palabra, como tupla de letras
+
+def fusionar(palabras, par):
+    nuevas = {}
+    for simbolos, f in palabras.items():
+        salida, i = [], 0
+        while i < len(simbolos):
+            if i < len(simbolos) - 1 and (simbolos[i], simbolos[i + 1]) == par:
+                salida.append(simbolos[i] + simbolos[i + 1]); i += 2
+            else:
+                salida.append(simbolos[i]); i += 1
+        nuevas[tuple(salida)] = f
+    return nuevas
+
+print(f"{'Vuelta':<7}{'Par fusionado':<18}{'Frecuencia':<11}Nuevo símbolo")
+for vuelta in range(1, 8):
+    pares = Counter()
+    for simbolos, f in palabras.items():
+        for a, b in zip(simbolos, simbolos[1:]):
+            pares[(a, b)] += f
+    par, f = pares.most_common(1)[0]            # en caso de empate gana el que apareció antes
+    palabras = fusionar(palabras, par)
+    print(f"{vuelta:<7}{str(par):<18}{f:<11}{par[0] + par[1]}")
+```
+
+La primera fusión es `(e, s)`, no `(l, o)`: aparece en `newest` (×5) y en `widest` (×3), 8 veces en total, más que cualquier otro par. Las fusiones siguientes construyen `est`, `low` y `new`. Así, `lowest`, una palabra que **no estaba en el corpus**, se codifica como `["low", "est"]`: reutiliza dos piezas que el algoritmo ya había aprendido. En un modelo real el proceso es el mismo, pero con miles de millones de palabras y decenas de miles de fusiones.
 
 #### Comparativa de algoritmos de subword {#sec-comparativa-subword}
 
-: Algoritmos de tokenización más usados en LLM modernos {#tbl-subword-comparativa}
+: Comparativa de algoritmos de subword {#tbl-subword-comparativa}
 
 | Algoritmo | Usado por | Idea clave |
 |---|---|---|
@@ -214,9 +329,11 @@ Tras el entrenamiento, la palabra `lowest` se codifica como `["low", "est"]` —
 La ventana de contexto es el número máximo de tokens que el modelo puede procesar en una sola pasada. Limitaciones prácticas:
 - **Memoria:** la atención es O(n²) en memoria (sin optimizaciones)
 - **Modelos tempranos:** GPT-2 (1024), GPT-3 (2048), GPT-4 (8192)
-- **Modelos actuales:** Llama 3 (8K), Qwen 3.6 (128K), DeepSeek R1 (128K), Gemini (32K-1M), Claude (100K-200K)
+- **Modelos recientes** (cifras orientativas; cambian entre versiones): Llama 3 (8K) y Llama 3.1 (128K), Qwen 3.6 (128K), DeepSeek R1 (128K), algunos modelos Gemini (hasta 1M de tokens). Consulta siempre la ficha técnica del modelo que vayas a usar.
 
 Técnicas de extensión: RoPE (Rotary Position Embedding), ALiBi, windowing y atención dispersa.
+
+Una ventana grande no es una ventana útil: cada token de más cuesta dinero y memoria (ver [Tokens, dinero y memoria](#sec-tokens-coste-memoria)) y, en la práctica, los modelos aprovechan peor la información que queda en mitad de un contexto muy largo.
 
 ### Parámetros de inferencia {#sec-parametros-inferencia}
 
@@ -325,6 +442,87 @@ plt.show()
 - Combinación común: temp=0.7, top-p=0.9, top-k=40.
 :::
 
+### De modelo base a asistente: base, instruct y razonamiento {#sec-base-instruct}
+
+El preentrenamiento produce un **modelo base**: alguien que ha leído media internet y sabe continuar cualquier texto. Si le escribes «¿Cuál es la capital de Francia?», puede responder... o seguir con otras diez preguntas de examen, porque eso es lo que suele venir después en los textos que leyó. No sabe que estás esperando una respuesta.
+
+Los modelos que usas a diario pasan por una segunda fase de entrenamiento con ejemplos de conversaciones y con preferencias humanas. El resultado es un modelo **instruct** (o *chat*): sigue instrucciones, respeta la plantilla de roles que vimos antes y se niega a ciertas peticiones. Esa fase se estudia con más detalle en [Del estado oculto a la salida](../bloque3/03c-previo-cabezas.qmd) (Bloque 3).
+
+Hay una tercera familia, los **modelos de razonamiento**. Antes de contestar generan una larga cadena de tokens «pensando», y esos tokens también se pagan y también ocupan contexto.
+
+| Tipo | Qué hace bien | Cuándo conviene | Coste típico |
+|---|---|---|---|
+| **Base** | Continuar texto, ser punto de partida para fine-tuning | Investigación, fine-tuning propio | Bajo |
+| **Instruct / chat** | Seguir instrucciones, conversar, usar herramientas | La mayoría de aplicaciones, incluidos RAG y agentes | Medio |
+| **Razonamiento** | Problemas de varios pasos (cálculo, código, planificación) | Tareas difíciles donde la precisión pesa más que la latencia | Alto: muchos tokens de salida |
+
+::: {.callout-warning}
+## Por qué un LLM «se inventa» cosas
+
+El modelo se entrena para producir la continuación **más plausible**, no la más verdadera. Cuando no sabe algo, no tiene un mecanismo interno que le avise: sigue generando texto verosímil. Los modelos instruct reducen el problema, pero no lo eliminan. Por eso en el módulo verás técnicas para anclar las respuestas en documentos reales (RAG, Bloque 3) y para medir las alucinaciones ([Bloque 4](../bloque4/04b-alucinaciones.qmd)).
+:::
+
+### Un LLM no es determinista, ni siquiera con temperatura 0 {#sec-determinismo}
+
+Con temperatura 0 el modelo elige siempre el token más probable, así que cabría esperar la misma respuesta en cada ejecución. En la práctica **puede variar** de una llamada a otra, porque:
+
+- Las operaciones en coma flotante sobre GPU no siempre se ejecutan en el mismo orden, y sumar en distinto orden da resultados ligeramente distintos. Si dos tokens tienen una probabilidad casi idéntica, un cambio minúsculo basta para que gane el otro.
+- Los servidores agrupan peticiones de varios usuarios, y cómo se agrupan puede cambiar el cálculo.
+- Algunos modelos (los de tipo *mixture of experts*) enrutan cada token a expertos distintos según el lote.
+
+Consecuencia práctica: si tu aplicación necesita resultados reproducibles, **no te bases en que el modelo repita palabra por palabra**. Valida la salida (por ejemplo, con un esquema JSON), guarda la respuesta que usaste y, al evaluar, repite la medición varias veces.
+
+### Tokens, dinero y memoria {#sec-tokens-coste-memoria}
+
+Los tokens son la unidad de cobro y también la de memoria. Veamos las dos cuentas.
+
+**Cuánto cuesta.** Las APIs cobran aparte los tokens de entrada (el prompt) y los de salida (la respuesta), normalmente por millón de tokens, y la salida suele costar varias veces más que la entrada. El siguiente cálculo usa **precios inventados**; sustitúyelos por los de tu proveedor.
+
+```{python}
+#| echo: true
+#| eval: true
+
+# Precios ILUSTRATIVOS (euros por millón de tokens): cámbialos por los de tu proveedor
+PRECIO_ENTRADA = 0.50
+PRECIO_SALIDA = 2.00
+
+tokens_entrada = 2_000      # un prompt con instrucciones + contexto recuperado
+tokens_salida = 500         # la respuesta
+peticiones_dia = 10_000
+
+coste_peticion = (tokens_entrada * PRECIO_ENTRADA + tokens_salida * PRECIO_SALIDA) / 1_000_000
+print(f"Coste por petición: {coste_peticion * 1000:.2f} milésimas de euro")
+print(f"Coste mensual ({peticiones_dia:,} peticiones/día): {coste_peticion * peticiones_dia * 30:,.0f} €")
+
+# ¿Qué pasa si el contexto recuperado se duplica?
+coste_doble = ((tokens_entrada * 2) * PRECIO_ENTRADA + tokens_salida * PRECIO_SALIDA) / 1_000_000
+print(f"Duplicando el contexto: {coste_doble * peticiones_dia * 30:,.0f} € al mes")
+```
+
+Cambia `tokens_entrada` y observa. Esa es una de las razones por las que en RAG importa recuperar **pocos fragmentos buenos** y no muchos fragmentos mediocres.
+
+**Cuánta memoria ocupa.** Durante la generación el modelo guarda las claves y valores de todos los tokens anteriores (la *caché KV* que vimos en [01a](01a-transformer.qmd#sec-entrenamiento-inferencia)). Se puede calcular a partir de la configuración del modelo, sin descargar los pesos:
+
+```{python}
+#| echo: true
+#| eval: true
+
+from transformers import AutoConfig
+
+def kv_cache_por_token(nombre, bytes_por_valor=2):          # 2 bytes = float16
+    c = AutoConfig.from_pretrained(nombre)
+    head_dim = getattr(c, "head_dim", None) or c.hidden_size // c.num_attention_heads
+    return 2 * c.num_hidden_layers * c.num_key_value_heads * head_dim * bytes_por_valor, c
+
+for nombre in ["Qwen/Qwen2.5-0.5B", "Qwen/Qwen3-0.6B"]:
+    por_token, c = kv_cache_por_token(nombre)
+    print(f"{nombre}: {c.num_attention_heads} cabezas de consulta, {c.num_key_value_heads} de K/V")
+    print(f"   {por_token / 1024:.0f} KiB por token  →  {por_token * 32_768 / 1e9:.1f} GB con 32k tokens "
+          f"· {por_token * 131_072 / 1e9:.1f} GB con 128k tokens (por conversación)")
+```
+
+Dos modelos de tamaño parecido necesitan cantidades muy distintas de memoria para el mismo contexto. La diferencia viene sobre todo de cuántas cabezas K/V comparten (la GQA de la que hablamos en 01a). Y la cifra es **por conversación**: un servidor con muchos usuarios simultáneos multiplica esa memoria. Por eso «una ventana de 128k» no significa que sea gratis usarla.
+
 ### Más allá del texto: el LLM como modelo generativo {#sec-llm-generativo}
 
 Un LLM no es más que un modelo que aprende una distribución de probabilidad $P(\text{token} \mid \text{contexto})$ y muestrea de ella. Esta misma idea —aprender la distribución subyacente de los datos y generar nuevas muestras— es el principio unificador de todos los modelos generativos:
@@ -371,7 +569,7 @@ No todos los modelos "abiertos" lo son realmente. Existe una distinción clave e
 
 | Tipo | Acceso a pesos | Ejemplos | Licencia típica |
 |---|---|---|---|
-| **Privado** | Solo API (nunca ves los pesos) | GPT-4o, Claude 4, Gemini 2.5 | Términos de servicio |
+| **Privado** | Solo API (nunca ves los pesos) | Familias GPT-4o, Claude y Gemini (las versiones cambian con frecuencia) | Términos de servicio |
 | **Open-weight** | Pesos descargables, pero con restricciones de uso | Qwen 3.6, Gemma 4, Llama 3.3, DeepSeek R1 | Licencia específica (Llama 2 Community, Gemma ToS, DeepSeek License) |
 | **Open-source** | Pesos + código fuente + datos de entrenamiento | OLMo 2, Pythia, Bloom, Falcon | OSI-approved (Apache 2.0, MIT) |
 
@@ -418,7 +616,7 @@ llm = ChatOpenAI(
     model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),   # Modelo principal del curso
     max_tokens=2048,
     base_url=os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1"),
-    api_key="<API_KEY>"
+    api_key=os.getenv("LLM_API_KEY")
 )
 
 resp = llm.invoke("Explica qué es un Transformer en 3 frases")
@@ -436,7 +634,7 @@ print(resp.content)
 import requests
 
 r = requests.get("https://llamus.cs.us.es/api/v1/models",
-                  headers={"Authorization": "Bearer <API_KEY>"})
+                  headers={"Authorization": f"Bearer {os.getenv('LLM_API_KEY')}"})
 models = r.json()
 for m in models["data"]:
     print(f"  • {m['id']}")
@@ -452,6 +650,26 @@ for m in models["data"]:
 - **Modelos actualizados:** Qwen 3.6, Gemma 4, Llama 3.3, DeepSeek...
 - **OpenAI-compatible:** mismo código que con cualquier API comercial
 - **Gratuito para alumnos de la US** con tu API key institucional
+:::
+
+## Comprueba lo aprendido {#sec-comprueba-01b}
+
+Intenta responder antes de abrir la solución.
+
+::: {.callout-note collapse="true" title="1. Un colega dice: «con temperatura 0 mi chatbot siempre responderá igual». ¿Qué le contestas?"}
+Que no está garantizado. Con temperatura 0 se elige el token más probable, pero las operaciones en GPU, el agrupamiento de peticiones y otros detalles de implementación pueden cambiar ligeramente las probabilidades, y entonces un token distinto puede ganar. Para reproducibilidad hay que validar la salida y guardar las respuestas, no confiar en que se repitan.
+:::
+
+::: {.callout-note collapse="true" title="2. Tu prompt en español gasta más tokens que su traducción al inglés. ¿Por qué, y qué implica?"}
+Porque el vocabulario del tokenizador se construye a partir de los datos de entrenamiento, y los idiomas menos representados se trocean en piezas más pequeñas. Implica más coste por petición, menos texto útil dentro de la misma ventana de contexto y, a veces, peor rendimiento. El recargo depende del tokenizador (en el Experimento 2 era mayor con GPT-2 que con Qwen2.5).
+:::
+
+::: {.callout-note collapse="true" title="3. Tienes un servicio con 100 usuarios simultáneos y contexto de 32k tokens. ¿Por qué la memoria de la GPU puede ser el cuello de botella aunque el modelo quepa de sobra?"}
+Porque cada conversación necesita su propia caché KV, y crece con la longitud del contexto. Si cada conversación ocupa varios GB, 100 conversaciones pueden superar con creces el tamaño del propio modelo. Modelos con menos cabezas K/V (GQA) reducen este problema.
+:::
+
+::: {.callout-note collapse="true" title="4. ¿Qué diferencia hay entre un modelo base y uno instruct, y cuál usarías para un asistente de atención al cliente?"}
+El base solo continúa texto; el instruct se ha entrenado además para seguir instrucciones y conversar con una plantilla de roles. Para un asistente usarías un instruct, a menos que quieras partir de un base para hacer tu propio fine-tuning.
 :::
 
 ---

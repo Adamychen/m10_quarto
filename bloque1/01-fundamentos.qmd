@@ -7,13 +7,13 @@ engine: jupyter
 
 > **Competencias asociadas:** [CE-1](../index.qmd#sec-competencias-especificas)
 >
-> **Dependencias:** `torch`, `transformers`, `sentence-transformers`, `chromadb`, `faiss-cpu`, `matplotlib`, `scikit-learn`, `numpy`
+> **Dependencias:** `torch`, `transformers`, `sentence-transformers`, `chromadb`, `faiss-cpu`, `langchain-text-splitters`, `matplotlib`, `scikit-learn`, `numpy`
 
 > **Orientación previa:** comienza por el [panorama histórico: del texto a los embeddings](00-panorama.qmd). Es una introducción conceptual que no sustituye los temas técnicos de este bloque.
 
 ::: {.callout-tip}
 ## Ejecución en Colab
-Todas las celdas de código están diseñadas para ejecutarse en Google Colab con GPU T4 gratuita (12 GB RAM).
+Todas las celdas de código están diseñadas para ejecutarse en Google Colab con GPU T4 gratuita (16 GB de VRAM y 12 GB de RAM).
 
 1. Haz clic en el badge "Open in Colab" de arriba
 2. Si es la primera vez, autoriza Colab en GitHub: **Settings → GitHub → Connect to GitHub**
@@ -53,11 +53,9 @@ flowchart TD
         P0 --> C
         A[01a<br/>Transformer<br/>+ atención + posicional]:::input --> B[01b<br/>LLM e inferencia<br/>+ tokenización BPE]:::proc
         A --> C[01c<br/>Embeddings<br/>+ espacio geométrico]:::doc
-        A --> E2[01e<br/>Salidas y objetivos<br/>LM · Value · Reward · SFT]:::obs
-        B --> E2
         C --> D[01d<br/>Bases de datos<br/>vectoriales]:::doc
-        D --> F["HPD 1<br/>Pipeline de embeddings<br/>y búsqueda semántica"]:::out
-        E2 --> F
+        D --> E2[01e<br/>De documentos a<br/>recuperación]:::obs
+        E2 --> F["HPD 1<br/>Pipeline de embeddings<br/>y búsqueda semántica"]:::out
     end
     D --> G["RAG avanzado<br/>(Bloque 3)"]:::out
     F --> H["Proyecto<br/>integrador"]:::out
@@ -70,7 +68,7 @@ flowchart TD
 ```
 :::
 
-Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos con la arquitectura Transformer (atención, codificación posicional, variantes), pasamos a los LLM y la inferencia (incluyendo una profundización en tokenización BPE), continuamos con la representación vectorial del lenguaje (embeddings y su geometría) y terminamos con las bases de datos vectoriales que permiten búsqueda semántica eficiente. La página 01e complementa este recorrido mostrando cómo un mismo backbone puede producir distintas salidas y cómo SFT, PPO y DPO modifican el entrenamiento según la tarea.
+Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos con la arquitectura Transformer (atención, codificación posicional, variantes), pasamos a los LLM y la inferencia (incluyendo una profundización en tokenización BPE), continuamos con la representación vectorial del lenguaje (embeddings y su geometría) y continuamos con las bases de datos vectoriales que permiten búsqueda semántica eficiente y terminamos con el paso que convierte todo lo anterior en un sistema que funciona: trocear documentos, combinar búsqueda léxica y semántica y medir la calidad de la recuperación (01e). Las páginas 01c, 01d y 01e comparten un mismo caso conductor, el buscador de preguntas frecuentes de un banco, para que puedas comparar técnicas sobre los mismos datos.
 
 El [panorama histórico](00-panorama.qmd) añade una perspectiva distinta a esta secuencia técnica. Allí se sigue la línea one-hot → TF-IDF → word2vec/GloVe → representaciones contextuales → SBERT/E5 → RAG, mientras que las páginas técnicas explican en detalle la línea RNN/LSTM → Transformer → LLM → herramientas y agentes. Mantener ambas líneas evita presentar los embeddings como una consecuencia exclusiva de los LLM: los embeddings de palabras son anteriores al Transformer, pero los embeddings contextuales y de frases modernos aprovechan esta arquitectura.
 
@@ -85,20 +83,20 @@ La siguiente tabla muestra el itinerario que sigue este bloque en su exposición
 | **Panorama histórico** — De one-hot y TF-IDF a embeddings contextuales, búsqueda semántica y RAG | [00-panorama.qmd](00-panorama.qmd) |
 | **Transformers** — Pipeline intuitiva, atención, codificación posicional, variantes | [01a-transformer.qmd](01a-transformer.qmd) |
 | **LLM e inferencia** — Preentrenamiento, BPE paso a paso, parámetros, HF Hub, API Llamus | [01b-llms.qmd](01b-llms.qmd) |
-| **Embeddings** — word2vec, SBERT, espacio geométrico, anisotropía y whitening | [01c-embeddings.qmd](01c-embeddings.qmd) |
+| **Embeddings** — word2vec, representaciones contextuales, SBERT y espacio geométrico | [01c-embeddings.qmd](01c-embeddings.qmd) |
 | **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica | [01d-vectordb.qmd](01d-vectordb.qmd) |
-| **Salidas y objetivos de entrenamiento** — LM, value, reward, SFT, PPO y DPO (lectura recomendada) | [01e-llm-por-dentro.qmd](01e-llm-por-dentro.qmd) |
+| **De documentos a recuperación** — Chunking, BM25, búsqueda híbrida (RRF), hit@k, recall@k y MRR | [01e-recuperacion.qmd](01e-recuperacion.qmd) |
 | **HPD 1 — Pipeline de embeddings** | [hpd1-embeddings.qmd](hpd1-embeddings.qmd) |
 
 ::: {.callout-note}
-**Teoría obligatoria.** Los temas 01a-01d son obligatorios. La página 01e es lectura recomendada (no obligatoria) y entra en evaluación conceptual integrada en el proyecto final, no en un examen separado.
+**Teoría obligatoria.** Los temas 01a-01e son obligatorios. Cada página termina con una sección *Comprueba lo aprendido*: preguntas con la respuesta plegada para que te autoevalúes. Las secciones marcadas como *Nivel avanzado* son opcionales en una primera lectura. La lectura recomendada sobre cabezas de salida, SFT, PPO y DPO se ha movido al [Bloque 3, como previo a fine-tuning](../bloque3/03c-previo-cabezas.qmd).
 :::
 
 ```{python}
 #| echo: true
 #| eval: false
 
-!pip install -q chromadb faiss-cpu sentence-transformers
+!pip install -q chromadb faiss-cpu sentence-transformers langchain-text-splitters
 
 
 ```
@@ -174,7 +172,7 @@ Tras haber asimilado los conceptos de las secciones anteriores, puedes pasar al 
 ::: {.callout-note}
 ## Antes de continuar
 
-1. Asegúrate de haber ejecutado `source .venv/bin/activate` (o `setup.bat` en Windows)
+1. Asegúrate de tener un entorno Python 3.11+ con las dependencias de `requirements.txt` instaladas
 2. Confirma que ejecutaste todas las celdas de código de los sub-temas sin errores
 3. Lee Vaswani et al. [-@vaswani2017attention] secciones 3-5 (lectura obligatoria)
 :::

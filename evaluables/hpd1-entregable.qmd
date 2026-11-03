@@ -18,24 +18,20 @@ engine: jupyter
 Cada ejercicio pide que asignes el resultado a una variable con un nombre concreto
 (`eval1_estrategia`, `eval2_recall`, `eval3_busqueda`, `eval4_justificacion`).
 El script de corrección ejecutará tu notebook e inspeccionará esas variables.
-
-Además, la variable `CAMINO` debe estar definida al inicio del notebook.
 :::
 
-```{python}
-#| echo: true
-#| eval: true
-
-CAMINO = "A"  # Cambiar a "B" o "C" según tu elección
-```
-
 ## Setup
+
+::: {.callout-tip icon=false}
+## Tiempo de ejecución en Colab
+Codificar los 5551 chunks del ejercicio 2 tarda unos **6-7 minutos** en una CPU de Colab y unos **9 segundos** con la GPU T4 gratuita (ambos tiempos medidos). Antes de empezar, activa la GPU en *Entorno de ejecución → Cambiar tipo de entorno de ejecución → GPU T4*. Colab no garantiza GPU libre en todo momento; si no te la da, el cuaderno funciona igual con CPU, solo que esa celda tarda más. Los resultados (recall@k) son los mismos con CPU y con GPU.
+:::
 
 ```{python}
 #| echo: true
 #| eval: false
 
-!pip install -q chromadb sentence-transformers fpdf2 matplotlib pandas langchain langchain-community langchain-text-splitters pypdf python-dotenv datasets
+!pip install -q chromadb==1.5.9 sentence-transformers==5.5.1 fpdf2==2.8.7 matplotlib "pandas<3" langchain==1.3.2 langchain-community==0.3.31 langchain-text-splitters==1.1.2 pypdf==6.12.2 python-dotenv==1.2.2 datasets==4.8.5 langchain-core==1.4.0 langgraph==1.2.2 openai==2.38.0
 ```
 
 ```{python}
@@ -55,7 +51,6 @@ Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").
 """
 
 import os
-
 
 def _load_llm_api_key():
     try:
@@ -78,7 +73,6 @@ def _load_llm_api_key():
         except ImportError:
             pass
 
-
 _load_llm_api_key()
 
 if os.getenv("LLM_API_KEY"):
@@ -87,7 +81,6 @@ else:
     print("⚠️  LLM_API_KEY no encontrada.")
     print("    • Local: crea un archivo .env con LLM_API_KEY=tu_clave")
     print("    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'")
-
 
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 import warnings
@@ -152,60 +145,68 @@ def crear_pdf(nombre: str, titulo: str, contenido: str) -> None:
 print("Helper PDF listo.")
 ```
 
-::: {.panel-tabset}
-
-## Camino A — Finanzas
+## Ejercicios — contexto financiero
 
 **Contexto:** Trabajas como Data Scientist en una consultora financiera. Tu cliente te pide un sistema de búsqueda semántica sobre documentación financiera real del benchmark FIQA (Financial Question Answering), un benchmark del ecosistema BEIR. El sistema debe permitir a los analistas buscar información por concepto, no por palabra clave.
 
-### Corpus — Documentos financieros reales (FIQA)
+::: {.callout-note icon=false}
+## Anotaciones incompletas
+
+Las relevancias de FiQA son **incompletas**: un documento que responde bien a una consulta pero que no aparece en el ground truth cuenta como **fallo** en recall@k. Ten esta limitación presente al interpretar las métricas.
+:::
 
 ```{python}
 #| echo: true
 
-if CAMINO == "A":
-    from datasets import load_dataset
+import random
 
-    fiqa_corpus = load_dataset("BeIR/fiqa", "corpus", split="corpus")
-    fiqa_queries = load_dataset("BeIR/fiqa", "queries", split="queries")
-    fiqa_qrels = load_dataset("BeIR/fiqa-qrels", split="train")
+# ------------------------------------------------------------------ Muestreo FiQA (estilo BEIR)
+N_QUERIES = 50       # consultas de evaluación (cada una con al menos 1 documento relevante)
+N_DOCS_TOTAL = 1500  # tamaño aproximado del corpus: relevantes + distractores aleatorios
+SEED = 42            # semilla fija: el mismo muestreo en cada ejecución
 
-    # Filtrar corpus a documentos que tengan qrels (ground truth real)
-    qrel_cids = {str(cid) for cid in fiqa_qrels["corpus-id"]}
-    fiqa_filtered = fiqa_corpus.filter(lambda x: x["_id"] in qrel_cids)
-    fiqa_subset = fiqa_filtered.select(range(30))
-    print(f"FIQA corpus cargado: {len(fiqa_subset)} documentos financieros reales con qrels")
+rng = random.Random(SEED)
 
-    docs_a = []
-    for doc in fiqa_subset:
-        docs_a.append(Document(
-            page_content=doc["text"],
-            metadata={"source": f"fiqa_{doc['_id']}.txt", "fiqa_id": doc["_id"]}
-        ))
+# Qrels del split test (BeIR/fiqa-qrels tiene train, validation y test)
+fiqa_qrels = load_dataset("BeIR/fiqa-qrels", split="test")
+relevantes_por_query = {}
+for row in fiqa_qrels:
+    if row["score"] > 0:
+        relevantes_por_query.setdefault(str(row["query-id"]), set()).add(str(row["corpus-id"]))
+print(f"Consultas de test con al menos 1 documento relevante: {len(relevantes_por_query)}")
 
-    subset_ids = {int(doc["_id"]) for doc in fiqa_subset}
-    qid_to_corpus_ids = {}
-    for qrel in fiqa_qrels:
-        if qrel["corpus-id"] in subset_ids:
-            qid = str(qrel["query-id"])
-            if qid not in qid_to_corpus_ids:
-                qid_to_corpus_ids[qid] = []
-            qid_to_corpus_ids[qid].append(str(qrel["corpus-id"]))
+# 1) Consultas: N_QUERIES al azar (semilla fija)
+qids_muestra = rng.sample(sorted(relevantes_por_query, key=int), N_QUERIES)
 
-    selected_qids = list(qid_to_corpus_ids.keys())[:5]
-    queries_map = {}
-    for q in fiqa_queries:
-        if q["_id"] in selected_qids:
-            queries_map[q["_id"]] = q["text"]
+# 2) Documentos relevantes de esas consultas: todos
+rel_ids = set()
+for qid in qids_muestra:
+    rel_ids |= relevantes_por_query[qid]
 
-    gt_a_raw = {}
-    for qid in selected_qids:
-        gt_a_raw[queries_map[qid]] = qid_to_corpus_ids[qid]
+# 3) Distractores aleatorios hasta N_DOCS_TOTAL
+fiqa_corpus = load_dataset("BeIR/fiqa", "corpus", split="corpus")
+textos_corpus = dict(zip(fiqa_corpus["_id"], fiqa_corpus["text"]))
+assert rel_ids <= textos_corpus.keys(), "Hay qrels que apuntan a documentos fuera del corpus"
+candidatos = [i for i, txt in textos_corpus.items() if i not in rel_ids and txt.strip()]
+distractores = rng.sample(candidatos, N_DOCS_TOTAL - len(rel_ids))
+docs_ids = sorted(rel_ids | set(distractores), key=int)
 
-    print(f"Queries de evaluación: {len(selected_qids)}")
-    print(f"Documentos en corpus: {len(docs_a)}")
-else:
-    print("Camino A no seleccionado — saltando generación.")
+# Consultas y ground truth restringidos a la muestra
+fiqa_queries = load_dataset("BeIR/fiqa", "queries", split="queries")
+qids_set = set(qids_muestra)
+queries_map = {q["_id"]: q["text"] for q in fiqa_queries if q["_id"] in qids_set}
+consultas_a = [(qid, queries_map[qid]) for qid in qids_muestra]    # lista de (qid, texto)
+gt_a = {qid: relevantes_por_query[qid] for qid in qids_muestra}   # qid -> ids de documentos relevantes
+
+docs_a = [
+    Document(page_content=textos_corpus[i], metadata={"source": f"fiqa_{i}.txt", "fiqa_id": i})
+    for i in docs_ids
+]
+
+pares = sum(len(v) for v in gt_a.values())
+print(f"Consultas de evaluación: {len(consultas_a)}")
+print(f"Documentos en corpus: {len(docs_a)} ({len(rel_ids)} relevantes + {len(distractores)} distractores)")
+print(f"Pares consulta-documento relevante: {pares} (media {pares / len(gt_a):.2f} por consulta)")
 ```
 
 #### Ejercicio 1 — Estrategia de chunking (2 ptos) {#sec-hpd1-e1-a}
@@ -221,586 +222,229 @@ Asigna tu respuesta a `eval1_estrategia`.
 ```{python}
 #| echo: true
 
-if CAMINO == "A":
-    eval1_estrategia = """Escribir aquí la justificación. Por ejemplo:
+# TODO: sustituye el texto de la plantilla por tu justificación (ejercicio 1).
+eval1_estrategia = """TODO: escribe aquí tu justificación (unas 100-200 palabras).
 
-    Elijo chunking por tamaño fijo con RecursiveCharacterTextSplitter (chunk_size=300, overlap=50)
-    porque los documentos financieros de FIQA contienen párrafos densos con múltiples métricas. El
-    solapamiento asegura que magnitudes concretas no se pierdan en los cortes entre chunks. La
-    estrategia por párrafos no es adecuada porque los párrafos de FIQA varían en longitud y pueden
-    mezclar varios conceptos en uno solo."""
-    print("✅ eval1_estrategia asignada.")
-else:
-    eval1_estrategia = None
+Preguntas que conviene responder: ¿qué pasa con un párrafo de FiQA que mezcla varios conceptos?
+¿Qué ocurre con una cifra si el corte cae justo en medio de la frase? ¿Qué parámetros usas en el
+ejercicio 2 y cómo afectan al tamaño de los chunks?"""
+print("✅ eval1_estrategia asignada.")
 ```
 
 #### Ejercicio 2 — Indexación y recall@k (2.5 ptos) {#sec-hpd1-e2-a}
 
-Genera los embeddings de los documentos FIQA, construye la colección en Chroma y evalúa con recall@k usando el ground truth derivado de las anotaciones reales del benchmark.
+Genera los embeddings de los chunks de los documentos FIQA muestreados, construye la colección en Chroma y evalúa **recall@k** sobre las 50 consultas usando el ground truth de las anotaciones reales del benchmark.
+
+Convención de la métrica: `k` es el número de chunks recuperados y el recall se calcula **a nivel de documento**, es decir, qué fracción de los documentos relevantes de cada consulta aparece entre los documentos de los `k` primeros chunks. Promedia sobre las consultas. El resultado queda en `eval2_recall`.
 
 ```{python}
 #| echo: true
 
-if CAMINO == "A":
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=CHUNK_SIZE,
-        chunk_overlap=CHUNK_OVERLAP,
-        separators=["\n\n", "\n", ". ", " ", ""]
+import time
+
+splitter = RecursiveCharacterTextSplitter(
+    chunk_size=CHUNK_SIZE,
+    chunk_overlap=CHUNK_OVERLAP,
+    separators=["\n\n", "\n", ". ", " ", ""]
+)
+chunks_a = splitter.split_documents(docs_a)
+print(f"Chunks generados: {len(chunks_a)}")
+
+# HNSW con ef más alto: el índice aproximado da resultados estables y muy próximos a la búsqueda exacta
+collection_a = client.get_or_create_collection(
+    name="hpd1_finanzas",
+    metadata={"hnsw:space": "cosine", "hnsw:construction_ef": 200, "hnsw:search_ef": 200, "hnsw:M": 32}
+)
+
+# Embeddings en lote (mucho más rápido que codificar chunk a chunk)
+t0 = time.perf_counter()
+ids_chunks = [f"fin_{i:05d}" for i in range(len(chunks_a))]
+embeddings_chunks = model.encode(
+    ["passage: " + c.page_content for c in chunks_a],
+    normalize_embeddings=True, batch_size=32, show_progress_bar=False,
+).tolist()
+t_emb = time.perf_counter() - t0
+
+for ini in range(0, len(chunks_a), 1000):
+    fin = ini + 1000
+    collection_a.add(
+        ids=ids_chunks[ini:fin],
+        embeddings=embeddings_chunks[ini:fin],
+        documents=[c.page_content for c in chunks_a[ini:fin]],
+        metadatas=[{"fiqa_id": c.metadata["fiqa_id"], "idx": ini + j}
+                   for j, c in enumerate(chunks_a[ini:fin])],
     )
-    chunks_a = splitter.split_documents(docs_a)
-    print(f"Chunks generados: {len(chunks_a)}")
+print(f"Indexación completada: {collection_a.count()} vectores ({t_emb:.1f} s generando embeddings)")
 
-    collection_a = client.get_or_create_collection(
-        name="hpd1_finanzas",
-        metadata={"hnsw:space": "cosine"}
-    )
+def buscar(collection, query, k=5):
+    qe = model.encode("query: " + query, normalize_embeddings=True).tolist()
+    return collection.query(query_embeddings=[qe], n_results=k)
 
-    fiqa_to_chunk_ids = {}
-    for i, chunk in enumerate(chunks_a):
-        embedding = model.encode(chunk.page_content).tolist()
-        fiqa_id = chunk.metadata.get("fiqa_id", "")
-        cid = f"fin_{i:04d}"
-        collection_a.add(
-            ids=[cid],
-            embeddings=[embedding],
-            documents=[chunk.page_content],
-            metadatas=[{"fiqa_id": fiqa_id, "idx": i}]
-        )
-        if fiqa_id not in fiqa_to_chunk_ids:
-            fiqa_to_chunk_ids[fiqa_id] = []
-        fiqa_to_chunk_ids[fiqa_id].append(cid)
-    print(f"Indexación completada: {collection_a.count()} vectores")
+def recall_at_k(metadatas, relevantes, k):
+    """Recall a nivel de documento: fracción de documentos relevantes presentes
+    entre los fiqa_id de los k primeros chunks recuperados."""
+    docs_top_k = {m["fiqa_id"] for m in metadatas[:k]}
+    return len(docs_top_k & relevantes) / len(relevantes)
 
-    gt_a = {}
-    for q_text, corpus_ids in gt_a_raw.items():
-        chunk_ids = []
-        for cid in corpus_ids:
-            chunk_ids.extend(fiqa_to_chunk_ids.get(cid, []))
-        gt_a[q_text] = chunk_ids
-    print(f"Ground truth construido: {len(gt_a)} queries con anotaciones reales de FIQA")
+KS = [1, 3, 5, 10]
+busquedas = {qid: buscar(collection_a, q, k=max(KS)) for qid, q in consultas_a}
 
-    def recall_at_k(retrieved_ids, relevant_ids, k):
-        if len(relevant_ids) == 0:
-            return 0.0
-        top_k = retrieved_ids[:k]
-        hits = sum(1 for rid in relevant_ids if rid in top_k)
-        return hits / len(relevant_ids)
+eval2_recall = {}
+for k in KS:
+    recalls = [recall_at_k(busquedas[qid]["metadatas"][0], gt_a[qid], k) for qid, _ in consultas_a]
+    eval2_recall[f"recall@{k}"] = round(float(np.mean(recalls)), 4)
 
-    def buscar(collection, query, k=5):
-        qe = model.encode(query).tolist()
-        return collection.query(query_embeddings=[qe], n_results=k)
-
-    eval2_recall = {}
-    for k in [1, 3, 5]:
-        recalls = []
-        for q, relevantes in gt_a.items():
-            res = buscar(collection_a, q, k=k)
-            retrieved = res["ids"][0]
-            r = recall_at_k(retrieved, relevantes, k)
-            recalls.append(r)
-        eval2_recall[f"recall@{k}"] = round(np.mean(recalls), 4)
-
-    print("📊 recall@k sobre FIQA corpus (ground truth real):")
-    for k_str, v in eval2_recall.items():
-        print(f"   {k_str}: {v:.4f}")
-else:
-    eval2_recall = None
+print(f"📊 recall@k sobre {len(consultas_a)} consultas FIQA (ground truth real, nivel documento):")
+for k_str, v in eval2_recall.items():
+    print(f"   {k_str}: {v:.4f}")
 ```
 
 #### Ejercicio 3 — Búsqueda semántica (1.5 ptos) {#sec-hpd1-e3-a}
 
-Ejecuta 3 consultas de búsqueda semántica sobre el corpus FIQA y muestra los resultados (top-3 chunks con su distancia coseno). Las consultas son preguntas reales del benchmark.
+Ejecuta 3 consultas de búsqueda semántica sobre el corpus FIQA y muestra los resultados (top-3 chunks con su distancia coseno). Las consultas son preguntas reales del benchmark (las tres primeras de la muestra).
 
 Asigna los resultados (lista de diccionarios con query, top-3 chunks y distancias) a `eval3_busqueda`.
 
 ```{python}
 #| echo: true
 
-if CAMINO == "A":
-    consultas_a = list(gt_a.keys())[:3]
+consultas_ej3 = [q for _, q in consultas_a[:3]]
 
-    eval3_busqueda = []
-    for q in consultas_a:
-        res = buscar(collection_a, q, k=3)
-        resultados = []
-        for i in range(len(res["ids"][0])):
-            resultados.append({
-                "id": res["ids"][0][i],
-                "distancia": round(res["distances"][0][i], 4),
-                "texto": res["documents"][0][i][:200],
-                "fuente": res["metadatas"][0][i].get("fiqa_id", ""),
-            })
-        eval3_busqueda.append({"query": q, "resultados": resultados})
+eval3_busqueda = []
+for q in consultas_ej3:
+    res = buscar(collection_a, q, k=3)
+    resultados = []
+    for i in range(len(res["ids"][0])):
+        resultados.append({
+            "id": res["ids"][0][i],
+            "distancia": round(res["distances"][0][i], 4),
+            "texto": res["documents"][0][i][:200],
+            "fuente": res["metadatas"][0][i].get("fiqa_id", ""),
+        })
+    eval3_busqueda.append({"query": q, "resultados": resultados})
 
-    for r in eval3_busqueda:
-        print(f"\n🔍 {r['query']}")
-        for res in r["resultados"]:
-            print(f"   [{res['distancia']:.4f}] {res['texto'][:100]}...")
-    print("\n✅ eval3_busqueda asignada.")
-else:
-    eval3_busqueda = None
+for r in eval3_busqueda:
+    print(f"\n🔍 {r['query']}")
+    for res in r["resultados"]:
+        print(f"   [{res['distancia']:.4f}] {res['texto'][:100]}...")
+print("\n✅ eval3_busqueda asignada.")
+```
+
+Función auxiliar — ya escrita, no es parte de tu solución. La usarás en el ejercicio 4.
+
+```{python}
+#| echo: true
+
+# ------------------------------------------------------------------ Función auxiliar (YA PROPORCIONADA)
+def evaluar_modelo_alternativo(model_id, prefijo_consulta="", prefijo_doc="", emb_chunks=None):
+    """Evalúa otro modelo de embeddings sobre EXACTAMENTE los mismos chunks, consultas y
+    ground truth que los ejercicios 2 y 3, con búsqueda exacta por coseno (numpy, sin Chroma).
+
+    Devuelve una tupla (medias, r10_por_consulta):
+      - medias: {"recall@1": ..., "recall@3": ..., "recall@5": ..., "recall@10": ...}
+                recall a nivel de documento, promediado sobre las consultas.
+      - r10_por_consulta: lista con el recall@10 de cada consulta (mismo orden que consultas_a).
+
+    Si ya tienes los embeddings de los chunks de ese modelo, pásalos en emb_chunks y no se
+    vuelven a calcular (en una CPU, codificar los chunks es lo que más tarda).
+    """
+    modelo = SentenceTransformer(model_id)
+    if emb_chunks is None:
+        C = modelo.encode([prefijo_doc + c.page_content for c in chunks_a],
+                          normalize_embeddings=True, batch_size=32, show_progress_bar=False)
+    else:
+        C = np.asarray(emb_chunks)
+    Q = modelo.encode([prefijo_consulta + q for _, q in consultas_a],
+                      normalize_embeddings=True, batch_size=32, show_progress_bar=False)
+    fiqa_ids = [c.metadata["fiqa_id"] for c in chunks_a]
+
+    S = Q @ C.T                                   # similitud coseno (vectores ya normalizados)
+    top = np.argsort(-S, axis=1)[:, :10]          # los 10 chunks más parecidos, de mayor a menor
+
+    KS = [1, 3, 5, 10]
+    recalls = {k: [] for k in KS}
+    for fila, (qid, _) in enumerate(consultas_a):
+        rel = gt_a[qid]
+        for k in KS:
+            docs_top_k = {fiqa_ids[i] for i in top[fila, :k]}
+            recalls[k].append(len(docs_top_k & rel) / len(rel))
+
+    medias = {f"recall@{k}": round(float(np.mean(recalls[k])), 4) for k in KS}
+    return medias, recalls[10]
+
+print("✅ Función evaluar_modelo_alternativo lista.")
 ```
 
 #### Ejercicio 4 — Justificación del modelo (1.5 ptos) {#sec-hpd1-e4-a}
 
-Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de MTEB para las tareas BIOSSES y STS12, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica sobre un corpus financiero real como FIQA.
+Tu cliente pregunta: **¿es `intfloat/e5-small-v2` una elección defendible para este buscador, frente a un modelo entrenado para otra tarea?**
+
+Para responderlo, compara e5-small-v2 con `sentence-transformers/paraphrase-MiniLM-L6-v2`. Es un modelo pequeño que se entrenó para detectar **paráfrasis** (dos frases que dicen lo mismo), no para encontrar documentos que respondan a una pregunta. Compáralos **sobre la misma muestra** del ejercicio 2: los mismos chunks, las mismas 50 consultas y el mismo ground truth. La función `evaluar_modelo_alternativo` ya hace el trabajo de embeber y medir; tú la llamas y analizas el resultado.
+
+Tu justificación debe:
+
+1. Llamar a la función con el modelo de paráfrasis (TODO (a) de la celda) y presentar una tabla con `recall@1`, `recall@3`, `recall@5` y `recall@10` de los dos modelos, y el número de consultas en que gana cada uno (TODO (b)).
+2. Basarse en **tus cifras**. La nota de MTEB puede citarse como contexto, pero no sustituye a tu medida.
+3. Explicar con tus palabras por qué las tareas STS no bastan para decidir sobre un buscador (relaciona con la sección 2.6 del taller, «STS no es recuperación»).
+4. Incluir al menos una limitación de tu evaluación y cómo la mitigarías.
+5. Terminar con una conclusión prudente: ¿mantienes e5-small-v2 o cambias de modelo? ¿Qué medirías antes de decidir?
 
 Asigna tu respuesta a `eval4_justificacion`.
 
-```{python}
-#| echo: true
+::: {.callout-note icon=false}
+## Ojo con las conclusiones
 
-if CAMINO == "A":
-    eval4_justificacion = """Escribir aquí la justificación. Por ejemplo:
+Con esta muestra de 50 consultas, **e5-small-v2 no es demostrablemente mejor que all-MiniLM-L6-v2** en recall@10: la diferencia que observes es menor que el ruido de la muestra. En recall@1 sí puede aparecer una ventaja a favor de e5, pero depende de qué consultas caigan en la muestra. No afirmes que un modelo es mejor que otro sin evidencia que lo sostenga.
 
-    e5-small-v2 obtiene un Spearman de 0.894 en BIOSSES (similitud semántica biomédica) y
-    0.774 en STS12 (dominio general). Aunque FIQA es un benchmark financiero, el alto
-    rendimiento en STS12 indica que el modelo captura bien relaciones semánticas en texto
-    narrativo, que es el formato dominante en los documentos de FIQA. Con 33M de parámetros,
-    es eficiente para ejecutarse en local sin GPU, adecuado para un pipeline docente."""
-    print("✅ eval4_justificacion asignada.")
-else:
-    eval4_justificacion = None
-```
-
-## Camino B — Salud
-
-**Contexto:** Trabajas como Data Scientist en un laboratorio de investigación biomédica. Necesitas indexar literatura científica real del benchmark NFCorpus (biomedical information retrieval), un benchmark del ecosistema BEIR. El sistema debe permitir a los investigadores buscar por concepto, no solo por palabras clave.
-
-### Corpus — Documentos biomédicos reales (NFCorpus)
-
-```{python}
-#| echo: true
-
-if CAMINO == "B":
-    from datasets import load_dataset
-
-    nf_corpus = load_dataset("BeIR/nfcorpus", "corpus", split="corpus")
-    nf_queries = load_dataset("BeIR/nfcorpus", "queries", split="queries")
-    nf_qrels = load_dataset("BeIR/nfcorpus-qrels", split="train")
-
-    qrel_cids = set(nf_qrels["corpus-id"])
-    nf_filtered = nf_corpus.filter(lambda x: x["_id"] in qrel_cids)
-    nf_subset = nf_filtered.select(range(30))
-    print(f"NFCorpus cargado: {len(nf_subset)} documentos biomédicos reales con qrels")
-
-    docs_b = []
-    for doc in nf_subset:
-        text = f"Title: {doc['title']}\n\n{doc['text']}"
-        docs_b.append(Document(
-            page_content=text,
-            metadata={"source": f"nf_{doc['_id']}.txt", "nf_id": doc["_id"]}
-        ))
-
-    subset_ids = set(nf_subset["_id"])
-    qid_to_corpus_ids_b = {}
-    for qrel in nf_qrels:
-        if qrel["corpus-id"] in subset_ids:
-            qid = qrel["query-id"]
-            if qid not in qid_to_corpus_ids_b:
-                qid_to_corpus_ids_b[qid] = []
-            qid_to_corpus_ids_b[qid].append(qrel["corpus-id"])
-
-    selected_qids_b = list(qid_to_corpus_ids_b.keys())[:5]
-    queries_map_b = {}
-    for q in nf_queries:
-        if q["_id"] in selected_qids_b:
-            queries_map_b[q["_id"]] = q["text"]
-
-    gt_b_raw = {}
-    for qid in selected_qids_b:
-        gt_b_raw[queries_map_b[qid]] = qid_to_corpus_ids_b[qid]
-
-    print(f"Queries de evaluación: {len(selected_qids_b)}")
-    print(f"Documentos en corpus: {len(docs_b)}")
-else:
-    print("Camino B no seleccionado — saltando generación.")
-
-```
-
-#### Ejercicio 1 — Estrategia de chunking (2 ptos) {#sec-hpd1-e1-b}
-
-Describe qué estrategia de chunking eliges (chunk por párrafos vs. tamaño fijo con solapamiento) y por qué es adecuada para documentos biomédicos reales del benchmark NFCorpus. Justifica tu respuesta en términos de:
-
-- Coherencia semántica de los chunks
-- Capacidad de recuperar información con consultas sobre conceptos específicos (ej. "AUC en detección de nódulos", "eficacia del compuesto", "efectos adversos")
-- Ventajas del solapamiento entre chunks en este dominio
-
-Asigna tu respuesta a `eval1_estrategia`.
-
-```{python}
-#| echo: true
-
-if CAMINO == "B":
-    eval1_estrategia = """Escribir aquí la justificación. Por ejemplo:
-
-    Elijo chunking por tamaño fijo con RecursiveCharacterTextSplitter (chunk_size=300, overlap=50)
-    porque los artículos biomédicos de NFCorpus contienen párrafos densos con múltiples métricas (p-valores,
-    AUC, tamaños muestrales). El solapamiento evita que conceptos clave no se pierdan en los cortes. La
-    estrategia por párrafos no es adecuada porque los párrafos de los artículos científicos varían mucho
-    en longitud y pueden mezclar varios resultados experimentales."""
-    print("✅ eval1_estrategia asignada.")
-else:
-    eval1_estrategia = None
-```
-
-#### Ejercicio 2 — Indexación y recall@k (2.5 ptos) {#sec-hpd1-e2-b}
-
-Genera los embeddings de los documentos NFCorpus, construye la colección en Chroma y evalúa con recall@k usando el ground truth derivado de las anotaciones reales del benchmark.
-
-```{python}
-#| echo: true
-
-if CAMINO == "B":
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=CHUNK_SIZE,
-        chunk_overlap=CHUNK_OVERLAP,
-        separators=["\n\n", "\n", ". ", " ", ""]
-    )
-    chunks_b = splitter.split_documents(docs_b)
-    print(f"Chunks generados: {len(chunks_b)}")
-
-    collection_b = client.get_or_create_collection(
-        name="hpd1_salud",
-        metadata={"hnsw:space": "cosine"}
-    )
-
-    nf_to_chunk_ids = {}
-    for i, chunk in enumerate(chunks_b):
-        embedding = model.encode(chunk.page_content).tolist()
-        nf_id = chunk.metadata.get("nf_id", "")
-        cid = f"sal_{i:04d}"
-        collection_b.add(
-            ids=[cid],
-            embeddings=[embedding],
-            documents=[chunk.page_content],
-            metadatas=[{"nf_id": nf_id, "idx": i}]
-        )
-        if nf_id not in nf_to_chunk_ids:
-            nf_to_chunk_ids[nf_id] = []
-        nf_to_chunk_ids[nf_id].append(cid)
-    print(f"Indexación completada: {collection_b.count()} vectores")
-
-    gt_b = {}
-    for q_text, corpus_ids in gt_b_raw.items():
-        chunk_ids = []
-        for cid in corpus_ids:
-            chunk_ids.extend(nf_to_chunk_ids.get(cid, []))
-        gt_b[q_text] = chunk_ids
-    print(f"Ground truth construido: {len(gt_b)} queries con anotaciones reales de NFCorpus")
-
-    def recall_at_k(retrieved_ids, relevant_ids, k):
-        if len(relevant_ids) == 0:
-            return 0.0
-        top_k = retrieved_ids[:k]
-        hits = sum(1 for rid in relevant_ids if rid in top_k)
-        return hits / len(relevant_ids)
-
-    def buscar(collection, query, k=5):
-        qe = model.encode(query).tolist()
-        return collection.query(query_embeddings=[qe], n_results=k)
-
-    eval2_recall = {}
-    for k in [1, 3, 5]:
-        recalls = []
-        for q, relevantes in gt_b.items():
-            res = buscar(collection_b, q, k=k)
-            retrieved = res["ids"][0]
-            r = recall_at_k(retrieved, relevantes, k)
-            recalls.append(r)
-        eval2_recall[f"recall@{k}"] = round(np.mean(recalls), 4)
-
-    print("📊 recall@k sobre NFCorpus corpus (ground truth real):")
-    for k_str, v in eval2_recall.items():
-        print(f"   {k_str}: {v:.4f}")
-else:
-    eval2_recall = None
-```
-
-#### Ejercicio 3 — Búsqueda semántica (1.5 ptos) {#sec-hpd1-e3-b}
-
-Ejecuta 3 consultas de búsqueda semántica sobre el corpus NFCorpus y muestra los resultados (top-3 chunks con su distancia coseno). Las consultas son preguntas reales del benchmark.
-
-Asigna los resultados a `eval3_busqueda`.
-
-```{python}
-#| echo: true
-
-if CAMINO == "B":
-    consultas_b = list(gt_b.keys())[:3]
-
-    eval3_busqueda = []
-    for q in consultas_b:
-        res = buscar(collection_b, q, k=3)
-        resultados = []
-        for i in range(len(res["ids"][0])):
-            resultados.append({
-                "id": res["ids"][0][i],
-                "distancia": round(res["distances"][0][i], 4),
-                "texto": res["documents"][0][i][:200],
-                "fuente": res["metadatas"][0][i].get("nf_id", ""),
-            })
-        eval3_busqueda.append({"query": q, "resultados": resultados})
-
-    for r in eval3_busqueda:
-        print(f"\n🔍 {r['query']}")
-        for res in r["resultados"]:
-            print(f"   [{res['distancia']:.4f}] {res['texto'][:100]}...")
-    print("\n✅ eval3_busqueda asignada.")
-else:
-    eval3_busqueda = None
-```
-
-#### Ejercicio 4 — Justificación del modelo (1.5 ptos) {#sec-hpd1-e4-b}
-
-Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de MTEB para las tareas BIOSSES y STS12, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica sobre un corpus biomédico real como NFCorpus.
-
-Asigna tu respuesta a `eval4_justificacion`.
-
-```{python}
-#| echo: true
-
-if CAMINO == "B":
-    eval4_justificacion = """Escribir aquí la justificación. Por ejemplo:
-
-    e5-small-v2 obtiene un Spearman de 0.894 en BIOSSES, un benchmark de similitud textual
-    biomédica. Este resultado es directamente relevante para nuestro corpus NFCorpus de artículos de
-    investigación clínica: indica que el modelo alinea bien textos con terminología médica
-    y expresiones científicas. El 0.774 en STS12 (dominio general) confirma que mantiene
-    buena calidad en texto narrativo. Con 33M de parámetros, es lo suficientemente ligero
-    para ejecutarse en entornos como Colab sin GPU."""
-    print("✅ eval4_justificacion asignada.")
-else:
-    eval4_justificacion = None
-```
-
-## Camino C — E-commerce
-
-**Contexto:** Trabajas como Data Scientist en un marketplace digital. Tu equipo necesita un sistema de búsqueda semántica sobre productos reales de Amazon del benchmark ESCI (Amazon Shopping Queries). El sistema debe permitir a los compradores encontrar productos por concepto y necesidad, no solo por palabras clave.
-
-### Corpus — Productos reales de Amazon (ESCI)
-
-```{python}
-#| echo: true
-
-if CAMINO == "C":
-    import urllib.request, gzip, io, json
-
-    url = "https://huggingface.co/datasets/spacemanidol/ESCI-product-search/resolve/main/dev.jsonl.gz"
-    response = urllib.request.urlopen(url)
-    buf = io.BufferedReader(response)
-    gz = gzip.GzipFile(fileobj=buf)
-
-    esci_records = []
-    for i, line in enumerate(gz):
-        if i >= 30:
-            break
-        esci_records.append(json.loads(line))
-
-    products = {}
-    for rec in esci_records:
-        for key in ['positive_passages', 'positive_passages_substitute', 'negative_passages',
-                     'negative_passages_substitute', 'negative_passages_complement', 'negative_passages_true']:
-            for p in rec.get(key, []):
-                docid = p.get('docid', '')
-                if docid and docid not in products:
-                    products[docid] = p
-
-    print(f"ESCI cargado: {len(esci_records)} queries, {len(products)} productos reales")
-
-    docs_c = []
-    for docid, p in products.items():
-        title = p.get('title', '')
-        desc = p.get('text', '')
-        bullets = p.get('bullet_points', '')
-        full_text = f"Title: {title}\n\n{desc}"
-        if bullets:
-            full_text += f"\n\nFeatures:\n{bullets}"
-        docs_c.append(Document(
-            page_content=full_text,
-            metadata={"source": f"esci_{docid}.txt", "esci_id": docid}
-        ))
-
-    gt_c_raw = {}
-    for rec in esci_records:
-        q = rec['query']
-        pos_docids = [p['docid'] for p in rec.get('positive_passages', []) if p.get('docid')]
-        if pos_docids:
-            gt_c_raw[q] = pos_docids
-
-    selected_queries_c = list(gt_c_raw.keys())[:5]
-    gt_c_raw = {q: gt_c_raw[q] for q in selected_queries_c}
-
-    print(f"Queries de evaluación: {len(selected_queries_c)}")
-    print(f"Documentos en corpus: {len(docs_c)}")
-else:
-    print("Camino C no seleccionado — saltando generación.")
-
-```
-
-#### Ejercicio 1 — Estrategia de chunking (2 ptos) {#sec-hpd1-e1-c}
-
-Describe qué estrategia de chunking eliges (chunk por párrafos vs. tamaño fijo con solapamiento) y por qué es adecuada para productos reales de Amazon del benchmark ESCI. Justifica tu respuesta en términos de:
-
-- Coherencia semántica de los chunks
-- Capacidad de recuperar información con consultas sobre productos específicos (ej. "auriculares con cancelación de ruido", "tasa de retorno de calzado")
-- Ventajas del solapamiento entre chunks en este dominio
-
-Asigna tu respuesta a `eval1_estrategia`.
-
-```{python}
-#| echo: true
-
-if CAMINO == "C":
-    eval1_estrategia = """Escribir aquí la justificación. Por ejemplo:
-
-    Elijo chunking por tamaño fijo con RecursiveCharacterTextSplitter (chunk_size=300, overlap=50)
-    porque los productos de ESCI tienen descripciones y bullet points con información detallada.
-    El solapamiento evita que características concretas como "cancelación de ruido activa" o
-    "batería de 12 horas" se pierdan en los cortes. La estrategia por párrafos no es adecuada
-    porque las descripciones de producto son heterogéneas en longitud y estructura."""
-    print("✅ eval1_estrategia asignada.")
-else:
-    eval1_estrategia = None
-```
-
-#### Ejercicio 2 — Indexación y recall@k (2.5 ptos) {#sec-hpd1-e2-c}
-
-Genera los embeddings de los productos ESCI, construye la colección en Chroma y evalúa con recall@k usando el ground truth derivado de las anotaciones reales del benchmark (Exact match).
-
-```{python}
-#| echo: true
-
-if CAMINO == "C":
-    splitter = RecursiveCharacterTextSplitter(
-        chunk_size=CHUNK_SIZE,
-        chunk_overlap=CHUNK_OVERLAP,
-        separators=["\n\n", "\n", ". ", " ", ""]
-    )
-    chunks_c = splitter.split_documents(docs_c)
-    print(f"Chunks generados: {len(chunks_c)}")
-
-    collection_c = client.get_or_create_collection(
-        name="hpd1_ecommerce",
-        metadata={"hnsw:space": "cosine"}
-    )
-
-    esci_to_chunk_ids = {}
-    for i, chunk in enumerate(chunks_c):
-        embedding = model.encode(chunk.page_content).tolist()
-        esci_id = chunk.metadata.get("esci_id", "")
-        cid = f"eco_{i:04d}"
-        collection_c.add(
-            ids=[cid],
-            embeddings=[embedding],
-            documents=[chunk.page_content],
-            metadatas=[{"esci_id": esci_id, "idx": i}]
-        )
-        if esci_id not in esci_to_chunk_ids:
-            esci_to_chunk_ids[esci_id] = []
-        esci_to_chunk_ids[esci_id].append(cid)
-    print(f"Indexación completada: {collection_c.count()} vectores")
-
-    gt_c = {}
-    for q_text, docids in gt_c_raw.items():
-        chunk_ids = []
-        for did in docids:
-            chunk_ids.extend(esci_to_chunk_ids.get(did, []))
-        gt_c[q_text] = chunk_ids
-    print(f"Ground truth construido: {len(gt_c)} queries con anotaciones Exact de ESCI")
-
-    def recall_at_k(retrieved_ids, relevant_ids, k):
-        if len(relevant_ids) == 0:
-            return 0.0
-        top_k = retrieved_ids[:k]
-        hits = sum(1 for rid in relevant_ids if rid in top_k)
-        return hits / len(relevant_ids)
-
-    def buscar(collection, query, k=5):
-        qe = model.encode(query).tolist()
-        return collection.query(query_embeddings=[qe], n_results=k)
-
-    eval2_recall = {}
-    for k in [1, 3, 5]:
-        recalls = []
-        for q, relevantes in gt_c.items():
-            res = buscar(collection_c, q, k=k)
-            retrieved = res["ids"][0]
-            r = recall_at_k(retrieved, relevantes, k)
-            recalls.append(r)
-        eval2_recall[f"recall@{k}"] = round(np.mean(recalls), 4)
-
-    print("📊 recall@k sobre ESCI corpus (ground truth real):")
-    for k_str, v in eval2_recall.items():
-        print(f"   {k_str}: {v:.4f}")
-else:
-    eval2_recall = None
-```
-
-#### Ejercicio 3 — Búsqueda semántica (1.5 ptos) {#sec-hpd1-e3-c}
-
-Ejecuta 3 consultas de búsqueda semántica sobre el corpus ESCI y muestra los resultados (top-3 chunks con su distancia coseno). Las consultas son preguntas reales de compradores de Amazon.
-
-Asigna los resultados a `eval3_busqueda`.
-
-```{python}
-#| echo: true
-
-if CAMINO == "C":
-    consultas_c = list(gt_c.keys())[:3]
-
-    eval3_busqueda = []
-    for q in consultas_c:
-        res = buscar(collection_c, q, k=3)
-        resultados = []
-        for i in range(len(res["ids"][0])):
-            resultados.append({
-                "id": res["ids"][0][i],
-                "distancia": round(res["distances"][0][i], 4),
-                "texto": res["documents"][0][i][:200],
-                "fuente": res["metadatas"][0][i].get("esci_id", ""),
-            })
-        eval3_busqueda.append({"query": q, "resultados": resultados})
-
-    for r in eval3_busqueda:
-        print(f"\n🔍 {r['query']}")
-        for res in r["resultados"]:
-            print(f"   [{res['distancia']:.4f}] {res['texto'][:100]}...")
-    print("\n✅ eval3_busqueda asignada.")
-else:
-    eval3_busqueda = None
-```
-
-#### Ejercicio 4 — Justificación del modelo (1.5 ptos) {#sec-hpd1-e4-c}
-
-Justifica por qué `intfloat/e5-small-v2` es una buena elección para este pipeline. Debes basarte en los resultados de MTEB para las tareas BIOSSES y STS12, y explicar cómo se relacionan con la calidad esperada en búsqueda semántica sobre productos reales de Amazon (ESCI).
-
-Asigna tu respuesta a `eval4_justificacion`.
-
-```{python}
-#| echo: true
-
-if CAMINO == "C":
-    eval4_justificacion = """Escribir aquí la justificación. Por ejemplo:
-
-    e5-small-v2 obtiene un Spearman de 0.774 en STS12 (similitud textual de dominio general),
-    lo que indica una buena capacidad para alinear textos narrativos como descripciones de
-    productos reales de Amazon. Su rendimiento en BIOSSES (0.894) muestra robustez incluso
-    con vocabulario especializado. Con solo 33M de parámetros, el modelo es lo suficientemente
-    ligero para ejecutarse en Colab sin GPU, adecuado para un pipeline docente."""
-    print("✅ eval4_justificacion asignada.")
-else:
-    eval4_justificacion = None
-```
-
+Pregunta guía (opcional): si compararas e5-small-v2 con all-MiniLM-L6-v2 sobre esta misma muestra, ¿podrías afirmar cuál de los dos es mejor? ¿Qué te faltaría para poder hacerlo?
 :::
+
+```{python}
+#| echo: true
+
+# --- Línea base: e5-small-v2 con el MISMO método exacto (ya escrita) -------------------------
+# Reutiliza los embeddings del ejercicio 2 (embeddings_chunks): no hace falta codificar otra vez.
+metricas_e5, r10_e5 = evaluar_modelo_alternativo("intfloat/e5-small-v2", "query: ", "passage: ",
+                                                 emb_chunks=embeddings_chunks)
+print("e5-small-v2: búsqueda HNSW del ejercicio 2 frente a búsqueda exacta de la función")
+for k_str in eval2_recall:
+    print(f"   {k_str}: HNSW = {eval2_recall[k_str]:.4f} | exacta = {metricas_e5[k_str]:.4f}")
+
+# --- (a) TODO -------------------------------------------------------------------------------
+# Llama a evaluar_modelo_alternativo con "sentence-transformers/paraphrase-MiniLM-L6-v2".
+# Este modelo NO usa prefijos: no pases prefijo_consulta ni prefijo_doc.
+# Guarda las medias en metricas_para y la lista de recall@10 por consulta en r10_para.
+metricas_para, r10_para = None, None   # ← sustituye esta línea por tu llamada
+
+# --- (b) TODO -------------------------------------------------------------------------------
+# Imprime una tabla con recall@1, recall@3, recall@5 y recall@10 de los dos modelos
+# (metricas_e5 y metricas_para), y el número de consultas en que gana cada uno comparando
+# r10_e5 y r10_para consulta a consulta. Cuenta también los empates.
+# Pista: sum(a > b for a, b in zip(lista_1, lista_2)) cuenta las consultas en que gana lista_1.
+
+print("✅ Completa los TODO (a) y (b) y después eval4_justificacion.")
+```
+
+```{python}
+#| echo: true
+
+# TODO: sustituye el texto de la plantilla por tu justificación (ejercicio 4).
+eval4_justificacion = """TODO: escribe aquí la justificación (unas 150-250 palabras). Responde a estos puntos:
+
+1. Cifras: ¿qué modelo tiene mejor recall@10 en tu tabla? ¿Y mejor recall@1? ¿En cuántas consultas gana cada uno? Usa las cifras de tu propia tabla.
+2. Explicación para no técnicos: uno de los dos modelos se entrenó para encontrar textos que "dicen lo mismo" y el otro para encontrar textos que responden a una pregunta. ¿Cuál necesita un buscador y por qué?
+3. STS frente a recuperación: ¿por qué una buena nota en STS (similitud entre frases) no garantiza que un modelo sea un buen buscador de documentos?
+4. Limitación: con 50 consultas, ¿qué diferencias te parecen ruido? Menciona también las anotaciones incompletas de FiQA y los distractores aleatorios. ¿Cómo lo mitigarías?
+5. Conclusión prudente: ¿mantienes e5-small-v2? ¿Qué medirías antes de decidir?"""
+print("✅ eval4_justificacion asignada.")
+```
+
 
 ## Resumen de entregables
 
 ```{python}
 #| echo: true
 
-print(f"Camino seleccionado: {CAMINO}")
 print(f"\nVariables de corrección:")
 for var in ["eval1_estrategia", "eval2_recall", "eval3_busqueda", "eval4_justificacion"]:
     val = globals().get(var, None)

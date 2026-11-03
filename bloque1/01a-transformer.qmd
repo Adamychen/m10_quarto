@@ -81,7 +81,7 @@ Durante la inferencia generativa, la salida se obtiene un token cada vez. La fle
 ## Las 4 etapas de la pipeline
 
 1. **Tokenización** — el texto se divide en unidades subpalabra (tokens). Por ejemplo, *"unhappiness"* puede descomponerse en `["un", "happiness"]` o `["unhapp", "iness"]`. Cada token recibe un ID entero del vocabulario del modelo.
-2. **Embedding** — cada ID se convierte en un vector denso de dimensión $d$ (típicamente $d = 4096$). Los vectores se eligen de modo que conceptos similares caen cerca en el espacio vectorial.
+2. **Embedding** — cada ID se convierte en un vector denso de dimensión $d$ (típicamente $d = 4096$). Los vectores no se eligen a mano: se aprenden durante el entrenamiento, y el resultado es que conceptos similares tienden a quedar cerca en el espacio vectorial.
 3. **Procesamiento contextual** — $L$ capas de Transformer transforman todos los estados en paralelo. En un encoder cada posición puede consultar toda la secuencia; en un decoder-only solo puede consultar las posiciones anteriores y la actual. Tras $L$ capas, cada posición codifica información contextual.
 4. **Predicción** — el estado oculto final se proyecta a una distribución de probabilidad sobre todo el vocabulario, y una estrategia de *decoding* (temperatura, top-p, top-k) elige el siguiente token.
 
@@ -172,172 +172,139 @@ La figura @fig-mascaras-atencion muestra por qué la máscara es una restricció
 
 ![Scaled Dot-Product Attention (izquierda) y Atención multi-cabeza (derecha) (@vaswani2017attention, Figure 2)](../images/multi-head-attention.webp){#fig-sdpa-vs-mha}
 
-#### Scaled Dot-Product Attention — Low Level (numpy) {#sec-sdpa-numpy}
+Las fórmulas dicen qué calcula la atención, pero no por qué está diseñada así. Los tres experimentos siguientes responden a tres preguntas de diseño. Son cortos y puedes ejecutarlos en Colab.
 
-La primera implementación calcula atención sin máscara para que se vea la operación básica. Después aplicamos una máscara causal a la misma función.
+#### Experimento 1: ¿por qué dividir entre $\sqrt{d_k}$?
+
+Los vectores de un modelo real tienen cientos o miles de dimensiones. Si no se corrige, cuanto más largos son, más grandes son las puntuaciones $QK^\mathsf{T}$. **Antes de ejecutar, predice:** si no dividimos, ¿qué le pasará al reparto de la atención cuando `d_k` pasa de 4 a 512? Lo comprobamos con vectores aleatorios de distintos tamaños:
 
 ```{python}
 #| echo: true
 #| eval: true
 
-def scaled_dot_product_attention_numpy(Q, K, V, mask=None):
-    """Atención paso a paso con numpy. Muestra la matemática subyacente."""
-    d_k = K.shape[-1]
-    scores = np.matmul(Q, K.transpose(0, 2, 1))
-    scores = scores / np.sqrt(d_k)
-    if mask is not None:
-        scores = np.where(mask, -np.inf, scores)
-    scores = scores - np.max(scores, axis=-1, keepdims=True)
-    weights = np.exp(scores) / np.sum(np.exp(scores), axis=-1, keepdims=True)
-    output = np.matmul(weights, V)
-    return output, weights
+def softmax(x):
+    x = x - x.max(axis=-1, keepdims=True)
+    e = np.exp(x)
+    return e / e.sum(axis=-1, keepdims=True)
 
-np.random.seed(42)
-batch, seq_len, d_k = 1, 3, 4
-Q = np.random.randn(batch, seq_len, d_k)
-K = np.random.randn(batch, seq_len, d_k)
-V = np.random.randn(batch, seq_len, d_k)
-
-out_np, attn_np = scaled_dot_product_attention_numpy(Q, K, V)
-print("Matriz de atención (numpy):")
-print(np.round(attn_np[0], 3))
-print("\nCada fila suma 1:", np.round(attn_np[0].sum(axis=1), 3))
-
-causal_mask = np.triu(np.ones((seq_len, seq_len), dtype=bool), k=1)
-_, attn_causal = scaled_dot_product_attention_numpy(Q, K, V, mask=causal_mask)
-print("\nAtención causal (las posiciones futuras quedan a cero):")
-print(np.round(attn_causal[0], 3))
-
-
-
+np.random.seed(0)
+T = 6  # palabras en la frase
+for d_k in [4, 64, 512]:
+    Q = np.random.randn(T, d_k)
+    K = np.random.randn(T, d_k)
+    scores = Q @ K.T
+    sin_escalar = softmax(scores)
+    escalado = softmax(scores / np.sqrt(d_k))
+    print(f"d_k={d_k:3d} | desv. scores: {scores.std():5.2f} sin escalar, "
+          f"{(scores / np.sqrt(d_k)).std():4.2f} escalados | "
+          f"peso máximo medio: {sin_escalar.max(-1).mean():.2f} sin escalar, "
+          f"{escalado.max(-1).mean():.2f} escalado")
 ```
 
-#### Scaled Dot-Product Attention — High Level (PyTorch) {#sec-sdpa-torch}
+Qué observar:
+
+- Sin escalar, con `d_k = 512` el peso máximo medio es 1.00: cada palabra mira a una sola. Un *softmax* tan concentrado deja casi sin señal de aprendizaje.
+- Escalando, el peso máximo se mantiene en torno a 0.4–0.5 con cualquier tamaño. El escalado hace que el reparto de la atención no dependa de la dimensión.
+
+#### Experimento 2: ¿la atención sabe en qué orden van las palabras?
+
+**Antes de ejecutar, predice:** si barajamos las palabras de la frase, ¿cambian las representaciones que produce la atención (más allá de cambiar de sitio)?
 
 ```{python}
 #| echo: true
 #| eval: true
 
-def scaled_dot_product_attention_torch(Q, K, V):
-    """Atención paso a paso con PyTorch, equivalente a la versión numpy."""
-    d_k = K.shape[-1]
-    scores = torch.matmul(Q, K.transpose(-2, -1)) / torch.sqrt(torch.tensor(d_k, dtype=torch.float32))
-    weights = torch.softmax(scores, dim=-1)
-    output = torch.matmul(weights, V)
-    return output, weights
+torch.manual_seed(0)
+d = 8
+Wq, Wk, Wv = (torch.randn(d, d) for _ in range(3))
 
-Qt = torch.from_numpy(Q)
-Kt = torch.from_numpy(K)
-Vt = torch.from_numpy(V)
+def atencion(x):
+    q, k, v = x @ Wq, x @ Wk, x @ Wv
+    pesos = torch.softmax(q @ k.T / d**0.5, dim=-1)
+    return pesos @ v
 
-out_th, attn_th = scaled_dot_product_attention_torch(Qt, Kt, Vt)
-print("Matriz de atención (PyTorch):")
-print(np.round(attn_th.numpy()[0], 3))
+x = torch.randn(5, d)                    # 5 palabras, cada una un vector de 8 números
+orden = torch.tensor([3, 0, 4, 1, 2])    # nuevo orden de las palabras
 
-print(f"\n¿Resultados idénticos? {np.allclose(out_np, out_th.numpy(), atol=1e-6)}")
-
-
-
+salida_reordenada = atencion(x[orden])   # primero reordenamos, luego atendemos
+reordenada_salida = atencion(x)[orden]   # primero atendemos, luego reordenamos
+print("¿Son iguales?", torch.allclose(salida_reordenada, reordenada_salida, atol=1e-5))
 ```
 
-#### Multi-Head Attention — Low Level (numpy) {#sec-mha-numpy}
+Reordenamos las palabras y luego aplicamos la atención, o aplicamos la atención y luego reordenamos. Salen las mismas representaciones. Es decir, **la atención por sí sola no distingue el orden**: trata la frase como un conjunto de palabras. Por eso el modelo necesita añadir información de posición, algo que veremos en la sección de codificación posicional.
+
+#### Experimento 3: ¿qué puede ver cada palabra?
 
 ```{python}
 #| echo: true
 #| eval: true
 
-def multi_head_attention_numpy(Q, K, V, num_heads=2):
-    """Multi-head atención desde cero: divide en cabezas, atiende, concatena, proyecta."""
-    batch, seq_len, d_model = Q.shape
-    d_k = d_model // num_heads
+torch.manual_seed(0)
+d, T = 8, 5
+mascara = torch.triu(torch.ones(T, T, dtype=torch.bool), diagonal=1)  # True = bloqueado
+q = torch.randn(T, d)
+puntuaciones = q @ q.T / d**0.5
+pesos = torch.softmax(puntuaciones.masked_fill(mascara, float("-inf")), dim=-1)
 
-    Q_heads = Q.reshape(batch, seq_len, num_heads, d_k).transpose(0, 2, 1, 3)
-    K_heads = K.reshape(batch, seq_len, num_heads, d_k).transpose(0, 2, 1, 3)
-    V_heads = V.reshape(batch, seq_len, num_heads, d_k).transpose(0, 2, 1, 3)
-
-    outputs, attn_weights = [], []
-    for h in range(num_heads):
-        scores = Q_heads[:, h] @ K_heads[:, h].swapaxes(-2, -1) / np.sqrt(d_k)
-        weights = np.exp(scores) / np.sum(np.exp(scores), axis=-1, keepdims=True)
-        outputs.append(weights @ V_heads[:, h])
-        attn_weights.append(weights)
-
-    concat = np.concatenate(outputs, axis=-1)
-    return concat, attn_weights
-
-Q_mh = np.random.randn(1, 3, 8)
-K_mh = np.random.randn(1, 3, 8)
-V_mh = np.random.randn(1, 3, 8)
-out_mh, attn_mh = multi_head_attention_numpy(Q_mh, K_mh, V_mh, num_heads=2)
-print(f"Salida multi-head: {out_mh.shape}")
-print(f"Cabeza 0 pesos:\n{np.round(attn_mh[0][0], 3)}")
-print(f"Cabeza 1 pesos:\n{np.round(attn_mh[1][0], 3)}")
-print(f"\nCada cabeza atiende de forma distinta (diferentes pesos).")
-
-
-
-```
-
-#### Multi-Head Attention — High Level (PyTorch) {#sec-mha-torch}
-
-```{python}
-#| echo: true
-#| eval: true
-
-embed_dim = 8
-num_heads = 2
-mha = nn.MultiheadAttention(embed_dim=embed_dim, num_heads=num_heads, batch_first=True)
-
-Qt_mh = torch.from_numpy(Q_mh).float()
-Kt_mh = torch.from_numpy(K_mh).float()
-Vt_mh = torch.from_numpy(V_mh).float()
-
-out_th_mh, attn_th_mh = mha(Qt_mh, Kt_mh, Vt_mh, need_weights=True)
-print(f"Salida nn.MultiheadAttention: {out_th_mh.shape}")
-print(f"Pesos de atención:\n{np.round(attn_th_mh.detach().numpy(), 3)}")
-print(f"\nParámetros entrenables de la capa: {sum(p.numel() for p in mha.parameters())}")
-
-
-
-```
-
-#### Visualización de atención {#sec-visualizacion-atencion}
-
-```{python}
-#| echo: true
-#| eval: true
-
-fig, axes = plt.subplots(1, 3, figsize=(14, 4))
-
-axes[0].imshow(attn_np[0], cmap="Blues", vmin=0, vmax=1)
-axes[0].set_title("Atención simple (numpy)")
-axes[0].set_xticks(range(seq_len)); axes[0].set_yticks(range(seq_len))
-axes[0].set_xticklabels([f"T{i}" for i in range(seq_len)])
-axes[0].set_yticklabels([f"T{i}" for i in range(seq_len)])
-
-axes[1].imshow(attn_mh[0][0], cmap="Blues", vmin=0, vmax=1)
-axes[1].set_title("Multi-head: cabeza 0")
-axes[1].set_xticks(range(seq_len)); axes[1].set_yticks(range(seq_len))
-
-axes[2].imshow(attn_mh[1][0], cmap="Blues", vmin=0, vmax=1)
-axes[2].set_title("Multi-head: cabeza 1")
-axes[2].set_xticks(range(seq_len)); axes[2].set_yticks(range(seq_len))
-
+print(np.round(pesos.numpy(), 2))
+fig, ax = plt.subplots(figsize=(4.5, 4))
+im = ax.imshow(pesos.numpy(), cmap="Blues", vmin=0, vmax=1)
+ax.set_xlabel("Palabra a la que se atiende")
+ax.set_ylabel("Palabra que atiende")
+ax.set_xticks(range(T)); ax.set_yticks(range(T))
+ax.set_title("Máscara causal")
+plt.colorbar(im, ax=ax)
 plt.tight_layout()
 plt.show()
-plt.close(fig)
-
-
-
 ```
+
+Cada fila es una palabra que mira y cada columna, la palabra a la que mira. La máscara causal deja en cero todo lo que queda a la derecha de la diagonal: la primera palabra solo se mira a sí misma y la última ve a todas. Los números son aleatorios; lo que importa es el patrón triangular.
+
+Esto es lo que permite entrenar un LLM generativo: al predecir una palabra, la máscara impide ver las siguientes, que son justamente la respuesta. Un *encoder* como BERT no usa esta máscara, y por eso cada palabra puede mirar en las dos direcciones.
+
+Los experimentos anteriores usan vectores aleatorios. Para ver atención real en un modelo, la demo [Atención en un modelo real](../demos/atencion-modelo-real.qmd) muestra seis cabezas de BETO, un BERT entrenado en español.
+
+#### Varias cabezas, la misma operación
+
+En lugar de una sola atención, el modelo calcula varias en paralelo, cada una con sus propias proyecciones $W_Q$, $W_K$ y $W_V$. Cada cabeza puede especializarse en un tipo de relación distinto, y la salida final combina todas. PyTorch hace todo esto en una sola llamada. El siguiente código aplica la máscara causal a una capa completa con dos cabezas:
+
+```{python}
+#| echo: true
+#| eval: true
+
+torch.manual_seed(0)
+d, T = 8, 5
+mascara = torch.triu(torch.ones(T, T, dtype=torch.bool), diagonal=1)
+mha = nn.MultiheadAttention(embed_dim=d, num_heads=2, batch_first=True)
+x = torch.randn(1, T, d)
+_, pesos = mha(x, x, x, attn_mask=mascara, need_weights=True, average_attn_weights=True)
+pesos = pesos[0].detach()
+print("Forma de los pesos:", tuple(pesos.shape))
+print("Primera fila (solo se mira a sí misma):", pesos[0].numpy().round(2))
+print("Posiciones por encima de la diagonal a cero:", bool((pesos.triu(1) == 0).all()))
+```
+
+Los pesos están promediados sobre las dos cabezas. La primera fila solo tiene peso en sí misma, y todo lo que queda por encima de la diagonal es cero.
 
 ::: {.callout-warning}
 ## Atención no equivale a explicación
 
-Un mapa de atención muestra cómo se distribuyen determinados pesos dentro de una capa y una cabeza. No demuestra por sí solo que esos tokens sean la causa de la respuesta del modelo. Para atribuir influencia hay que combinarlo con gradientes, ablaciones u otros métodos causales [@jain2019attention].
+Un mapa de atención muestra cómo se distribuyen determinados pesos dentro de una capa y una cabeza. No demuestra por sí solo que esos tokens sean la causa de la respuesta del modelo. Para atribuir influencia hay que combinarlo con gradientes o con experimentos de intervención.
+:::
+
+::: {.callout-tip}
+## Qué te llevas de esta sección
+
+- La atención mezcla información entre posiciones; la máscara decide quién puede ver a quién.
+- Sin información de posición, la atención no distingue el orden de las palabras.
+- Escalar por $\sqrt{d_k}$ mantiene estable el reparto de pesos cuando los vectores son grandes.
 :::
 
 ### La red feed-forward: transformar cada posición {#sec-feed-forward}
+
+**En una frase:** cuando la atención ya ha mezclado la información entre palabras, una pequeña red neuronal transforma cada palabra *por separado*, sin mezclarlas.
+
+::::: {.callout-note collapse="true" title="Nivel avanzado: fórmulas de la FFN y SwiGLU"}
 
 La atención mezcla información entre posiciones, pero no sustituye a la transformación que se aplica dentro de cada posición. Esa segunda función es la red feed-forward, también llamada MLP o FFN:
 
@@ -355,7 +322,13 @@ $$
 
 Esta formulación utiliza una rama que modula a la otra mediante un producto elemento a elemento. Las FFN también se han interpretado como una forma de memoria asociativa: determinadas direcciones de entrada activan transformaciones que recuperan patrones aprendidos [@geva2021transformer]. Esta interpretación es útil como intuición, pero no significa que cada neurona almacene un hecho aislado.
 
+:::::
+
 ### Normalización y conexiones residuales {#sec-normalizacion-residuales}
+
+**En una frase:** dos trucos de ingeniería (mantener las escalas controladas y sumar la entrada a la salida de cada subcapa) que hacen posible entrenar redes con decenas de capas.
+
+::::: {.callout-note collapse="true" title="Nivel avanzado: LayerNorm, RMSNorm, Pre-Norm y Post-Norm"}
 
 LayerNorm normaliza las características de un estado individual, no las observaciones de un lote:
 
@@ -383,7 +356,13 @@ Las conexiones residuales añaden la entrada de una subcapa a su salida. Esta ru
 
 En la práctica, los detalles exactos dependen del modelo. No todos los LLM emplean la misma normalización ni la misma variante de MLP [@ba2016layernorm; @zhang2019rmsnorm].
 
+:::::
+
 ### Coste de la atención {#sec-coste-atencion}
+
+**En una frase:** comparar cada palabra con todas las demás cuesta el *cuadrado* de la longitud del texto: duplicar el contexto cuadruplica la matriz de atención.
+
+::::: {.callout-note collapse="true" title="Nivel avanzado: coste O(T²) y FlashAttention"}
 
 La atención densa compara cada posición con todas las demás. Para una secuencia de longitud $T$, la matriz de puntuaciones tiene forma $T \times T$ y el coste aproximado de calcularla es:
 
@@ -400,13 +379,21 @@ El crecimiento cuadrático explica por qué duplicar la ventana de contexto no d
 FlashAttention reorganiza el cálculo en bloques para reducir movimientos de memoria y evitar materializar toda la matriz de atención en la memoria de la GPU [@dao2022flashattention]. Mejora la ejecución de la atención exacta, pero no convierte automáticamente el coste cuadrático en lineal. Las ventanas locales y las máscaras dispersas son decisiones diferentes.
 :::
 
+:::::
+
 ### MHA, MQA y GQA {#sec-mha-mqa-gqa}
+
+**En una frase:** si varias cabezas comparten sus claves y valores, la caché de generación ocupa mucho menos, a cambio (en general) de una pérdida de calidad pequeña. Lo verás en cifras en [Tokens, dinero y memoria](01b-llms.qmd#sec-tokens-coste-memoria).
+
+::::: {.callout-note collapse="true" title="Nivel avanzado: MHA, MQA y GQA"}
 
 En la atención multi-cabeza estándar, cada cabeza tiene sus propias proyecciones de consultas, claves y valores. En *Multi-Query Attention* (MQA), varias cabezas de consulta comparten las mismas claves y valores. *Grouped-Query Attention* (GQA) ocupa una posición intermedia: agrupa varias cabezas de consulta para compartir un conjunto más pequeño de cabezas K/V.
 
 La ventaja aparece sobre todo durante la inferencia. El modelo debe conservar las claves y valores de los tokens anteriores en la caché KV; si hay menos cabezas K/V, esa caché ocupa menos memoria. Muchos LLM modernos utilizan GQA como compromiso entre calidad y coste [@grattafiori2024llama3].
 
 La atención local, GQA y FlashAttention resuelven problemas distintos. La primera limita qué posiciones se consultan; la segunda reduce el número de representaciones K/V almacenadas; la tercera optimiza cómo se ejecuta el cálculo.
+
+:::::
 
 ### Codificación posicional
 
@@ -454,11 +441,11 @@ plt.close(fig)
 #| echo: true
 #| eval: true
 
-vocab_size = 50
+max_posiciones = 50      # nº máximo de posiciones que la tabla sabe representar
 d_model = 32
-pos_embedding = nn.Embedding(vocab_size, d_model)
+pos_embedding = nn.Embedding(max_posiciones, d_model)   # tabla SIN entrenar: valores al azar
 
-posiciones = torch.arange(vocab_size)
+posiciones = torch.arange(max_posiciones)
 pe_aprendida = pos_embedding(posiciones).detach().numpy()
 
 fig, axes = plt.subplots(1, 2, figsize=(14, 4))
@@ -468,19 +455,24 @@ axes[0].set_title("Sinusoidal (fija)")
 axes[0].set_xlabel("Posición"); axes[0].set_ylabel("Dimensión")
 
 axes[1].imshow(pe_aprendida.T, cmap="RdBu", aspect="auto")
-axes[1].set_title("nn.Embedding (aprendida)")
+axes[1].set_title("nn.Embedding (sin entrenar: al azar)")
 axes[1].set_xlabel("Posición")
 
 plt.tight_layout()
 plt.show()
 plt.close(fig)
-print("La versión aprendida se adapta a los datos; la sinusoidal es fija pero extrapola a secuencias más largas.")
+print("Izquierda: una fórmula fija, con patrón. Derecha: una tabla que arranca al azar; durante el entrenamiento")
+print("del modelo sus valores se ajustarían. Tiene una fila por posición, así que no sabe nada de posiciones > 49.")
 
 
 
 ```
 
 ### Posiciones relativas: RoPE y ALiBi {#sec-posiciones-relativas}
+
+**En una frase:** los modelos actuales no suman un vector de posición a la entrada; incorporan la *distancia* entre palabras directamente dentro de la atención.
+
+::::: {.callout-note collapse="true" title="Nivel avanzado: RoPE, ALiBi y comparativa de métodos"}
 
 La codificación sinusoidal y la aprendida absoluta se incorporan normalmente a los embeddings. Los LLM modernos suelen utilizar alternativas que introducen la posición directamente en la atención. La más extendida es RoPE (*Rotary Position Embedding*), que rota las componentes de las consultas y las claves según su posición.
 
@@ -503,6 +495,8 @@ Otra alternativa es ALiBi, que no añade vectores posicionales, sino que incorpo
 
 La codificación posicional no es un detalle cosmético. Cambia la geometría de las puntuaciones de atención y, por tanto, la forma en que el modelo utiliza el contexto.
 
+:::::
+
 ### Variantes de la arquitectura {#sec-variantes}
 
 : Comparativa de las tres variantes principales de la arquitectura Transformer {#tbl-variantes-transformer}
@@ -513,7 +507,7 @@ La codificación posicional no es un detalle cosmético. Cambia la geometría de
 | Decoder-only | Modelado causal del siguiente token | GPT, Llama, Qwen, Gemma | Generación de texto, chat y código |
 | Encoder-decoder | Transformación de una secuencia en otra | T5, BART | Traducción, resumen y QA |
 
-BERT es un ejemplo de encoder-only entrenado con objetivos bidireccionales [@devlin2019bert]. T5 representa la familia encoder-decoder que formula muchas tareas como transformación de texto a texto [@raffel2020t5]. Los LLM conversacionales actuales suelen pertenecer a la familia decoder-only, aunque sus etapas de instrucción y alineamiento se estudian por separado en [01e - Del estado oculto a la salida](01e-llm-por-dentro.qmd).
+BERT es un ejemplo de encoder-only entrenado con objetivos bidireccionales [@devlin2019bert]. T5 representa la familia encoder-decoder que formula muchas tareas como transformación de texto a texto [@raffel2020t5]. Los LLM conversacionales actuales suelen pertenecer a la familia decoder-only, aunque sus etapas de instrucción y alineamiento se estudian por separado en [Del estado oculto a la salida](../bloque3/03c-previo-cabezas.qmd) (Bloque 3).
 
 ::: {#fig-variantes-transformer}
 ```{mermaid}
@@ -558,6 +552,26 @@ Durante la inferencia, la situación cambia. El modelo genera un token, lo añad
 ## Dos afirmaciones que no se contradicen
 
 El Transformer procesa muchas posiciones en paralelo durante el entrenamiento, pero genera una respuesta token a token durante la inferencia. La máscara causal mantiene la misma restricción de información en las dos fases.
+:::
+
+## Comprueba lo aprendido {#sec-comprueba-01a}
+
+Intenta responder antes de abrir la solución.
+
+::: {.callout-note collapse="true" title="1. Si la atención «mezcla» información entre palabras, ¿por qué hace falta además una codificación posicional?"}
+Porque la atención por sí sola trata la frase como un conjunto: si barajas las palabras, obtiene las mismas representaciones (Experimento 2). Sin información de posición, «el perro muerde al hombre» y «el hombre muerde al perro» serían indistinguibles.
+:::
+
+::: {.callout-note collapse="true" title="2. ¿Para qué sirve la máscara causal al entrenar un LLM generativo, y por qué BERT no la usa?"}
+Al predecir cada palabra, la máscara impide ver las siguientes, que son justo la respuesta; sin ella el modelo copiaría en lugar de aprender a predecir. BERT no genera texto: su objetivo es entender la frase completa, así que cada palabra puede mirar a ambos lados.
+:::
+
+::: {.callout-note collapse="true" title="3. Pasas de un contexto de 8.000 a 32.000 tokens. ¿Cuánto crece, aproximadamente, la matriz de atención?"}
+Se multiplica por 16. El contexto es 4 veces mayor y la matriz es T × T, así que crece 4² = 16 veces. Por eso técnicas como FlashAttention (que no cambia el cálculo, pero evita guardar toda la matriz) o la atención local son tan importantes.
+:::
+
+::: {.callout-note collapse="true" title="4. Quieres (a) un chatbot y (b) un modelo para generar embeddings de documentos. ¿Qué familia de Transformer eliges para cada uno?"}
+(a) Decoder-only, porque genera texto token a token. (b) Un encoder (o un modelo de embeddings basado en uno), porque necesita una representación de toda la entrada con atención bidireccional.
 :::
 
 ::: {.callout-important}

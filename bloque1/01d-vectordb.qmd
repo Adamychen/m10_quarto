@@ -44,15 +44,100 @@ print("Librerías cargadas correctamente.")
 
 ## Bases de Datos Vectoriales {#sec-bases-datos-vectoriales}
 
-Una vez que tenemos embeddings, necesitamos almacenarlos y buscarlos eficientemente. Aquí entran las bases de datos vectoriales.
+Una vez que tenemos embeddings, necesitamos almacenarlos y buscarlos. Retomamos el buscador de preguntas frecuentes del banco ([01c](01c-embeddings.qmd#sec-caso-conductor)) y nos preguntamos qué ocurre cuando deja de ser un juego de 14 frases.
 
-::: {.callout-note}
-## Idioma de los ejemplos
+```{python}
+#| echo: true
+#| eval: true
 
-Los modelos de embeddings que usamos (`all-MiniLM-L6-v2`) están entrenados en inglés, por lo que los ejemplos usan texto en inglés. Usar un tokenizador inglés sobre texto español produce más subtokens por palabra y embeddings de menor calidad. Para trabajar con español, cambia a un modelo multilingüe como `intfloat/multilingual-e5-small`.
+# El mismo corpus del caso conductor
+modelo = SentenceTransformer("paraphrase-multilingual-MiniLM-L12-v2")
+
+faq = [
+    ("pagos", "Puedes pagar con tarjeta de crédito o débito en cualquier comercio adherido."),
+    ("pagos", "No se admite el pago con tarjeta en operaciones superiores a 3.000 euros; usa transferencia."),
+    ("pagos", "Para pedir un reembolso, solicita la devolución en la app en un plazo de 14 días."),
+    ("transferencias", "La comisión por transferencia SEPA es de 0,50 euros por operación."),
+    ("transferencias", "Las transferencias internacionales tienen una comisión del 2 % del importe."),
+    ("seguridad", "Si pierdes tu tarjeta, bloquéala desde la app o llama al teléfono de atención 24 horas."),
+    ("transferencias", "El IBAN es el código que identifica tu cuenta bancaria en transferencias nacionales e internacionales."),
+    ("seguridad", "Para cambiar tu contraseña, entra en Ajustes > Seguridad y pulsa «Restablecer»."),
+    ("efectivo", "El límite diario de retirada en cajeros es de 600 euros."),
+    ("cuentas", "Abrir una cuenta nueva es gratis y se completa en cinco minutos con tu DNI."),
+    ("financiacion", "Los préstamos personales se conceden en 24 horas si tienes la nómina domiciliada."),
+    ("financiacion", "La hipoteca a tipo variable se revisa cada seis meses según el Euríbor."),
+    ("errores", "Error E-4021: la operación fue rechazada por saldo insuficiente."),
+    ("errores", "Error E-4012: la tarjeta ha caducado y debe renovarse."),
+]
+temas = [t for t, _ in faq]
+textos = [x for _, x in faq]
+emb_faq = modelo.encode(textos, normalize_embeddings=True)
+print(f"{len(textos)} documentos · embeddings {emb_faq.shape}")
+```
+
+### Métricas de similitud {#sec-metricas-similitud}
+
+Para saber qué documento está «más cerca» necesitamos una medida de cercanía. Hay tres habituales:
+
+: Métricas de distancia y similitud entre vectores {#tbl-metricas-similitud}
+
+| Métrica | Fórmula | Qué mide |
+|---|---|---|
+| **Coseno** | $\cos(\vec{a}, \vec{b}) = \frac{\vec{a} \cdot \vec{b}}{\lVert \vec{a} \rVert \, \lVert \vec{b} \rVert}$ | El ángulo entre los vectores (ignora su longitud) |
+| **Producto escalar** | $\vec{a} \cdot \vec{b}$ | El ángulo **y** la longitud |
+| **L2 (Euclídea)** | $\lVert \vec{a} - \vec{b} \rVert_2$ | La distancia en línea recta |
+
+¿Importa cuál elijas? **Predice** con este ejemplo: una consulta $q$ y dos documentos, $a$ (casi en la misma dirección, pero con vector largo) y $b$ (más desviado, pero con vector corto).
+
+```{python}
+#| echo: true
+#| eval: true
+
+import numpy as np
+
+q = np.array([1.0, 0.0])
+a = np.array([3.0, 0.3])      # misma dirección que q, vector largo
+b = np.array([0.5, 0.45])     # dirección distinta, vector corto
+
+def cosine_sim(x, y):
+    return x @ y / (np.linalg.norm(x) * np.linalg.norm(y))
+
+print("SIN normalizar:")
+for nombre, v in [("a", a), ("b", b)]:
+    print(f"  doc {nombre}: coseno = {cosine_sim(q, v):.3f} · producto escalar = {q @ v:.3f} · distancia L2 = {np.linalg.norm(q - v):.3f}")
+
+an, bn = a / np.linalg.norm(a), b / np.linalg.norm(b)
+print("NORMALIZADOS (longitud 1):")
+for nombre, v in [("a", an), ("b", bn)]:
+    print(f"  doc {nombre}: coseno = {cosine_sim(q, v):.3f} · producto escalar = {q @ v:.3f} · distancia L2 = {np.linalg.norm(q - v):.3f}")
+```
+
+Sin normalizar, el coseno y el producto escalar prefieren $a$, pero L2 prefiere $b$ (está físicamente más cerca de $q$ aunque apunte hacia otro lado). Una vez normalizados, **las tres métricas ordenan igual**. De ahí la regla práctica:
+
+::: {.callout-warning}
+## Regla práctica
+
+Normaliza los embeddings (longitud 1). Con vectores normalizados, coseno, producto escalar y L2 dan el mismo orden, y puedes usar la más rápida del motor (normalmente el producto escalar). Comprueba en la ficha de tu modelo si ya devuelve vectores normalizados; muchos lo hacen y otros no.
 :::
 
-### Búsqueda exacta (KNN) vs. aproximada (ANN) {#sec-knn-vs-ann}
+### Cuánto ocupan los vectores {#sec-memoria-vectores}
+
+Un vector de $d$ dimensiones en `float32` ocupa $4d$ bytes. Eso hace que memoria y escala sean cuestiones de aritmética, no de magia:
+
+```{python}
+#| echo: true
+#| eval: true
+
+print(f"{'Vectores':>12}  " + "  ".join(f"d={d:<5}" for d in (384, 768, 1536)))
+for n in (100_000, 1_000_000, 10_000_000, 100_000_000):
+    print(f"{n:>12,}  " + "  ".join(f"{n * d * 4 / 1e9:>6.1f} GB" for d in (384, 768, 1536)))
+```
+
+Mil millones de documentos de 1.536 dimensiones requieren más de 6 TB **solo en vectores**, sin contar el índice. Hasta unos pocos millones de vectores cabe en la memoria de un portátil; más allá hay que comprimir (cuantización), repartir en varios nodos o ambas cosas. Y elegir un modelo de menos dimensiones (384 en lugar de 1.536) reduce el coste cuatro veces.
+
+### Búsqueda exacta (KNN) frente a aproximada (ANN) {#sec-knn-vs-ann}
+
+La búsqueda **exacta** compara la consulta con todos los vectores: coste proporcional al número de documentos $n$. La **aproximada** (ANN) usa un índice para mirar solo una fracción de los vectores a cambio de perder, a veces, algún vecino verdadero.
 
 ::: {#fig-knn-vs-ann}
 ```{mermaid}
@@ -64,27 +149,83 @@ graph TD
     end
     subgraph "ANN (HNSW / IVF)"
         A --> E[Índice jerárquico<br/>o clustering]
-        E --> F["O(log n) aprox."]
+        E --> F["Mira solo una fracción"]
         F --> G[Top-k aproximado<br/>con alta recall]
     end
 ```
 :::
 
-: Comparativa de métodos de búsqueda exacta vs. aproximada {#tbl-knn-ann}
+Los dos índices ANN más usados son:
 
-| Método | Precisión | Velocidad | Memoria |
-|---|---|---|---|
-| KNN exacto | 100 % | O(n) | — |
-| HNSW | 99 %+ | O(log n) | Alta |
-| IVF | 95-99 % | O(√n) | Media |
+- **IVF** (*inverted file*): agrupa los vectores en `nlist` grupos (clusters) y, al consultar, solo explora los `nprobe` grupos más cercanos a la consulta.
+- **HNSW** (@sec-hnsw): construye un grafo de vecinos por capas y lo recorre de forma voraz. Su parámetro principal en consulta es `efSearch` (cuántos candidatos explora).
+
+#### El compromiso se mide, no se supone {#sec-benchmark-ann}
+
+Vamos a medirlo. Para no depender de una descarga grande, generamos 200.000 vectores sintéticos con estructura de clusters (con ruido suficiente para que los grupos se solapen). Es un banco de pruebas **didáctico**: con embeddings reales los números cambian, pero el razonamiento es el mismo.
+
+```{python}
+#| echo: true
+#| eval: true
+
+import os, time
+os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"     # evita un conflicto de OpenMP en macOS
+os.environ["OMP_NUM_THREADS"] = "1"
+import faiss
+
+rng = np.random.default_rng(0)
+N, d, C = 200_000, 128, 300
+centros = rng.normal(size=(C, d)).astype("float32")
+X = centros[rng.integers(0, C, size=N)] + 1.1 * rng.normal(size=(N, d)).astype("float32")
+X /= np.linalg.norm(X, axis=1, keepdims=True)
+consultas = centros[rng.integers(0, C, size=200)] + 1.1 * rng.normal(size=(200, d)).astype("float32")
+consultas /= np.linalg.norm(consultas, axis=1, keepdims=True)
+k = 10
+
+def ms_por_consulta(indice):
+    t = time.perf_counter()
+    _, I = indice.search(consultas, k)
+    return (time.perf_counter() - t) / len(consultas) * 1000, I
+
+exacto = faiss.IndexFlatIP(d)      # IP = producto escalar = coseno si los vectores están normalizados
+exacto.add(X)
+t_exacto, verdad = ms_por_consulta(exacto)
+recall = lambda I: np.mean([len(set(a) & set(b)) / k for a, b in zip(I, verdad)])
+
+print(f"EXACTO  : {t_exacto:6.2f} ms/consulta · recall@{k} = 1.00 · {X.nbytes/1e6:.0f} MB de vectores")
+
+ivf = faiss.IndexIVFFlat(faiss.IndexFlatIP(d), d, 512, faiss.METRIC_INNER_PRODUCT)
+ivf.train(X); ivf.add(X)
+for nprobe in (1, 4, 16):
+    ivf.nprobe = nprobe
+    t, I = ms_por_consulta(ivf)
+    print(f"IVF     : nprobe={nprobe:<3} {t:6.2f} ms/consulta · recall@{k} = {recall(I):.2f}")
+
+hnsw = faiss.IndexHNSWFlat(d, 16, faiss.METRIC_INNER_PRODUCT)
+hnsw.hnsw.efConstruction = 64
+t0 = time.perf_counter(); hnsw.add(X); t_build = time.perf_counter() - t0
+for ef in (4, 16, 64, 256):
+    hnsw.hnsw.efSearch = ef
+    t, I = ms_por_consulta(hnsw)
+    print(f"HNSW    : efSearch={ef:<4} {t:6.2f} ms/consulta · recall@{k} = {recall(I):.2f}")
+print(f"(construir el índice HNSW tardó {t_build:.1f} s)")
+```
+
+Tres lecciones que salen de la tabla:
+
+1. **A esta escala la búsqueda exacta ya es rápida** (unos milisegundos). Hasta cientos de miles de vectores, un índice plano suele bastar; complicarse con ANN no compensa.
+2. **Con ANN, velocidad y exactitud se compran una con la otra.** Cada índice tiene una perilla (`nprobe`, `efSearch`) que las intercambia. Una `efSearch` baja es muy rápida, pero pierde buena parte de los vecinos reales.
+3. **Construir el índice también cuesta** (tiempo y memoria), sobre todo con HNSW. Si tus datos cambian continuamente, esto importa.
+
+La pregunta práctica no es «¿qué índice es mejor?», sino «¿qué recall necesito y qué latencia puedo permitirme?». Un RAG que pierde el 5 % de los vecinos suele ser aceptable; un sistema de deduplicación legal, quizá no.
 
 ### HNSW (Hierarchical Navigable Small World) {#sec-hnsw}
 
-El algoritmo más popular en producción (usado por Chroma, Qdrant, Pinecone). Construye un grafo multi-capa donde:
+El algoritmo más popular en producción (usado por Chroma, Qdrant, Pinecone y pgvector). Construye un grafo multi-capa donde:
 
 - Las capas superiores tienen pocos nodos (conexiones largas)
 - Las capas inferiores tienen todos los nodos (conexiones cortas)
-- La búsqueda comienza en la capa superior y desciende, recorriendo el grafo greedy
+- La búsqueda comienza en la capa superior y desciende, recorriendo el grafo de forma voraz [@malkov2018hnsw]
 
 ::: {#fig-hnsw-grafo}
 ```{mermaid}
@@ -115,209 +256,134 @@ graph TD
 ```
 :::
 
-### Métricas de similitud {#sec-metricas-similitud}
-
-: Métricas de distancia y similitud entre vectores {#tbl-metricas-similitud}
-
-| Métrica | Fórmula | Cuándo usarla |
-|---|---|---|
-| **Coseno** | cos(\vec{a}, \vec{b}) = \frac{\vec{a} \cdot \vec{b}}{\|\vec{a}\| \|\vec{b}\|} | Embeddings normalizados (recomendada) |
-| **Producto escalar** | \vec{a} \cdot \vec{b} | Embeddings normalizados (equivalente al coseno) |
-| **L2 (Euclídea)** | \|\vec{a} - \vec{b}\|_2 | Embeddings no normalizados, búsqueda por cercanía absoluta |
-
-::: {.callout-warning}
-## Regla práctica
-
-Siempre normaliza los embeddings (||v|| = 1). Con embeddings normalizados, coseno y producto escalar son equivalentes, y la búsqueda es más estable.
-:::
-
-```{python}
-#| echo: true
-#| eval: true
-
-def cosine_sim(a, b):
-    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
-
-def euclidean_dist(a, b):
-    return np.linalg.norm(a - b)
-
-a = np.array([1.0, 0.0, 0.0])
-b = np.array([0.8, 0.6, 0.0])
-c = np.array([0.0, 1.0, 0.0])
-
-print(f"coseno(a, b): {cosine_sim(a, b):.3f}")
-print(f"coseno(a, c): {cosine_sim(a, c):.3f}")
-print(f"coseno(b, c): {cosine_sim(b, c):.3f}")
-print()
-print(f"L2(a, b): {euclidean_dist(a, b):.3f}")
-print(f"L2(a, c): {euclidean_dist(a, c):.3f}")
-print(f"L2(b, c): {euclidean_dist(b, c):.3f}")
-
-
-```
-
 ### Chroma — Base de datos vectorial local {#sec-chroma}
 
-Chroma es una base de datos vectorial embebida que funciona en local sin servidor. Ideal para prototipado y proyectos pequeños/medios.
+Chroma es una base de datos vectorial embebida que funciona en local sin servidor. Ideal para prototipado y proyectos pequeños. A diferencia de una librería de índices (FAISS), guarda también **el texto y los metadatos** de cada documento.
 
 ```{python}
 #| echo: true
 #| eval: true
 
 import chromadb
-from chromadb.config import Settings
 
-# Cliente persistente (los datos se guardan en disco)
-client = chromadb.Client(Settings(
-    persist_directory=".chroma_db",
-    anonymized_telemetry=False
-))
+# EphemeralClient: todo en memoria (ideal para tutoriales).
+# Para guardar en disco usa: chromadb.PersistentClient(path=".chroma_db")
+client = chromadb.EphemeralClient()
+collection = client.get_or_create_collection(name="faq_banco", metadata={"hnsw:space": "cosine"})
 
-# Crear o recuperar colección
-collection = client.get_or_create_collection(
-    name="ejemplo_embeddings",
-    metadata={"hnsw:space": "cosine"}
+collection.upsert(                                  # upsert: si el id existe, lo actualiza (se puede re-ejecutar)
+    ids=[f"faq_{i}" for i in range(len(textos))],
+    documents=textos,
+    embeddings=emb_faq.tolist(),
+    metadatas=[{"tema": t} for t in temas],
 )
-
-print(f"Colección '{collection.name}' lista.")
-print(f"Total de documentos hasta ahora: {collection.count()}")
-
-
+print(f"Documentos en la colección: {collection.count()}")
 ```
+
+Búsqueda semántica, con y sin filtro por metadatos:
 
 ```{python}
 #| echo: true
 #| eval: true
 
-# Cargar modelo de embeddings
-model = SentenceTransformer("all-MiniLM-L6-v2")
+def consultar(texto, k=3, **filtros):
+    q = modelo.encode([texto], normalize_embeddings=True).tolist()
+    res = collection.query(query_embeddings=q, n_results=k, **filtros)
+    for doc, meta, dist in zip(res["documents"][0], res["metadatas"][0], res["distances"][0]):
+        print(f"  sim={1 - dist:.2f} [{meta['tema']:<14}] {doc[:70]}")
 
-# Añadir documentos con sus embeddings
-documentos = [
-    "Artificial intelligence is revolutionizing medicine",
-    "Transformers can process sequences in parallel",
-    "Vector databases optimize semantic search",
-    "Fine-tuning with LoRA reduces training cost",
-    "Supervised machine learning requires labeled data"
-]
-
-ids = [f"doc_{i}" for i in range(len(documentos))]
-embeddings_docs = model.encode(documentos).tolist()
-
-collection.add(
-    ids=ids,
-    documents=documentos,
-    embeddings=embeddings_docs
-)
-
-print(f"Documentos insertados: {collection.count()}")
-
-
+pregunta = "¿Cuánto me cobran por mandar dinero al extranjero?"
+print("Sin filtro:")
+consultar(pregunta)
+print("Solo tema = 'errores':")
+consultar(pregunta, where={"tema": "errores"})
 ```
 
-```{python}
-#| echo: true
-#| eval: true
-
-# Búsqueda semántica
-query = "How do current models process sequences?"
-query_embedding = model.encode([query]).tolist()
-
-resultados = collection.query(
-    query_embeddings=query_embedding,
-    n_results=3
-)
-
-print(f"Consulta: {query}\n")
-for i, (doc, dist) in enumerate(zip(resultados["documents"][0], resultados["distances"][0])):
-    sim = 1 - dist
-    print(f"{i+1}. [sim={sim:.4f}] {doc}")
-
-
-```
+El filtro por metadatos **restringe el conjunto antes de buscar** (aquí a los códigos de error, que no tienen nada que ver con la pregunta, y aun así devuelve algo). Es una herramienta potentísima en producción: acotar por cliente, por idioma, por fecha o por permisos de acceso. También es una fuente de errores: si el filtro es demasiado estricto, el sistema devuelve «lo menos malo» entre documentos irrelevantes (recuerda el caso 6 de [01c](01c-embeddings.qmd#sec-fallo-sin-respuesta)).
 
 ### FAISS — Indexación en memoria {#sec-faiss}
 
-FAISS (Facebook AI Similarity Search) es una librería de indexación ANN embebible, ideal para integración en pipelines de Python sin necesidad de un servidor de base de datos.
+FAISS (Facebook AI Similarity Search) es una **librería de índices** embebible [@johnson2019faiss]: ya la usamos en el banco de pruebas. A diferencia de Chroma, solo guarda vectores y devuelve posiciones; los textos y metadatos los gestionas tú.
 
 ```{python}
 #| echo: true
 #| eval: true
 
-import faiss
+indice_faq = faiss.IndexFlatIP(emb_faq.shape[1])
+indice_faq.add(emb_faq.astype("float32"))
 
-# Convertir embeddings a matriz numpy
-emb_matrix = np.array(embeddings_docs).astype("float32")
-dimension = emb_matrix.shape[1]
-
-# Índice plano (exacto) - solo para comparación
-index_exact = faiss.IndexFlatL2(dimension)
-index_exact.add(emb_matrix)
-
-# Índice IVF con cuantización (aproximado)
-nlist = 2  # número de clusters
-quantizer = faiss.IndexFlatL2(dimension)
-index_ivf = faiss.IndexIVFFlat(quantizer, dimension, nlist, faiss.METRIC_L2)
-index_ivf.train(emb_matrix)
-index_ivf.add(emb_matrix)
-index_ivf.nprobe = 2  # número de clusters a explorar
-
-# Búsqueda en ambos índices
-query_vec = np.array(query_embedding).astype("float32")
-dist_exact, idx_exact = index_exact.search(query_vec, 3)
-dist_ivf, idx_ivf = index_ivf.search(query_vec, 3)
-
-print("FAISS — Comparación exacto vs. aproximado:\n")
-print("Índice exacto (FlatL2):")
-for i, idx in enumerate(idx_exact[0]):
-    print(f"  {i+1}. {documentos[idx]} (dist: {dist_exact[0][i]:.4f})")
-
-print("\nÍndice aproximado (IVF):")
-for i, idx in enumerate(idx_ivf[0]):
-    print(f"  {i+1}. {documentos[idx]} (dist: {dist_ivf[0][i]:.4f})")
-
-print(f"\n¿Mismos resultados? {set(idx_exact[0]) == set(idx_ivf[0])}")
-
-
+q = modelo.encode(["¿Cuánto me cobran por mandar dinero al extranjero?"], normalize_embeddings=True).astype("float32")
+puntuaciones, posiciones = indice_faq.search(q, 3)
+for p, i in zip(puntuaciones[0], posiciones[0]):
+    print(f"  {p:.2f}  {textos[i][:70]}")
 ```
 
 ### Comparativa operacional {#sec-comparativa-vdb}
 
-: Comparativa operacional entre Chroma, FAISS, Qdrant y Pinecone {#tbl-comparativa-vdb}
+Las cifras de escala son **órdenes de magnitud orientativos**; dependen del hardware, de la dimensión y de la configuración. Mide con tus datos.
 
-| Característica | Chroma | FAISS | Qdrant | Pinecone |
-|---|---|---|---|---|
-| **Tipo** | Base de datos | Librería | Base de datos | SaaS |
-| **Infraestructura** | Local (sin servidor) | Embebible | Servidor Docker | Cloud |
-| **Persistencia** | Disco (SQLite + vectores) | Memoria / disco | Disco | Cloud |
-| **Privacidad** | Total (local) | Total (local) | Según deploy | Datos en cloud |
-| **Escala** | < 1M vectores | > 1M vectores | 1M+ vectores | Ilimitado |
-| **Coste** | Gratuito | Gratuito | Self-hosted gratis | Por uso |
-| **API** | Python nativa | Python/C++ | REST + gRPC | REST |
+: Comparativa operacional entre opciones habituales de almacenamiento vectorial {#tbl-comparativa-vdb}
 
-### Árbol de decisión para elegir {#sec-arbol-decision}
+| Característica | Chroma | FAISS | pgvector | Qdrant | Pinecone |
+|---|---|---|---|---|---|
+| **Tipo** | Base de datos embebida | Librería de índices | Extensión de PostgreSQL | Base de datos (servidor) | Servicio gestionado (SaaS) |
+| **Infraestructura** | Local, sin servidor | Dentro de tu proceso | Tu PostgreSQL | Docker o cloud | Cloud |
+| **Escala cómoda** | Decenas–cientos de miles de vectores | Desde miles hasta miles de millones (con índices comprimidos) | Hasta unos millones de vectores | Millones y más (con varios nodos) | Gestionada por el proveedor |
+| **Latencia** | Baja (en proceso) | Muy baja (en proceso) | Baja–media (según índice) | Baja (red + índice) | Depende de la red |
+| **Texto y metadatos** | Sí | No (los gestionas tú) | Sí (SQL completo) | Sí (filtros avanzados) | Sí |
+| **Privacidad** | Total (local) | Total (local) | Total si lo alojas tú | Total en self-hosting | Los datos salen a la nube |
+| **Coste** | Gratuito | Gratuito | Gratuito (+ tu PostgreSQL) | Self-hosted gratis | Por uso |
+| **Lo más útil** | Prototipar rápido | Máximo control y velocidad | Si ya usas SQL | Producción con filtros y escala | No operar infraestructura |
+
+### Cómo elegir según escala, latencia y privacidad {#sec-arbol-decision}
 
 ::: {#fig-arbol-decision-vdb}
 ```{mermaid}
 graph TD
-    A[¿Proyecto pequeño<br/>&lt; 100K vectores?] -->|Sí| B[Chroma<br/>FAISS]
-    A -->|No| C[¿Privacidad total?]
-    C -->|Sí| D[FAISS + gestión propia]
-    C -->|No| E[¿Infraestructura propia?]
-    E -->|Sí| F[Qdrant]
-    E -->|No| G[Pinecone]
+    A[¿Datos que no<br/>pueden salir de tu<br/>infraestructura?] -->|Sí| B[¿Ya tienes<br/>PostgreSQL?]
+    A -->|No| C[¿Quieres evitar<br/>operar infraestructura?]
+    B -->|Sí| D[pgvector]
+    B -->|No| E[Qdrant self-hosted<br/>o FAISS]
+    C -->|Sí| F[Pinecone<br/>u otro SaaS]
+    C -->|No| G[¿Prototipo o<br/>producción?]
+    G -->|Prototipo| H[Chroma]
+    G -->|Producción| I[Qdrant o pgvector]
 ```
 :::
+
+Tres preguntas, en este orden:
+
+1. **Privacidad:** ¿pueden los documentos salir de tu infraestructura? Si no, descartas los servicios gestionados.
+2. **Escala:** ¿cuántos vectores tendrás dentro de un año, y a qué dimensión? Haz la cuenta de memoria ([arriba](#sec-memoria-vectores)); si cabe cómodamente en un servidor, no necesitas un sistema distribuido.
+3. **Latencia y carga:** ¿cuántas consultas por segundo y qué recall mínimo? El banco de pruebas de [arriba](#sec-benchmark-ann) muestra que el índice es una decisión que se afina, no una etiqueta.
 
 ::: {.callout-tip}
 ## Consejo práctico
 
-Para el proyecto del módulo empieza con Chroma: es local, no requiere servidor y escala bien para el alcance del curso. Si luego necesitas más rendimiento, migrar a FAISS o Qdrant es directo porque la API de búsqueda semántica es equivalente.
+Para el proyecto del módulo empieza con Chroma: es local, no requiere servidor y sobra para el alcance del curso. Si luego necesitas más rendimiento o filtros avanzados, migrar es razonable porque el flujo (generar embeddings → indexar con metadatos → consultar) es el mismo.
+:::
+
+## Comprueba lo aprendido {#sec-comprueba-01d}
+
+::: {.callout-note collapse="true" title="1. Un compañero propone montar Pinecone para un buscador sobre 50.000 documentos internos confidenciales. ¿Qué le dices?"}
+Dos cosas. Primero, la privacidad: Pinecone es un servicio gestionado y los datos salen de tu infraestructura, así que puede estar descartado por política de la empresa. Segundo, la escala: 50.000 vectores caben en la memoria de un portátil y una búsqueda exacta tarda milisegundos; Chroma, FAISS o pgvector bastan.
+:::
+
+::: {.callout-note collapse="true" title="2. Tienes 20 millones de vectores de 768 dimensiones en float32. ¿Cuánta memoria necesitas solo para los vectores?"}
+20.000.000 × 768 × 4 bytes ≈ 61 GB. Sin contar el índice. Esto empuja hacia cuantización, sistemas distribuidos o modelos de menos dimensiones.
+:::
+
+::: {.callout-note collapse="true" title="3. Subes efSearch de HNSW de 16 a 256. ¿Qué esperas que pase con el recall y con la latencia?"}
+El recall sube (se acerca a 1) y la latencia aumenta, porque el índice explora más candidatos. En el banco de pruebas, de aproximadamente 0,70 a 0,99 de recall, con una latencia varias veces mayor (aunque sigue siendo mucho menor que la de la búsqueda exacta).
+:::
+
+::: {.callout-note collapse="true" title="4. ¿Por qué se recomienda normalizar los embeddings?"}
+Porque con vectores de longitud 1, coseno, producto escalar y L2 producen el mismo orden. Evita sorpresas entre motores que usan métricas distintas por defecto y permite usar la operación más rápida.
 :::
 
 ---
 
-> Has completado la teoría del Bloque 1. Ahora pasa al taller práctico: **[HPD 1 — Pipeline de embeddings y búsqueda semántica](hpd1-embeddings.qmd)**.
+> Has completado la teoría de representación y búsqueda. Falta un paso para tener un pipeline completo: trocear los documentos y comprobar que se recuperan bien. Continúa con **[01e — De documentos a recuperación](01e-recuperacion.qmd)** y después con el taller **[HPD 1 — Pipeline de embeddings y búsqueda semántica](hpd1-embeddings.qmd)**.
 
 # References
 

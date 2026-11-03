@@ -14,8 +14,9 @@ jupyter: python3
 - Usar LangChain para carga de PDFs y chunking con solapamiento
 - Generar embeddings con un modelo open-source
 - Indexar en Chroma y ejecutar búsqueda semántica
-- Evaluar calidad con recall@k
-- Validar el modelo con benchmarks estándar (MTEB)
+- Evaluar la calidad con un ground truth definido por contenido (recall@k, hit@k y MRR)
+- Comparar la búsqueda densa con una línea base léxica (BM25) y con la búsqueda híbrida
+- Validar el modelo con benchmarks estándar (MTEB) y entender sus límites
 
 ## Materiales
 - Librerías: `langchain`, `langchain-text-splitters`, `sentence-transformers`, `chromadb`, `pypdf`, `fpdf2`, `arxiv`, `mteb`
@@ -25,7 +26,7 @@ jupyter: python3
 
 ## Pipeline
 1. **Parte 1 — Aproximación conceptual:** abstracts reales, ejecutar un pipeline completo sobre un ejemplo pequeño
-2. **Parte 2 — Escenario realista:** corpus real de ArXiv, indexación a escala, evaluación MTEB
+2. **Parte 2 — Escenario realista:** corpus real de ArXiv (~1.300 chunks), evaluación con consultas difíciles, comparación BM25 / denso / híbrido y evaluación MTEB
 :::
 
 ::: {.callout-note icon=false}
@@ -37,7 +38,7 @@ por palabras clave exactas. O en un hospital recuperando historiales clínicos c
 síntomas parecidos. Los tres problemas se resuelven con la misma arquitectura:
 convertir documentos en vectores y buscar por similitud semántica.
 
-Al final de este taller sabrás construir ese pipeline de principio a fin. Y lo mejor:
+Al final de este taller sabrás construir ese pipeline de principio a fin y, sobre todo, **medir si funciona**. Y lo mejor:
 cambiar de dominio (legal, médico, financiero) solo requiere cambiar los documentos
 de entrada — el código es el mismo.
 :::
@@ -48,11 +49,16 @@ de entrada — el código es el mismo.
 El [panorama histórico del Bloque 1](00-panorama.qmd) termina en la idea de que un documento y una consulta pueden situarse en un mismo espacio semántico. Este taller convierte esa idea en un sistema ejecutable: ingesta de documentos, chunking, embeddings, indexación, recuperación y evaluación. El objetivo no es solo llamar a un modelo, sino comprobar qué calidad tiene la representación cuando se utiliza para recuperar información.
 :::
 
+::: {.callout-tip icon=false}
+## Antes de empezar
+Activa antes la GPU gratuita en *Entorno de ejecución → Cambiar tipo de entorno de ejecución → GPU T4*: con ella, calcular los embeddings pasa de minutos a segundos. Si Colab no te da GPU libre, el taller funciona igual con CPU, solo que esas celdas tardan más. Ejecuta **ya** la celda de instalación de más abajo y sigue leyendo mientras termina: tarda unos 2 minutos. Si al acabar aparece un aviso en rojo sobre *dependency conflicts* (`google-colab`, `requests`, `opentelemetry`), ignóralo: son paquetes que trae Colab y no afectan a este taller.
+:::
+
 ```{python}
 #| echo: true
 #| eval: false
 
-!pip install -q chromadb sentence-transformers fpdf2 arxiv mteb matplotlib scikit-learn pandas langchain langchain-community langchain-text-splitters pypdf
+!pip install -q chromadb==1.5.9 sentence-transformers==5.5.1 fpdf2==2.8.7 arxiv==4.0.0 mteb==2.12.30 matplotlib scikit-learn "pandas<3" langchain==1.3.2 langchain-community==0.3.31 langchain-text-splitters==1.1.2 pypdf==6.12.2 langchain-core==1.4.0 langgraph==1.2.2 openai==2.38.0
 ```
 
 ```{python}
@@ -69,7 +75,7 @@ import pandas as pd
 from fpdf import FPDF
 from sklearn.decomposition import PCA
 from sentence_transformers import SentenceTransformer
-from langchain_community.document_loaders import PyPDFLoader
+from langchain_community.document_loaders import PyPDFLoader, TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 import chromadb
 import numpy as np
@@ -94,6 +100,17 @@ print(f"Directorio temporal: {BASE_DIR}")
 model = SentenceTransformer(MODEL_NAME)
 print(f"Modelo cargado: {MODEL_NAME}")
 print(f"  Dimensión de embeddings: {model.get_embedding_dimension()}")
+
+# ------------------------------------------------------------------ Funciones de embedding (modelo E5)
+def embed_passages(textos):
+    """Documentos/chunks. E5 espera el prefijo 'passage: '. Se codifica por lotes y normalizado."""
+    return model.encode(["passage: " + t for t in textos], normalize_embeddings=True,
+                        batch_size=64, show_progress_bar=False)
+
+def embed_queries(textos):
+    """Consultas. E5 espera el prefijo 'query: '."""
+    return model.encode(["query: " + t for t in textos], normalize_embeddings=True,
+                        show_progress_bar=False)
 
 # ------------------------------------------------------------------ Chroma (cliente compartido)
 client = chromadb.EphemeralClient()
@@ -174,10 +191,13 @@ def cargar_pdfs(dir_path: str) -> list:
     documentos = []
 
     for filename in sorted(os.listdir(dir_path)):
+        ruta = os.path.join(dir_path, filename)
+
+        if filename.endswith(".txt"):          # abstracts de respaldo (si falla la descarga de PDFs)
+            documentos.extend(TextLoader(ruta, encoding="utf-8").load())
+            continue
         if not filename.endswith(".pdf"):
             continue
-
-        ruta = os.path.join(dir_path, filename)
 
         # TODO: Crear un PyPDFLoader con la ruta del archivo
         # TODO: Llamar a loader.load() para obtener los Document
@@ -230,7 +250,13 @@ for i, chunk in enumerate(chunks):
 
 ## 1.4 Embeddings e indexación en Chroma {#sec-hpd1-1-4-embeddings}
 
-Cada chunk se codifica con `model.encode()` y se inserta en la colección vectorial.
+Todos los chunks se codifican **en un solo lote** (mucho más rápido que de uno en uno) y se insertan en la colección vectorial.
+
+::: {.callout-note icon=false}
+## Los prefijos `query:` y `passage:` de E5
+
+La familia E5 se entrenó con un prefijo distinto para consultas (`query: `) y documentos (`passage: `), y su ficha pide usarlos. Las funciones `embed_queries` y `embed_passages` de la celda de configuración ya lo hacen por ti. ¿Importan mucho? **Mídelo, no lo asumas:** en una prueba nuestra con `e5-small-v2` sobre 5.400 documentos de FiQA, omitirlos cambió el recall@10 en medio punto (0,716 frente a 0,721). Esa prueba usa **otra muestra** de FiQA, distinta de la del entregable (otras consultas y otro tamaño de corpus), así que sus cifras **no son comparables** con las de las 50 consultas del entregable. Poco, pero otros modelos y otros corpus pueden comportarse distinto, y seguir la ficha del modelo no cuesta nada.
+:::
 
 ```{python}
 #| echo: true
@@ -242,44 +268,33 @@ collection = client.get_or_create_collection(
 )
 
 print("Generando embeddings e indexando...")
+embeddings_chunks = embed_passages([c.page_content for c in chunks])    # un solo lote
 
-for chunk_idx, chunk in enumerate(chunks):
-    embedding = model.encode(chunk.page_content).tolist()
-
+contador = {}     # índice del chunk DENTRO de cada documento
+for chunk, embedding in zip(chunks, embeddings_chunks):
     fuente = os.path.basename(chunk.metadata["source"])
-    chunk_id = f"{fuente.replace('.pdf', '')}_chunk_{chunk_idx}"
+    contador[fuente] = contador.get(fuente, -1) + 1
+    idx_local = contador[fuente]
+    chunk_id = f"{os.path.splitext(fuente)[0]}_chunk_{idx_local}"
 
     # TODO: collection.add() con:
     #   ids          — [chunk_id]
-    #   embeddings   — [embedding]
+    #   embeddings   — [embedding.tolist()]
     #   documents    — [chunk.page_content]
-    #   metadatas    — [{"fuente": fuente, "chunk_index": chunk_idx}]
+    #   metadatas    — [{"fuente": fuente, "chunk_index": idx_local}]
 
 print(f"Indexación completada: {collection.count()} vectores en Chroma")
 ```
 
 ::: {.callout-tip}
-## ¿Chroma, FAISS o Qdrant? ¿Cuál elijo?
+## ¿Chroma, FAISS, pgvector o Qdrant? ¿Cuál elijo?
 
-: Comparativa de Chroma, FAISS y Qdrant para almacenar embeddings {#tbl-vector-stores}
-
-| | Chroma | FAISS | Qdrant |
-|---|---|---|---|
-| **Instalación** | `pip install chromadb` | `pip install faiss-cpu` | Docker o cloud |
-| **Escala máxima** | ~500k vectores | Miles de millones | Miles de millones |
-| **Privacidad** | Total (local, sin servidor) | Total (librería embebible) | Depende del despliegue |
-| **Ideal para...** | Prototipos, HPD, proyectos pequeños | Producción on-premise, búsqueda a gran escala | Cloud multi-tenant, API REST nativa |
-
-| **Lo usamos en...** | HPD 1, HPD 5 (RAG) | — | — |
-
-**Regla práctica:** empieza con Chroma (es lo que usamos aquí). Si tu proyecto crece
-a >100k documentos o necesitas servir consultas por API, migra a Qdrant. Si necesitas
-máxima velocidad en local con millones de vectores, FAISS.
+La comparativa completa, con criterios de escala, latencia y privacidad, está en [01d](01d-vectordb.qmd#sec-comparativa-vdb). Para este taller basta la regla práctica: **empieza con Chroma** (local, sin servidor, guarda texto y metadatos). Con unos miles de chunks una búsqueda exacta tarda milisegundos y no necesitas nada más sofisticado; si el proyecto crece, el flujo (embeddings → indexar con metadatos → consultar) se traslada a otro motor. Lo usamos en HPD 1 y en HPD 5.
 :::
 
 ## 1.5 Búsqueda semántica {#sec-hpd1-1-5-busqueda}
 
-La consulta se codifica y se recuperan los `k` chunks más similares por distancia coseno.
+La consulta se codifica y se recuperan los `k` chunks más similares por distancia coseno. Modelo y corpus están en inglés, así que la consulta también (recuerda: [modelo e idioma deben ir a juego](01c-embeddings.qmd#sec-fallo-idioma); en el ejercicio E1 lo pondrás a prueba).
 
 ```{python}
 #| echo: true
@@ -297,7 +312,7 @@ def buscar(collection, query: str, k: int = 5) -> dict:
     Returns:
         dict: Resultado de Chroma con ids, distances, documents y metadatas.
     """
-    query_embedding = model.encode(query).tolist()
+    query_embedding = embed_queries([query])[0].tolist()
 
     # TODO: Llamar a collection.query() con:
     #   query_embeddings — [query_embedding]
@@ -306,8 +321,9 @@ def buscar(collection, query: str, k: int = 5) -> dict:
     return resultados
 
 
-resultados = buscar(collection, "¿Cómo funciona la atención en los Transformers?", k=3)
-print("\nResultados para: '¿Cómo funciona la atención en los Transformers?'")
+PREGUNTA = "How does the attention mechanism work in Transformers?"
+resultados = buscar(collection, PREGUNTA, k=3)
+print(f"\nResultados para: '{PREGUNTA}'")
 for i, (chunk_id, distancia, texto) in enumerate(zip(
     resultados["ids"][0],
     resultados["distances"][0],
@@ -365,7 +381,7 @@ for doc in df_empleados["documento"]:
     print(f"  → {doc}")
 
 # Mismo modelo, mismo encode(), mismo pipeline
-embeddings_tab = model.encode(df_empleados["documento"].tolist())
+embeddings_tab = embed_passages(df_empleados["documento"].tolist())
 print(f"\nEmbeddings tabulares: {embeddings_tab.shape}")
 ```
 
@@ -391,7 +407,7 @@ print(f"Indexación completada: {collection_tab.count()} vectores en Chroma")
 
 # Buscar: "empleados senior de I+D"
 res = collection_tab.query(
-    query_embeddings=[model.encode("empleados senior de I+D").tolist()],
+    query_embeddings=[embed_queries(["empleados senior de I+D"])[0].tolist()],
     n_results=2
 )
 print("\nBúsqueda: 'empleados senior de I+D'")
@@ -408,7 +424,7 @@ for doc, dist in zip(res["documents"][0], res["distances"][0]):
 |---|---|---|
 | **Texto** (PDFs, webs, emails) | `e5-small-v2`, `text-embedding-3-small` | No, vienen pre-entrenados |
 | **Tabular (rápido)** | Texto concatenado + `e5-small-v2` | No, usas el mismo modelo |
-| **Tabular (riguroso)** | TabNet, SCARF | Sí, requieren GPU y target supervisado |
+| **Tabular (riguroso)** | SCARF (aprendizaje contrastivo, autosupervisado) | Sí: hay que entrenarlo con tus propios datos |
 | **Código fuente** | CodeBERT, UnixCoder | No, vienen pre-entrenados |
 | **Imágenes + texto** | CLIP | No, pre-entrenado multimodal |
 
@@ -419,33 +435,39 @@ de embeddings. Si cambias de dominio, cambias los documentos de entrada, no el c
 ::: {.callout-warning}
 ## Limitación honesta del texto concatenado
 
-Este enfoque no sabe que 55000 está numéricamente más cerca de 52000 que de 12000.
-Para eso existen modelos especializados como TabNet (atención sobre columnas
-tabulares) y SCARF (aprendizaje contrastivo tabular), que se mencionan en la
-teoría del Bloque 1. Ambos requieren entrenamiento supervisado con GPU.
+Este enfoque no sabe que 55000 está numéricamente más cerca de 52000 que de 12000. Compruébalo:
 
-Para el 80% de los casos reales de búsqueda semántica sobre datos corporativos
-(buscar empleados por perfil, filtrar productos por características, recuperar
-registros por descripción), el texto concatenado es suficiente.
+```{python}
+#| echo: true
+#| eval: false
+
+for consulta in ["empleado con salario de 51000 euros", "empleado con salario de 12000 euros"]:
+    res = collection_tab.query(query_embeddings=[embed_queries([consulta])[0].tolist()], n_results=4)
+    print(f"\n{consulta}")
+    for meta, dist in zip(res["metadatas"][0], res["distances"][0]):
+        print(f"   {meta['nombre']:<15} distancia {dist:.3f}")
+```
+
+Observa dos cosas: las distancias son casi idénticas entre empleados (el modelo capta "es un empleado con salario", no la cifra) y un salario que no existe (12000) devuelve resultados igual de "cercanos" que uno que sí existe. Para criterios numéricos exactos (salario > 50000, antigüedad > 6 años) la solución habitual no es un embedding mejor sino **combinar la búsqueda semántica con filtros por metadatos** (`where=` en Chroma, o SQL). Existen modelos específicos para filas tabulares, como SCARF, pero hay que entrenarlos con tus datos.
+
+Para muchos casos de búsqueda por descripción (buscar empleados por perfil, productos por características, registros por texto libre) el texto concatenado es un buen punto de partida; para filtros por cifras, no.
 :::
 
-## 1.7 Evaluación con recall@k {#sec-hpd1-1-7-recall}
+## 1.7 Evaluación: recall@k, hit@k y MRR {#sec-hpd1-1-7-recall}
 
 ::: {.callout-note icon=false}
 
-## ¿Qué mide recall@k?
+## ¿Cómo se mide si la búsqueda funciona?
 
-De todos los chunks que deberían aparecer para una consulta (los anotamos a mano como ground truth), ¿cuántos recupera el sistema entre los primeros *k* resultados?
+Necesitamos preguntas de prueba y saber qué chunks son **relevantes** para cada una (el *ground truth*). Con ellos:
 
-: Comparativa del comportamiento de recall@k según el valor de k {#tbl-recall-comparativa}
+- **recall@k:** de todos los chunks relevantes, ¿qué fracción aparece entre los $k$ primeros?
+- **hit@k:** ¿hay al menos un relevante entre los $k$ primeros? (sí/no)
+- **MRR:** $1/\text{posición}$ del primer relevante, promediado.
 
-| Ejemplo con k=1 | Ejemplo con k=5 |
-|---|---|
-| Solo miramos el primer resultado | Miramos los 5 primeros |
-| Si acierta → 1.0 | Si los 2 relevantes salen entre los 5 → 1.0 |
-| Muy exigente | Más realista para búsquedas exploratorias |
+Si una pregunta tiene 5 chunks relevantes y $k=1$, el recall@1 solo puede valer 0,2 como máximo aunque el sistema sea perfecto. Por eso con $k$ pequeño y varios relevantes conviene mirar también hit@k.
 
-Definimos manualmente qué chunks esperamos para cada consulta. Esa lista es el *ground truth*: el criterio humano contra el que medimos al sistema.
+**¿Cómo decidimos qué chunk es relevante?** *Por su contenido*: un chunk es relevante para una pregunta si pertenece al documento correcto y contiene alguna de las frases clave que anotamos a mano. Así el ground truth sigue siendo válido aunque cambies `CHUNK_SIZE` (si lo definiéramos con identificadores como `doc_chunk_3`, cada cambio de troceado lo invalidaría).
 
 :::
 
@@ -453,13 +475,20 @@ Definimos manualmente qué chunks esperamos para cada consulta. Esa lista es el 
 #| echo: true
 #| eval: false
 
+def ids_relevantes(collection, fuente_id, frases):
+    """IDs de los chunks del documento `fuente_id` cuyo texto contiene alguna de las frases (ground truth por contenido)."""
+    datos = collection.get(include=["documents", "metadatas"])
+    return [cid for cid, texto, meta in zip(datos["ids"], datos["documents"], datos["metadatas"])
+            if meta["fuente"].startswith(fuente_id) and any(f in texto.lower() for f in frases)]
+
+
 def recall_at_k(retrieved_ids: list, relevant_ids: list, k: int) -> float:
     """
-    Calcula recall@k: proporción de documentos relevantes recuperados en el top-k.
+    Calcula recall@k: proporción de chunks relevantes recuperados en el top-k.
 
     Args:
         retrieved_ids: IDs recuperados por el sistema (ordenados por relevancia).
-        relevant_ids: IDs relevantes esperados (ground truth).
+        relevant_ids: IDs relevantes (ground truth).
         k: Ventana de resultados a considerar.
 
     Returns:
@@ -475,40 +504,53 @@ def recall_at_k(retrieved_ids: list, relevant_ids: list, k: int) -> float:
     return ...  # ← completar
 
 
+def hit_at_k(retrieved_ids, relevant_ids, k):
+    """1.0 si algún relevante aparece entre los k primeros, 0.0 si no."""
+    return float(any(r in relevant_ids for r in retrieved_ids[:k]))
+
+
+def reciprocal_rank(retrieved_ids, relevant_ids):
+    """1/posición del primer relevante (0.0 si no aparece)."""
+    for pos, r in enumerate(retrieved_ids, start=1):
+        if r in relevant_ids:
+            return 1.0 / pos
+    return 0.0
+
+
+# (consulta) -> (documento correcto, frases clave que debe contener un chunk relevante)
 QUERIES_PRUEBA = {
-    "How does multi-head attention work?": [
-        "1706.03762_chunk_0", "1706.03762_chunk_1",
-    ],
-    "What are sentence embeddings?": [
-        "1908.10084_chunk_0", "1908.10084_chunk_1",
-    ],
-    "How does RAG combine retrieval with generation?": [
-        "2005.11401_chunk_0", "2005.11401_chunk_1",
-    ],
-    "What is the Transformer architecture?": [
-        "1706.03762_chunk_0", "1706.03762_chunk_1",
-    ],
-    "What tasks does RAG improve?": [
-        "2005.11401_chunk_2", "2005.11401_chunk_3",
-    ],
+    "How does multi-head attention work?":            ("1706.03762", ["attention"]),
+    "What are sentence embeddings?":                  ("1908.10084", ["sentence embeddings"]),
+    "How does RAG combine retrieval with generation?": ("2005.11401", ["non-parametric", "retriev"]),
+    "What is the Transformer architecture?":          ("1706.03762", ["transformer"]),
+    "What tasks does RAG improve?":                   ("2005.11401", ["tasks", "qa"]),
 }
 
-print("Evaluación recall@k — corpus con abstracts reales")
+print("Evaluación — corpus con abstracts reales")
 print("=" * 60)
 
-for k in [1, 3, 5]:
-    recalls = []
-    for query, relevantes in QUERIES_PRUEBA.items():
-        res = buscar(collection, query, k=k)
-        retrieved = res["ids"][0]
-        r = recall_at_k(retrieved, relevantes, k)
-        recalls.append(r)
+for q, (fuente_id, frases) in QUERIES_PRUEBA.items():
+    print(f"  {len(ids_relevantes(collection, fuente_id, frases))} chunks relevantes · {q}")
 
-    media = np.mean(recalls)
+for k in [1, 3, 5]:
+    recalls, hits, rrs = [], [], []
+    for query, (fuente_id, frases) in QUERIES_PRUEBA.items():
+        relevantes = ids_relevantes(collection, fuente_id, frases)
+        retrieved = buscar(collection, query, k=10)["ids"][0]
+        recalls.append(recall_at_k(retrieved, relevantes, k))
+        hits.append(hit_at_k(retrieved, relevantes, k))
+        rrs.append(reciprocal_rank(retrieved, relevantes))
+
     print(f"\n  k = {k}")
-    print(f"    Recalls individuales: {[f'{r:.2f}' for r in recalls]}")
-    print(f"    recall@{k} medio: {media:.3f}")
+    print(f"    recall@{k} individuales: {[f'{r:.2f}' for r in recalls]}")
+    print(f"    recall@{k} medio: {np.mean(recalls):.3f} · hit@{k} medio: {np.mean(hits):.2f} · MRR: {np.mean(rrs):.3f}")
 ```
+
+::: {.callout-tip}
+## Qué observar
+
+Con pocos chunks por documento, recall@1 es bajo porque cada pregunta tiene varios chunks relevantes y solo miras uno. Compáralo con hit@1 y con recall@5. Estas dos lecturas juntas dicen algo distinto: *¿el primer resultado es bueno?* frente a *¿he encontrado todo lo relevante?*
+:::
 
 ## Limpieza parte 1 {#sec-hpd1-limpieza-p1}
 
@@ -608,18 +650,23 @@ collection_real = client.get_or_create_collection(
     metadata={"hnsw:space": "cosine"}
 )
 
-print("Indexando corpus real...")
-for chunk_idx, chunk in enumerate(chunks_real):
-    embedding = model.encode(chunk.page_content).tolist()
-    fuente = os.path.basename(chunk.metadata["source"])
-    chunk_id = f"{fuente.replace('.pdf', '')}_chunk_{chunk_idx}"
+print("Indexando corpus real (embeddings por lotes)...")
+embeddings_real = embed_passages([c.page_content for c in chunks_real])
 
-    collection_real.add(
-        ids=[chunk_id],
-        embeddings=[embedding],
-        documents=[chunk.page_content],
-        metadatas=[{"fuente": fuente, "chunk_index": chunk_idx}],
-    )
+contador_real = {}
+ids_real = []
+for chunk in chunks_real:
+    fuente = os.path.basename(chunk.metadata["source"])
+    contador_real[fuente] = contador_real.get(fuente, -1) + 1
+    ids_real.append(f"{os.path.splitext(fuente)[0]}_chunk_{contador_real[fuente]}")
+
+collection_real.add(
+    ids=ids_real,
+    embeddings=embeddings_real.tolist(),
+    documents=[c.page_content for c in chunks_real],
+    metadatas=[{"fuente": os.path.basename(c.metadata["source"]),
+                "chunk_index": int(i.rsplit("_", 1)[1])} for c, i in zip(chunks_real, ids_real)],
+)
 
 print(f"Indexación completada: {collection_real.count()} vectores en Chroma")
 ```
@@ -651,48 +698,137 @@ for query in consultas:
     print(f"   {top_text}...")
 ```
 
-## 2.4 Recall@k sobre corpus real {#sec-hpd1-2-4-recall-real}
+## 2.4 Evaluación sobre el corpus real {#sec-hpd1-2-4-recall-real}
+
+Ahora los papers están completos y cada pregunta tiene decenas de chunks relevantes. Esto cambia qué métrica tiene sentido: con 25 chunks relevantes y $k=5$, **recall@5 no puede superar 0,20**. Aquí `hit@k` y `MRR` cuentan la historia útil: *¿aparece algo bueno arriba?*
 
 ```{python}
 #| echo: true
 #| eval: false
 
-QUERIES_PRUEBA_REAL = {
-    "How does multi-head attention work?": [
-        "1706.03762_chunk_0", "1706.03762_chunk_1",
-    ],
-    "How is BERT pre-trained?": [
-        "1810.04805_chunk_0", "1810.04805_chunk_1",
-    ],
-    "How does RAG combine retrieval and generation?": [
-        "2005.11401_chunk_0", "2005.11401_chunk_1",
-    ],
-    "What is Low-Rank Adaptation?": [
-        "2106.09685_chunk_0", "2106.09685_chunk_1",
-    ],
-    "What metrics does RAGAS use?": [
-        "2309.15217_chunk_0",
-    ],
+# Consultas "fáciles" (la pregunta usa el vocabulario del paper) y "difíciles" (paráfrasis, siglas, términos exactos)
+QUERIES_REAL = {
+    # fáciles
+    "How does multi-head attention work?":        ("1706.03762", ["multi-head"]),
+    "How is BERT pre-trained?":                   ("1810.04805", ["masked lm", "masked language model", "next sentence prediction"]),
+    "How does RAG combine retrieval and generation?": ("2005.11401", ["rag-sequence", "rag-token", "non-parametric memory"]),
+    "What is Low-Rank Adaptation?":               ("2106.09685", ["low-rank", "rank decomposition"]),
+    "What metrics does RAGAS use?":               ("2309.15217", ["faithfulness", "answer relevance", "context relevance"]),
+    # difíciles
+    "RAG-Token versus RAG-Sequence":              ("2005.11401", ["rag-token", "rag-sequence"]),
+    "how to fine-tune a huge model while keeping most weights frozen": ("2106.09685", ["frozen", "freeze", "freezes"]),
+    "what is the MLM objective":                  ("1810.04805", ["masked lm", "mlm"]),
+    "siamese network for comparing sentences":    ("1908.10084", ["siamese"]),
+    "why divide the dot products by the square root of the key dimension": ("1706.03762", ["scaled dot-product", "sqrt", "√dk"]),
 }
 
-print("Evaluación recall@k — corpus real")
-print("=" * 60)
+def evaluar_ranking(funcion_ranking, consultas, collection):
+    """Devuelve (hit@5, recall@5, MRR) medios. funcion_ranking(consulta) -> lista de IDs ordenada."""
+    hits, recalls, rrs = [], [], []
+    for query, (fuente_id, frases) in consultas.items():
+        relevantes = ids_relevantes(collection, fuente_id, frases)
+        if not relevantes:
+            print(f"   ⚠️ sin chunks relevantes para: {query}")
+            continue
+        ranking = funcion_ranking(query)
+        hits.append(hit_at_k(ranking, relevantes, 5))
+        recalls.append(recall_at_k(ranking, relevantes, 5))
+        rrs.append(reciprocal_rank(ranking, relevantes))
+    return np.mean(hits), np.mean(recalls), np.mean(rrs)
 
-for k in [1, 3, 5]:
-    recalls = []
-    for query, relevantes in QUERIES_PRUEBA_REAL.items():
-        res = buscar(collection_real, query, k=k)
-        retrieved = res["ids"][0]
-        r = recall_at_k(retrieved, relevantes, k)
-        recalls.append(r)
+def ranking_denso(query, n=100):
+    return buscar(collection_real, query, k=n)["ids"][0]
 
-    media = np.mean(recalls)
-    print(f"\n  k = {k}")
-    print(f"    Recalls individuales: {[f'{r:.2f}' for r in recalls]}")
-    print(f"    recall@{k} medio: {media:.3f}")
+hit5, rec5, mrr = evaluar_ranking(ranking_denso, QUERIES_REAL, collection_real)
+print("Evaluación — búsqueda DENSA (e5-small-v2) sobre el corpus real")
+print(f"   hit@5 = {hit5:.2f} · recall@5 = {rec5:.3f} · MRR = {mrr:.3f}")
+print("   (el recall@5 es bajo por construcción: hay muchos chunks relevantes por pregunta)")
 ```
 
-## 2.5 Evaluación MTEB — Validación profesional del modelo {#sec-mteb-hpd1}
+## 2.5 Línea base léxica y búsqueda híbrida {#sec-hpd1-2-5-hibrida}
+
+Una evaluación solo vale en comparación. Construimos una **línea base léxica** (BM25, explicado en [01e](01e-recuperacion.qmd#sec-bm25)) y una **búsqueda híbrida** que fusiona los rankings de BM25 y del modelo denso con *Reciprocal Rank Fusion*. La implementación está dada: tu trabajo es interpretarla.
+
+```{python}
+#| echo: true
+#| eval: false
+
+import math
+import re
+from collections import Counter
+
+def tokenizar(texto):
+    return re.findall(r"[a-z0-9\-]+", texto.lower())
+
+class BM25:
+    """BM25 con índice invertido (rápido incluso con ~1.300 chunks)."""
+    def __init__(self, documentos, ids, k1=1.5, b=0.75):
+        self.ids = ids
+        self.tf = [Counter(tokenizar(d)) for d in documentos]
+        self.largo = [sum(t.values()) for t in self.tf]
+        self.avgdl = sum(self.largo) / len(self.largo)
+        self.df = Counter(w for t in self.tf for w in t)
+        self.inv = {}
+        for i, t in enumerate(self.tf):
+            for w in t:
+                self.inv.setdefault(w, []).append(i)
+        self.k1, self.b, self.N = k1, b, len(documentos)
+
+    def ranking(self, consulta):
+        puntos = Counter()
+        for w in set(tokenizar(consulta)):
+            if w not in self.inv:
+                continue
+            idf = math.log(1 + (self.N - self.df[w] + 0.5) / (self.df[w] + 0.5))
+            for i in self.inv[w]:
+                f = self.tf[i][w]
+                puntos[i] += idf * f * (self.k1 + 1) / (f + self.k1 * (1 - self.b + self.b * self.largo[i] / self.avgdl))
+        return [self.ids[i] for i, _ in puntos.most_common()]        # solo chunks con alguna coincidencia
+
+datos = collection_real.get(include=["documents"])
+bm25 = BM25(datos["documents"], datos["ids"])
+
+def ranking_bm25(query):
+    return bm25.ranking(query)
+
+def ranking_hibrido(query, c=60):
+    puntos = Counter()
+    for ranking in (ranking_bm25(query), ranking_denso(query)):
+        for pos, cid in enumerate(ranking, start=1):
+            puntos[cid] += 1 / (c + pos)
+    return [cid for cid, _ in puntos.most_common()]
+
+METODOS = [("Denso", ranking_denso), ("BM25", ranking_bm25), ("Híbrido", ranking_hibrido)]
+
+print(f"{'Método':<10} {'hit@5':>6} {'recall@5':>9} {'MRR':>6}")
+for nombre, f in METODOS:
+    h, r, m = evaluar_ranking(f, QUERIES_REAL, collection_real)
+    print(f"{nombre:<10} {h:>6.2f} {r:>9.3f} {m:>6.3f}")
+
+# Consulta a consulta: posición del PRIMER chunk relevante (None = no aparece)
+print(f"\n{'Posición del primer relevante':<68} {'Denso':>6} {'BM25':>6} {'Híbr.':>6}")
+for query, (fuente_id, frases) in QUERIES_REAL.items():
+    relevantes = set(ids_relevantes(collection_real, fuente_id, frases))
+    posiciones = []
+    for _, f in METODOS:
+        ranking = f(query)
+        posiciones.append(next((i + 1 for i, cid in enumerate(ranking) if cid in relevantes), None))
+    print(f"{query[:66]:<68} {str(posiciones[0]):>6} {str(posiciones[1]):>6} {str(posiciones[2]):>6}")
+```
+
+::: {.callout-note icon=false}
+## Cómo leer el resultado (y cómo no)
+
+En nuestra ejecución (las cifras varían ligeramente con la versión del extractor de PDF) el método denso encontró algo relevante entre los 5 primeros en las 10 consultas (hit@5 = 1,00) y BM25 solo en 8, pero **cuando BM25 acertaba lo colocaba antes** (MRR 0,74 frente a 0,68). La tabla consulta a consulta explica por qué:
+
+- BM25 acierta a la primera en consultas que usan palabras del propio texto ("frozen", "square root", "RAG-Token") y en dos de ellas supera al denso.
+- BM25 falla en preguntas formuladas con otras palabras ("How is BERT pre-trained?" → posición 31; "How does RAG combine retrieval and generation?" → posición 21).
+- El híbrido queda en medio y **no mejora al mejor de los dos**.
+
+Con 10 consultas cualquier diferencia pequeña es ruido. Lo que debes sacar de este ejercicio no es "gana el método X", sino el método de trabajo: un conjunto de consultas, un ground truth por contenido, una línea base y mirar consulta a consulta *dónde* falla cada método.
+:::
+
+## 2.6 Evaluación MTEB — Validación profesional del modelo {#sec-mteb-hpd1}
 
 ::: {.callout-note icon=false}
 Esta sección descarga benchmarks públicos y evalúa el modelo. No es necesaria
@@ -704,7 +840,7 @@ comparar modelos de embeddings en tu proyecto final.
 
 ## ¿Cómo sabemos si el modelo de embeddings es bueno?
 
-MTEB (Massive Text Embedding Benchmark) es el examen estándar: una colección de tareas que miden distintas habilidades (clasificar, agrupar, recuperar, medir similitud).
+MTEB (Massive Text Embedding Benchmark) es el examen estándar: una colección de tareas que miden distintas habilidades (clasificar, agrupar, recuperar, medir similitud) [@muennighoff2023mteb].
 
 Aquí nos centramos en STS (Semantic Textual Similarity): el modelo recibe pares de frases y les asigna una puntuación de parecido. El benchmark compara esas puntuaciones con las que daría un humano. Por ejemplo:
 
@@ -715,7 +851,13 @@ Aquí nos centramos en STS (Semantic Textual Similarity): el modelo recibe pares
 
 La métrica es Spearman rank: una correlación de rankings entre lo que dice el modelo y lo que dice el humano. Va de 0 (aleatorio) a 1 (perfecto). Un 0,89 significa que el modelo coincide muy bien con el criterio humano.
 
-Usamos dos tareas complementarias: BIOSSES (100 pares, dominio biomédico, rapidísima) y STS12 (621 pares, dominio general). Juntas dan una foto fiable del modelo en menos de 1 minuto.
+Usamos dos tareas complementarias: BIOSSES (100 pares, dominio biomédico, rapidísima) y STS12 (621 pares, dominio general). Juntas dan una foto rápida del modelo en menos de 1 minuto.
+
+::: {.callout-warning icon=false}
+## STS no es recuperación
+
+Estas tareas miden si el modelo puntúa bien *pares de frases* parecidas. Una buena nota en STS **no garantiza** que el modelo recupere bien documentos largos para una pregunta, que es lo que hacemos en este taller. MTEB incluye también tareas de **Retrieval** (basadas en el benchmark BEIR [@thakur2021beir], por ejemplo FiQA2018 o NFCorpus) que son mucho más relevantes para un sistema de búsqueda; consulta la pestaña *Retrieval* del leaderboard de MTEB y, sobre todo, **mide con tus propias consultas**, como acabas de hacer en las secciones 2.4 y 2.5.
+:::
 
 :::
 
@@ -788,9 +930,9 @@ Escribe un texto de ~300 palabras sobre *fine-tuning con LoRA* y añádelo al di
 
 **A2 — Experimenta con los parámetros de chunking**
 
-Modifica `CHUNK_SIZE` y `CHUNK_OVERLAP` en 3 combinaciones (por ejemplo: `200/30`, `400/60`, `800/120`). Anota en una tabla el número de chunks generados y el recall@1 medio para cada combinación.
+Modifica `CHUNK_SIZE` y `CHUNK_OVERLAP` en 3 combinaciones (por ejemplo: `200/30`, `400/60`, `800/120`) y repite la evaluación de la sección 1.7 (o la 2.4). Anota en una tabla el número de chunks, el hit@1 y el MRR medios para cada combinación.
 
-¿Qué combinación funciona mejor? ¿Por qué crees que ocurre?
+Como el ground truth se define **por contenido**, las cifras de las tres combinaciones son comparables. ¿Qué combinación funciona mejor? ¿Por qué crees que ocurre? ¿Qué habría pasado si el ground truth se hubiera definido con identificadores como `doc_chunk_3`?
 
 ::: {.callout-note}
 **Objetivo:** desarrollar criterio sobre cómo elegir el tamaño de chunk según el caso de uso.
@@ -800,7 +942,7 @@ Modifica `CHUNK_SIZE` y `CHUNK_OVERLAP` en 3 combinaciones (por ejemplo: `200/30
 
 **A3 — Cambia de modelo de embeddings**
 
-Sustituye `intfloat/e5-small-v2` por `all-MiniLM-L6-v2` (22M parámetros, disponible en Sentence-Transformers). Repite el recall@k en la Parte 1. ¿Mejora o empeora? ¿Merece la pena usar un modelo más pequeño?
+Sustituye `intfloat/e5-small-v2` por `all-MiniLM-L6-v2` (22M parámetros, disponible en Sentence-Transformers; este modelo **no** usa prefijos `query:`/`passage:`, así que adapta `embed_queries` y `embed_passages`). Repite la evaluación en la **Parte 2**, no en la Parte 1: con solo 3 documentos casi cualquier modelo se ve bien. ¿Mejora o empeora? ¿Merece la pena usar un modelo más pequeño?
 
 ::: {.callout-note}
 **Objetivo:** comparar modelos y desarrollar criterio de selección.
@@ -810,10 +952,20 @@ Sustituye `intfloat/e5-small-v2` por `all-MiniLM-L6-v2` (22M parámetros, dispon
 
 **A4 — Construye tu propio ground truth**
 
-Para el corpus real (ArXiv), lee el abstract de 2 papers de la lista y escribe 3 consultas nuevas con sus chunks relevantes esperados. Ejecuta recall@k sobre tus consultas y compara los resultados con el ground truth del profesor.
+Para el corpus real (ArXiv), lee el abstract de 2 papers de la lista y escribe 3 consultas nuevas con el documento correcto y 2-3 frases clave que debe contener un chunk relevante. Evalúa el método denso y compara tus resultados con los de las consultas del profesor.
 
 ::: {.callout-note}
 **Objetivo:** entender que el ground truth no es automático — requiere juicio humano.
+:::
+
+---
+
+**A5 — Caza fallos**
+
+Con la Parte 2 ya evaluada, encuentra **una consulta** en la que BM25 recupere el resultado correcto en la primera posición y el denso no, y **otra** en la que ocurra lo contrario. Para cada una, explica por qué falla el método que falla (pista: mira el [Caso 3 de 01c](01c-embeddings.qmd#sec-fallo-codigos) y la sección [Buscar con palabras](01e-recuperacion.qmd#sec-bm25)).
+
+::: {.callout-note}
+**Objetivo:** aprender a diagnosticar un sistema de recuperación consulta a consulta, no solo con una media.
 :::
 
 ---
@@ -822,7 +974,7 @@ Para el corpus real (ArXiv), lee el abstract de 2 papers de la lista y escribe 3
 
 **E1 — Pipeline multilingüe**
 
-Sustituye `e5-small-v2` por `intfloat/multilingual-e5-small`. Traduce los abstracts al español y compara el recall@k entre consultas en inglés → docs en español vs inglés → inglés. ¿Se mantiene la calidad translingüe?
+Sustituye `e5-small-v2` por `intfloat/multilingual-e5-small` (mantiene los prefijos `query:`/`passage:`). Traduce los abstracts al español y compara hit@k y MRR entre consultas en inglés → docs en español vs inglés → inglés. ¿Se mantiene la calidad translingüe? Repite con el modelo solo inglés para ver cuánto se degrada.
 
 **E2 — Chunking semántico avanzado**
 
@@ -878,10 +1030,14 @@ subgraph "Consulta"
     F["Query en lenguaje natural"] --> G["Embedding de consulta"]
     G --> E
     E --> H["Resultados top-k"]
+    F --> K["BM25<br>(línea base léxica)"]
+    K --> L["Fusión RRF<br>(híbrido)"]
+    H --> L
 end
 subgraph "Evaluación"
-    H --> I["Recall@k"]
-    D --> J["MTEB<br>Similitud textual"]
+    H --> I["hit@k · recall@k · MRR<br>(ground truth por contenido)"]
+    L --> I
+    D --> J["MTEB<br>(límites de STS)"]
 end
 ```
 :::
