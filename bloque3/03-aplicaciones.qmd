@@ -43,6 +43,7 @@ Los tres pilares de este bloque son complementarios y se refuerzan mutuamente:
 |---|---|
 | **RAG Avanzado** — Re-ranking, HyDE, RAG-Fusion, RAGAS, multi-fuente | [03b-rag-avanzado.qmd](03b-rag-avanzado.qmd) |
 | **Datos Sintéticos** — CTGAN, TVAE, TabDDPM, SDV, validación estadística | [03a-datos-sinteticos.qmd](03a-datos-sinteticos.qmd) |
+| **Previo a fine-tuning** — Cabezas de salida, SFT, PPO y DPO (lectura recomendada) | [03c-previo-cabezas.qmd](03c-previo-cabezas.qmd) |
 | **Fine-tuning eficiente** — LoRA, QLoRA, PEFT, cuándo adaptar modelos | [03c-fine-tuning.qmd](03c-fine-tuning.qmd) |
 | **HPD 5 — Sistema RAG sobre datos mixtos** | [hpd5-rag-mixto.qmd](../evaluables/hpd5-rag-mixto.qmd) |
 

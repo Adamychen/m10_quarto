@@ -46,11 +46,16 @@ En este taller construyes ese sistema completo. Y al final lo evalúas con RAGAS
 saber objetivamente si funciona bien, no solo "a ojo".
 :::
 
+::: {.callout-tip icon=false}
+## Antes de empezar
+Ejecuta **ya** la celda de instalación de más abajo y sigue leyendo mientras termina: tarda unos 2 minutos. Si al acabar aparece un aviso en rojo sobre *dependency conflicts* (`google-colab`, `requests`, `opentelemetry`), ignóralo: son paquetes que trae Colab y no afectan a este taller.
+:::
+
 ```{python}
 #| echo: true
 #| eval: false
 
-!pip install -q chromadb sentence-transformers langchain langchain-community langchain-text-splitters pypdf ragas datasets fpdf2 pandas matplotlib scikit-learn python-dotenv flashrank
+!pip install -q chromadb==1.5.9 sentence-transformers==5.5.1 langchain==1.3.2 langchain-community==0.3.31 langchain-text-splitters==1.1.2 pypdf==6.12.2 ragas==0.4.3 datasets==4.8.5 fpdf2==2.8.7 "pandas<3" matplotlib scikit-learn python-dotenv==1.2.2 flashrank==0.2.10 langchain-core==1.4.0 langgraph==1.2.2 openai==2.38.0
 ```
 
 ```{python}
@@ -649,12 +654,36 @@ print(f"Dataset de evaluación: {len(dataset_eval)} preguntas")
 
 ## 6.2 Evaluar con RAGAS {#sec-hpd5-6-2-ragas}
 
+::: {.callout-note}
+## RAGAS necesita dos modelos
+RAGAS usa un **LLM juez** (`llm`) y un **modelo de embeddings**. El juez puntúa `faithfulness`, `context_precision` y `answer_relevancy`; los embeddings solo los usa `answer_relevancy`. Un juez pequeño puede puntuar 0 una respuesta honesta del tipo "No tengo datos suficientes para responder a esta pregunta", aunque sea correcta. Interpreta las puntuaciones con esa cautela.
+:::
+
 ```{python}
 #| echo: true
 
 from ragas import evaluate
 from ragas.metrics import faithfulness, answer_relevancy, context_precision
+from ragas.llms import LangchainLLMWrapper
+from langchain_core.embeddings import Embeddings
 from datasets import Dataset
+
+# RAGAS necesita DOS modelos: `llm` (juez) y `embeddings` (similitud para answer_relevancy).
+# Si no se pasan embeddings, RAGAS intenta usar OpenAI y falla sin OPENAI_API_KEY.
+# Usamos el e5-small-v2 que ya cargaste en `model`, sin claves extra.
+# e5 recomienda el prefijo "query: " en ambos lados para comparar textos entre sí.
+class LocalEmbeddings(Embeddings):
+    """Adapta SentenceTransformer a la interfaz de LangChain que RAGAS acepta."""
+
+    def embed_documents(self, texts):
+        return model.encode(["query: " + t for t in texts]).tolist()
+
+    def embed_query(self, text):
+        return model.encode(["query: " + text])[0].tolist()
+
+# Llamus devuelve una sola respuesta por petición y answer_relevancy pide 3 por defecto.
+# Con strictness=1 genera una pregunta por respuesta y se evita el aviso de RAGAS.
+answer_relevancy.strictness = 1
 
 # ─── COMPLETAR: evaluar con RAGAS ───
 # TODO: Convertir dataset_eval a Dataset de Hugging Face
@@ -664,7 +693,7 @@ from datasets import Dataset
 #       "contexts": [...],
 #       "ground_truth": [...],
 #   })
-# TODO: Ejecutar evaluate(dataset_hf, metrics=[faithfulness, answer_relevancy, context_precision])
+# TODO: Ejecutar evaluate(dataset_hf, metrics=[...]) pasando también llm (envuelto con LangchainLLMWrapper) y embeddings=LocalEmbeddings()
 # TODO: Convertir resultados a DataFrame y mostrarlo
 
 # result = evaluate(...)
@@ -852,9 +881,8 @@ Escribe 3 preguntas originales que no estén en la lista `preguntas_eval`. Para 
 
 Este taller te ha proporcionado un pipeline RAG funcional sobre datos mixtos.
 El **[Entregable de HPD 5](../evaluables/hpd5-entregable.qmd)** te pide construir
-un pipeline similar pero adaptado a tu camino elegido (Finanzas, Salud o
-E-commerce), con tu propio corpus, tu base de datos y una evaluación completa
-con RAGAS.
+un pipeline similar con tu propio corpus financiero, tu base de datos y una
+evaluación completa con RAGAS.
 :::
 
 # References

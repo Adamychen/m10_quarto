@@ -106,7 +106,7 @@ Gracias a esa combinación fija, dos equipos independientes pueden evaluar el mi
 ::: {.callout-tip}
 ## ¿Por qué MTEB aparece primero?
 
-Porque en este módulo ya lo usas: el [HPD 1 ejecuta MTEB](../bloque1/hpd1-embeddings.qmd#sec-mteb-hpd1) sobre BIOSSES y STS12, y el [entregable de HPD 1](../evaluables/hpd1-entregable.qmd) te pide justificar la elección de un modelo de embeddings "teniendo en cuenta el benchmark MTEB". Esta sección te ofrece el marco conceptual que da sentido a esa práctica.
+Porque en este módulo ya lo usas: el [HPD 1 ejecuta MTEB](../bloque1/hpd1-embeddings.qmd#sec-mteb-hpd1) sobre BIOSSES y STS12, y el [entregable de HPD 1](../evaluables/hpd1-entregable.qmd) te pide justificar la elección de un modelo de embeddings con evidencia de recuperación (tus propias métricas y las tareas de *Retrieval* de MTEB), explicando por qué una nota de STS no basta. Esta sección te ofrece el marco conceptual que da sentido a esa práctica.
 :::
 
 #### Cómo leer un leaderboard críticamente {#sec-leer-leaderboard}

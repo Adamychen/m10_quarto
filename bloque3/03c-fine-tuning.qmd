@@ -6,6 +6,8 @@ engine: jupyter
 [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque3/03c-fine-tuning.ipynb)
 
 > Este tema forma parte del Bloque 3 — Aplicaciones. Se recomienda haber completado los [Bloques 1](../bloque1/01-fundamentos.qmd) y [2](../bloque2/02-orquestacion.qmd) primero.
+>
+> **Lectura previa recomendada:** [Del estado oculto a la salida: cabezas y objetivos de entrenamiento](03c-previo-cabezas.qmd), que explica qué son una cabeza de salida, SFT, PPO y DPO.
 
 ```{python}
 #| echo: true

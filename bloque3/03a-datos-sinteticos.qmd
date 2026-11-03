@@ -503,7 +503,7 @@ plt.show()
 
 ---
 
-> Continúa con la validación práctica en los **[ejercicios del entregable HPD 5](../evaluables/hpd5-entregable.qmd)**, donde aplicarás generación de datos sintéticos en tu camino elegido.
+> Continúa con la validación práctica en los **[ejercicios del entregable HPD 5](../evaluables/hpd5-entregable.qmd)**, donde aplicarás generación de datos sintéticos en el contexto financiero del módulo.
 
 # References
 

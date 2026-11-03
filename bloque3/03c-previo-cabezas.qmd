@@ -1,15 +1,14 @@
 ---
-title: "01e — Del estado oculto a la salida: cabezas y objetivos de entrenamiento"
+title: "03c (previo) — Del estado oculto a la salida: cabezas y objetivos de entrenamiento"
 lang: es
 ---
 
-> Este tema forma parte del Bloque 1 — Fundamentos.
-> Se recomienda leerlo después de [01a — Arquitectura Transformer](01a-transformer.qmd) y [01b — LLM e inferencia](01b-llms.qmd).
+> Esta página es el **previo conceptual de [03c — Fine-tuning eficiente](03c-fine-tuning.qmd)**: explica qué es una cabeza de salida y qué significan SFT, PPO y DPO antes de ajustar un modelo. Se recomienda haber leído antes [01a — Arquitectura Transformer](../bloque1/01a-transformer.qmd) y [01b — LLM e inferencia](../bloque1/01b-llms.qmd). Es lectura recomendada, no obligatoria.
 
 ::: {.callout-note}
 ## Qué aprenderás
 
-En [01a - Cómo funciona un Transformer de un vistazo](01a-transformer.qmd#sec-vistazo-transformer) vimos cómo una secuencia de tokens se transforma en estados ocultos contextualizados. En esta página seguimos el recorrido hasta la salida del modelo.
+En [01a - Cómo funciona un Transformer de un vistazo](../bloque1/01a-transformer.qmd#sec-vistazo-transformer) vimos cómo una secuencia de tokens se transforma en estados ocultos contextualizados. En esta página seguimos el recorrido hasta la salida del modelo.
 
 La idea central es sencilla, pero conviene separar dos niveles que suelen mezclarse:
 
@@ -248,7 +247,7 @@ El ajuste eficiente de parámetros introduce otra distinción. LoRA (*Low-Rank A
 
 El modelo base puede permanecer congelado mientras se entrenan esos adaptadores. El resultado sigue utilizando la misma LM head, pero el *backbone* produce estados ocultos diferentes porque los adaptadores han modificado su transformación. En prompt tuning, en cambio, se aprenden vectores adicionales que se incorporan a la entrada [@lester2021prompttuning].
 
-La explicación detallada de LoRA aparece en [03c - Fine-tuning eficiente](../bloque3/03c-fine-tuning.qmd#sec-lora). Aquí basta con conservar la separación:
+La explicación detallada de LoRA aparece en [03c - Fine-tuning eficiente](03c-fine-tuning.qmd#sec-lora). Aquí basta con conservar la separación:
 
 | Concepto | Qué describe |
 |---|---|
@@ -282,14 +281,14 @@ El *backbone* construye representaciones contextuales. La cabeza determina cómo
 Esta distinción conecta la página con el resto del módulo:
 
 - En el Bloque 2, las llamadas a un LLM utilizan la política y su *LM head* para producir tokens.
-- En el Bloque 3, SFT y LoRA permiten adaptar el comportamiento a instrucciones o datos de dominio.
+- En la página siguiente de este bloque ([03c](03c-fine-tuning.qmd)), SFT y LoRA permiten adaptar el comportamiento a instrucciones o datos de dominio.
 - En el Bloque 4, los modelos de recompensa y los evaluadores *LLM-as-a-judge* pueden proporcionar señales de evaluación, pero no son equivalentes por definición.
 
 La pregunta práctica que debe guiar la lectura de un paper es: ¿qué representación produce el modelo, qué salida se calcula a partir de ella y con qué señal se entrenan sus parámetros?
 
 ---
 
-> Has terminado esta lectura del Bloque 1. Continúa con [HPD 1 - Pipeline de embeddings y búsqueda semántica](hpd1-embeddings.qmd).
+> Continúa con **[03c — Fine-tuning eficiente](03c-fine-tuning.qmd)**, donde aplicarás SFT y LoRA.
 
 # References
 
