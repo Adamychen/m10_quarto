@@ -9,19 +9,19 @@ engine: jupyter
 
 ::: {.callout-tip icon=false}
 ## Objetivos
-- Implementar un servidor MCP con FastMCP que exponga datos corporativos
+- Implementar un servidor MCP con FastMCP que exponga datos de facturación
 - Definir herramientas (tools) y recursos (resources) tipados con Python
 - Conectar un cliente LLM y dejar que decida qué tool usar
-- Aplicar y probar medidas de seguridad (sanitización, límites)
+- Aplicar y probar medidas de seguridad (solo lectura, sanitización, límites)
 - Analizar riesgos: prompt injection, data leakage
 
 ## Materiales
 - Librerías: `fastmcp`, `sqlite3` (stdlib), `openai`, `python-dotenv`
-- Base de datos SQLite corporativa: empleados, proyectos, horas (generada en el notebook)
+- Base de datos SQLite de ejemplo: **Chinook** (tienda de música digital, se descarga en el notebook)
 - LLM: API Llamus US (`https://llamus.cs.us.es/api/v1`) o local (Ollama)
 
 ## Pipeline
-1. **Setup:** crear BD SQLite con datos realistas
+1. **Setup:** descargar la base Chinook y abrirla en modo solo lectura
 2. **Servidor:** implementar tools y resources con FastMCP
 3. **Cliente:** conectar un LLM y probar consultas en lenguaje natural
 4. **Seguridad:** sanitización, límites, test de ataques
@@ -31,33 +31,40 @@ engine: jupyter
 ::: {.callout-note icon=false}
 ## ¿Por qué necesitas esto?
 
-Imagina que trabajas en una empresa con 3 sistemas distintos: un ERP con datos de
-empleados, un CRM con clientes y hojas de cálculo con presupuestos. Conectar un
-asistente conversacional a cada uno requeriría 3 integraciones distintas, cada una
-con su propia autenticación y formato. MCP (Model Context Protocol) resuelve
+Imagina que trabajas como analista en una empresa con 3 sistemas distintos: un ERP
+con la facturación, un CRM con clientes y hojas de cálculo con inventario.
+Conectar un asistente conversacional a cada uno requeriría 3 integraciones distintas,
+cada una con su propia autenticación y formato. MCP (Model Context Protocol) resuelve
 esto: es un estándar abierto que actúa como un *USB-C para LLM*. Defines un
 servidor por cada fuente de datos y cualquier cliente LLM se conecta igual.
 
-En este taller construyes tu primer servidor MCP con 3 tablas de ejemplo. Pero la
-arquitectura escala a cualquier fuente de datos: SQL, APIs REST, archivos locales,
-servicios cloud. El protocolo es el mismo.
+En este taller construyes tu primer servidor MCP sobre una base de datos real de
+ejemplo (Chinook, con facturas, clientes, catálogo y empleados). La arquitectura escala
+a cualquier fuente de datos: SQL, APIs REST, archivos locales, servicios cloud.
+El protocolo es el mismo.
 :::
 
-# Parte 1 — Setup y dataset corporativo {#sec-hpd4-p1}
+# Parte 1 — Setup y base de datos {#sec-hpd4-p1}
 
-Empezamos instalando dependencias y creando una base de datos SQLite con 3 tablas interrelacionadas: `empleados`, `proyectos` y `horas`.
+Empezamos instalando dependencias y descargando la base de datos Chinook.
+
+::: {.callout-tip icon=false}
+## Antes de empezar
+Ejecuta **ya** la celda de instalación de más abajo y sigue leyendo mientras termina: tarda unos 2 minutos. Si al acabar aparece un aviso en rojo sobre *dependency conflicts* (`google-colab`, `requests`, `opentelemetry`), ignóralo: son paquetes que trae Colab y no afectan a este taller.
+:::
 
 ```{python}
 #| echo: true
 #| eval: false
 
-!pip install -q fastmcp openai python-dotenv
+!pip install -q fastmcp==3.3.1 openai==2.38.0 python-dotenv==1.2.2
 ```
 
 ```{python}
 #| echo: true
 
-import os, sqlite3, tempfile, json
+import os, sqlite3, tempfile, json, re, time, urllib.request
+from pathlib import Path
 """
 Setup compartido para la API key de Llamus en todos los notebooks.
 Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).
@@ -113,191 +120,91 @@ np.random.seed(42)
 print("Librerías cargadas correctamente.")
 ```
 
-## 1.1 Crear la base de datos corporativa {#sec-hpd4-bd-corporativa}
+## 1.1 Descargar y abrir la base Chinook {#sec-hpd4-bd-chinook}
 
-Vamos a crear 3 tablas que simulan los datos de una empresa con ~30 empleados repartidos en 5 departamentos, 12 proyectos y 150 registros de horas imputadas.
+[Chinook](https://github.com/lerocha/chinook-database) es una base de datos de ejemplo de una tienda de música digital: catálogo (artistas, álbumes, pistas, géneros), clientes, empleados y facturas. Fue creada por Luis Rocha y se distribuye con **licencia MIT**. Los datos de catálogo proceden de una biblioteca de iTunes real; clientes y empleados son ficticios.
+
+El fichero SQLite pesa unos 1 MB. Lo descargamos una vez, lo guardamos en caché en el directorio temporal y lo abrimos en **modo solo lectura** (`mode=ro`): el servidor MCP nunca debe poder modificar los datos.
 
 ```{python}
 #| echo: true
 
-db = sqlite3.connect(":memory:")
+CHINOOK_URL = "https://github.com/lerocha/chinook-database/raw/master/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite"
+CHINOOK_PATH = os.path.join(tempfile.gettempdir(), "chinook_cache", "Chinook_Sqlite.sqlite")
 
-# Tabla empleados
-db.execute("""
-    CREATE TABLE empleados (
-        id INTEGER PRIMARY KEY,
-        nombre TEXT NOT NULL,
-        departamento TEXT NOT NULL,
-        salario REAL NOT NULL,
-        antiguedad_años INTEGER NOT NULL
-    )
-""")
+def _es_chinook(path) -> bool:
+    """Comprueba que el fichero es SQLite y contiene la tabla Invoice."""
+    try:
+        con = sqlite3.connect(f"{Path(path).resolve().as_uri()}?mode=ro", uri=True)
+        try:
+            return con.execute(
+                "SELECT 1 FROM sqlite_master WHERE type='table' AND name='Invoice'"
+            ).fetchone() is not None
+        finally:
+            con.close()
+    except sqlite3.DatabaseError:
+        return False
 
-# Tabla proyectos
-db.execute("""
-    CREATE TABLE proyectos (
-        id INTEGER PRIMARY KEY,
-        nombre TEXT NOT NULL,
-        departamento TEXT NOT NULL,
-        presupuesto REAL NOT NULL,
-        estado TEXT NOT NULL CHECK(estado IN ('activo', 'finalizado', 'pausado'))
-    )
-""")
+def descargar_chinook(url=CHINOOK_URL, destino=CHINOOK_PATH, timeout=60) -> str:
+    """Descarga Chinook (~1 MB) al directorio temporal. Si ya existe la copia en caché, no la descarga de nuevo."""
+    if os.path.exists(destino) and _es_chinook(destino):
+        return destino
+    os.makedirs(os.path.dirname(destino), exist_ok=True)
+    tmp = destino + ".part"
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as resp:
+            data = resp.read()
+        with open(tmp, "wb") as f:
+            f.write(data)
+    except Exception as e:
+        raise RuntimeError(
+            f"No se pudo descargar la base Chinook desde:\n  {url}\n"
+            f"Causa: {e}\n"
+            "Comprueba la conexión a Internet. Si el problema persiste, descarga el fichero "
+            f"manualmente y guárdalo en:\n  {destino}"
+        ) from e
+    if not _es_chinook(tmp):
+        os.remove(tmp)
+        raise RuntimeError("El fichero descargado no es la base Chinook (SQLite con tabla Invoice).")
+    os.replace(tmp, destino)
+    return destino
 
-# Tabla horas (relaciona empleados con proyectos)
-db.execute("""
-    CREATE TABLE horas (
-        id INTEGER PRIMARY KEY,
-        empleado_id INTEGER NOT NULL,
-        proyecto_id INTEGER NOT NULL,
-        fecha TEXT NOT NULL,
-        horas REAL NOT NULL,
-        FOREIGN KEY (empleado_id) REFERENCES empleados(id),
-        FOREIGN KEY (proyecto_id) REFERENCES proyectos(id)
-    )
-""")
+def conectar_solo_lectura(path: str):
+    """Abre la base en modo solo lectura (mode=ro) y con un autorizador que solo permite leer:
+    el motor rechaza ATTACH, PRAGMA, escrituras y cualquier otra acción aunque el validador falle."""
+    uri = Path(path).resolve().as_uri() + "?mode=ro"
+    con = sqlite3.connect(uri, uri=True, check_same_thread=False)
+    permitidas = {sqlite3.SQLITE_SELECT, sqlite3.SQLITE_READ, sqlite3.SQLITE_FUNCTION}
+    con.set_authorizer(lambda accion, *_: sqlite3.SQLITE_OK if accion in permitidas else sqlite3.SQLITE_DENY)
+    return con
 
-print("✅ Tablas creadas: empleados, proyectos, horas")
+DB_PATH = descargar_chinook()
+db = conectar_solo_lectura(DB_PATH)
+print(f"✅ Chinook abierta en modo solo lectura: {DB_PATH}")
 ```
 
 ```{python}
 #| echo: true
 
-# Datos: empleados
-empleados_data = [
-    (1, "Ana García", "I+D", 55000, 7),
-    (2, "Carlos Ruiz", "I+D", 62000, 10),
-    (3, "Beatriz López", "I+D", 48000, 3),
-    (4, "David Martín", "I+D", 51000, 5),
-    (5, "Elena Díaz", "I+D", 58000, 8),
-    (6, "Fernando Gil", "I+D", 45000, 2),
-    (7, "Gloria Sanz", "Ventas", 52000, 6),
-    (8, "Héctor Mora", "Ventas", 47000, 4),
-    (9, "Isabel Cruz", "Ventas", 50000, 5),
-    (10, "Javier León", "Ventas", 54000, 9),
-    (11, "Karla Vega", "Ventas", 43000, 2),
-    (12, "Luis Paz", "RRHH", 44000, 3),
-    (13, "Marina Rey", "RRHH", 46000, 6),
-    (14, "Nicolás Gil", "RRHH", 41000, 1),
-    (15, "Olga Serrano", "RRHH", 48000, 4),
-    (16, "Pablo Ortiz", "Operaciones", 50000, 7),
-    (17, "Rosa Ibáñez", "Operaciones", 53000, 8),
-    (18, "Sergio Lara", "Operaciones", 45000, 3),
-    (19, "Teresa Campos", "Operaciones", 47000, 5),
-    (20, "Uriel Bueno", "Operaciones", 49000, 6),
-    (21, "Violeta Ríos", "Finanzas", 56000, 9),
-    (22, "Walter Pinto", "Finanzas", 59000, 11),
-    (23, "Ximena Rojas", "Finanzas", 51000, 4),
-    (24, "Yago Fuentes", "Finanzas", 48000, 3),
-    (25, "Zaida Herrera", "Finanzas", 52000, 7),
-    (26, "Alberto Casas", "I+D", 47000, 2),
-    (27, "Blanca Núñez", "Ventas", 44000, 3),
-    (28, "César Román", "Operaciones", 46000, 4),
-    (29, "Diana Soler", "Finanzas", 54000, 6),
-    (30, "Emilio Toro", "RRHH", 42000, 1),
-]
-
-db.executemany(
-    "INSERT INTO empleados VALUES (?, ?, ?, ?, ?)",
-    empleados_data
-)
-print(f"✅ {len(empleados_data)} empleados insertados")
-print(f"   Departamentos: {', '.join(sorted(set(e[2] for e in empleados_data)))}")
-```
-
-```{python}
-#| echo: true
-
-proyectos_data = [
-    (1, "Alpha", "I+D", 200000, "activo"),
-    (2, "Beta", "I+D", 150000, "activo"),
-    (3, "Gamma", "I+D", 80000, "finalizado"),
-    (4, "CRM Upgrade", "Ventas", 120000, "activo"),
-    (5, "Sales Dashboard", "Ventas", 60000, "pausado"),
-    (6, "Onboarding 2.0", "RRHH", 45000, "activo"),
-    (7, "Payroll Migration", "RRHH", 90000, "finalizado"),
-    (8, "Logística Smart", "Operaciones", 180000, "activo"),
-    (9, "Warehouse AI", "Operaciones", 130000, "pausado"),
-    (10, "ERP Modernización", "Finanzas", 250000, "activo"),
-    (11, "Auditoría 2026", "Finanzas", 75000, "activo"),
-    (12, "Forecast Tool", "Finanzas", 95000, "finalizado"),
-]
-
-db.executemany(
-    "INSERT INTO proyectos VALUES (?, ?, ?, ?, ?)",
-    proyectos_data
-)
-print(f"✅ {len(proyectos_data)} proyectos insertados")
-print(f"   Activos: {sum(1 for p in proyectos_data if p[4] == 'activo')}")
-print(f"   Finalizados: {sum(1 for p in proyectos_data if p[4] == 'finalizado')}")
-print(f"   Pausados: {sum(1 for p in proyectos_data if p[4] == 'pausado')}")
-```
-
-```{python}
-#| echo: true
-
-# Generar 150 registros de horas realistas
-horas_data = []
-horas_por_proyecto = {
-    1: 25, 2: 20, 3: 10, 4: 18, 5: 8,
-    6: 12, 7: 10, 8: 22, 9: 9, 10: 28,
-    11: 14, 12: 8
-}
-meses = ["2026-01", "2026-02", "2026-03", "2026-04", "2026-05"]
-
-hora_id = 1
-for proy_id, num_registros in horas_por_proyecto.items():
-    proy_depto = [p[2] for p in proyectos_data if p[0] == proy_id][0]
-    empleados_depto = [e[0] for e in empleados_data if e[2] == proy_depto]
-    if not empleados_depto:
-        empleados_depto = [e[0] for e in empleados_data]
-
-    for _ in range(num_registros):
-        emp_id = int(np.random.choice(empleados_depto))
-        mes = np.random.choice(meses)
-        dia = np.random.randint(1, 28)
-        fecha = f"{mes}-{dia:02d}"
-        h = np.random.choice([2, 3, 4, 4, 5, 6, 7, 8])
-        horas_data.append((hora_id, emp_id, proy_id, fecha, h))
-        hora_id += 1
-
-db.executemany(
-    "INSERT INTO horas VALUES (?, ?, ?, ?, ?)",
-    horas_data
-)
-print(f"✅ {len(horas_data)} registros de horas insertados")
-print(f"   Empleados distintos: {len(set(h[1] for h in horas_data))}")
-print(f"   Proyectos con horas: {len(set(h[2] for h in horas_data))}")
-```
-
-```{python}
-#| echo: true
-
-# Explorar el schema
+# Explorar el esquema y unas muestras de datos
 print("=" * 60)
-print("SCHEMA — Base de datos corporativa")
+print("TABLAS PRINCIPALES — Chinook")
 print("=" * 60)
 
-cursor = db.cursor()
-for row in cursor.execute("SELECT sql FROM sqlite_master WHERE type='table' ORDER BY name"):
-    print(row[0])
-    print()
+for tabla in ["Customer", "Invoice", "InvoiceLine", "Track", "Album", "Artist", "Genre"]:
+    columnas = [d[0] for d in db.execute(f"SELECT * FROM {tabla} LIMIT 0").description]
+    print(f"  {tabla}({', '.join(columnas)})")
 
-print("--- Muestra: empleados ---")
-for row in db.execute("SELECT * FROM empleados LIMIT 5"):
+print("\n--- Muestra: 3 clientes ---")
+for row in db.execute("SELECT CustomerId, FirstName, LastName, Country FROM Customer LIMIT 3"):
     print(f"  {row}")
 
-print("\n--- Muestra: proyectos activos ---")
-for row in db.execute("SELECT * FROM proyectos WHERE estado = 'activo' LIMIT 5"):
-    print(f"  {row}")
-
-print("\n--- Top 5 empleados por horas imputadas ---")
+print("\n--- Top 5 países por facturación ---")
 for row in db.execute("""
-    SELECT e.nombre, e.departamento, SUM(h.horas) as total_horas
-    FROM horas h JOIN empleados e ON h.empleado_id = e.id
-    GROUP BY e.id ORDER BY total_horas DESC LIMIT 5
+    SELECT BillingCountry, ROUND(SUM(Total), 2) AS total
+    FROM Invoice GROUP BY BillingCountry ORDER BY total DESC LIMIT 5
 """):
-    print(f"  {row[0]} ({row[1]}): {row[2]:.0f}h")
+    print(f"  {row[0]}: {row[1]:.2f}")
 ```
 
 ---
@@ -313,22 +220,24 @@ Creamos un servidor con FastMCP que expone una herramienta de consulta SQL. De m
 
 from fastmcp import FastMCP
 
-mcp = FastMCP("Servidor Corporativo")
+mcp = FastMCP("Servidor Facturación Chinook")
 
 # ─── COMPLETAR: implementa la tool consultar_sql ───
 @mcp.tool()
 def consultar_sql(query: str) -> str:
     """
-    Ejecuta una consulta SQL en la base de datos corporativa.
+    Ejecuta una consulta SQL sobre la base de datos de facturación (Chinook).
 
-    Schema disponible:
-      - empleados(id, nombre, departamento, salario, antiguedad_años)
-      - proyectos(id, nombre, departamento, presupuesto, estado)
-      - horas(id, empleado_id, proyecto_id, fecha, horas)
+    Schema disponible (principales):
+      - Customer(CustomerId, FirstName, LastName, Company, City, Country, Email, ...)
+      - Invoice(InvoiceId, CustomerId, InvoiceDate, BillingCountry, BillingCity, Total)
+      - InvoiceLine(InvoiceLineId, InvoiceId, TrackId, UnitPrice, Quantity)
+      - Track(TrackId, Name, AlbumId, GenreId, Composer, Milliseconds, UnitPrice)
+      - Album(AlbumId, Title, ArtistId)  ·  Artist(ArtistId, Name)  ·  Genre(GenreId, Name)
 
     Args:
         query: consulta SQL (solo SELECT). Ejemplo:
-               'SELECT * FROM empleados WHERE departamento = "I+D"'
+               "SELECT FirstName, LastName FROM Customer WHERE Country = 'Brazil'"
 
     Returns:
         Resultados de la consulta en formato tabla.
@@ -337,7 +246,7 @@ def consultar_sql(query: str) -> str:
     #   columnas = [d[0] for d in cursor.description]
     #   filas = cursor.fetchmany(20)
     # TODO: envolver en try/except y devolver string siempre
-    # NOTA: db es la variable global de la conexión en memoria (Parte 1)
+    # NOTA: db es la variable global de la conexión (Parte 1, solo lectura)
 
     pass  # ← completar
 
@@ -349,11 +258,11 @@ print("✅ Servidor MCP creado con 1 tool: consultar_sql")
 
 # Probar la tool directamente (sin lanzar el servidor)
 print("=== Probando tool consultar_sql directamente ===")
-print("1. Empleados de I+D:")
-# print(consultar_sql('SELECT nombre, salario FROM empleados WHERE departamento = "I+D"'))
+print("1. Clientes de Brasil:")
+# print(consultar_sql("SELECT FirstName, LastName FROM Customer WHERE Country = 'Brazil'"))
 
-print("\n2. Proyectos activos con presupuesto > 100k:")
-# print(consultar_sql('SELECT nombre, presupuesto FROM proyectos WHERE estado = "activo" AND presupuesto > 100000'))
+print("\n2. Álbumes de AC/DC:")
+# print(consultar_sql("SELECT Title FROM Album JOIN Artist USING (ArtistId) WHERE Artist.Name = 'AC/DC'"))
 
 print("\n⚠️  Descomenta las líneas cuando hayas implementado la tool.")
 ```
@@ -388,7 +297,7 @@ def esquema_bd() -> str:
     """
     # TODO: usar db.execute() para obtener el DDL de cada tabla
     #   cursor = db.execute('SELECT sql FROM sqlite_master WHERE type="table"')
-    # NOTA: db es la variable global de la conexión en memoria
+    # NOTA: db es la variable global de la conexión (solo lectura)
 
     pass  # ← completar
 ```
@@ -402,28 +311,29 @@ print("=== Probando resource schema://tablas ===")
 print("⚠️  Descomenta la línea anterior cuando hayas implementado el resource.")
 ```
 
-## 3.2 Tool: buscar empleado por ID {#sec-hpd4-tool-empleado}
+## 3.2 Tool: buscar cliente por ID {#sec-hpd4-tool-cliente}
 
 ```{python}
 #| echo: true
 
-# ─── COMPLETAR: implementa la tool empleado_por_id ───
+# ─── COMPLETAR: implementa la tool cliente_por_id ───
 @mcp.tool()
-def empleado_por_id(id_empleado: int) -> str:
+def cliente_por_id(id_cliente: int) -> str:
     """
-    Busca un empleado por su ID y devuelve todos sus datos.
+    Busca un cliente por su ID y devuelve su ficha básica y un resumen de compras.
+    Por privacidad no se devuelven el email, el teléfono ni la dirección.
 
     Args:
-        id_empleado: ID del empleado (número entero).
+        id_cliente: ID del cliente (número entero).
 
     Returns:
-        Datos del empleado o mensaje de error si no existe.
+        Datos del cliente o mensaje de error si no existe.
 
-    Ejemplo: empleado_por_id(3) → 'Beatriz López | I+D | 48000€ | 3 años'
+    Ejemplo: cliente_por_id(1) → 'Luís Gonçalves | Brazil | São José dos Campos | 7 facturas | 39.62 total'
     """
-    # TODO: usar db.execute() con parámetro ? para buscar por id
-    #   row = db.execute('SELECT * FROM empleados WHERE id = ?', (id_empleado,)).fetchone()
-    # NOTA: db es la variable global de la conexión en memoria
+    # TODO: usar db.execute() con parámetro ? para buscar por CustomerId
+    #   Combina Customer con Invoice (LEFT JOIN) para contar facturas y sumar Total
+    # NOTA: db es la variable global de la conexión (solo lectura)
 
     pass  # ← completar
 ```
@@ -431,35 +341,35 @@ def empleado_por_id(id_empleado: int) -> str:
 ```{python}
 #| echo: true
 
-print("=== Probando tool empleado_por_id ===")
-# print(empleado_por_id(1))
-# print(empleado_por_id(99))  # Debería dar error
+print("=== Probando tool cliente_por_id ===")
+# print(cliente_por_id(1))
+# print(cliente_por_id(9999))  # Debería dar error
 print("⚠️  Descomenta las líneas cuando hayas implementado la tool.")
 ```
 
-## 3.3 Tool: resumen de proyecto {#sec-hpd4-tool-resumen}
+## 3.3 Tool: resumen de un álbum {#sec-hpd4-tool-resumen}
 
 ```{python}
 #| echo: true
 
-# ─── COMPLETAR: implementa la tool resumen_proyecto ───
+# ─── COMPLETAR: implementa la tool resumen_album ───
 @mcp.tool()
-def resumen_proyecto(id_proyecto: int) -> str:
+def resumen_album(id_album: int) -> str:
     """
-    Devuelve un resumen del proyecto: nombre, departamento, presupuesto,
-    estado, número de empleados asignados y total de horas imputadas.
+    Devuelve un resumen del álbum: título, artista, número de pistas,
+    unidades vendidas e ingresos generados.
 
     Args:
-        id_proyecto: ID del proyecto (número entero).
+        id_album: ID del álbum (número entero).
 
     Returns:
         Resumen en formato texto.
 
-    Ejemplo: resumen_proyecto(1) → 'Alpha | I+D | 200000€ | activo | 8 empleados | 145h'
+    Ejemplo: resumen_album(1) → 'For Those About To Rock We Salute You | AC/DC | 10 pistas | 10 unidades vendidas | 9.90 ingresos'
     """
-    # TODO: usar db.execute() con JOIN entre proyectos y horas
-    #   obtener nombre, departamento, presupuesto, estado + total_horas
-    # NOTA: db es la variable global de la conexión en memoria
+    # TODO: usar db.execute() con JOIN entre Album, Artist, Track e InvoiceLine
+    #   unidades = SUM(InvoiceLine.Quantity); ingresos = SUM(UnitPrice * Quantity)
+    # NOTA: db es la variable global de la conexión (solo lectura)
 
     pass  # ← completar
 ```
@@ -467,13 +377,13 @@ def resumen_proyecto(id_proyecto: int) -> str:
 ```{python}
 #| echo: true
 
-print("=== Probando tool resumen_proyecto ===")
-# print(resumen_proyecto(1))
-# print(resumen_proyecto(10))
+print("=== Probando tool resumen_album ===")
+# print(resumen_album(1))
+# print(resumen_album(2))
 print("⚠️  Descomenta las líneas cuando hayas implementado la tool.")
 ```
 
-## 3.4 Resource: estadísticas del servidor {#sec-hpd4-resource-stats}
+## 3.4 Resource: estadísticas de la base de datos {#sec-hpd4-resource-stats}
 
 ```{python}
 #| echo: true
@@ -483,11 +393,10 @@ print("⚠️  Descomenta las líneas cuando hayas implementado la tool.")
 def stats_servidor() -> str:
     """
     Devuelve un resumen agregado de la base de datos:
-    número de empleados por departamento, proyectos por estado,
-    presupuesto total, horas totales imputadas.
+    número de clientes, facturas, facturación total, pistas y álbumes.
     """
-    # TODO: usar db.execute() con GROUP BY y agregaciones
-    # NOTA: db es la variable global de la conexión en memoria
+    # TODO: usar db.execute() con COUNT(*) y SUM(Total) sobre las tablas correspondientes
+    # NOTA: db es la variable global de la conexión (solo lectura)
 
     pass  # ← completar
 ```
@@ -506,7 +415,7 @@ print("⚠️  Descomenta la línea anterior cuando hayas implementado el resour
 # Verificar cuántas tools y resources tenemos registrados
 tools = await mcp.list_tools()
 resources = await mcp.list_resources()
-print(f"✅ Servidor MCP: {len(tools)} tools, ~{len(resources)} resources registrados")
+print(f"✅ Servidor MCP: {len(tools)} tools, {len(resources)} resources registrados")
 ```
 
 ---
@@ -524,6 +433,7 @@ from openai import OpenAI
 
 LLM_KEY = os.getenv("LLM_API_KEY")
 LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
+LLM_MODEL = os.getenv("LLM_MODEL", "gemma4:26b-mlx")
 
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env con:\n    LLM_API_KEY=tu_api_key")
@@ -555,16 +465,14 @@ tool → observa resultado → responde) es exactamente el mismo.
 ```{python}
 #| echo: true
 
-import json
-
 def ejecutar_tool_mcp(nombre: str, args: dict) -> str:
     """
     Invoca una tool MCP por nombre. Simula lo que haría un cliente MCP real.
     """
     tools_disponibles = {
         "consultar_sql": consultar_sql,
-        "empleado_por_id": empleado_por_id,
-        "resumen_proyecto": resumen_proyecto,
+        "cliente_por_id": cliente_por_id,
+        "resumen_album": resumen_album,
     }
 
     if nombre not in tools_disponibles:
@@ -581,7 +489,7 @@ tools_definition = [
         "type": "function",
         "function": {
             "name": "consultar_sql",
-            "description": "Ejecuta una consulta SQL en la BD corporativa. Tablas: empleados(id, nombre, departamento, salario, antiguedad_años), proyectos(id, nombre, departamento, presupuesto, estado), horas(id, empleado_id, proyecto_id, fecha, horas).",
+            "description": "Ejecuta una consulta SQL SELECT sobre la base de facturación Chinook. Tablas: Customer, Invoice, InvoiceLine, Track, Album, Artist, Genre.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -591,10 +499,10 @@ tools_definition = [
             }
         }
     },
-    # TODO: Añadir definición de empleado_por_id
-    # {"type": "function", "function": {"name": "empleado_por_id", ...}},
-    # TODO: Añadir definición de resumen_proyecto
-    # {"type": "function", "function": {"name": "resumen_proyecto", ...}},
+    # TODO: Añadir definición de cliente_por_id
+    # {"type": "function", "function": {"name": "cliente_por_id", ...}},
+    # TODO: Añadir definición de resumen_album
+    # {"type": "function", "function": {"name": "resumen_album", ...}},
 ]
 
 print(f"Tools definidas: {[t['function']['name'] for t in tools_definition]}")
@@ -615,13 +523,13 @@ def preguntar_al_llm(pregunta: str) -> str:
         return "⚠️  Configura LLM_API_KEY en .env"
 
     messages = [
-        {"role": "system", "content": "Eres un asistente corporativo. Tienes acceso a una base de datos con empleados, proyectos y horas. Usa las herramientas disponibles para responder preguntas. Responde en español, de forma concisa."},
+        {"role": "system", "content": "Eres un analista de una tienda de música digital. Tienes acceso a una base de datos de facturación (clientes, facturas, catálogo). Usa las herramientas disponibles para responder preguntas. Responde en español, de forma concisa."},
         {"role": "user", "content": pregunta}
     ]
 
     # ─── COMPLETAR: implementa el bucle de tool calling ───
     # TODO: Llamar a client.chat.completions.create con:
-    #   model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"), messages=messages, tools=tools_definition, tool_choice="auto"
+    #   model=LLM_MODEL, messages=messages, tools=tools_definition, tool_choice="auto"
     # TODO: Si la respuesta tiene tool_calls, ejecutar cada tool con ejecutar_tool_mcp()
     # TODO: Añadir el resultado al historial y volver a llamar al LLM
     # TODO: Devolver la respuesta final del LLM (response.choices[0].message.content)
@@ -636,8 +544,8 @@ print("✅ Función preguntar_al_llm definida.")
 
 Implementar el bucle de tool calling a mano requiere gestionar `tool_calls`, ejecutar
 las tools y reinyectar los resultados en el historial. El patrón es idéntico al que
-usaste en HPD 2 con LangChain, pero sin la abstracción. Si te atascas, consulta el
-código de referencia en `evaluables/hpd4-entregable.qmd`.
+usaste en HPD 2 con LangChain, pero sin la abstracción. Si te atascas, repasa el
+bucle de tool calling de HPD 2 y la documentación de la API de OpenAI.
 :::
 
 ```{python}
@@ -648,7 +556,7 @@ if not LLM_KEY:
 else:
     print("=== Probando cliente LLM + MCP ===\n")
 
-    pregunta = "¿Cuántos empleados hay en el departamento de I+D?"
+    pregunta = "¿Cuántos clientes tenemos en Brasil?"
     print(f"PREGUNTA: {pregunta}")
     # respuesta = preguntar_al_llm(pregunta)
     # print(f"   RESPUESTA: {respuesta}")
@@ -709,6 +617,14 @@ def sanitizar_query(query: str) -> str:
 print("✅ Función sanitizar_query definida.")
 ```
 
+::: {.callout-note icon=false}
+## Defensa en profundidad
+
+La sanitización es la primera barrera, pero no la única. La conexión `db` ya está en modo
+solo lectura y con un autorizador que solo permite leer: aunque una consulta sorteara el
+filtro de palabras, SQLite la rechazaría. Compruébalo en la siguiente sección.
+:::
+
 ## 5.2 Probar ataques de prompt injection {#sec-hpd4-test-ataques}
 
 Ejecutamos varios intentos de ataque para verificar que nuestras defensas funcionan.
@@ -721,11 +637,11 @@ print("TEST DE SEGURIDAD — Prompt Injection")
 print("=" * 60)
 
 ataques = [
-    "DROP TABLE empleados",
-    "DELETE FROM proyectos WHERE estado = 'finalizado'",
-    "INSERT INTO empleados VALUES (99, 'Hacker', 'IT', 999999, 0)",
-    "UPDATE empleados SET salario = 0",
-    "SELECT * FROM empleados; DROP TABLE horas; --",
+    "DROP TABLE Customer",
+    "DELETE FROM Invoice WHERE InvoiceId = 1",
+    "INSERT INTO Genre VALUES (99, 'Hacker')",
+    "UPDATE Invoice SET Total = 0",
+    "SELECT * FROM Customer; DROP TABLE Invoice; --",
 ]
 
 # ─── COMPLETAR: prueba cada ataque contra sanitizar_query ───
@@ -746,7 +662,7 @@ print("\n⚠️  Completa el bucle para ver los resultados de cada ataque.")
 
 # ─── COMPLETAR: añade límite de filas a consultar_sql ───
 # Después de ejecutar la query, limita la salida a un máximo de 30 filas.
-# Si hay más de 30, muestra las primeras 30 y añade "... y N filas más".
+# Si hay más de 30, muestra las primeras 30 y añade "... y más filas".
 
 # También añade límite de caracteres: si el resultado supera 2000 caracteres, trunca.
 
@@ -764,8 +680,9 @@ Marca con ✅ lo que has implementado (los que queden vacíos son mitigaciones q
 
 | Riesgo | Mitigación |
 |---|---|
-| SQL Injection vía prompt | Solo permitir SELECT, sanitizar query |
+| SQL Injection vía prompt | Solo permitir SELECT, sanitizar query, conexión en solo lectura |
 | Data leakage (demasiadas filas) | Limitar a 30 filas, 2000 caracteres |
+| Datos personales (Customer, Employee) | No exponer email, teléfono ni dirección al asistente; usar vistas sin esas columnas |
 | Path traversal (si expusieras archivos) | Validar rutas con `os.path.abspath` |
 | Denegación de servicio | Timeout en queries (máx. 5s) |
 | Acceso no autorizado | API keys en transporte, logs de auditoría |
@@ -773,6 +690,7 @@ Marca con ✅ lo que has implementado (los que queden vacíos son mitigaciones q
 
 - [ ] SQL Injection vía prompt
 - [ ] Data leakage (demasiadas filas)
+- [ ] Datos personales (Customer, Employee)
 - [ ] Path traversal (si expusieras archivos)
 - [ ] Denegación de servicio
 - [ ] Acceso no autorizado
@@ -799,19 +717,19 @@ Probamos el servidor MCP con preguntas de dificultad creciente. Observa qué her
 
 preguntas_prueba = [
     # Nivel 1: consulta simple → debería usar consultar_sql
-    "¿Cuántos empleados hay en el departamento de Finanzas?",
+    "¿Cuántos clientes tenemos en Brasil?",
 
-    # Nivel 2: búsqueda por ID → debería usar empleado_por_id
-    "Dame los datos del empleado con ID 7",
+    # Nivel 2: búsqueda por ID → debería usar cliente_por_id
+    "Dame los datos del cliente con ID 7",
 
-    # Nivel 3: resumen agregado → debería usar resumen_proyecto
-    "¿Cuál es el estado actual del proyecto Alpha y cuántas horas se han imputado?",
+    # Nivel 3: resumen de un álbum → debería usar resumen_album
+    "¿Cuántas unidades se han vendido del álbum con ID 1 y cuánto ingreso generó?",
 
-    # Nivel 4: consulta compleja → debería usar consultar_sql
-    "¿Qué departamento tiene el presupuesto total más alto en proyectos activos?",
+    # Nivel 4: consulta agregada → debería usar consultar_sql
+    "¿Qué género tiene más pistas en el catálogo?",
 
-    # Nivel 5: múltiples pasos → podría combinar varias tools
-    "Dime qué empleados han trabajado en el proyecto de mayor presupuesto y cuántas horas cada uno",
+    # Nivel 5: múltiples pasos → podría combinar varias tools o varias consultas
+    "¿Qué cliente ha gastado más en total y en qué país vive?",
 ]
 
 if not LLM_KEY:
@@ -837,11 +755,11 @@ Completa esta tabla con tus observaciones sobre cada pregunta:
 ┌────┬──────────────────────────────────────────┬─────────────────┬──────────┬─────────────────────────┐
 │  # │ Pregunta                                 │ Tool(s) usada   │ ¿Correcto?│ Observaciones           │
 ├────┼──────────────────────────────────────────┼─────────────────┼──────────┼─────────────────────────┤
-│  1 │ Empleados en Finanzas                    │                 │   / 5    │                         │
-│  2 │ Datos del empleado 7                     │                 │   / 5    │                         │
-│  3 │ Resumen proyecto Alpha                   │                 │   / 5    │                         │
-│  4 │ Dpto con más presupuesto activo          │                 │   / 5    │                         │
-│  5 │ Empleados del proyecto más caro          │                 │   / 5    │                         │
+│  1 │ Clientes en Brasil                       │                 │   / 5    │                         │
+│  2 │ Datos del cliente 7                      │                 │   / 5    │                         │
+│  3 │ Unidades e ingresos del álbum 1          │                 │   / 5    │                         │
+│  4 │ Género con más pistas                    │                 │   / 5    │                         │
+│  5 │ Cliente que más ha gastado               │                 │   / 5    │                         │
 └────┴──────────────────────────────────────────┴─────────────────┴──────────┴─────────────────────────┘
 ```
 
@@ -859,14 +777,14 @@ graph TD
 
     subgraph "Servidor MCP (stdio)"
         D[Tool: consultar_sql]
-        E[Tool: empleado_por_id]
-        F[Tool: resumen_proyecto]
+        E[Tool: cliente_por_id]
+        F[Tool: resumen_album]
         G[Resource: schema://tablas]
         H[Resource: stats://resumen]
     end
 
     subgraph "Datos"
-        I[(SQLite<br/>corporativa.db)]
+        I[(SQLite Chinook<br/>solo lectura)]
     end
 
     A --> B
@@ -878,7 +796,7 @@ graph TD
     E --> I
     F --> I
 
-    J[Sanitización<br/>+ límite filas<br/>+ logs] -.-> D
+    J[Sanitización<br/>+ límite filas<br/>+ solo lectura] -.-> D
 
     style A fill:#4B8BBE,color:#fff
     style B fill:#306998,color:#fff
@@ -904,22 +822,22 @@ Estos ejercicios no se entregan, pero te preparan para el HPD 4 evaluable y el p
 
 ---
 
-**A1 — Añade una tool empleados_por_departamento**
+**A1 — Añade una tool clientes_por_pais**
 
-Crea `@mcp.tool() empleados_por_departamento(departamento: str)` que devuelva la lista de empleados de un departamento con formato: `nombre | salario | antiguedad_años`. Si el departamento no existe, devuelve un mensaje con los departamentos disponibles.
+Crea `@mcp.tool() clientes_por_pais(pais: str)` que devuelva la lista de clientes de un país con formato: `nombre | ciudad | nº de facturas`. No incluyas email ni teléfono. Si el país no existe, devuelve un mensaje indicando que no hay clientes y sugiriendo consultar los países disponibles.
 
 ::: {.callout-note}
-**Objetivo:** entender que añadir tools especializadas reduce la carga del LLM (no necesita escribir SQL para consultas simples).
+**Objetivo:** entender que añadir tools especializadas reduce la carga del LLM (no necesita escribir SQL para consultas simples) y que una tool puede decidir qué columnas exponer.
 :::
 
 ---
 
-**A2 — Añade un resource presupuesto://total**
+**A2 — Añade un resource facturacion://por-anio**
 
-Crea `@mcp.resource("presupuesto://total")` que devuelva el presupuesto total de todos los proyectos y el desglose por departamento.
+Crea `@mcp.resource("facturacion://por-anio")` que devuelva la facturación total y el número de facturas por año.
 
 ::: {.callout-note}
-**Objetivo:** distinguir tools (acciones que modifican o consultan con parámetros) de resources (datos estáticos de solo lectura).
+**Objetivo:** distinguir tools (acciones que consultan con parámetros) de resources (datos de solo lectura sin parámetros).
 :::
 
 ---

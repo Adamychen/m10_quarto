@@ -45,11 +45,16 @@ ventas, finanzas, salud, legal, logística.
 
 Empezamos instalando las dependencias necesarias y configurando el LLM.
 
+::: {.callout-tip icon=false}
+## Antes de empezar
+Ejecuta **ya** la celda de instalación de más abajo y sigue leyendo mientras termina: tarda unos 2 minutos. Si al acabar aparece un aviso en rojo sobre *dependency conflicts* (`google-colab`, `requests`, `opentelemetry`), ignóralo: son paquetes que trae Colab y no afectan a este taller.
+:::
+
 ```{python}
 #| echo: true
 #| eval: false
 
-!pip install -q langchain langchain-openai langchain-community pandas matplotlib seaborn python-dotenv
+!pip install -q langchain==1.3.2 langchain-openai==1.2.2 langchain-community==0.3.31 "pandas<3" matplotlib seaborn python-dotenv==1.2.2 langchain-core==1.4.0 langgraph==1.2.2 openai==2.38.0
 ```
 
 ```{python}

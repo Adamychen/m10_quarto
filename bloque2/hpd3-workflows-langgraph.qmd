@@ -13,7 +13,7 @@ engine: jupyter
 - Implementar routing, evaluator-optimizer y parallelization con `StateGraph`
 - Añadir human-in-the-loop con `interrupt()` y checkpointing
 - Construir un supervisor multi-agente con `create_agent`
-- Resolver un problema del camino elegido (A/B/C) con el patrón adecuado
+- Resolver un problema de análisis financiero con el patrón adecuado
 
 ## Materiales
 - Librerías: `langgraph`, `langgraph-prebuilt`, `langgraph-checkpoint`, `langchain-openai`, `python-dotenv`
@@ -24,7 +24,7 @@ engine: jupyter
 1. **Parte 1 — Patrones de 02f como grafos:** routing, evaluator-optimizer y parallelization con `StateGraph`
 2. **Parte 2 — Human-in-the-loop:** interrupt + checkpointing + gate de aprobación
 3. **Parte 3 — Multi-agente supervisor:** supervisor con agentes especializados
-4. **Parte 4 — Problemas del camino A/B/C:** diseña e implementa el grafo de tu camino
+4. **Parte 4 — Problema aplicado (finanzas):** diseña e implementa el grafo del resumen trimestral
 5. **Ejercicios:** extiende los grafos con nuevos nodos y patrones
 :::
 
@@ -36,11 +36,16 @@ En el HPD 2 construiste un agente ReAct con `create_agent` de LangChain: el LLM 
 ¿Por qué importa? Porque en producción necesitas flujos inspeccionables: saber en qué paso falló, pausar una ejecución para pedir aprobación humana o coordinar varios agentes especializados. LangGraph es el estándar *de facto* para esto en el ecosistema LangChain, y el proyecto integrador final te pide aplicar un patrón de la taxonomía de 02f — este taller te da el repertorio en código.
 :::
 
+::: {.callout-tip icon=false}
+## Antes de empezar
+Ejecuta **ya** la celda de instalación de más abajo y sigue leyendo mientras termina: tarda unos 2 minutos. Si al acabar aparece un aviso en rojo sobre *dependency conflicts* (`google-colab`, `requests`, `opentelemetry`), ignóralo: son paquetes que trae Colab y no afectan a este taller.
+:::
+
 ```{python}
 #| echo: true
 #| eval: false
 
-!pip install -q langgraph langgraph-prebuilt langgraph-checkpoint langchain-openai python-dotenv
+!pip install -q langgraph==1.2.2 langgraph-prebuilt==1.1.0 langgraph-checkpoint==4.1.1 langchain-openai==1.2.2 python-dotenv==1.2.2 langchain-core==1.4.0 openai==2.38.0
 ```
 
 ```{python}
@@ -671,18 +676,11 @@ Las aristas `analista → supervisor` y `redactor → supervisor` crean un bucle
 
 ---
 
-# Parte 4 — Problemas del camino A/B/C {#sec-hpd3-p4}
+# Parte 4 — Problema aplicado: análisis financiero {#sec-hpd3-p4}
 
-Elige tu camino (la misma elección de `CAMINO` que usas en los entregables) y resuelve el problema propuesto con el patrón que más se ajuste, implementándolo como grafo de LangGraph. Los tres problemas se resuelven con los patrones de la Parte 1-3; lo importante es justificar la elección antes de codificar.
+Aplica los patrones de las Partes 1–3 a un problema de análisis financiero: elige el patrón que mejor se ajuste, impleméntalo como grafo de LangGraph y justifica la elección antes de codificar.
 
-```{python}
-#| echo: true
-
-CAMINO = "A"  # Cambia a "B" o "C" según tu camino
-print(f"Problema del Camino {CAMINO}")
-```
-
-## 4.1 Camino A — Finanzas: resumen trimestral con evaluator-optimizer {#sec-hpd3-p4-a}
+## 4.1 Resumen trimestral con evaluator-optimizer {#sec-hpd3-p4-a}
 
 **Problema:** el equipo de reporting genera cada trimestre un resumen ejecutivo de 5 frases sobre el balance. Los primeros borradores del LLM son imprecisos (mezclan cifras, olvidan riesgos). Queremos un flujo que genere, evalúe y mejore hasta superar el umbral de calidad, con presupuesto de reintentos.
 
@@ -691,7 +689,7 @@ print(f"Problema del Camino {CAMINO}")
 ```{python}
 #| echo: true
 
-# ─── COMPLETAR: grafo del Camino A ───
+# ─── COMPLETAR: grafo del resumen trimestral ───
 # TODO: definir EstadoFinanzas con: datos (str), borrador, criticas, score, intentos
 # TODO: reutilizar el esquema de la Parte 1.2 con un prompt de generación financiera:
 #   - datos: balance sintético (activo, pasivo, patrimonio, deuda neta)
@@ -703,45 +701,9 @@ BALANCE_EJEMPLO = {
     "deuda_neta": 3_100_000, "efectivo": 1_200_000,
 }
 
-print("Esquema del Camino A listo para implementar:")
+print("Esquema del resumen trimestral listo para implementar:")
 for k, v in BALANCE_EJEMPLO.items():
     print(f"  {k}: {v}")
-```
-
-## 4.2 Camino B — Salud: triaje de literatura con routing {#sec-hpd3-p4-b}
-
-**Problema:** un equipo clínico recibe preguntas sobre literatura biomédica. Unas son factuales (dosis, efectos secundarios de un fármaco — requieren precisión y citar la fuente) y otras analíticas (comparar dos tratamientos, interpretar un ensayo — requieren razonamiento). Queremos enrutar cada pregunta al prompt especializado correcto.
-
-**Patrón sugerido:** routing (Parte 1.1) con clasificador que distingue `factual` (dosis/efectos) de `analitica` (comparativa/interpretación), y manejadores con prompts clínicos distintos.
-
-```{python}
-#| echo: true
-
-# ─── COMPLETAR: grafo del Camino B ───
-# TODO: reutilizar el esquema de la Parte 1.1 con:
-#   - clasificador clínico: "factual" vs "analitica"
-#   - experto_factual: responde con datos concretos, si no los sabe lo dice
-#   - experto_analitico: razona pros/contras y pide más datos si faltan
-
-print("Esquema del Camino B listo para implementar.")
-```
-
-## 4.3 Camino C — E-commerce: soporte con supervisor multi-agente {#sec-hpd3-p4-c}
-
-**Problema:** el equipo de soporte quiere que una pregunta sobre pedidos (estado, devolución, reembolso) se atienda con un agente especializado en el CRM, y que los problemas no resueltos escalen a un humano. Queremos un supervisor que delega y, ante baja confianza, pasa el caso a revisión humana.
-
-**Patrón sugerido:** supervisor multi-agente (Parte 3) + gate de escalado con `interrupt()` (Parte 2): si el agente de CRM no encuentra el pedido o la pregunta está fuera de alcance, pausa y pide intervención.
-
-```{python}
-#| echo: true
-
-# ─── COMPLETAR: grafo del Camino C ───
-# TODO: tool consultar_pedido(pedido_id) con datos ficticios de pedidos
-# TODO: agente soporte_crm con create_agent
-# TODO: supervisor que decide: 'crm', 'humano' (con interrupt) o 'fin'
-# TODO: probar con pedidos existentes y con un id inexistente (debe escalar)
-
-print("Esquema del Camino C listo para implementar.")
 ```
 
 ::: {.callout-tip icon=false}
@@ -843,8 +805,8 @@ graph TD
         A --> S
         C --> S
     end
-    subgraph "Parte 4 — Camino A/B/C"
-        P4[Problema del camino<br/>patrón justificado + grafo]
+    subgraph "Parte 4 — Problema aplicado"
+        P4[Problema financiero<br/>patrón justificado + grafo]
     end
     R --> E --> P --> I --> S --> P4
 ```
