@@ -162,7 +162,7 @@ Catálogo de fuentes con licencia segura:
 | [UCI ML Repository](https://archive.ics.uci.edu) | Datasets clásicos de ML tabular | Bien documentados |
 | [Google Dataset Search](https://datasetsearch.research.google.com) | Buscador transversal de datasets abiertos | Filtra por licencia |
 | [datos.gob.es](https://datos.gob.es) / [data.europa.eu](https://data.europa.eu) | Datos abiertos de administraciones españolas y europeas | Mucho material tabular y documental |
-| [PubMed](https://pubmed.ncbi.nlm.nih.gov) (API con `biopython`/`pymed`) | Abstracts biomédicos | Ya usado en HPD 5 |
+| [PubMed](https://pubmed.ncbi.nlm.nih.gov) (API con `biopython`/`pymed`) | Abstracts biomédicos | Fuente alternativa de texto científico |
 | [SEC EDGAR](https://www.sec.gov/edgar) | Informes financieros de empresas públicas | Formato HTML/TXT |
 | Yahoo Finance (`yfinance`) / Alpha Vantage | Cotizaciones y datos de mercado | API con límites gratuitos |
 | [Awesome Public Datasets](https://github.com/awesomedata/awesome-public-datasets) | Índice curado de datasets abiertos | Muy amplio |

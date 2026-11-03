@@ -19,10 +19,10 @@ Cada página tiene un badge Open in Colab en la parte superior. Si es la primera
 
 Como alternativa: **File → Open Notebook → GitHub**, busca `Adamychen/m10_quarto` y selecciona el notebook de la carpeta `notebooks/`.
 
-### Entregables por caminos
+### Entregables
 
-Cada alumno elige al inicio un camino de aplicación (Finanzas, Salud o E-commerce).
-Todos los entregables (HPD 1-5) y el proyecto final se adaptan al camino elegido.
+Todos los entregables (HPD 1-5) comparten un único contexto de aplicación: análisis financiero.
+El proyecto final es libre.
 
 | HPD | Entregable | Peso |
 |---|---|---|
@@ -33,7 +33,7 @@ Todos los entregables (HPD 1-5) y el proyecto final se adaptan al camino elegido
 | HPD 5 — RAG con evaluación | `evaluables/hpd5-entregable.qmd` | 7.5 % |
 | — | **Proyecto integrador final** (`evaluables/proyecto-final.qmd`) | 60 % |
 
-Los talleres presenciales (comunes para todos los caminos) están en `bloque1/`, `bloque2/` y `bloque3/`.
+Los talleres presenciales están en `bloque1/`, `bloque2/` y `bloque3/`.
 
 Los talleres presenciales (con código parcialmente completado por el alumno) están en `bloque1/`, `bloque2/`, `bloque3/` y `bloque4/`.
 
@@ -81,7 +81,8 @@ m10_quarto/
 │   ├── 01a-transformer.qmd
 │   ├── 01b-llms.qmd
 │   ├── 01c-embeddings.qmd
-│   └── 01d-vectordb.qmd
+│   ├── 01d-vectordb.qmd
+│   └── 01e-recuperacion.qmd
 ├── bloque2/                     # Orquestación: prompt, frameworks, MCP, agentes
 │   ├── 02-orquestacion.qmd
 │   ├── 02a-prompt-engineering.qmd
@@ -97,11 +98,11 @@ m10_quarto/
 │   ├── 03-aplicaciones.qmd
 │   ├── 03a-datos-sinteticos.qmd
 │   ├── 03b-rag-avanzado.qmd
+│   ├── 03c-previo-cabezas.qmd
 │   └── 03c-fine-tuning.qmd
 ├── bloque4/                     # Despliegue y gobernanza
 │   └── 04-gobernanza.qmd
-├── evaluables/                  # Entregables y proyecto (7 ficheros)
-│   ├── caminos.qmd
+├── evaluables/                  # Entregables y proyecto (6 ficheros)
 │   ├── hpd1-entregable.qmd
 │   ├── hpd2-entregable.qmd
 │   ├── hpd4-entregable.qmd

@@ -15,6 +15,7 @@ m10_quarto/
 │   ├── 01b-llms.qmd             # LLM e inferencia
 │   ├── 01c-embeddings.qmd       # Modelos de embeddings
 │   ├── 01d-vectordb.qmd         # Bases de datos vectoriales
+│   ├── 01e-recuperacion.qmd     # Chunking, BM25, búsqueda híbrida y métricas
 │   └── hpd1-embeddings.qmd      # HPD 1 — Taller: Pipeline de embeddings
 ├── bloque2/                     # Orquestación: prompt, frameworks, MCP, agentes
 │   ├── 02-orquestacion.qmd      # Índice del bloque
@@ -31,6 +32,7 @@ m10_quarto/
 │   ├── 03-aplicaciones.qmd      # Índice del bloque
 │   ├── 03a-datos-sinteticos.qmd
 │   ├── 03b-rag-avanzado.qmd
+│   ├── 03c-previo-cabezas.qmd   # Previo: cabezas de salida, SFT, PPO y DPO
 │   └── 03c-fine-tuning.qmd
 ├── bloque4/                     # Despliegue y gobernanza (CE-6)
 │   ├── 04-gobernanza.qmd        # Índice del bloque
@@ -40,8 +42,7 @@ m10_quarto/
 │   ├── 04d-sesgo.qmd            # Tipos + auditoría de sesgo
 │   ├── 04e-documentacion.qmd    # Model Card + System Card
 │   └── 04f-despliegue.qmd       # On-prem + observabilidad + caching
-├── evaluables/                  # Entregables y proyecto (7 ficheros)
-│   ├── caminos.qmd                  # Elección de camino (A/B/C)
+├── evaluables/                  # Entregables y proyecto (6 ficheros)
 │   ├── hpd1-entregable.qmd          # HPD 1 — Entregable: Pipeline de embeddings
 │   ├── hpd2-entregable.qmd          # HPD 2 — Entregable: Agente analítico con Tool Calling
 │   ├── hpd4-entregable.qmd          # HPD 4 — Entregable: Servidor MCP
@@ -73,11 +74,11 @@ m10_quarto/
 | Sección | Páginas |
 |---|---|
 | **Inicio** | `index.qmd` (Presentación), `about.qmd` (Acerca de), `mod10.md` (Guía docente) |
-| **Bloque 1 — Fundamentos** | `bloque1/00-panorama.qmd` (Panorama histórico), `bloque1/01-fundamentos.qmd`, `01a-transformer.qmd`, `01b-llms.qmd`, `01c-embeddings.qmd`, `01d-vectordb.qmd`, `bloque1/hpd1-embeddings.qmd`, `evaluables/hpd1-entregable.qmd` |
+| **Bloque 1 — Fundamentos** | `bloque1/00-panorama.qmd` (Panorama histórico), `bloque1/01-fundamentos.qmd`, `01a-transformer.qmd`, `01b-llms.qmd`, `01c-embeddings.qmd`, `01d-vectordb.qmd`, `01e-recuperacion.qmd`, `bloque1/hpd1-embeddings.qmd`, `evaluables/hpd1-entregable.qmd` |
 | **Bloque 2 — Orquestación** | `bloque2/02-orquestacion.qmd`, `02a-prompt-engineering.qmd`, `02b-langchain.qmd`, `02c-llamaindex.qmd`, `02d-mcp.qmd`, `02e-agentes.qmd`, `02f-patrones-agentes.qmd`, `bloque2/hpd2-agente-tool-calling.qmd`, `evaluables/hpd2-entregable.qmd`, `bloque2/hpd3-workflows-langgraph.qmd`, `bloque2/hpd4-servidor-mcp.qmd`, `evaluables/hpd4-entregable.qmd` |
-| **Bloque 3 — Aplicaciones** | `bloque3/03-aplicaciones.qmd`, `03b-rag-avanzado.qmd`, `03a-datos-sinteticos.qmd`, `03c-fine-tuning.qmd`, `evaluables/hpd5-rag-mixto.qmd`, `evaluables/hpd5-entregable.qmd` |
+| **Bloque 3 — Aplicaciones** | `bloque3/03-aplicaciones.qmd`, `03b-rag-avanzado.qmd`, `03a-datos-sinteticos.qmd`, `03c-previo-cabezas.qmd`, `03c-fine-tuning.qmd`, `evaluables/hpd5-rag-mixto.qmd`, `evaluables/hpd5-entregable.qmd` |
 | **Bloque 4 — Gobernanza** | `bloque4/04-gobernanza.qmd`, `04a-evaluacion.qmd`, `04b-alucinaciones.qmd`, `04c-privacidad.qmd`, `04d-sesgo.qmd`, `04e-documentacion.qmd`, `04f-despliegue.qmd` |
-| **Evaluación** | `evaluables/caminos.qmd`, `05-evaluacion.qmd`, `evaluables/proyecto-final.qmd` |
+| **Evaluación** | `05-evaluacion.qmd`, `evaluables/proyecto-final.qmd` |
 | **Recursos** | `06-herramientas.qmd`, `07-bibliografia.qmd` |
 
 > La fuente de verdad del sidebar es `_quarto.yml` (líneas 12-99). Si este fichero y `_quarto.yml` divergen, prioriza `_quarto.yml`.
@@ -385,7 +386,7 @@ else:
 ` (pre-render automático, ver sección "API key centralizada").
 - El grid del sitio está configurado en `_quarto.yml` (sidebar 260px, body 850px, margin 0px).
 - Footer con créditos en todas las páginas.
-- `scripts/`, `solutions/` y `guias/` están en `.gitignore` y excluidos del render. Los scripts de corrección (`scripts/corregir_hpdN.py`) referenciados en los `.qmd` evaluables se desarrollarán en una iteración futura.
+- `solutions/` y `guias/` están en `.gitignore` y excluidos del render (`scripts/` sí se versiona). La corrección se apoya en `solutions/corregir.py <hpd> <cuaderno.ipynb>`, que hace un análisis estático del cuaderno entregado (variables `eval*` sin rellenar, stubs, errores, longitud y palabras clave de los textos) y marca dónde revisar; no pone nota ni ejecuta nada. Admite `--csv` para resumir una tanda de entregas.
 - `mod10.md` (raíz) es la guía docente pública del módulo: se renderiza (`*.md` en `_quarto.yml`) y aparece en el sidebar bajo "Inicio".
 - Autoría: Adam Leiyi Chen Abolacio, Fernando Sancho Caparrini (Universidad de Sevilla).
 

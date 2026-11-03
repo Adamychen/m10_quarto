@@ -33,12 +33,13 @@ _Objetivos de bloque: comprender la arquitectura que subyace a los LLM modernos 
 - Panorama histórico de las representaciones: one-hot, Bag of Words, TF-IDF, semántica distribucional, word2vec, GloVe, ELMo, BERT, Sentence-BERT, E5 y recuperación densa. Distinción entre embeddings de token, estados ocultos contextuales y embeddings de frase.
 - Arquitectura Transformer: mecanismo de atención multi-cabeza, codificación posicional y variantes (encoder-only, decoder-only, encoder-decoder). Lectura complementaria: Vaswani et al. (2017), secciones 3-5.
 - Grandes Modelos de Lenguaje (LLM): preentrenamiento, tokenización (BPE, SentencePiece), ventana de contexto y parámetros relevantes para su uso en producción (temperatura, top-p, top-k).
-- Modelos de embeddings: semántica distribucional, modelos de frase (Sentence-BERT, E5, text-embedding-3-small de OpenAI). Embeddings multimodales y para datos tabulares (TabNet, SCARF).
-- Bases de datos vectoriales: indexación ANN (HNSW, IVF), métricas de similitud (coseno, producto escalar, L2). Comparativa operacional: Chroma (local/sin servidor), FAISS (librería embebible), Qdrant y Pinecone (cloud-native). Criterios de elección según escala y requisitos de privacidad.
+- Modelos de embeddings: semántica distribucional, modelos de frase (Sentence-BERT, E5, text-embedding-3-small de OpenAI). Embeddings multimodales y para datos tabulares (texto de la fila o SCARF). Cuándo fallan los embeddings: negación, cifras, códigos, idioma del modelo, truncado y puntuaciones no calibradas.
+- Bases de datos vectoriales: indexación ANN (HNSW, IVF), métricas de similitud (coseno, producto escalar, L2). Comparativa operacional: Chroma (local/sin servidor), FAISS (librería embebible), Qdrant y Pinecone (cloud-native). Medición de latencia y recall de los índices (flat, IVF, HNSW), estimación de memoria y criterios de elección según escala, latencia y privacidad (incluido pgvector).
+- De documentos a recuperación: chunking y solapamiento, búsqueda léxica (BM25), búsqueda híbrida (RRF) y métricas de recuperación (hit@k, recall@k, MRR).
 
 **Actividad práctica (HPD 1):**
 
-Pipeline de embeddings end-to-end. El alumno construirá un notebook que: (1) carga un corpus de documentos técnicos en PDF, (2) aplica chunking con solapamiento, (3) genera embeddings con un modelo open-source (p. ej., intfloat/e5-small-v2 vía Sentence-Transformers), (4) indexa en Chroma y (5) ejecuta consultas de búsqueda semántica evaluando recall@k.
+Pipeline de embeddings end-to-end. El alumno construirá un notebook que: (1) carga un corpus de documentos técnicos en PDF, (2) aplica chunking con solapamiento, (3) genera embeddings con un modelo open-source (p. ej., intfloat/e5-small-v2 vía Sentence-Transformers), (4) indexa en Chroma y (5) ejecuta consultas de búsqueda semántica evaluando recall@k, hit@k y MRR sobre un ground truth definido por contenido, y (6) compara la búsqueda densa con una línea base léxica (BM25) y con la híbrida. En el entregable evalúa sobre una muestra del benchmark estándar FiQA (BEIR) y contrasta su modelo con otro entrenado para una tarea distinta.
 
 ## Bloque 2 — Orquestación: Prompt Engineering, Frameworks y Agentes
 
@@ -55,9 +56,9 @@ _Objetivos de bloque: diseñar pipelines de prompting robustos, usar frameworks 
 
 HPD 2: Construcción de un agente analítico con LangChain + Tool Calling. El agente recibirá preguntas en lenguaje natural sobre un dataset y usará herramientas (ejecutar pandas, llamar a una API de visualización) para responderlas de forma autónoma.
 
-HPD 3: Implementación de workflows y agentes con LangGraph. El alumno traducirá a grafos de ejecución los patrones de la taxonomía del bloque (routing, evaluator-optimizer, parallelization), añadirá human-in-the-loop con checkpointing y construirá un supervisor multi-agente con agentes especializados, resolviendo un problema del camino elegido (Finanzas, Salud o E-commerce).
+HPD 3: Implementación de workflows y agentes con LangGraph. El alumno traducirá a grafos de ejecución los patrones de la taxonomía del bloque (routing, evaluator-optimizer, parallelization), añadirá human-in-the-loop con checkpointing y construirá un supervisor multi-agente con agentes especializados, resolviendo un problema de análisis financiero.
 
-HPD 4: Configuración de un servidor MCP local con Python. El alumno expondrá como herramienta MCP el acceso a una base de datos SQLite corporativa ficticia, y comprobará la conexión desde un cliente LLM, evaluando los riesgos de inyección de prompts y fuga de datos.
+HPD 4: Configuración de un servidor MCP local con Python. El alumno expondrá como herramienta MCP el acceso de solo lectura a una base de datos SQLite estándar de enseñanza (Chinook: facturación, clientes y catálogo), y comprobará la conexión desde un cliente LLM, evaluando los riesgos de inyección de prompts y fuga de datos.
 
 ## Bloque 3 — Aplicaciones: RAG, Datos Sintéticos y Fine-tuning
 

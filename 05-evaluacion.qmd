@@ -12,18 +12,14 @@ title: "Evaluación"
 | Participación en foros (mínimo 3 de 4) | 10 % | Participado / No participado | CE-6 (pensamiento crítico) |
 | Proyecto integrador final | 60 % | 5,0 / 10 | CE-1 a CE-6 |
 
-## Elegir tu camino {#sec-elegir-camino}
+## Contexto de los entregables {#sec-contexto-entregables}
 
-Antes de comenzar, cada alumno elige uno de los tres caminos de aplicación en
-la página [Elegir tu camino](evaluables/caminos.qmd). Esta elección determina los
-datasets y la narrativa de los entregables HPD 1-5. El proyecto integrador final
-es libre: problema y patrón agéntico propios (ver sección siguiente).
-
-| Camino | Dominio | Perfil |
-|---|---|---|
-| **A — Finanzas** | Datos financieros y corporativos | Data Scientist financiero |
-| **B — Salud** | Literatura biomédica y datos clínicos | Data Scientist biomédico |
-| **C — E-commerce** | Comercio electrónico y productos | Data Scientist de producto |
+Los entregables HPD 1-5 comparten un único contexto de aplicación: **análisis
+financiero y corporativo** (informes, balances, noticias de mercado, datos de
+crédito). Las competencias y los criterios de evaluación son los de siempre; el
+contexto único evita que cada alumno trabaje con datos distintos y facilita la
+corrección. El proyecto integrador final es libre: problema y patrón agéntico
+propios (ver sección siguiente).
 
 ## Entregables parciales {#sec-entregables-parciales}
 

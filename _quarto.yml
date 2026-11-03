@@ -42,8 +42,8 @@ website:
             text: Embeddings
           - href: bloque1/01d-vectordb.qmd
             text: Bases de datos vectoriales
-          - href: bloque1/01e-llm-por-dentro.qmd
-            text: Cabezas de predicción
+          - href: bloque1/01e-recuperacion.qmd
+            text: De documentos a recuperación
           - href: bloque1/hpd1-embeddings.qmd
             text: "HPD 1 — Embeddings"
           - href: evaluables/hpd1-entregable.qmd
@@ -82,6 +82,8 @@ website:
             text: RAG Avanzado
           - href: bloque3/03a-datos-sinteticos.qmd
             text: Datos Sintéticos
+          - href: bloque3/03c-previo-cabezas.qmd
+            text: "Previo: cabezas y objetivos"
           - href: bloque3/03c-fine-tuning.qmd
             text: Fine-tuning eficiente
           - href: evaluables/hpd5-rag-mixto.qmd
@@ -120,8 +122,6 @@ website:
             text: "Temperatura y muestreo"
       - section: "Evaluación"
         contents:
-          - href: evaluables/caminos.qmd
-            text: Elegir tu camino
           - href: 05-evaluacion.qmd
             text: Evaluación
           - href: evaluables/proyecto-final.qmd
