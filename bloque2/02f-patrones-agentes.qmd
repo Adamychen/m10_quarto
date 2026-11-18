@@ -117,6 +117,8 @@ Antes de elegir entre workflows y agentes hay un nivel cero:
 
 La siguiente taxonomía —adaptada de la guía de Anthropic [@anthropic2024buildingagents] y del capítulo "Agent Design Patterns" de Roitman [-@roitman2026hitchhiker]— distingue dos familias: patrones de workflow (el sistema decide el orden) y patrones de agente autónomo (el LLM controla el flujo). Los ejemplos en código de este tema son workflows ([prompt chaining](#sec-ejemplo-chaining) y [routing](#sec-ejemplo-routing)); los agentes autónomos ya se implementan en [02e](02e-agentes.qmd) y en el HPD 2.
 
+> **Demo interactiva:** [¿workflow o agente?](../demos/patrones.qmd). Procesa tres correos de cliente con cinco patrones y compara llamadas, resultado y previsibilidad.
+
 ### Workflow patterns {#sec-workflow-patterns}
 
 Estos patrones usan LLM dentro de un flujo de control *predefinido*. El sistema (no el modelo) decide el orden de ejecución.

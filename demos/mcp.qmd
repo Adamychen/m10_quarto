@@ -1,0 +1,281 @@
+---
+title: "Demo — MCP en dos minutos"
+description: "Compara cuántas integraciones hacen falta con y sin MCP, y recorre mensaje a mensaje la conversación entre un cliente y el servidor Chinook del HPD 4."
+engine: markdown
+---
+
+> Demo que acompaña a [Model Context Protocol](../bloque2/02d-mcp.qmd#sec-mcp-problema) y prepara el [HPD 4](../bloque2/hpd4-servidor-mcp.qmd). Se ejecuta en el navegador y no necesita clave de API.
+
+**MCP** (*Model Context Protocol*) es un protocolo estándar para que una aplicación con LLM descubra y use herramientas externas. Esta demo responde a dos preguntas: **para qué sirve** (parte A) y **qué se dicen** exactamente la aplicación y el servidor (parte B).
+
+```{shinylive-python}
+#| standalone: true
+#| viewerHeight: 1450
+
+import html
+import json
+import re
+
+from shiny import reactive
+from shiny.express import input, ui, render
+
+BLUE, DARK, YELLOW, ORANGE, GREEN, RED, GRAY = (
+    "#4B8BBE", "#306998", "#FFD43B", "#e65100", "#2e7d32", "#c62828", "#9ca3af")
+
+APPS = ["Claude Desktop", "ChatGPT", "Cursor", "VS Code", "Tu app Python", "Qwen + LangChain"]
+TOOLS = ["BD Chinook", "Ficheros CSV", "API del tiempo", "Google Drive", "GitHub", "Correo", "Calendario", "Slack"]
+
+# ── Parte B: la conversación real entre cliente y servidor ──────────────────
+TOOLS_LIST = [
+    {"name": "consultar_sql",
+     "description": "Ejecuta una consulta SELECT de solo lectura sobre la base de datos Chinook.",
+     "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}},
+    {"name": "cliente_por_id",
+     "description": "Busca un cliente por su ID y devuelve su ficha básica y un resumen de compras.",
+     "inputSchema": {"type": "object", "properties": {"id_cliente": {"type": "integer"}}, "required": ["id_cliente"]}},
+    {"name": "resumen_album",
+     "description": "Devuelve título, artista, pistas, unidades vendidas e ingresos de un álbum.",
+     "inputSchema": {"type": "object", "properties": {"id_album": {"type": "integer"}}, "required": ["id_album"]}},
+]
+QUESTION = "¿Quién es el cliente 1 y cuánto ha gastado?"
+RESULT_TEXT = "Luís Gonçalves | Brazil | São José dos Campos | 7 facturas | 39.62 total"
+
+# (fase, de, a, título, mensaje (dict o texto), explicación)
+STEPS = [
+    ("Presentarse", "cli", "srv", "initialize",
+     {"jsonrpc": "2.0", "id": 1, "method": "initialize",
+      "params": {"protocolVersion": "2025-06-18", "capabilities": {},
+                 "clientInfo": {"name": "mi-app", "version": "1.0"}}},
+     "Tu app arranca el servidor (aquí por <b>stdio</b>: como un proceso hijo) y se presenta: qué versión del "
+     "protocolo habla y quién es. Fíjate en el <code>id</code>: la respuesta llevará el mismo."),
+    ("Presentarse", "srv", "cli", "respuesta a initialize",
+     {"jsonrpc": "2.0", "id": 1,
+      "result": {"protocolVersion": "2025-06-18", "capabilities": {"tools": {}, "resources": {}},
+                 "serverInfo": {"name": "Servidor Facturación Chinook", "version": "1.0"}}},
+     "El servidor contesta con el mismo <code>id</code> y dice qué ofrece (<code>capabilities</code>): "
+     "herramientas y recursos. Es el servidor que construyes en el HPD 4."),
+    ("Presentarse", "cli", "srv", "notifications/initialized",
+     {"jsonrpc": "2.0", "method": "notifications/initialized"},
+     "Una <b>notificación</b>: no lleva <code>id</code> porque no espera respuesta. «Listo, empezamos»."),
+    ("Descubrir", "cli", "srv", "tools/list",
+     {"jsonrpc": "2.0", "id": 2, "method": "tools/list"},
+     "El cliente pregunta qué herramientas hay. <b>Nadie las ha programado en tu app</b>: se descubren en este momento."),
+    ("Descubrir", "srv", "cli", "lista de herramientas",
+     {"jsonrpc": "2.0", "id": 2, "result": {"tools": TOOLS_LIST}},
+     "Cada herramienta llega con su <b>nombre</b>, su <b>descripción</b> y un <b>esquema</b> de argumentos. "
+     "Es justo lo que el LLM leerá para decidir cuál usar (como en la demo del agente)."),
+    ("Usar", "user", "llm", "el usuario pregunta",
+     f"Usuario: «{QUESTION}»\n\nEl LLM recibe la pregunta junto con las 3 herramientas descubiertas "
+     f"y decide llamar a cliente_por_id con id_cliente = 1.",
+     "Este paso no es MCP: ocurre dentro de tu app, entre el usuario y el LLM. El LLM solo <b>propone</b> la llamada."),
+    ("Usar", "cli", "srv", "tools/call",
+     {"jsonrpc": "2.0", "id": 3, "method": "tools/call",
+      "params": {"name": "cliente_por_id", "arguments": {"id_cliente": 1}}},
+     "El cliente traduce la propuesta del LLM a una petición estándar: nombre de la herramienta y argumentos, "
+     "que cumplen el esquema recibido en el paso 5."),
+    ("Usar", "srv", "cli", "resultado",
+     {"jsonrpc": "2.0", "id": 3,
+      "result": {"content": [{"type": "text", "text": RESULT_TEXT}], "isError": False}},
+     "El servidor ejecuta la función Python contra la base de datos y devuelve el resultado como texto. "
+     "Sin email ni teléfono: el servidor decide qué datos salen."),
+    ("Usar", "llm", "user", "respuesta final",
+     "LLM: «El cliente 1 es Luís Gonçalves, de São José dos Campos (Brasil). "
+     "Tiene 7 facturas por un total de 39,62 $.»",
+     "El resultado vuelve al LLM, que redacta la respuesta para el usuario. Fuera de MCP otra vez."),
+]
+PHASES = ["Presentarse", "Descubrir", "Usar"]
+LANES = {"user": (70, "Usuario"), "llm": (230, "LLM"), "cli": (400, "Cliente MCP"),
+         "srv": (580, "Servidor MCP")}
+
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.muted{color:#6b7280;font-size:.85em}
+h4{font-size:1.15rem;font-weight:700;margin:18px 0 6px;color:#306998}
+.counts{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0}
+.count{flex:1;min-width:160px;border-radius:10px;padding:6px 12px;border:2px solid #e5e7eb}
+.count b{font-size:1.8em;display:block;line-height:1.1}
+.count.on{border-color:currentColor}
+.chip{display:inline-block;border:1px solid #306998;color:#306998;background:#fff;border-radius:999px;
+  padding:2px 12px;margin:2px 6px 2px 0;font-size:.85em;cursor:pointer;user-select:none}
+.chip:hover{background:#e8f0f8}.chip.on{background:#306998;color:#fff}
+pre.js{font-size:.8em;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:8px 10px;
+  margin:6px 0 0;white-space:pre-wrap;max-height:240px;overflow:auto}
+.k{color:#306998}.s{color:#2e7d32}.n{color:#e65100}.idk{background:#FFD43B;border-radius:3px;padding:0 2px}
+""")
+
+# ── Parte A ─────────────────────────────────────────────────────────────────
+ui.h4("Parte A · El problema: conectar todo con todo")
+with ui.layout_columns(col_widths=(4, 4, 4)):
+    ui.input_slider("n", "Aplicaciones de IA", 1, 6, 3)
+    ui.input_slider("m", "Herramientas y fuentes de datos", 1, 8, 4)
+    ui.input_switch("mcp", "Usar MCP", value=False)
+
+
+@render.ui
+def integrations():
+    n, m, use = input.n(), input.m(), input.mcp()
+    W, row = 640, 34
+    H = max(n, m) * row + 30
+    yA = lambda i: 20 + (H - 30 - n * row) / 2 + i * row + row / 2
+    yT = lambda j: 20 + (H - 30 - m * row) / 2 + j * row + row / 2
+    xA, xT, xM = 130, 510, 320
+    parts = []
+    if use:
+        for i in range(n):
+            parts.append(f"<line x1='{xA + 6}' y1='{yA(i)}' x2='{xM - 34}' y2='{yA(i)}' stroke='{GREEN}' stroke-width='2'/>")
+        for j in range(m):
+            parts.append(f"<line x1='{xM + 34}' y1='{yT(j)}' x2='{xT - 6}' y2='{yT(j)}' stroke='{ORANGE}' stroke-width='2'/>")
+        top, bot = min(yA(0), yT(0)) - 16, max(yA(n - 1), yT(m - 1)) + 16
+        parts.append(
+            f"<rect x='{xM - 34}' y='{top}' width='68' height='{bot - top}' rx='10' fill='{YELLOW}' stroke='#111'/>"
+            f"<text x='{xM}' y='{(top + bot) / 2 + 5}' text-anchor='middle' font-size='14' font-weight='700'>MCP</text>")
+    else:
+        for i in range(n):
+            for j in range(m):
+                parts.append(f"<line x1='{xA + 6}' y1='{yA(i)}' x2='{xT - 6}' y2='{yT(j)}' stroke='{RED}' "
+                             f"stroke-width='1.3' stroke-opacity='.55'/>")
+    for i in range(n):
+        parts.append(f"<rect x='10' y='{yA(i) - 13}' width='{xA - 4}' height='26' rx='7' fill='{BLUE}'/>"
+                     f"<text x='{10 + (xA - 4) / 2}' y='{yA(i) + 4}' text-anchor='middle' font-size='11.5' "
+                     f"font-weight='600' fill='#fff'>{APPS[i]}</text>")
+    for j in range(m):
+        parts.append(f"<rect x='{xT + 4}' y='{yT(j) - 13}' width='{W - xT - 14}' height='26' rx='7' fill='{DARK}'/>"
+                     f"<text x='{xT + 4 + (W - xT - 14) / 2}' y='{yT(j) + 4}' text-anchor='middle' font-size='11.5' "
+                     f"font-weight='600' fill='#fff'>{TOOLS[j]}</text>")
+    svg = (f"<svg viewBox='0 0 {W} {H}' width='100%' style='display:block;max-width:660px;margin:auto' "
+           f"font-family='system-ui,sans-serif'>{''.join(parts)}</svg>")
+    without, with_ = n * m, n + m
+    counts = (
+        f"<div class='counts'>"
+        f"<div class='count{'' if use else ' on'}' style='color:{RED}'><span class='muted'>Sin MCP: un adaptador por pareja</span>"
+        f"<b>{n} × {m} = {without}</b></div>"
+        f"<div class='count{' on' if use else ''}' style='color:{GREEN}'><span class='muted'>Con MCP: un cliente por app y un servidor por herramienta</span>"
+        f"<b>{n} + {m} = {with_}</b></div></div>"
+    )
+    extra = (f"<p style='margin:4px 0 0;font-size:.9em'>¿Añadir una herramienta más? Sin MCP, <b>{n}</b> adaptadores nuevos "
+             f"(uno por app). Con MCP, <b>1</b> servidor, y todas las apps pueden usarlo.</p>")
+    return ui.HTML(f"<div class='card'>{svg}{counts}{extra}</div>")
+
+
+# ── Parte B ─────────────────────────────────────────────────────────────────
+ui.h4("Parte B · La conversación: qué se dicen el cliente y el servidor")
+
+pos = reactive.value(0)
+
+
+@reactive.effect
+@reactive.event(input.next)
+def _n():
+    pos.set(min(pos() + 1, len(STEPS) - 1))
+
+
+@reactive.effect
+@reactive.event(input.prev)
+def _p():
+    pos.set(max(pos() - 1, 0))
+
+
+@reactive.effect
+@reactive.event(input.phase)
+def _ph():
+    pos.set(next(i for i, s in enumerate(STEPS) if s[0] == input.phase()))
+
+
+with ui.div(style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"):
+    ui.input_action_button("prev", "◀", class_="btn-outline-primary btn-sm")
+    ui.input_action_button("next", "Siguiente mensaje ▶", class_="btn-primary btn-sm")
+
+    @render.ui
+    def phases():
+        cur = STEPS[pos()][0]
+        return ui.HTML("".join(
+            f"<span class='chip{' on' if p == cur else ''}' "
+            f"onclick=\"Shiny.setInputValue('phase', '{p}', {{priority: 'event'}})\">{i + 1}. {p}</span>"
+            for i, p in enumerate(PHASES)))
+
+
+def pretty(msg, step_id):
+    """JSON coloreado, con el id resaltado para ver qué respuesta corresponde a qué petición."""
+    if isinstance(msg, str):
+        return html.escape(msg)
+    out = html.escape(json.dumps(msg, ensure_ascii=False, indent=2))
+    out = out.replace("&quot;", '"')
+    out = re.sub(r'"([^"]+)":', r'<span class="k">"\1"</span>:', out)
+    out = re.sub(r': "([^"]*)"', r': <span class="s">"\1"</span>', out)
+    out = re.sub(r': (\d+|true|false)', r': <span class="n">\1</span>', out)
+    out = re.sub(r'(<span class="k">"id"</span>: <span class="n">\d+</span>)', r'<span class="idk">\1</span>', out, count=1)
+    return out
+
+
+@render.ui
+def sequence():
+    p = pos()
+    n = len(STEPS)
+    rowh, top = 30, 46
+    H = top + n * rowh + 10
+    parts = []
+    # Zona «dentro de tu app»
+    parts.append(f"<rect x='150' y='4' width='330' height='{H - 8}' rx='10' fill='#eef4fa'/>"
+                 f"<text x='315' y='{H - 12}' text-anchor='middle' font-size='10.5' fill='#306998'>tu aplicación</text>")
+    for key, (x, label) in LANES.items():
+        parts.append(f"<line x1='{x}' y1='34' x2='{x}' y2='{H - 22}' stroke='#d1d5db' stroke-dasharray='4 4'/>"
+                     f"<text x='{x}' y='18' text-anchor='middle' font-size='11.5' font-weight='700' fill='#374151'>{label}</text>"
+                     + (f"<text x='{x}' y='31' text-anchor='middle' font-size='10' fill='#6b7280'>Facturación Chinook</text>"
+                        if key == "srv" else ""))
+    for i, (ph, a, b, title, *_rest) in enumerate(STEPS):
+        y = top + i * rowh
+        x1, x2 = LANES[a][0], LANES[b][0]
+        mcp_msg = {a, b} <= {"cli", "srv"}
+        cur, past = i == p, i < p
+        col = (ORANGE if cur else (DARK if mcp_msg else GRAY)) if (cur or past) else "#cbd5e1"
+        op = 1 if (cur or past) else 0.8
+        d = 1 if x2 > x1 else -1
+        italic = "" if mcp_msg else " font-style='italic'"
+        parts.append(
+            f"<g opacity='{op}' style='cursor:pointer' onclick=\"Shiny.setInputValue('goto', {i}, {{priority: 'event'}})\">"
+            f"<line x1='{x1}' y1='{y}' x2='{x2 - 7 * d}' y2='{y}' stroke='{col}' stroke-width='{3 if cur else 1.8}'/>"
+            f"<path d='M{x2},{y} l{-9 * d},-5 l0,10 z' fill='{col}'/>"
+            f"<text x='{(x1 + x2) / 2}' y='{y - 5}' text-anchor='middle' font-size='11' "
+            f"font-weight='{700 if cur else 500}' fill='{'#111' if (cur or past) else '#94a3b8'}'"
+            f"{italic}>{i + 1}. {html.escape(title)}</text></g>"
+        )
+    svg = (f"<svg viewBox='0 0 660 {H}' width='100%' style='display:block;max-width:660px;margin:auto' "
+           f"font-family='system-ui,sans-serif'>{''.join(parts)}</svg>")
+    ph, a, b, title, msg, expl = STEPS[p]
+    kind = "Mensaje JSON-RPC (esto sí es MCP)" if {a, b} <= {"cli", "srv"} else "Dentro de tu app (esto no es MCP)"
+    return ui.HTML(
+        f"<div class='card'>{svg}"
+        f"<div style='margin-top:6px'><b>{p + 1}. {html.escape(title)}</b> "
+        f"<span class='muted'>· {LANES[a][1]} → {LANES[b][1]} · {kind}</span></div>"
+        f"<p style='margin:4px 0;font-size:.92em'>{expl}</p>"
+        f"<pre class='js'>{pretty(msg, p)}</pre></div>"
+    )
+
+
+@reactive.effect
+@reactive.event(input.goto)
+def _goto():
+    pos.set(int(input.goto()))
+```
+
+## Qué observar
+
+1. **Parte A.** Con el interruptor apagado, sube aplicaciones y herramientas al máximo: 6 × 8 = 48 adaptadores, uno por pareja. Enciende **«Usar MCP»**: 6 + 8 = 14. Cada aplicación implementa un cliente MCP una vez, y cada herramienta, un servidor MCP una vez.
+2. **Parte B, fase «Presentarse» (mensajes 1-3).** El cliente y el servidor acuerdan la versión del protocolo y el servidor declara qué ofrece. Fíjate en el `id` resaltado: la respuesta lleva el mismo que la petición. Así se emparejan en JSON-RPC.
+3. **Fase «Descubrir» (4-5).** Tu aplicación no sabe de antemano qué herramientas hay: las pide con `tools/list`. Cada una llega con nombre, descripción y esquema de argumentos, lo mismo que escribes en el docstring de `@mcp.tool()` en el HPD 4.
+4. **Fase «Usar» (6-9).** Los mensajes en cursiva (6 y 9) no son MCP: ocurren dentro de tu aplicación, entre el usuario y el LLM. El LLM solo **propone** la llamada; el cliente la convierte en `tools/call`, y es el servidor quien ejecuta la función.
+
+## Qué has visto
+
+- MCP resuelve un problema de **integración**: pasa de N × M adaptadores a N + M, y una herramienta nueva sirve al momento para todas las aplicaciones.
+- Es un protocolo pequeño: mensajes JSON-RPC para presentarse, descubrir herramientas y llamarlas. No hay magia.
+- El LLM no habla MCP. Lo habla tu aplicación (el cliente), que hace de intermediaria entre el modelo y el servidor.
+
+::: {.callout-warning}
+## Qué es real y qué está simplificado
+
+- Los mensajes siguen el formato real de MCP (versión del protocolo `2025-06-18`), pero se han omitido campos opcionales.
+- Las herramientas y el resultado de `cliente_por_id(1)` son los del servidor «Facturación Chinook» que construyes en el HPD 4.
+- En la parte A, «adaptador» simplifica mucho: cada integración real tiene autenticación, formatos y errores propios, y por eso el ahorro de MCP es aún mayor de lo que sugieren los números.
+:::

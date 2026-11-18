@@ -80,6 +80,8 @@ graph TB
 Sin MCP hacen falta M × N integraciones ad hoc (3 × 3 = 9); con MCP bastan M + N implementaciones estandarizadas (3 + 3 = 6).
 :::
 
+> **Demo interactiva:** [MCP en dos minutos](../demos/mcp.qmd). Mueve los deslizadores para ver N × M frente a N + M, y recorre mensaje a mensaje la conversación con el servidor Chinook del HPD 4.
+
 ### Arquitectura de MCP {#sec-mcp-arquitectura}
 
 MCP sigue el modelo cliente-servidor. Cada servidor expone capacidades en 3 categorías:
@@ -317,6 +319,8 @@ graph TD
 | **Escalada de privilegios** | Principio de mínimo privilegio: cada tool accede solo a lo que necesita |
 
 :::
+
+> **Demo interactiva:** [inyección de prompt](../demos/inyeccion.qmd). Un correo con texto oculto intenta que un agente envíe datos fuera de la empresa; activa defensas y comprueba cuáles lo paran.
 
 ### Servidor MCP completo para ejecutar como script {#sec-servidor-mcp-script}
 

@@ -124,6 +124,12 @@ website:
             text: "Temperatura y muestreo"
           - href: demos/agente.qmd
             text: "Dentro de un agente"
+          - href: demos/patrones.qmd
+            text: "¿Workflow o agente?"
+          - href: demos/mcp.qmd
+            text: "MCP en dos minutos"
+          - href: demos/inyeccion.qmd
+            text: "Inyección de prompt"
       - section: "Evaluación"
         contents:
           - href: 05-evaluacion.qmd
