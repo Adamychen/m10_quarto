@@ -116,7 +116,7 @@ El problema es la escala. Los modelos modernos tienen miles de millones de pará
 ::: {.callout-warning}
 ## El problema de memoria
 
-Fine-tuning completo de un modelo 7B requiere ~56 GB de RAM: 14 GB para los pesos + 28 GB para los gradientes + 14 GB para los estados del optimizador Adam. Una GPU de consumidor (RTX 4090: 24 GB) no basta. Aquí entran las técnicas PEFT (Parameter-Efficient Fine-Tuning).
+Fine-tuning completo de un modelo 7B requiere ~56 GB de memoria de GPU: 14 GB para los pesos + 14 GB para los gradientes + 28 GB para los dos estados del optimizador Adam (contando todo en 16 bits; en la práctica, con precisión mixta, Adam guarda sus estados y una copia de los pesos en 32 bits, y la cifra se acerca al doble). Una GPU de consumidor (RTX 4090: 24 GB) no basta. Aquí entran las técnicas PEFT (Parameter-Efficient Fine-Tuning).
 :::
 
 ---
@@ -252,6 +252,8 @@ print(f"  Dropout: {config.lora_dropout}")
 - **r=64, alpha=128** — solo si tienes muchos datos (>10k ejemplos) y VRAM suficiente
 :::
 
+> **Demo interactiva:** [LoRA: cuánto se entrena de verdad](../demos/lora.qmd). Mueve el rango, elige las capas y comprueba cuántos parámetros se entrenan, si cabe en tu GPU y por qué basta con rango bajo.
+
 ---
 
 ### QLoRA: fine-tuning en GPU de consumidor {#sec-qlora}
@@ -282,7 +284,7 @@ graph TD
 
 | Enfoque | Modelo 7B en GPU | VRAM necesaria |
 |---|---|---|
-| Fine-tuning completo (16-bit) | 14 GB pesos + 42 GB optimizador | ~56 GB |
+| Fine-tuning completo (16-bit) | 14 GB pesos + 14 GB gradientes + 28 GB optimizador | ~56 GB |
 | LoRA (16-bit) | 14 GB pesos (congelados) + 0.1 GB LoRA | ~16 GB |
 | **QLoRA (4-bit)** | 4 GB pesos (congelados) + 0.1 GB LoRA | ~6 GB |
 

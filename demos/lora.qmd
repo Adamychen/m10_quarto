@@ -1,0 +1,718 @@
+---
+title: "Demo — LoRA: cuánto se entrena de verdad"
+description: "Mueve el rango r y elige qué capas adaptar: mira cuántos parámetros se entrenan, si el entrenamiento cabe en tu GPU y por qué un cambio de rango bajo basta."
+engine: markdown
+---
+
+> Demo que acompaña a [Fine-tuning eficiente](../bloque3/03c-fine-tuning.qmd#sec-lora). Las formas de las capas y el número de parámetros salen del `config.json` real de cada modelo, y el recuento de parámetros entrenables coincide con el que da `peft` (`model.print_trainable_parameters()`). Se ejecuta en el navegador y no necesita clave de API.
+
+LoRA no modifica la matriz de pesos *W* de una capa: la congela y le suma el producto de dos matrices estrechas, *B·A*, que son lo único que se entrena. El **rango r** es su anchura. La demo tiene tres partes:
+
+1. **¿Cuánto se entrena?** Elige un modelo, un rango y las capas que adaptas.
+2. **¿Cabe en mi GPU?** Compara la memoria del fine-tuning completo, LoRA y QLoRA con ese mismo modelo.
+3. **¿Por qué basta con rango bajo?** Aproxima una matriz con muy pocas direcciones y mira cuándo funciona y cuándo no.
+
+```{shinylive-python}
+#| standalone: true
+#| viewerHeight: 2440
+
+## file: app.py
+import base64
+import math
+import struct
+import zlib
+
+import numpy as np
+from shiny import reactive
+from shiny.express import input, ui, render
+
+from data import DATA
+
+MODELS = DATA["models"]
+MODS = ["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"]
+MOD_GROUP = {"q_proj": "atención", "k_proj": "atención", "v_proj": "atención", "o_proj": "atención",
+             "gate_proj": "MLP", "up_proj": "MLP", "down_proj": "MLP"}
+RANKS = [1, 2, 4, 8, 16, 32, 64, 128, 256]
+PRESETS = {
+    "min": ("Mínima", 8, ["q_proj", "v_proj"]),
+    "mas": ("Más capacidad", 16, ["q_proj", "k_proj", "v_proj", "o_proj"]),
+    "max": ("Muchos datos", 64, MODS),
+}
+GPUS = [("T4 · Colab gratis", 16), ("RTX 4090", 24), ("A100", 80)]
+MARGIN_GB = 2.0  # activaciones y buffers, estimación fija
+BLUE, DARK, YELLOW, ORANGE, GREEN, RED = "#4B8BBE", "#306998", "#FFD43B", "#e65100", "#2e7d32", "#c62828"
+
+
+# ── Formato en español ──────────────────────────────────────────────────────
+def fint(n):
+    return f"{int(round(n)):,}".replace(",", ".")
+
+
+def fdec(x, d=1):
+    return f"{x:.{d}f}".replace(".", ",")
+
+
+def fpct(x):
+    p = 100 * x
+    if p >= 10:
+        return fdec(p, 0) + " %"
+    if p >= 1:
+        return fdec(p, 1) + " %"
+    if p >= 0.1:
+        return fdec(p, 2) + " %"
+    return fdec(p, 3) + " %"
+
+
+def fbig(n):
+    if n >= 1e9:
+        return fdec(n / 1e9, 1) + " mil millones"
+    if n >= 1e6:
+        return fdec(n / 1e6, 1) + " millones"
+    return fint(n)
+
+
+def fbytes(b):
+    if b >= 1e9:
+        return fdec(b / 1e9, 1) + " GB"
+    if b >= 1e6:
+        return fdec(b / 1e6, 1) + " MB"
+    return fdec(b / 1e3, 0) + " KB"
+
+
+def chip(text, on, event, value, cls=""):
+    c = "chip" + (" on" if on else "") + (" " + cls if cls else "")
+    return (f"<button class='{c}' onclick=\"Shiny.setInputValue('{event}', '{value}', "
+            f"{{priority:'event'}})\">{text}</button>")
+
+
+# ── Estado ──────────────────────────────────────────────────────────────────
+model_i = reactive.value(1)
+rank = reactive.value(8)
+mods = reactive.value(["q_proj", "v_proj"])
+
+
+@reactive.effect
+@reactive.event(input.pick_model)
+def _pm():
+    model_i.set(int(input.pick_model()))
+
+
+@reactive.effect
+@reactive.event(input.pick_r)
+def _pr():
+    rank.set(int(input.pick_r()))
+
+
+@reactive.effect
+@reactive.event(input.tog_mod)
+def _tm():
+    m = input.tog_mod()
+    cur = list(mods())
+    cur = [x for x in cur if x != m] if m in cur else cur + [m]
+    mods.set([x for x in MODS if x in cur])
+
+
+@reactive.effect
+@reactive.event(input.preset)
+def _ps():
+    _, r, ms = PRESETS[input.preset()]
+    rank.set(r)
+    mods.set(list(ms))
+
+
+@reactive.calc
+def setup():
+    m = MODELS[model_i()]
+    r = rank()
+    ms = mods()
+    trainable = sum(r * sum(m["dims"][x]) for x in ms) * m["layers"]
+    return m, r, ms, trainable
+
+
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.card h4{margin:2px 0 8px;font-size:1.05em;color:#306998}
+.muted{color:#6b7280;font-size:.85em}
+.note{background:#fff8e1;border-left:3px solid #FFD43B;padding:3px 9px;font-size:.8em;color:#5b4a00;margin:-2px 0 6px;border-radius:0 4px 4px 0}
+.crow{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:4px 0}
+.lbl{font-size:.8em;font-weight:700;color:#374151;min-width:118px}
+.chip{border:1.5px solid #306998;color:#306998;border-radius:999px;padding:3px 12px;cursor:pointer;
+  font-size:.86em;background:#fff;font-family:inherit}
+.chip:hover{background:#e8f0f8}.chip.on{background:#306998;color:#fff}
+.chip.mod{border-color:#e65100;color:#e65100}.chip.mod:hover{background:#fdf0e8}
+.chip.mod.on{background:#e65100;color:#fff}
+.chip.pre{border-style:dashed;border-color:#6b7280;color:#374151}.chip.pre.on{background:#374151;color:#fff;border-style:solid}
+.grp{font-size:.72em;color:#9ca3af;margin:0 2px 0 6px}
+.tiles{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0}
+.tile{flex:1;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:5px 10px;font-size:.84em}
+.tile b{display:block;font-size:1.3em;color:#111}
+.tile .o{color:#e65100}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:.8em;margin:4px 0}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-2px;margin-right:4px}
+.verd{font-size:.86em;margin:3px 0}
+.pill{border-radius:4px;padding:0 7px;color:#fff;font-weight:600;font-size:.85em}
+.panels{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.panel{text-align:center;font-size:.8em}
+.panel img{width:168px;height:168px;image-rendering:pixelated;border:1px solid #e5e7eb;border-radius:4px;display:block}
+.kinds{display:flex;gap:6px;flex-wrap:wrap}
+.irs--shiny .irs-bar{background:#e65100;border-color:#e65100}
+.irs--shiny .irs-single{background:#e65100}
+@keyframes grow{from{opacity:.3}to{opacity:1}}
+.ba{animation:grow .35s ease-out both}
+""")
+
+# ═════════════════════════ CONTROLES COMUNES ═════════════════════════════════
+with ui.div(class_="card"):
+
+    @render.ui
+    def controls():
+        m, r, ms, _ = setup()
+        models = "".join(chip(f"Qwen {x['label']}", i == model_i(), "pick_model", i)
+                         for i, x in enumerate(MODELS))
+        ranks = "".join(chip(str(x), x == r, "pick_r", x) for x in RANKS)
+        mod_html, last = "", None
+        for x in MODS:
+            if MOD_GROUP[x] != last:
+                mod_html += f"<span class='grp'>{MOD_GROUP[x]}</span>"
+                last = MOD_GROUP[x]
+            mod_html += chip(x, x in ms, "tog_mod", x, "mod")
+        presets = "".join(chip(f"{name}: r={pr}, {len(pm)} capas",
+                               pr == r and list(pm) == list(ms), "preset", k, "pre")
+                          for k, (name, pr, pm) in PRESETS.items())
+        return ui.HTML(
+            f"<div class='crow'><span class='lbl'>Modelo</span>{models}</div>"
+            f"<div class='crow'><span class='lbl'>Rango r</span>{ranks}</div>"
+            f"<div class='crow'><span class='lbl'>Capas que adapta<br><code style='font-weight:400'>target_modules</code></span>{mod_html}</div>"
+            f"<div class='crow'><span class='lbl'>Recetas del capítulo</span>{presets}</div>"
+            f"<div class='muted'>{m['name']} · {fint(m['total'])} parámetros · {m['layers']} bloques Transformer</div>"
+        )
+
+
+# ═════════════════════════ PARTE 1 ══════════════════════════════════════════
+def layer_svg(m, r, mod):
+    n_in, n_out = m["dims"][mod]
+    s = 220 / max(n_in, n_out)
+    ww, wh = n_in * s, n_out * s
+    rp = max(r * s, 1.5)
+    x0, y0 = 8, 30
+    bx = x0 + ww + 46
+    ax = bx + rp + 26
+    width = ax + ww + 12
+    height = y0 + wh + 40
+    p = [f"<svg viewBox='0 0 {width:.0f} {height:.0f}' width='100%' style='max-width:{width:.0f}px'>"]
+    p.append(f"<rect x='{x0}' y='{y0}' width='{ww:.1f}' height='{wh:.1f}' fill='#dbe7f3' stroke='{DARK}' stroke-width='1.5' rx='2'/>")
+    p.append(f"<text x='{x0 + ww / 2:.1f}' y='{y0 + wh / 2:.1f}' text-anchor='middle' font-size='22' font-weight='700' fill='{DARK}'>W</text>")
+    p.append(f"<text x='{x0 + ww / 2:.1f}' y='{y0 + wh / 2 + 20:.1f}' text-anchor='middle' font-size='11' fill='{DARK}'>congelada</text>")
+    p.append(f"<text x='{x0}' y='{y0 - 8}' font-size='11' fill='#374151'>{mod}: {fint(n_out)} × {fint(n_in)}</text>")
+    p.append(f"<text x='{x0 + ww + 23:.1f}' y='{y0 + wh / 2 + 8:.1f}' text-anchor='middle' font-size='24' fill='#374151'>+</text>")
+    p.append(f"<rect class='ba' x='{bx:.1f}' y='{y0}' width='{rp:.1f}' height='{wh:.1f}' fill='{ORANGE}' rx='1'/>")
+    p.append(f"<text x='{bx:.1f}' y='{y0 - 8}' font-size='12' font-weight='700' fill='{ORANGE}'>B</text>")
+    p.append(f"<text x='{bx:.1f}' y='{y0 + wh + 16:.1f}' font-size='11' fill='#374151'>{fint(n_out)} × {r}</text>")
+    p.append(f"<text x='{bx + rp + 13:.1f}' y='{y0 + 10:.1f}' text-anchor='middle' font-size='20' fill='#374151'>·</text>")
+    p.append(f"<rect class='ba' x='{ax:.1f}' y='{y0}' width='{ww:.1f}' height='{rp:.1f}' fill='{ORANGE}' rx='1'/>")
+    p.append(f"<text x='{ax:.1f}' y='{y0 - 8}' font-size='12' font-weight='700' fill='{ORANGE}'>A</text>")
+    p.append(f"<text x='{ax:.1f}' y='{y0 + rp + 15:.1f}' font-size='11' fill='#374151'>{r} × {fint(n_in)}</text>")
+    p.append(f"<text x='{ax:.1f}' y='{y0 + rp + 33:.1f}' font-size='11' fill='#6b7280'>solo B y A se entrenan</text>")
+    p.append("</svg>")
+    return "".join(p)
+
+
+def dots_svg(frac):
+    """1000 puntos: cada uno es el 0,1 % de los parámetros del modelo."""
+    n = frac * 1000
+    full, part = int(n), n - int(n)
+    cols, gap = 50, 9.4
+    p = [f"<svg viewBox='0 0 {cols * gap + 4:.0f} {20 * gap + 4:.0f}' width='100%' style='max-width:480px'>"]
+    for k in range(1000):
+        x, y = 6 + (k % cols) * gap, 6 + (k // cols) * gap
+        if k < full:
+            fill, op = ORANGE, 1
+        elif k == full and part > 0:
+            fill, op = ORANGE, max(part, 0.15)
+        else:
+            fill, op = "#c7d7e8", 1
+        p.append(f"<circle cx='{x:.1f}' cy='{y:.1f}' r='3.6' fill='{fill}' opacity='{op:.2f}'/>")
+    p.append("</svg>")
+    return "".join(p)
+
+
+with ui.div(class_="card"):
+    ui.h4("1 · ¿Cuánto se entrena?")
+
+    @render.ui
+    def part1():
+        m, r, ms, trainable = setup()
+        if not ms:
+            return ui.HTML("<p class='muted'>Elige al menos una capa en <code>target_modules</code>.</p>")
+        mod = ms[0]
+        n_in, n_out = m["dims"][mod]
+        w_params, ba_params = n_in * n_out, r * (n_in + n_out)
+        frac = trainable / m["total"]
+        per_block = sum(r * sum(m["dims"][x]) for x in ms)
+        dots_txt = (f"{fdec(frac * 1000, 1)} puntos naranjas" if frac * 1000 >= 1
+                    else "ni siquiera un punto entero")
+        return ui.HTML(
+            f"<div class='muted'>Una de las capas que adaptas, dibujada a escala ({mod} de un bloque):</div>"
+            + layer_svg(m, r, mod)
+            + "<div class='tiles'>"
+            f"<div class='tile'>En esta capa<b><span class='o'>{fint(ba_params)}</span> de {fint(w_params)}</b>"
+            f"pesos entrenables: {fpct(ba_params / w_params)}</div>"
+            f"<div class='tile'>En todo el modelo<b><span class='o'>{fbig(trainable)}</span></b>"
+            f"de {fbig(m['total'])}: <b style='display:inline;font-size:1em' class='o'>{fpct(frac)}</b></div>"
+            f"<div class='tile'>Archivo del adaptador<b><span class='o'>{fbytes(trainable * 2)}</span></b>"
+            f"frente a {fbytes(m['total'] * 2)} del modelo</div>"
+            "</div>"
+            f"<div class='muted'>{len(ms)} capa{'s' if len(ms) > 1 else ''} por bloque × {m['layers']} bloques = "
+            f"{fint(per_block)} × {m['layers']} = {fint(trainable)} parámetros entrenables "
+            f"(lo mismo que imprime <code>print_trainable_parameters()</code>).</div>"
+            f"<div style='margin-top:8px;font-size:.84em'><b>Todo el modelo en 1000 puntos</b> "
+            f"<span class='muted'>(cada punto es el 0,1 % de los parámetros; en naranja, lo que entrena LoRA: {dots_txt})</span></div>"
+            + dots_svg(frac)
+        )
+
+
+# ═════════════════════════ PARTE 2 ══════════════════════════════════════════
+SEG_COLORS = {"pesos (16 bits)": DARK, "pesos (4 bits)": BLUE, "gradientes": YELLOW,
+              "optimizador (Adam)": "#f0a33a", "adaptador LoRA": ORANGE, "activaciones y margen": "#cbd5e1"}
+
+
+def memory(m, trainable):
+    n = m["total"]
+    margin = MARGIN_GB * 1e9
+    return [
+        ("Fine-tuning completo", [("pesos (16 bits)", 2 * n), ("gradientes", 2 * n),
+                                  ("optimizador (Adam)", 4 * n), ("activaciones y margen", margin)]),
+        ("LoRA", [("pesos (16 bits)", 2 * n), ("adaptador LoRA", 8 * trainable),
+                  ("activaciones y margen", margin)]),
+        ("QLoRA", [("pesos (4 bits)", 0.5 * n), ("adaptador LoRA", 8 * trainable),
+                   ("activaciones y margen", margin)]),
+    ]
+
+
+def verdict(gb):
+    for name, cap in GPUS:
+        if gb <= cap:
+            color = GREEN if cap == 16 else (BLUE if cap == 24 else DARK)
+            return color, f"cabe en una {name} ({cap} GB)"
+    k = math.ceil(gb / 80)
+    return RED, f"no cabe en una sola GPU: harían falta {k} A100 de 80 GB repartiendo el modelo"
+
+
+def memory_svg(rows):
+    totals = [sum(v for _, v in segs) / 1e9 for _, segs in rows]
+    xmax = max(max(totals), 85) * 1.04
+    L, R, W = 150, 600, 450
+    sx = W / xmax
+    p = [f"<svg viewBox='0 0 {R + 20} 200' width='100%'>"]
+    ys = [52, 100, 148]
+    for (name, segs), y, tot in zip(rows, ys, totals):
+        p.append(f"<text x='{L - 10}' y='{y + 17}' text-anchor='end' font-size='13' font-weight='600' fill='#111'>{name}</text>")
+        x = L
+        for seg, v in segs:
+            w = v / 1e9 * sx
+            p.append(f"<rect x='{x:.2f}' y='{y}' width='{max(w, 0.6):.2f}' height='26' fill='{SEG_COLORS[seg]}'>"
+                     f"<title>{seg}: {fdec(v / 1e9, 2)} GB</title></rect>")
+            x += w
+        txt = f"{fdec(tot, 1)} GB"
+        if x > R - 60:
+            p.append(f"<text x='{x - 6:.1f}' y='{y + 18}' text-anchor='end' font-size='12' font-weight='700' fill='#fff'>{txt}</text>")
+        else:
+            p.append(f"<text x='{x + 6:.1f}' y='{y + 18}' font-size='12' font-weight='700' fill='#111'>{txt}</text>")
+    for k, (gname, cap) in enumerate(GPUS):
+        gx = L + cap * sx
+        label_w = 6 * len(f"{gname} · {cap} GB")
+        anchor, dx = ("end", -4) if k == 0 or gx + label_w > R + 15 else ("start", 4)
+        ty = 14 if k != 1 else 30
+        p.append(f"<line x1='{gx:.1f}' y1='{ty + 4}' x2='{gx:.1f}' y2='182' stroke='#6b7280' stroke-dasharray='4 3'/>")
+        p.append(f"<text x='{gx + dx:.1f}' y='{ty}' text-anchor='{anchor}' font-size='11' fill='#374151'>{gname} · {cap} GB</text>")
+    p.append(f"<line x1='{L}' y1='182' x2='{L + W}' y2='182' stroke='#9ca3af'/>")
+    p.append(f"<text x='{L}' y='197' font-size='10' fill='#6b7280'>0 GB</text>")
+    p.append(f"<text x='{L + W}' y='197' text-anchor='end' font-size='10' fill='#6b7280'>{fdec(xmax, 0)} GB</text>")
+    p.append("</svg>")
+    return "".join(p), totals
+
+
+with ui.div(class_="card"):
+    ui.h4("2 · ¿Cabe en mi GPU?")
+    ui.HTML("<div class='note'>Estimación aproximada: la memoria real depende del tamaño del lote, la longitud de las secuencias y la precisión. Sirve para comparar, no para presupuestar.</div>")
+
+    @render.ui
+    def part2():
+        m, r, ms, trainable = setup()
+        rows = memory(m, trainable)
+        svg, totals = memory_svg(rows)
+        legend = "".join(f"<span><span class='sw' style='background:{c}'></span>{k}</span>"
+                         for k, c in SEG_COLORS.items())
+        verds = ""
+        for (name, _), tot in zip(rows, totals):
+            color, txt = verdict(tot)
+            verds += f"<div class='verd'><b>{name}</b> ({fdec(tot, 1)} GB): <span class='pill' style='background:{color}'>{txt}</span></div>"
+        return ui.HTML(
+            f"<div class='muted'>Memoria de GPU para entrenar <b>{m['name']}</b> con la configuración de arriba "
+            f"(pasa el ratón por las barras para ver cada parte).</div>"
+            + svg + f"<div class='legend'>{legend}</div>" + verds
+            + f"<div class='muted' style='margin-top:6px'>El adaptador LoRA ocupa {fbytes(8 * trainable)} incluidos su gradiente y su optimizador: "
+            f"casi invisible. Lo que decide si cabe es el modelo congelado, y por eso QLoRA lo guarda en 4 bits.</div>"
+        )
+
+
+# ═════════════════════════ PARTE 3 ══════════════════════════════════════════
+N = 48
+
+
+def make_matrices():
+    # Tinta = 1, fondo = 0: así la SVD mide las letras y no el fondo blanco.
+    img = 1 - np.array([[int(c, 16) / 15 for c in row] for row in DATA["image"]])
+    x = np.linspace(0, 1, N)
+    rng = np.random.default_rng(7)
+    pairs = [
+        (3.0, np.sin(2 * np.pi * x), np.cos(np.pi * x)),
+        (2.0, np.exp(-((x - 0.3) / 0.15) ** 2), np.sin(3 * np.pi * x)),
+        (1.3, np.cos(4 * np.pi * x), np.exp(-((x - 0.7) / 0.2) ** 2)),
+        (0.8, x - 0.5, np.sin(5 * np.pi * x)),
+    ]
+    structured = sum(s * np.outer(u, v) for s, u, v in pairs) + 0.03 * rng.standard_normal((N, N))
+    noise = rng.standard_normal((N, N))
+    return {"img": img, "struct": structured, "noise": noise}
+
+
+MATS = make_matrices()
+KINDS = {
+    "img": "La imagen del capítulo («LoRA»)",
+    "struct": "Un cambio ΔW con estructura",
+    "noise": "Ruido aleatorio (sin estructura)",
+}
+KIND_COLORS = {"img": DARK, "struct": ORANGE, "noise": "#9ca3af"}
+SVD = {}
+for key, M in MATS.items():
+    U, S, Vt = np.linalg.svd(M)
+    SVD[key] = (U, S, Vt, np.cumsum(S ** 2) / np.sum(S ** 2))
+
+
+def approx(key, k):
+    U, S, Vt, _ = SVD[key]
+    return (U[:, :k] * S[:k]) @ Vt[:k]
+
+
+def png_uri(rgb):
+    h, w, _ = rgb.shape
+    raw = b"".join(b"\x00" + rgb[y].tobytes() for y in range(h))
+
+    def chunk(tag, data):
+        return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
+
+    png = (b"\x89PNG\r\n\x1a\n" + chunk(b"IHDR", struct.pack(">IIBBBBB", w, h, 8, 2, 0, 0, 0))
+           + chunk(b"IDAT", zlib.compress(raw)) + chunk(b"IEND", b""))
+    return "data:image/png;base64," + base64.b64encode(png).decode()
+
+
+def gray(M):
+    c = (np.clip(M, 0, 1) * 255).astype(np.uint8)
+    return np.stack([c, c, c], axis=-1)
+
+
+def diverging(M, scale):
+    t = np.clip(M / scale, -1, 1)[..., None]
+    white = np.array([255, 255, 255])
+    pos, neg = np.array([230, 81, 0]), np.array([48, 105, 152])
+    return (white + (np.where(t > 0, pos, neg) - white) * np.abs(t)).astype(np.uint8)
+
+
+def energy_svg(kind, k):
+    W, H, L, T = 330, 170, 34, 10
+    pw, ph = W - L - 10, H - T - 28
+
+    def pt(i, e):
+        return L + (i - 1) / (N - 1) * pw, T + (1 - e) * ph
+
+    p = [f"<svg viewBox='0 0 {W} {H}' width='100%' style='max-width:{W}px'>"]
+    for e in (0, 0.5, 0.9, 1):
+        y = T + (1 - e) * ph
+        p.append(f"<line x1='{L}' y1='{y:.1f}' x2='{L + pw}' y2='{y:.1f}' stroke='#f3f4f6'/>")
+        p.append(f"<text x='{L - 4}' y='{y + 4:.1f}' text-anchor='end' font-size='9' fill='#6b7280'>{int(e * 100)} %</text>")
+    for key in KINDS:
+        cum = SVD[key][3]
+        pts = " ".join(f"{pt(i + 1, e)[0]:.1f},{pt(i + 1, e)[1]:.1f}" for i, e in enumerate(cum))
+        on = key == kind
+        p.append(f"<polyline points='{pts}' fill='none' stroke='{KIND_COLORS[key]}' "
+                 f"stroke-width='{2.5 if on else 1.2}' opacity='{1 if on else 0.45}'/>")
+    x, y = pt(k, SVD[kind][3][k - 1])
+    p.append(f"<line x1='{x:.1f}' y1='{T}' x2='{x:.1f}' y2='{T + ph}' stroke='#111' stroke-dasharray='3 3'/>")
+    p.append(f"<circle cx='{x:.1f}' cy='{y:.1f}' r='4.5' fill='{KIND_COLORS[kind]}' stroke='#fff' stroke-width='1.5'/>")
+    p.append(f"<text x='{L + pw / 2}' y='{H - 4}' text-anchor='middle' font-size='10' fill='#6b7280'>rango usado (1 a {N})</text>")
+    p.append("</svg>")
+    return "".join(p)
+
+
+with ui.div(class_="card"):
+    ui.h4("3 · ¿Por qué basta con rango bajo?")
+    ui.HTML("<div class='note'>Matrices de ejemplo, no pesos de un modelo real. La SVD sí se calcula de verdad.</div>")
+    ui.HTML("<div class='muted'>Una matriz de 48 × 48 se puede escribir como suma de 48 «direcciones» ordenadas "
+            "de más a menos importante (descomposición SVD). Quedarse con las primeras <i>k</i> es lo mismo que "
+            "escribirla como <i>B·A</i> con rango <i>k</i>.</div>")
+    ui.input_radio_buttons("kind", None, KINDS, selected="img", inline=True)
+    ui.input_slider("k", "Rango de la aproximación (k)", 1, N, 4, step=1,
+                    animate=ui.AnimationOptions(interval=450, loop=False), width="100%")
+
+    @render.ui
+    def part3():
+        kind, k = input.kind(), input.k()
+        M = MATS[kind]
+        Mk = approx(kind, k)
+        err = M - Mk
+        if kind == "img":
+            a, b = gray(1 - M), gray(1 - Mk)
+            c = diverging(err, 1.0)
+        else:
+            scale = np.abs(M).max()
+            a, b, c = diverging(M, scale), diverging(Mk, scale), diverging(err, scale)
+        rel = np.linalg.norm(err) / np.linalg.norm(M)
+        stored = k * (N + N)
+        energy = SVD[kind][3][k - 1]
+        panels = "".join(
+            f"<div class='panel'><img src='{png_uri(x)}' alt='{t}'><div>{t}</div></div>"
+            for x, t in ((a, "Original (48 × 48)"), (b, f"Con rango {k}"), (c, "Lo que se pierde")))
+        legend = "".join(f"<span><span class='sw' style='background:{KIND_COLORS[x]}'></span>{KINDS[x]}</span>"
+                         for x in KINDS)
+        return ui.HTML(
+            f"<div class='panels'>{panels}<div class='panel'>{energy_svg(kind, k)}"
+            f"<div>Información capturada según el rango</div></div></div>"
+            f"<div class='legend'>{legend}</div>"
+            "<div class='tiles'>"
+            f"<div class='tile'>Números guardados<b><span class='o'>{fint(stored)}</span> de {fint(N * N)}</b>"
+            f"{k} × (48 + 48) = {fpct(stored / (N * N))} de la matriz</div>"
+            f"<div class='tile'>Información capturada<b>{fpct(energy)}</b>de la «energía» de la matriz</div>"
+            f"<div class='tile'>Error de la aproximación<b>{fpct(rel)}</b>‖original − aproximación‖ / ‖original‖</div>"
+            "</div>"
+        )
+
+
+## file: data.py
+# DATA-START
+DATA = {
+ "models": [
+  {
+   "name": "Qwen/Qwen3-0.6B",
+   "label": "0,6B",
+   "total": 596049920,
+   "layers": 28,
+   "dims": {
+    "q_proj": [
+     1024,
+     2048
+    ],
+    "k_proj": [
+     1024,
+     1024
+    ],
+    "v_proj": [
+     1024,
+     1024
+    ],
+    "o_proj": [
+     2048,
+     1024
+    ],
+    "gate_proj": [
+     1024,
+     3072
+    ],
+    "up_proj": [
+     1024,
+     3072
+    ],
+    "down_proj": [
+     3072,
+     1024
+    ]
+   }
+  },
+  {
+   "name": "Qwen/Qwen3-8B",
+   "label": "8B",
+   "total": 8190735360,
+   "layers": 36,
+   "dims": {
+    "q_proj": [
+     4096,
+     4096
+    ],
+    "k_proj": [
+     4096,
+     1024
+    ],
+    "v_proj": [
+     4096,
+     1024
+    ],
+    "o_proj": [
+     4096,
+     4096
+    ],
+    "gate_proj": [
+     4096,
+     12288
+    ],
+    "up_proj": [
+     4096,
+     12288
+    ],
+    "down_proj": [
+     12288,
+     4096
+    ]
+   }
+  },
+  {
+   "name": "Qwen/Qwen3-32B",
+   "label": "32B",
+   "total": 32762123264,
+   "layers": 64,
+   "dims": {
+    "q_proj": [
+     5120,
+     8192
+    ],
+    "k_proj": [
+     5120,
+     1024
+    ],
+    "v_proj": [
+     5120,
+     1024
+    ],
+    "o_proj": [
+     8192,
+     5120
+    ],
+    "gate_proj": [
+     5120,
+     25600
+    ],
+    "up_proj": [
+     5120,
+     25600
+    ],
+    "down_proj": [
+     25600,
+     5120
+    ]
+   }
+  },
+  {
+   "name": "Qwen/Qwen2.5-72B-Instruct",
+   "label": "72B",
+   "total": 72706203648,
+   "layers": 80,
+   "dims": {
+    "q_proj": [
+     8192,
+     8192
+    ],
+    "k_proj": [
+     8192,
+     1024
+    ],
+    "v_proj": [
+     8192,
+     1024
+    ],
+    "o_proj": [
+     8192,
+     8192
+    ],
+    "gate_proj": [
+     8192,
+     29568
+    ],
+    "up_proj": [
+     8192,
+     29568
+    ],
+    "down_proj": [
+     29568,
+     8192
+    ]
+   }
+  }
+ ],
+ "image": [
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffecfffffffffffffffffffdddddeffffffffccfffffff",
+  "ffff90dfffffffffffffffffe1010002bfffffb00cffffff",
+  "ffff90dffffffffffffffffff07eeec20dffff5215ffffff",
+  "ffff90dfffffffff9558dffff07ffffc08ffff0970ffffff",
+  "ffff90dfffffffd205610afff07ffffe07fffa0ec0bfffff",
+  "ffff90dfffffff21efff40eff08ffff70cfff32ff05fffff",
+  "ffff90dffffffc09ffffd07fe0377752afffe0aff70fffff",
+  "ffff90dffffff80dfffff04fe0132202efff9056640bffff",
+  "ffff90dffffff80dfffff13ff08fffd05fff32544505ffff",
+  "ffff90dffffffa0bffffe05fe07ffff41ffd0affff60ffff",
+  "ffffa0effffffe05ffff90bfe07ffff70ef70effffb0afff",
+  "ffff909aaaaacf806de904fff07ffff90df04ffffff03fff",
+  "ffffa22111116ff910006ffff18ffffd19e2affffff72fff",
+  "fffffffffffffffffddfffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff",
+  "ffffffffffffffffffffffffffffffffffffffffffffffff"
+ ]
+}
+# DATA-END
+```
+
+## Qué observar
+
+1. **Parte 1, receta «Mínima».** Con Qwen 8B, r = 8 y solo `q_proj` y `v_proj`, LoRA entrena unos 3,8 millones de parámetros de 8.200 millones: **menos de un punto naranja** de los 1000. El adaptador ocupa unos 8 MB; el modelo, más de 16 GB.
+2. Sube el **rango** de 8 a 64: *B* y *A* engordan y los parámetros entrenables se multiplican por 8, pero la matriz *W* sigue siendo mucho mayor. Pulsa **«Muchos datos»** (las siete capas, r = 64) y mira cuántos puntos se encienden.
+3. **Parte 2.** Con Qwen 8B, el fine-tuning completo necesita una A100; LoRA, una RTX 4090; QLoRA cabe en la T4 gratuita de Colab. Fíjate en que el adaptador apenas se ve en las barras: cambiar el rango casi no mueve la memoria. Lo que la cambia es **cómo guardas el modelo congelado**.
+4. Cambia a **Qwen 72B**: el fine-tuning completo no cabe en ninguna GPU, y ni siquiera LoRA en 16 bits. Solo QLoRA entra en una A100. Con **Qwen 0,6B** (el del ejemplo de Colab del capítulo), todo cabe en la T4.
+5. **Parte 3, imagen «LoRA».** Lleva el deslizador a 1 y pulsa ▶. Con rango 1 o 2 es un borrón; con rango 4 ya se lee la palabra, guardando 384 números de 2.304 (el 17 %). A partir de 14 la copia es exacta: la palabra solo ocupa 14 filas, así que nunca necesita más de 14 direcciones.
+6. Elige **«Un cambio ΔW con estructura»**: con rango 4 la aproximación es casi perfecta (más del 99 % de la información). Ahora elige **«Ruido aleatorio»**: con rango 4 apenas captura nada, y necesitas casi todo el rango para reconstruirlo. Compara las tres curvas.
+
+## Qué has visto
+
+- **LoRA entrena una fracción mínima del modelo**, normalmente menos del 1 %. El resultado es un archivo de megas que se puede guardar, compartir o cambiar por otro sin tocar el modelo base: las «notas adhesivas» del capítulo.
+- **El rango es un compromiso entre capacidad y tamaño**, pero incluso con rangos altos el adaptador sigue siendo pequeño. La memoria de GPU depende sobre todo del **modelo congelado**: por eso QLoRA (4 bits) es lo que permite entrenar modelos grandes en GPUs modestas.
+- **Rango bajo funciona porque el cambio tiene estructura.** Si el ajuste que necesita el modelo para adaptarse a tu dominio se concentra en pocas direcciones, unas pocas columnas en *B* y filas en *A* lo capturan. Si fuera ruido sin estructura, LoRA no serviría. La hipótesis de Hu et al. (2022) es que, en la práctica, los cambios del fine-tuning son de este primer tipo.
+
+::: {.callout-warning}
+## Qué está simplificado
+
+- **Memoria.** Se usa la misma cuenta que en el capítulo: 2 bytes por parámetro para pesos y gradientes, y 4 para los dos estados de Adam. En la práctica, con precisión mixta, Adam guarda sus estados y una copia de los pesos en 32 bits (unos 16 bytes por parámetro), así que el fine-tuning completo real necesita **aproximadamente el doble**.
+- **Activaciones.** Dependen del tamaño del lote y de la longitud de las secuencias. Aquí se resumen en unos 2 GB fijos («activaciones y margen»), razonable con lote pequeño y *gradient checkpointing*.
+- **QLoRA.** Se cuentan todos los pesos a 4 bits (medio byte). En realidad algunas partes (embeddings, normalizaciones) suelen quedarse en 16 bits y la cuantización añade algo de memoria extra.
+- **Parte 3.** Las matrices son de juguete (48 × 48) y el «cambio con estructura» está construido a mano. En un modelo real, *W* tiene miles de filas y columnas, y *B·A* no se calcula con SVD sino entrenando.
+:::
+
+Para la explicación completa de LoRA y QLoRA, vuelve a [Fine-tuning eficiente](../bloque3/03c-fine-tuning.qmd#sec-lora).

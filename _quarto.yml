@@ -130,6 +130,8 @@ website:
             text: "MCP en dos minutos"
           - href: demos/inyeccion.qmd
             text: "Inyección de prompt"
+          - href: demos/lora.qmd
+            text: "LoRA: cuánto se entrena"
       - section: "Evaluación"
         contents:
           - href: 05-evaluacion.qmd
