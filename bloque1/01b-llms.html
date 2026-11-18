@@ -522,6 +522,12 @@ window.Quarto = {
  <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -635,10 +641,10 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p>El <a href="../bloque1/00-panorama.html">panorama histórico</a> distingue la línea de las representaciones semánticas de la línea de los modelos generativos. En esta página seguimos la segunda: cómo un modelo utiliza tokens, estados ocultos y una LM head para predecir texto.</p>
 </blockquote>
-<div id="34bbef50" class="cell" data-execution_count="1">
+<div id="93235773" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q transformers langchain<span class="op">-</span>openai requests matplotlib</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="02c488e0" class="cell" data-execution_count="2">
+<div id="66eb8876" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">Setup compartido para la API key de Llamus en todos los notebooks.</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).</span></span>
@@ -735,7 +741,7 @@ Librerías cargadas correctamente.</code></pre>
 </ul>
 <section id="experimento-1-tokeniza-tu-propia-frase" class="level4">
 <h4 class="anchored" data-anchor-id="experimento-1-tokeniza-tu-propia-frase">Experimento 1: tokeniza tu propia frase</h4>
-<div id="45bc207f" class="cell" data-execution_count="3">
+<div id="ea7d71d0" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>tok <span class="op">=</span> AutoTokenizer.from_pretrained(<span class="st">"Qwen/Qwen2.5-0.5B"</span>)</span>
@@ -778,7 +784,7 @@ Reconstruido: La tokenización trocea el texto.</code></pre>
 <section id="experimento-2-el-mismo-mensaje-en-inglés-y-en-español" class="level4">
 <h4 class="anchored" data-anchor-id="experimento-2-el-mismo-mensaje-en-inglés-y-en-español">Experimento 2: el mismo mensaje en inglés y en español</h4>
 <p><strong>Antes de ejecutar, predice:</strong> si dices lo mismo en español que en inglés, ¿cuántos tokens más crees que gasta el español: un 5 %, un 30 % o un 100 %? Anota tu respuesta y compárala con la tabla.</p>
-<div id="ae7114c0" class="cell" data-execution_count="4">
+<div id="505e73d5" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> statistics</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -810,7 +816,7 @@ Qwen2.5           1.15      1.49      +30%</code></pre>
 <section id="lo-que-el-modelo-no-ve-con-claridad" class="level3">
 <h3 class="anchored" data-anchor-id="lo-que-el-modelo-no-ve-con-claridad">Lo que el modelo no ve con claridad</h3>
 <p>Los tokens explican algunas de las rarezas más conocidas de los LLM.</p>
-<div id="2da1c145" class="cell" data-execution_count="5">
+<div id="056ab575" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>tok <span class="op">=</span> AutoTokenizer.from_pretrained(<span class="st">"Qwen/Qwen2.5-0.5B"</span>)</span>
@@ -834,7 +840,7 @@ Qwen2.5           1.15      1.49      +30%</code></pre>
 <section id="tokens-especiales" class="level3">
 <h3 class="anchored" data-anchor-id="tokens-especiales">Tokens especiales</h3>
 <p>Los modelos de chat no reciben solo el texto que escribes. Lo envuelven en una plantilla con tokens especiales que marcan quién habla y dónde empieza y termina cada turno. Esos tokens no corresponden a palabras; son marcadores.</p>
-<div id="602f0b1b" class="cell" data-execution_count="6">
+<div id="0b27efb2" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>tok <span class="op">=</span> AutoTokenizer.from_pretrained(<span class="st">"Qwen/Qwen2.5-0.5B"</span>)</span>
@@ -977,7 +983,7 @@ Figure&nbsp;1
 <li>Repetir 2-3 durante <span class="math inline">\(k\)</span> iteraciones (hasta alcanzar el tamaño de vocabulario deseado, p.&nbsp;ej. 50K).</li>
 </ol>
 <p><strong>Ejemplo numérico.</strong> Partimos de un corpus diminuto: <code>low</code> ×3, <code>lower</code> ×2, <code>newest</code> ×5 y <code>widest</code> ×3. El vocabulario inicial son sus diez letras: <code>d e i l n o r s t w</code>. En cada vuelta se cuentan los pares de símbolos vecinos y se fusiona el más frecuente. Antes de mirar la tabla, <strong>predice</strong>: ¿qué par crees que se fusionará primero?</p>
-<div id="6a7f5478" class="cell" data-execution_count="7">
+<div id="d782c019" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>corpus <span class="op">=</span> {<span class="st">"low"</span>: <span class="dv">3</span>, <span class="st">"lower"</span>: <span class="dv">2</span>, <span class="st">"newest"</span>: <span class="dv">5</span>, <span class="st">"widest"</span>: <span class="dv">3</span>}      <span class="co"># palabra -&gt; frecuencia</span></span>
@@ -1115,7 +1121,7 @@ Figure&nbsp;2
 </figcaption>
 </figure>
 </div>
-<div id="14fe7dea" class="cell" data-execution_count="8">
+<div id="bd466ec7" class="cell" data-execution_count="8">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_openai <span class="im">import</span> ChatOpenAI</span>
@@ -1136,7 +1142,7 @@ Figure&nbsp;2
 <span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </details>
 </div>
-<div id="2ed97163" class="cell" data-execution_count="9">
+<div id="e7e7ebf9" class="cell" data-execution_count="9">
 <details class="code-fold">
 <summary>Code</summary>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoTokenizer, AutoModelForCausalLM</span>
@@ -1272,7 +1278,7 @@ Figure&nbsp;2
 <h3 class="anchored" data-anchor-id="sec-tokens-coste-memoria">Tokens, dinero y memoria</h3>
 <p>Los tokens son la unidad de cobro y también la de memoria. Veamos las dos cuentas.</p>
 <p><strong>Cuánto cuesta.</strong> Las APIs cobran aparte los tokens de entrada (el prompt) y los de salida (la respuesta), normalmente por millón de tokens, y la salida suele costar varias veces más que la entrada. El siguiente cálculo usa <strong>precios inventados</strong>; sustitúyelos por los de tu proveedor.</p>
-<div id="4939ee3e" class="cell" data-execution_count="10">
+<div id="144727de" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Precios ILUSTRATIVOS (euros por millón de tokens): cámbialos por los de tu proveedor</span></span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>PRECIO_ENTRADA <span class="op">=</span> <span class="fl">0.50</span></span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>PRECIO_SALIDA <span class="op">=</span> <span class="fl">2.00</span></span>
@@ -1296,7 +1302,7 @@ Duplicando el contexto: 900 € al mes</code></pre>
 </div>
 <p>Cambia <code>tokens_entrada</code> y observa. Esa es una de las razones por las que en RAG importa recuperar <strong>pocos fragmentos buenos</strong> y no muchos fragmentos mediocres.</p>
 <p><strong>Cuánta memoria ocupa.</strong> Durante la generación el modelo guarda las claves y valores de todos los tokens anteriores (la <em>caché KV</em> que vimos en <a href="../bloque1/01a-transformer.html#sec-entrenamiento-inferencia">01a</a>). Se puede calcular a partir de la configuración del modelo, sin descargar los pesos:</p>
-<div id="aa58765e" class="cell" data-execution_count="11">
+<div id="5c62fc71" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoConfig</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> kv_cache_por_token(nombre, bytes_por_valor<span class="op">=</span><span class="dv">2</span>):          <span class="co"># 2 bytes = float16</span></span>
@@ -1468,7 +1474,7 @@ Modelo de embeddings: qwen3-embedding:0.6b</code></pre>
 <p>El identificador del modelo del curso es <code>gemma4:26b</code>. Si te equivocas, la API no devuelve un modelo parecido, devuelve <code>404 Model not found</code>. Puedes comprobar qué hay en tu cuenta con <code>client.models.list()</code> o <code>curl -H "Authorization: Bearer $LLM_API_KEY" https://llamus.cs.us.es/api/v1/models</code>.</p>
 </div>
 </div>
-<div id="50ffb64e" class="cell" data-execution_count="12">
+<div id="606f20d4" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_openai <span class="im">import</span> ChatOpenAI</span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>llm <span class="op">=</span> ChatOpenAI(</span>
@@ -1481,7 +1487,7 @@ Modelo de embeddings: qwen3-embedding:0.6b</code></pre>
 <span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>resp <span class="op">=</span> llm.invoke(<span class="st">"Explica qué es un Transformer en 3 frases"</span>)</span>
 <span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(resp.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="144b779d" class="cell" data-execution_count="13">
+<div id="efac8f61" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># También puedes consultar los modelos disponibles</span></span>
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> requests</span>
 <span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a></span>

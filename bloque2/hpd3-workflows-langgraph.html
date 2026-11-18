@@ -492,6 +492,12 @@ div.csl-indent {
  <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -670,10 +676,10 @@ div.csl-indent {
 <p>Ejecuta <strong>ya</strong> la celda de instalación de más abajo y sigue leyendo mientras termina: tarda unos 2 minutos. Si al acabar aparece un aviso en rojo sobre <em>dependency conflicts</em> (<code>google-colab</code>, <code>requests</code>, <code>opentelemetry</code>), ignóralo: son paquetes que trae Colab y no afectan a este taller.</p>
 </div>
 </div>
-<div id="47ad8394" class="cell" data-execution_count="1">
+<div id="d0b2e147" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q langgraph<span class="op">==</span><span class="fl">1.2.2</span> langgraph<span class="op">-</span>prebuilt<span class="op">==</span><span class="fl">1.1.0</span> langgraph<span class="op">-</span>checkpoint<span class="op">==</span><span class="fl">4.1.1</span> langchain<span class="op">-</span>openai<span class="op">==</span><span class="fl">1.2.2</span> python<span class="op">-</span>dotenv<span class="op">==</span><span class="fl">1.2.2</span> langchain<span class="op">-</span>core<span class="op">==</span><span class="fl">1.4.0</span> openai<span class="op">==</span><span class="fl">2.38.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="4ed0ccc3" class="cell" data-execution_count="2">
+<div id="5fc0214b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">Setup compartido para la API key de Llamus en todos los notebooks.</span></span>
@@ -730,7 +736,7 @@ div.csl-indent {
 Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="d2ae431c" class="cell" data-execution_count="3">
+<div id="bd697c63" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_openai <span class="im">import</span> ChatOpenAI</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -782,7 +788,7 @@ Figure&nbsp;1
 </figcaption>
 </figure>
 </div>
-<div id="544fb6f8" class="cell" data-execution_count="4">
+<div id="fe381f5f" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> TypedDict, Literal</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langgraph.graph <span class="im">import</span> StateGraph, END</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.messages <span class="im">import</span> HumanMessage</span>
@@ -842,7 +848,7 @@ Figure&nbsp;1
 <pre><code>✅ Grafo de routing compilado</code></pre>
 </div>
 </div>
-<div id="d13090c5" class="cell" data-execution_count="5">
+<div id="77e16499" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>preguntas_routing <span class="op">=</span> [</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"¿Cuál es la población de Sevilla?"</span>,</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"¿Por qué crees que bajaron las ventas este trimestre?"</span>,</span>
@@ -905,7 +911,7 @@ Figure&nbsp;2
 </figcaption>
 </figure>
 </div>
-<div id="5c13668f" class="cell" data-execution_count="6">
+<div id="ea5cb5ee" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> EstadoEvalOpt(TypedDict):</span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    tarea: <span class="bu">str</span></span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    borrador: <span class="bu">str</span></span>
@@ -964,7 +970,7 @@ Figure&nbsp;2
 <pre><code>✅ Grafo evaluator-optimizer compilado</code></pre>
 </div>
 </div>
-<div id="099d0210" class="cell" data-execution_count="7">
+<div id="8bdf17d3" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env"</span>)</span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -993,7 +999,7 @@ Figure&nbsp;2
 <section id="sec-hpd3-parallelization" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd3-parallelization">1.3 Parallelization: fan-out con <code>Send</code></h2>
 <p>El patrón de parallelization de 02f lanza varias llamadas en paralelo y combina sus salidas. En LangGraph se usa <code>Send</code> desde una arista condicional que genera varias ejecuciones del nodo worker, una por subtarea. La estructura canónica tiene tres piezas: un nodo despachador (no-op cuya arista condicional emite los <code>Send</code>), el worker que se ejecuta en paralelo (cada rama recibe un subestado con sus propios campos) y un nodo join que reúne las ramas:</p>
-<div id="e9bd0b40" class="cell" data-execution_count="8">
+<div id="7b34dee9" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Annotated</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> operator</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langgraph.types <span class="im">import</span> Send</span>
@@ -1043,7 +1049,7 @@ Figure&nbsp;2
 <pre><code>✅ Grafo de auditoría paralela compilado</code></pre>
 </div>
 </div>
-<div id="8057d1e1" class="cell" data-execution_count="9">
+<div id="9ffc07e0" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env"</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1084,7 +1090,7 @@ Figure&nbsp;2
 <section id="sec-hpd3-interrupt" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd3-interrupt">2.1 Gate de aprobación con interrupt</h2>
 <p>Simulamos un asistente que genera un informe y, antes de “enviarlo”, pide aprobación:</p>
-<div id="ce3a5f15" class="cell" data-execution_count="10">
+<div id="a8ac681c" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langgraph.checkpoint.memory <span class="im">import</span> InMemorySaver</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langgraph.types <span class="im">import</span> interrupt, Command</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1132,7 +1138,7 @@ Figure&nbsp;2
 <pre><code>✅ Grafo con interrupt compilado (checkpointer activo)</code></pre>
 </div>
 </div>
-<div id="2781c71e" class="cell" data-execution_count="11">
+<div id="f1de6b64" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env"</span>)</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1196,7 +1202,7 @@ Figure&nbsp;2
 <p>En la arquitectura supervisor de 02e, un agente principal delega en agentes especializados. Con <code>create_agent</code> (de <code>langchain.agents</code>, antes <code>langgraph-prebuilt</code>) cada especialista es un agente ReAct completo con sus propias tools. El supervisor decide a quién delegar.</p>
 <section id="sec-hpd3-agentes-especializados" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd3-agentes-especializados">3.1 Agentes especializados</h2>
-<div id="68dadfa5" class="cell" data-execution_count="12">
+<div id="0c0fc610" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Dataset de ejemplo: ventas por región y producto</span></span>
@@ -1217,7 +1223,7 @@ Barcelona Silla Ergonómica   80000    0.38
     Norte Silla Ergonómica   70000    0.35</code></pre>
 </div>
 </div>
-<div id="08163fe9" class="cell" data-execution_count="13">
+<div id="20259ea2" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain.agents <span class="im">import</span> create_agent</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.tools <span class="im">import</span> tool</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1267,7 +1273,7 @@ Barcelona Silla Ergonómica   80000    0.38
 <section id="sec-hpd3-supervisor" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd3-supervisor">3.2 El supervisor que delega</h2>
 <p>El supervisor es el nodo central: recibe la petición del usuario, decide qué especialista la resuelve (o si responde él mismo) y orquesta el bucle:</p>
-<div id="4f495c53" class="cell" data-execution_count="14">
+<div id="f144413e" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> typing <span class="im">import</span> Annotated</span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langgraph.graph <span class="im">import</span> add_messages</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.messages <span class="im">import</span> BaseMessage, HumanMessage</span>
@@ -1321,7 +1327,7 @@ Barcelona Silla Ergonómica   80000    0.38
 <pre><code>✅ Supervisor multi-agente compilado</code></pre>
 </div>
 </div>
-<div id="47f43ed3" class="cell" data-execution_count="15">
+<div id="08938a91" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>preguntas_supervisor <span class="op">=</span> [</span>
 <span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"¿Cuál es la región con más ventas?"</span>,</span>
 <span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Redacta un informe breve sobre Barcelona."</span>,</span>
@@ -1363,7 +1369,7 @@ Barcelona Silla Ergonómica   80000    0.38
 <h2 class="anchored" data-anchor-id="sec-hpd3-p4-a">4.1 Resumen trimestral con evaluator-optimizer</h2>
 <p><strong>Problema:</strong> el equipo de reporting genera cada trimestre un resumen ejecutivo de 5 frases sobre el balance. Los primeros borradores del LLM son imprecisos (mezclan cifras, olvidan riesgos). Queremos un flujo que genere, evalúe y mejore hasta superar el umbral de calidad, con presupuesto de reintentos.</p>
 <p><strong>Patrón sugerido:</strong> evaluator-optimizer (Parte 1.2) con criterios: (1) solo cifras del balance, (2) menciona al menos un riesgo, (3) máximo 5 frases.</p>
-<div id="dbe1c5c7" class="cell" data-execution_count="16">
+<div id="ade5343b" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: grafo del resumen trimestral ───</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: definir EstadoFinanzas con: datos (str), borrador, criticas, score, intentos</span></span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: reutilizar el esquema de la Parte 1.2 con un prompt de generación financiera:</span></span>

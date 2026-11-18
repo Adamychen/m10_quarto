@@ -522,6 +522,12 @@ window.Quarto = {
  <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -1039,7 +1045,7 @@ Figura&nbsp;2
 <section id="sec-demo-tfidf" class="level2">
 <h2 class="anchored" data-anchor-id="sec-demo-tfidf">Demostración: coincidencia literal frente a similitud semántica</h2>
 <p><strong>Antes de ejecutar, predice:</strong> ¿qué similitud esperas entre la frase del gato y la del felino con TF-IDF: alta, media o casi cero? La siguiente demostración utiliza únicamente TF-IDF para hacer visible el problema de la coincidencia léxica. La frase sobre el felino y la frase sobre el gato hablan de una situación similar, pero no comparten exactamente todas sus palabras.</p>
-<div id="0c09e07e" class="cell" data-execution_count="1">
+<div id="ddaff976" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.feature_extraction.text <span class="im">import</span> TfidfVectorizer</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.metrics.pairwise <span class="im">import</span> cosine_similarity</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -1092,7 +1098,7 @@ Matriz de similitud TF-IDF:
 </div>
 </div>
 <p>En una segunda ejecución, puedes sustituir TF-IDF por un encoder de frases. Para texto en español conviene utilizar un modelo multilingüe y respetar el formato de consulta que indique su documentación:</p>
-<div id="9f351f34" class="cell" data-execution_count="2">
+<div id="fe27be7b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q sentence<span class="op">-</span>transformers</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>

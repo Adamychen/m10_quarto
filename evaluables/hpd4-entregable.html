@@ -488,6 +488,12 @@ div.csl-indent {
  <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -609,10 +615,10 @@ div.csl-indent {
 </div>
 <section id="setup" class="level2">
 <h2 class="anchored" data-anchor-id="setup">Setup</h2>
-<div id="b1ce7946" class="cell" data-execution_count="1">
+<div id="497cda8a" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q fastmcp<span class="op">==</span><span class="fl">3.3.1</span> openai<span class="op">==</span><span class="fl">2.38.0</span> python<span class="op">-</span>dotenv<span class="op">==</span><span class="fl">1.2.2</span> <span class="st">"pandas&lt;3"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="627ac6aa" class="cell" data-execution_count="2">
+<div id="92665ae2" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os, sqlite3, tempfile, json, re, time, urllib.request</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
@@ -673,7 +679,7 @@ div.csl-indent {
 Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="227ebe14" class="cell" data-execution_count="3">
+<div id="6342e4b2" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>LLM_URL <span class="op">=</span> os.getenv(<span class="st">"LLM_URL"</span>, <span class="st">"https://llamus.cs.us.es/api/v1"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_MODEL <span class="op">=</span> os.getenv(<span class="st">"LLM_MODEL"</span>, <span class="st">"gemma4:26b"</span>)</span>
@@ -689,7 +695,7 @@ Librerías cargadas correctamente.</code></pre>
 <pre><code>✅ Cliente OpenAI configurado.</code></pre>
 </div>
 </div>
-<div id="99508c2a" class="cell" data-execution_count="4">
+<div id="fee55f7d" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Función auxiliar compartida: ejecutar herramienta del servidor MCP (simulación en notebook)</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> FastMCP</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -708,7 +714,7 @@ Librerías cargadas correctamente.</code></pre>
 <pre><code>✅ Helper de ejecución de tools listo.</code></pre>
 </div>
 </div>
-<div id="aae5ef74" class="cell" data-execution_count="5">
+<div id="548cf0c4" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>CHINOOK_URL <span class="op">=</span> <span class="st">"https://github.com/lerocha/chinook-database/raw/master/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite"</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>CHINOOK_PATH <span class="op">=</span> os.path.join(tempfile.gettempdir(), <span class="st">"chinook_cache"</span>, <span class="st">"Chinook_Sqlite.sqlite"</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -806,7 +812,7 @@ Librerías cargadas correctamente.</code></pre>
 </ul>
 <p>La conexión <code>db_e</code> ya está abierta en modo solo lectura (<code>mode=ro</code>) en la celda de setup.</p>
 <p>Asigna el servidor a <code>eval1_server</code> (como string con los logs de creación y verificación).</p>
-<div id="6966ab6b" class="cell" data-execution_count="6">
+<div id="51f85db2" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>mcp_e1 <span class="op">=</span> FastMCP(<span class="st">"Servidor Facturación Chinook (solo lectura)"</span>)</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp_e1.tool</span>()</span>
@@ -891,7 +897,7 @@ Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
 <p>Asigna el resultado (pregunta + respuesta completa) a <code>eval2_respuesta</code>.</p>
-<div id="7cab5479" class="cell" data-execution_count="7">
+<div id="e2f279b7" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: define las tres tools en formato OpenAI function calling (listar_tablas, describir_tabla, consultar_sql).</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   Para consultar_sql, describe en "description" las tablas y columnas principales (ayuda al LLM a escribir SQL).</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>tools_definition_e2 <span class="op">=</span> []</span>
@@ -931,7 +937,7 @@ Librerías cargadas correctamente.</code></pre>
 <p>Prueba al menos 3 intentos de ataque (inyección SQL o manipulación del prompt) contra tu servidor MCP, y comprueba también el límite de filas y el timeout. Documenta qué intentaste, qué respuesta obtuvo y si la defensa funcionó.</p>
 <p>Cada caso indica en <code>esperado</code> una parte del mensaje que devuelve el servidor cuando la defensa funciona (por ejemplo <code>"Error"</code>, <code>"más filas"</code> o <code>"timeout"</code>).</p>
 <p>Asigna los resultados a <code>eval3_ataques</code> (lista de diccionarios con ataque, resultado, defendido).</p>
-<div id="0f3f7698" class="cell" data-execution_count="8">
+<div id="a2b6b971" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ataques_e3 <span class="op">=</span> [</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    {</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"ataque"</span>: <span class="st">"DROP TABLE Customer"</span>,</span>
@@ -990,7 +996,7 @@ Librerías cargadas correctamente.</code></pre>
 <li>¿Qué consultas podrían bloquear el servidor y cómo lo evitarías?</li>
 </ul>
 <p>Asigna tu respuesta a <code>eval4_riesgos</code>.</p>
-<div id="b5001f93" class="cell" data-execution_count="9">
+<div id="0bf67071" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>eval4_riesgos <span class="op">=</span> <span class="st">"""TODO: escribe aquí el análisis de riesgos, con estas secciones:</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="st">RIESGOS DE PRIVACIDAD:</span></span>
@@ -1014,7 +1020,7 @@ Librerías cargadas correctamente.</code></pre>
 </section>
 <section id="resumen-de-entregables" class="level2">
 <h2 class="anchored" data-anchor-id="resumen-de-entregables">Resumen de entregables</h2>
-<div id="37ef0f90" class="cell" data-execution_count="10">
+<div id="7416820e" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Variables de corrección:"</span>)</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> var <span class="kw">in</span> [<span class="st">"eval1_server"</span>, <span class="st">"eval2_respuesta"</span>, <span class="st">"eval3_ataques"</span>, <span class="st">"eval4_riesgos"</span>]:</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    val <span class="op">=</span> <span class="bu">globals</span>().get(var, <span class="va">None</span>)</span>

@@ -492,6 +492,12 @@ div.csl-indent {
  <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -684,10 +690,10 @@ div.csl-indent {
 <p>Ejecuta <strong>ya</strong> la celda de instalación de más abajo y sigue leyendo mientras termina: tarda unos 2 minutos. Si al acabar aparece un aviso en rojo sobre <em>dependency conflicts</em> (<code>google-colab</code>, <code>requests</code>, <code>opentelemetry</code>), ignóralo: son paquetes que trae Colab y no afectan a este taller.</p>
 </div>
 </div>
-<div id="660d59cc" class="cell" data-execution_count="1">
+<div id="bfb8c721" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q fastmcp<span class="op">==</span><span class="fl">3.3.1</span> openai<span class="op">==</span><span class="fl">2.38.0</span> python<span class="op">-</span>dotenv<span class="op">==</span><span class="fl">1.2.2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="5b56761b" class="cell" data-execution_count="2">
+<div id="50f04c83" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os, sqlite3, tempfile, json, re, time, urllib.request</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> pathlib <span class="im">import</span> Path</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
@@ -752,7 +758,7 @@ Librerías cargadas correctamente.</code></pre>
 <h2 class="anchored" data-anchor-id="sec-hpd4-bd-chinook">1.1 Descargar y abrir la base Chinook</h2>
 <p><a href="https://github.com/lerocha/chinook-database">Chinook</a> es una base de datos de ejemplo de una tienda de música digital: catálogo (artistas, álbumes, pistas, géneros), clientes, empleados y facturas. Fue creada por Luis Rocha y se distribuye con <strong>licencia MIT</strong>. Los datos de catálogo proceden de una biblioteca de iTunes real; clientes y empleados son ficticios.</p>
 <p>El fichero SQLite pesa unos 1 MB. Lo descargamos una vez, lo guardamos en caché en el directorio temporal y lo abrimos en <strong>modo solo lectura</strong> (<code>mode=ro</code>): el servidor MCP nunca debe poder modificar los datos.</p>
-<div id="a5a213d7" class="cell" data-execution_count="3">
+<div id="8f87a41e" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>CHINOOK_URL <span class="op">=</span> <span class="st">"https://github.com/lerocha/chinook-database/raw/master/ChinookDatabase/DataSources/Chinook_Sqlite.sqlite"</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>CHINOOK_PATH <span class="op">=</span> os.path.join(tempfile.gettempdir(), <span class="st">"chinook_cache"</span>, <span class="st">"Chinook_Sqlite.sqlite"</span>)</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -809,7 +815,7 @@ Librerías cargadas correctamente.</code></pre>
 <pre><code>✅ Chinook abierta en modo solo lectura: /var/folders/5q/dq_s1n552d37rqhcc02ppsn00000gn/T/chinook_cache/Chinook_Sqlite.sqlite</code></pre>
 </div>
 </div>
-<div id="bf9db132" class="cell" data-execution_count="4">
+<div id="16c2cfeb" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Explorar el esquema y unas muestras de datos</span></span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"TABLAS PRINCIPALES — Chinook"</span>)</span>
@@ -862,7 +868,7 @@ TABLAS PRINCIPALES — Chinook
 <p>Creamos un servidor con FastMCP que expone una herramienta de consulta SQL. De momento sin sanitización — la añadiremos en la Parte 5 cuando hablemos de seguridad.</p>
 <section id="sec-hpd4-servidor-minimo" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd4-servidor-minimo">2.1 Servidor mínimo con una tool</h2>
-<div id="83b49449" class="cell" data-execution_count="5">
+<div id="6f54ebba" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> FastMCP</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>mcp <span class="op">=</span> FastMCP(<span class="st">"Servidor Facturación Chinook"</span>)</span>
@@ -900,7 +906,7 @@ TABLAS PRINCIPALES — Chinook
 <pre><code>✅ Servidor MCP creado con 1 tool: consultar_sql</code></pre>
 </div>
 </div>
-<div id="a3f3a835" class="cell" data-execution_count="6">
+<div id="f89af6a3" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Probar la tool directamente (sin lanzar el servidor)</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando tool consultar_sql directamente ==="</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"1. Clientes de Brasil:"</span>)</span>
@@ -940,7 +946,7 @@ TABLAS PRINCIPALES — Chinook
 <p>Un servidor MCP de verdad expone más que una sola tool. Añadimos resources (datos de solo lectura) y tools especializadas para consultas frecuentes.</p>
 <section id="sec-hpd4-resource-schema" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd4-resource-schema">3.1 Resource: schema de la base de datos</h2>
-<div id="aa347ebf" class="cell" data-execution_count="7">
+<div id="b1939256" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa el resource schema://tablas ───</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"schema://tablas"</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> esquema_bd() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -955,7 +961,7 @@ TABLAS PRINCIPALES — Chinook
 <span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span>  <span class="co"># ← completar</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="70d22d42" class="cell" data-execution_count="8">
+<div id="94edc7fb" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Probar el resource directamente</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando resource schema://tablas ==="</span>)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(esquema_bd())</span></span>
@@ -968,7 +974,7 @@ TABLAS PRINCIPALES — Chinook
 </section>
 <section id="sec-hpd4-tool-cliente" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd4-tool-cliente">3.2 Tool: buscar cliente por ID</h2>
-<div id="c5e5c38b" class="cell" data-execution_count="9">
+<div id="65a10255" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa la tool cliente_por_id ───</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cliente_por_id(id_cliente: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -990,7 +996,7 @@ TABLAS PRINCIPALES — Chinook
 <span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span>  <span class="co"># ← completar</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="f0869b6a" class="cell" data-execution_count="10">
+<div id="97499268" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando tool cliente_por_id ==="</span>)</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(cliente_por_id(1))</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(cliente_por_id(9999))  # Debería dar error</span></span>
@@ -1003,7 +1009,7 @@ TABLAS PRINCIPALES — Chinook
 </section>
 <section id="sec-hpd4-tool-resumen" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd4-tool-resumen">3.3 Tool: resumen de un álbum</h2>
-<div id="2cc15c3a" class="cell" data-execution_count="11">
+<div id="78fe5977" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa la tool resumen_album ───</span></span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> resumen_album(id_album: <span class="bu">int</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -1025,7 +1031,7 @@ TABLAS PRINCIPALES — Chinook
 <span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span>  <span class="co"># ← completar</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="5de2852d" class="cell" data-execution_count="12">
+<div id="33e9a23b" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando tool resumen_album ==="</span>)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(resumen_album(1))</span></span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="co"># print(resumen_album(2))</span></span>
@@ -1038,7 +1044,7 @@ TABLAS PRINCIPALES — Chinook
 </section>
 <section id="sec-hpd4-resource-stats" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd4-resource-stats">3.4 Resource: estadísticas de la base de datos</h2>
-<div id="dc4083b3" class="cell" data-execution_count="13">
+<div id="9cf69a41" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa el resource stats://resumen ───</span></span>
 <span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"stats://resumen"</span>)</span>
 <span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> stats_servidor() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -1051,7 +1057,7 @@ TABLAS PRINCIPALES — Chinook
 <span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span>  <span class="co"># ← completar</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="661403ae" class="cell" data-execution_count="14">
+<div id="9f932d31" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando resource stats://resumen ==="</span>)</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co"># print(stats_servidor())</span></span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"⚠️  Descomenta la línea anterior cuando hayas implementado el resource."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -1060,7 +1066,7 @@ TABLAS PRINCIPALES — Chinook
 ⚠️  Descomenta la línea anterior cuando hayas implementado el resource.</code></pre>
 </div>
 </div>
-<div id="86dd1a4d" class="cell" data-execution_count="15">
+<div id="94eecf6c" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Verificar cuántas tools y resources tenemos registrados</span></span>
 <span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>tools <span class="op">=</span> <span class="cf">await</span> mcp.list_tools()</span>
 <span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>resources <span class="op">=</span> <span class="cf">await</span> mcp.list_resources()</span>
@@ -1077,7 +1083,7 @@ TABLAS PRINCIPALES — Chinook
 <p>Ahora conectamos un LLM real al servidor MCP. El LLM recibirá la lista de tools disponibles (con sus descripciones y schemas) y decidirá cuál usar para cada pregunta.</p>
 <section id="sec-hpd4-config-llm" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd4-config-llm">4.1 Configurar el LLM</h2>
-<div id="673b46bd" class="cell" data-execution_count="16">
+<div id="6c1bc3f1" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
 <span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -1123,7 +1129,7 @@ TABLAS PRINCIPALES — Chinook
 <p>En HPD 2 usaste <code>create_agent</code> de LangChain para crear el agente. Aquí implementas el mismo bucle ReAct manualmente con la API de OpenAI. La diferencia es que las tools no son funciones Python decoradas con <code>@tool</code> — están en un servidor MCP independiente. El patrón de razonamiento (LLM decide → ejecuta tool → observa resultado → responde) es exactamente el mismo.</p>
 </div>
 </div>
-<div id="1b57c625" class="cell" data-execution_count="17">
+<div id="5f531c70" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ejecutar_tool_mcp(nombre: <span class="bu">str</span>, args: <span class="bu">dict</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Invoca una tool MCP por nombre. Simula lo que haría un cliente MCP real.</span></span>
@@ -1169,7 +1175,7 @@ TABLAS PRINCIPALES — Chinook
 <pre><code>Tools definidas: ['consultar_sql']</code></pre>
 </div>
 </div>
-<div id="4e399f5f" class="cell" data-execution_count="18">
+<div id="c1cb414f" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> preguntar_al_llm(pregunta: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Envía una pregunta al LLM. Si el LLM decide usar una tool,</span></span>
@@ -1213,7 +1219,7 @@ TABLAS PRINCIPALES — Chinook
 <p>Implementar el bucle de tool calling a mano requiere gestionar <code>tool_calls</code>, ejecutar las tools y reinyectar los resultados en el historial. El patrón es idéntico al que usaste en HPD 2 con LangChain, pero sin la abstracción. Si te atascas, repasa el bucle de tool calling de HPD 2 y la documentación de la API de OpenAI.</p>
 </div>
 </div>
-<div id="bf6f7dc4" class="cell" data-execution_count="19">
+<div id="a7047f82" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver al LLM en acción."</span>)</span>
 <span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1268,7 +1274,7 @@ Figure&nbsp;1
 </div>
 <section id="sec-hpd4-sanitizacion" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd4-sanitizacion">5.1 Añadir sanitización</h2>
-<div id="4d2018c4" class="cell" data-execution_count="20">
+<div id="a456965d" class="cell" data-execution_count="20">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: implementa la sanitización de queries SQL ───</span></span>
 <span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>PALABRAS_PROHIBIDAS <span class="op">=</span> [<span class="st">"DROP"</span>, <span class="st">"DELETE"</span>, <span class="st">"UPDATE"</span>, <span class="st">"INSERT"</span>, <span class="st">"ALTER"</span>, <span class="st">"CREATE"</span>, <span class="st">"TRUNCATE"</span>]</span>
 <span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1317,7 +1323,7 @@ Figure&nbsp;1
 <section id="sec-hpd4-test-ataques" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd4-test-ataques">5.2 Probar ataques de prompt injection</h2>
 <p>Ejecutamos varios intentos de ataque para verificar que nuestras defensas funcionan.</p>
-<div id="7d84740a" class="cell" data-execution_count="21">
+<div id="0cb3f833" class="cell" data-execution_count="21">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
 <span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"TEST DE SEGURIDAD — Prompt Injection"</span>)</span>
 <span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"="</span> <span class="op">*</span> <span class="dv">60</span>)</span>
@@ -1355,7 +1361,7 @@ TEST DE SEGURIDAD — Prompt Injection
 </section>
 <section id="sec-hpd4-limite-resultados" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd4-limite-resultados">5.3 Límite de resultados</h2>
-<div id="555623f7" class="cell" data-execution_count="22">
+<div id="486ecb4f" class="cell" data-execution_count="22">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ─── COMPLETAR: añade límite de filas a consultar_sql ───</span></span>
 <span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Después de ejecutar la query, limita la salida a un máximo de 30 filas.</span></span>
 <span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Si hay más de 30, muestra las primeras 30 y añade "... y más filas".</span></span>
@@ -1462,7 +1468,7 @@ Table&nbsp;1: Checklist de seguridad para servidores MCP en producción
 <section id="sec-hpd4-p6" class="level1">
 <h1>Parte 6 — Batería de pruebas</h1>
 <p>Probamos el servidor MCP con preguntas de dificultad creciente. Observa qué herramienta elige el LLM para cada caso.</p>
-<div id="46ee908d" class="cell" data-execution_count="23">
+<div id="aec35763" class="cell" data-execution_count="23">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>preguntas_prueba <span class="op">=</span> [</span>
 <span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Nivel 1: consulta simple → debería usar consultar_sql</span></span>
 <span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"¿Cuántos clientes tenemos en Brasil?"</span>,</span>

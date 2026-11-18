@@ -493,6 +493,12 @@ div.csl-indent {
  <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -597,10 +603,10 @@ div.csl-indent {
 <blockquote class="blockquote">
 <p>Este tema forma parte del Bloque 2 — Orquestación. Se recomienda haber visto <a href="../bloque2/02b-langchain.html">LangChain</a> primero.</p>
 </blockquote>
-<div id="2392e93b" class="cell" data-execution_count="1">
+<div id="ef75f8bf" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q llama<span class="op">-</span>index llama<span class="op">-</span>index<span class="op">-</span>llms<span class="op">-</span>openai<span class="op">-</span>like python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="7e4a919f" class="cell" data-execution_count="2">
+<div id="3197ddfb" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">Setup compartido para la API key de Llamus en todos los notebooks.</span></span>
@@ -657,7 +663,7 @@ div.csl-indent {
 Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="676c5673" class="cell" data-execution_count="3">
+<div id="ddc528d2" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.llms.openai_like <span class="im">import</span> OpenAILike</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.base.embeddings.base <span class="im">import</span> BaseEmbedding</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.base.llms.types <span class="im">import</span> LLMMetadata</span>
@@ -824,7 +830,7 @@ Table&nbsp;1: Comparativa entre LlamaIndex y LangChain por criterio de uso
 </section>
 <section id="sec-primer-contacto-llamaindex" class="level3">
 <h3 class="anchored" data-anchor-id="sec-primer-contacto-llamaindex">Primer contacto: indexar y preguntar</h3>
-<div id="1349472b" class="cell" data-execution_count="4">
+<div id="b557b8f6" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> VectorStoreIndex, Document</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos documentos de ejemplo en memoria (sin necesidad de archivos externos)</span></span>
@@ -850,7 +856,7 @@ Table&nbsp;1: Comparativa entre LlamaIndex y LangChain por criterio de uso
 <pre><code>Documentos cargados: 4
 
 Pregunta: ¿Cuáles fueron los ingresos totales en 2025?
-Respuesta: Los ingresos totales en 2025 fueron de 5,6 millones de euros.</code></pre>
+Respuesta: Los ingresos totales en 2025 fueron de 5.6 millones de euros.</code></pre>
 </div>
 </div>
 </section>
@@ -889,7 +895,7 @@ Figure&nbsp;2
 </figcaption>
 </figure>
 </div>
-<div id="e2b43299" class="cell" data-execution_count="5">
+<div id="74f0611c" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.node_parser <span class="im">import</span> SentenceSplitter</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.ingestion <span class="im">import</span> IngestionPipeline</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -995,7 +1001,7 @@ Figure&nbsp;3
 </figcaption>
 </figure>
 </div>
-<div id="d82ba1a9" class="cell" data-execution_count="6">
+<div id="db196315" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> VectorStoreIndex, SummaryIndex</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
@@ -1013,17 +1019,17 @@ Figure&nbsp;3
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(summary_index.as_query_engine(response_mode<span class="op">=</span><span class="st">"tree_summarize"</span>).query(pregunta))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== VectorStoreIndex ===
-La información disponible no permite determinar el crecimiento de la empresa entre 2024 y 2025, ya que no se proporcionan datos correspondientes al año 2024.
+No se proporciona información sobre el crecimiento de la empresa entre 2024 y 2025.
 
 === SummaryIndex (tree_summarize) ===
-Las ventas aumentaron de 4.8 millones de euros en 2024 a 5.6 millones de euros en 2025.</code></pre>
+Las ventas aumentaron de 4.8 millones de euros en 2024 a 5.6 millones de euros en 2025, lo que representa un incremento de 800.000 euros.</code></pre>
 </div>
 </div>
 </section>
 <section id="sec-query-engines" class="level3">
 <h3 class="anchored" data-anchor-id="sec-query-engines">Query Engines</h3>
 <p>Un Query Engine es el punto final de la API: recibe una pregunta en lenguaje natural y devuelve una respuesta.</p>
-<div id="d4eba2d2" class="cell" data-execution_count="7">
+<div id="556a78aa" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1059,7 +1065,7 @@ Fuente 3 (score: 0.162):
 <section id="sec-nlsql" class="level3">
 <h3 class="anchored" data-anchor-id="sec-nlsql">Consultas sobre datos estructurados (SQL)</h3>
 <p>LlamaIndex también puede traducir lenguaje natural a SQL:</p>
-<div id="cf87752a" class="cell" data-execution_count="8">
+<div id="c1cb74c8" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1160,7 +1166,7 @@ Figure&nbsp;4
 <section id="sec-chunking-estrategico" class="level3">
 <h3 class="anchored" data-anchor-id="sec-chunking-estrategico">Chunking estratégico</h3>
 <p>El tamaño y solapamiento de los chunks afectan drásticamente a la calidad del RAG:</p>
-<div id="ba1a7288" class="cell" data-execution_count="9">
+<div id="85ffd8ce" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.node_parser <span class="im">import</span> SentenceSplitter, TokenTextSplitter</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>texto_largo <span class="op">=</span> <span class="st">"La inteligencia artificial generativa está transformando el panorama del análisis de datos. "</span> <span class="op">*</span> <span class="dv">30</span></span>

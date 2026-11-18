@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Recorre paso a paso la traza de un agente con tool calling y comprueba qué pasa cuando la descripción de una herramienta es vaga o se solapa con otra.">
+
+<title>Demo — Dentro de un agente: cómo elige y usa sus herramientas – Módulo 10 — IA Generativa para Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<meta name="shinylive:serviceworker_dir" content="..">
+<script src="../site_libs/quarto-contrib/shinylive-0.10.15/shinylive/load-shinylive-sw.js" type="module"></script>
+<script src="../site_libs/quarto-contrib/shinylive-0.10.15/shinylive/run-python-blocks.js" type="module"></script>
+<link href="../site_libs/quarto-contrib/shinylive-0.10.15/shinylive/shinylive.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/shinylive-quarto-css/shinylive-quarto.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../demos/atencion.html">Demos interactivas</a></li><li class="breadcrumb-item"><a href="../demos/agente.html">Dentro de un agente</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Módulo 10 — IA Generativa para Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inicio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acerca de</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 1 — Fundamentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01a-transformer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01b-llms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs e inferencia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01c-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01d-vectordb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bases de datos vectoriales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 2 — Orquestación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02-orquestacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02a-prompt-engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prompt Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02b-langchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LangChain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02c-llamaindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LlamaIndex</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02d-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02e-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentes Inteligentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 3 — Aplicaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03-aplicaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03b-rag-avanzado.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAG Avanzado</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03a-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tuning eficiente</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 4 — Gobernanza</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Demos interactivas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Evaluación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../06-herramientas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Herramientas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../07-bibliografia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliografía</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#qué-observar" id="toc-qué-observar" class="nav-link active" data-scroll-target="#qué-observar">Qué observar</a></li>
+  <li><a href="#qué-has-visto" id="toc-qué-has-visto" class="nav-link" data-scroll-target="#qué-has-visto">Qué has visto</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="agente.ipynb" download="agente.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../demos/atencion.html">Demos interactivas</a></li><li class="breadcrumb-item"><a href="../demos/agente.html">Dentro de un agente</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Demo — Dentro de un agente: cómo elige y usa sus herramientas</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+<div>
+  <div class="description">
+    Recorre paso a paso la traza de un agente con tool calling y comprueba qué pasa cuando la descripción de una herramienta es vaga o se solapa con otra.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>Demo que acompaña a <a href="../bloque2/02e-agentes.html#sec-tool-calling">Diseño de agentes inteligentes</a> y sirve de base para el <a href="../bloque2/hpd2-agente-tool-calling.html">HPD 2</a>. Se ejecuta en el navegador con Shinylive y no necesita clave de API.</p>
+</blockquote>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>El modelo de esta demo es simulado
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Aquí no hay ningún LLM: el «modelo» elige herramienta contando cuántas palabras de lo que necesita coinciden con la <strong>descripción</strong> de cada herramienta. Un LLM real es mucho más listo, pero falla por la misma razón: <strong>solo sabe lo que dicen el nombre y la descripción de la herramienta</strong>.</p>
+</div>
+</div>
+<p>Un agente con herramientas funciona en bucle: el modelo recibe la pregunta junto con la lista de herramientas, decide si necesita una, <strong>pide</strong> que se ejecute (el modelo no ejecuta nada: solo escribe un JSON), tu código la ejecuta y le devuelve el resultado, y el modelo decide si necesita otra vuelta o ya puede responder.</p>
+<p>Elige una pregunta y pulsa <strong>Siguiente paso</strong> para recorrer la traza. A la derecha, el diagrama marca en qué parte del bucle estás.</p>
+<pre class="shinylive-python" data-engine="python"><code>#| '!! shinylive warning !!': |
+#|   shinylive does not work in self-contained HTML documents.
+#|   Please set `embed-resources: false` in your metadata.
+#| standalone: true
+#| viewerHeight: 1250
+
+import json
+import math
+import re
+import unicodedata
+
+# ── Datos de la empresa (lo que devuelven las herramientas) ──────────────────
+VENTAS = {
+    ("norte", "enero"): 120000, ("norte", "febrero"): 135000, ("norte", "marzo"): 142500,
+    ("sur", "enero"): 98000, ("sur", "febrero"): 107800, ("sur", "marzo"): 101300,
+    ("este", "enero"): 76000, ("este", "febrero"): 81500, ("este", "marzo"): 90200,
+}
+GLOSARIO = {
+    "ticket medio": "Importe medio por pedido: ventas totales divididas entre el número de pedidos.",
+    "churn": "Porcentaje de clientes que dejan de comprar en un periodo.",
+}
+
+TOOLS = ["consultar_ventas", "calcular", "buscar_glosario"]
+SIGNATURES = {
+    "consultar_ventas": "region: str, mes: str",
+    "calcular": "expresion: str",
+    "buscar_glosario": "termino: str",
+}
+DEFAULT_DESC = {
+    "consultar_ventas": "Devuelve las ventas en euros de una región (Norte, Sur o Este) en un mes concreto.",
+    "calcular": "Evalúa una operación aritmética y devuelve el resultado. Úsala para porcentajes, sumas o divisiones.",
+    "buscar_glosario": "Busca la definición de una métrica o término de negocio en el glosario de la empresa.",
+}
+PRESETS = {
+    "ok": ("Descripciones buenas", DEFAULT_DESC),
+    "vaga": ("Descripción vaga", {**DEFAULT_DESC, "consultar_ventas": "Herramienta útil para datos."}),
+    "solape": ("Dos herramientas se pisan", {
+        **DEFAULT_DESC,
+        "buscar_glosario": "Glosario de ventas por región y mes.",
+    }),
+}
+
+# ── Preguntas: lo que el modelo necesita en cada paso (su «intención») ──────
+# need: cómo formula el modelo lo que necesita; tool/args: la llamada correcta.
+QUESTIONS = [
+    {
+        "q": "¿Cuánto vendimos en el Norte en marzo?",
+        "steps": [
+            {"need": "Necesito las ventas de la región Norte en el mes de marzo.",
+             "tool": "consultar_ventas", "args": {"region": "Norte", "mes": "marzo"}, "short": "ventas Norte marzo"},
+        ],
+        "answer": "En marzo, la región Norte vendió **142.500 €**.",
+        "invented": "En marzo, la región Norte vendió unos **150.000 €**, una cifra en línea con meses anteriores.",
+    },
+    {
+        "q": "¿Cuánto crecieron las ventas del Sur de enero a febrero, en porcentaje?",
+        "steps": [
+            {"need": "Necesito las ventas de la región Sur en el mes de enero.",
+             "tool": "consultar_ventas", "args": {"region": "Sur", "mes": "enero"}, "short": "ventas Sur enero"},
+            {"need": "Necesito las ventas de la región Sur en el mes de febrero.",
+             "tool": "consultar_ventas", "args": {"region": "Sur", "mes": "febrero"}, "short": "ventas Sur febrero"},
+            {"need": "Ya tengo las dos cifras. Necesito calcular el porcentaje de crecimiento con una operación.",
+             "tool": "calcular", "args": {"expresion": "(107800 - 98000) / 98000 * 100"}, "short": "crecimiento porcentual"},
+        ],
+        "answer": "Las ventas del Sur crecieron un **10 %**: de 98.000 € en enero a 107.800 € en febrero.",
+        "invented": "Las ventas del Sur crecieron aproximadamente un **15 %** de enero a febrero.",
+    },
+    {
+        "q": "¿Qué significa «ticket medio»?",
+        "steps": [
+            {"need": "Necesito la definición del término de negocio «ticket medio».",
+             "tool": "buscar_glosario", "args": {"termino": "ticket medio"}, "short": "ticket medio"},
+        ],
+        "answer": "El **ticket medio** es el importe medio por pedido: las ventas totales divididas entre el número de pedidos.",
+        "invented": "El ticket medio es el precio medio de los productos del catálogo.",
+    },
+    {
+        "q": "Escribe una frase de bienvenida para el informe mensual.",
+        "steps": [],
+        "answer": "«Bienvenidos al informe mensual: estas son las cifras clave y lo que nos dicen.»",
+        "invented": "",
+    },
+]
+
+STOP = {"de", "la", "el", "en", "los", "las", "del", "un", "una", "y", "o", "a", "que", "con", "por",
+        "para", "su", "sus", "al", "es", "se", "lo", "ya", "mes", "necesito", "tengo", "dos", "cualquier"}
+THRESHOLD = 0.35
+
+
+def _norm(w):
+    return "".join(c for c in unicodedata.normalize("NFD", w.lower()) if unicodedata.category(c) != "Mn")
+
+
+def stems(text):
+    """Raíces de 5 letras de las palabras con contenido (simulación muy simple de «entender»)."""
+    return {_norm(w)[:5] for w in re.findall(r"\w+", text) if len(w) &gt; 2 and _norm(w) not in STOP}
+
+
+def scores(need, descs):
+    """Puntuación de cada herramienta: coincidencias entre la necesidad y nombre + descripción."""
+    n = stems(need)
+    out = {}
+    for t in TOOLS:
+        d = stems(descs[t])
+        common = sorted(n &amp; d)
+        out[t] = (len(common) / math.sqrt(len(d) or 1), common)
+    return out
+
+
+def run_tool(tool, args):
+    if tool == "consultar_ventas":
+        r, m = str(args.get("region", "")).lower(), str(args.get("mes", "")).lower()
+        if (r, m) in VENTAS:
+            return {"region": args["region"], "mes": args["mes"], "ventas_eur": VENTAS[(r, m)]}
+        return {"error": "Faltan o no son válidos 'region' y 'mes'."}
+    if tool == "calcular":
+        expr = str(args.get("expresion", ""))
+        if re.fullmatch(r"[\d\s+\-*/().]+", expr):
+            return {"resultado": round(eval(expr), 2)}
+        return {"error": f"«{expr}» no es una operación aritmética."}
+    if tool == "buscar_glosario":
+        term = str(args.get("termino", "")).lower()
+        if term in GLOSARIO:
+            return {"termino": term, "definicion": GLOSARIO[term]}
+        return {"error": f"«{args.get('termino')}» no está en el glosario."}
+    return {"error": "Herramienta desconocida"}
+
+
+def wrong_args(tool, short):
+    """Argumentos con los que el modelo llamaría a una herramienta que no encaja."""
+    if tool == "consultar_ventas":
+        return {"region": "?", "mes": "?"}
+    key = {"calcular": "expresion", "buscar_glosario": "termino"}[tool]
+    return {key: short}
+
+
+def build_trace(qi, descs):
+    """Lista de pasos: dicts con role in {user, think, call, result, answer} y su contenido."""
+    Q = QUESTIONS[qi]
+    trace = [{"role": "user", "text": Q["q"]}]
+    if not Q["steps"]:
+        trace.append({"role": "think", "text": "Puedo responder con lo que sé: no necesito ninguna herramienta.",
+                      "scores": None})
+        trace.append({"role": "answer", "text": Q["answer"], "status": "ok"})
+        return trace
+    for st in Q["steps"]:
+        sc = scores(st["need"], descs)
+        best = max(TOOLS, key=lambda t: sc[t][0])
+        if sc[best][0] &lt; THRESHOLD:
+            trace.append({"role": "think", "text": st["need"] + " Ninguna herramienta parece servir, así que respondo con lo que creo saber.",
+                          "scores": sc, "chosen": None})
+            trace.append({"role": "answer", "text": Q["invented"], "status": "invented"})
+            return trace
+        trace.append({"role": "think", "text": st["need"], "scores": sc, "chosen": best})
+        args = st["args"] if best == st["tool"] else wrong_args(best, st["short"])
+        trace.append({"role": "call", "tool": best, "args": args, "right": best == st["tool"]})
+        res = run_tool(best, args)
+        trace.append({"role": "result", "tool": best, "result": res})
+        if "error" in res:
+            trace.append({"role": "answer", "status": "fail",
+                          "text": "No he podido obtener el dato: la herramienta que elegí no era la adecuada."})
+            return trace
+    trace.append({"role": "answer", "text": Q["answer"], "status": "ok"})
+    return trace
+
+
+# ── Interfaz ─────────────────────────────────────────────────────────────────
+from shiny import reactive
+from shiny.express import input, ui, render
+
+BLUE, DARK, YELLOW, ORANGE, GREEN, RED, GRAY = (
+    "#4B8BBE", "#306998", "#FFD43B", "#e65100", "#2e7d32", "#c62828", "#9ca3af")
+
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.muted{color:#6b7280;font-size:.85em}
+.chip{display:inline-block;border:1px solid #306998;color:#306998;background:#fff;border-radius:999px;
+  padding:2px 12px;margin:2px 6px 2px 0;font-size:.85em;cursor:pointer;user-select:none}
+.chip:hover{background:#e8f0f8}.chip.on{background:#306998;color:#fff}
+.step{border-radius:10px;padding:8px 12px;margin:8px 0;font-size:.92em}
+.step .who{font-size:.75em;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.user{background:#4B8BBE;color:#fff;margin-left:22%}
+.think{background:#f3f4f6;font-style:italic}
+.call{background:#fff3e0;border:1.5px solid #e65100}
+.call.bad{border:2px solid #c62828;background:#ffebee}
+.result{background:#fffbe6;border:1.5px solid #e0b400}
+.answer{border:2px solid #2e7d32;background:#e8f5e9}
+.answer.fail{border-color:#e65100;background:#fff3e0}
+.answer.invented{border-color:#c62828;background:#ffebee}
+pre.js{margin:4px 0 0;font-size:.82em;background:none;border:none;padding:0;white-space:pre-wrap}
+.sc{display:grid;grid-template-columns:130px 1fr 34px;gap:2px 8px;align-items:center;font-style:normal;font-size:.85em;margin-top:6px}
+.track{height:10px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+.fill{display:block;height:100%;border-radius:3px}
+.kw{display:inline-block;background:#FFD43B;border-radius:3px;padding:0 4px;margin:0 2px;font-size:.85em;font-style:normal}
+@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+.new{animation:pop .35s ease-out both}
+textarea{font-size:.88em!important}
+""")
+
+pos = reactive.value(0)
+
+
+def descs():
+    return {t: input[f"d_{t}"]() for t in TOOLS}
+
+
+@reactive.calc
+def trace():
+    return build_trace(int(input.q()), descs())
+
+
+@reactive.effect
+@reactive.event(input.q, *[input[f"d_{t}"] for t in TOOLS])
+def _reset():
+    pos.set(0)
+
+
+@reactive.effect
+@reactive.event(input.next)
+def _next():
+    pos.set(min(pos() + 1, len(trace()) - 1))
+
+
+@reactive.effect
+@reactive.event(input.prev)
+def _prev():
+    pos.set(max(pos() - 1, 0))
+
+
+@reactive.effect
+@reactive.event(input.all)
+def _all():
+    pos.set(len(trace()) - 1)
+
+
+@reactive.effect
+@reactive.event(input.preset)
+def _preset():
+    for t, d in PRESETS[input.preset()][1].items():
+        ui.update_text_area(f"d_{t}", value=d)
+
+
+def md(text):
+    return re.sub(r"\*\*(.+?)\*\*", r"&lt;b&gt;\1&lt;/b&gt;", text)
+
+
+def js(obj):
+    return json.dumps(obj, ensure_ascii=False, indent=1)
+
+
+def render_step(s, new):
+    cls = " new" if new else ""
+    r = s["role"]
+    if r == "user":
+        return f"&lt;div class='step user{cls}'&gt;&lt;div class='who'&gt;Usuario&lt;/div&gt;{s['text']}&lt;/div&gt;"
+    if r == "think":
+        body = s["text"]
+        if s.get("scores"):
+            best = max(v[0] for v in s["scores"].values()) or 1
+            rows = []
+            for t, (v, common) in s["scores"].items():
+                col = GREEN if t == s.get("chosen") else GRAY
+                rows.append(
+                    f"&lt;code&gt;{t}&lt;/code&gt;&lt;span class='track'&gt;&lt;span class='fill' "
+                    f"style='width:{100 * v / best:.0f}%;background:{col}'&gt;&lt;/span&gt;&lt;/span&gt;&lt;span&gt;{v:.2f}&lt;/span&gt;"
+                )
+            chosen = s.get("chosen")
+            common = s["scores"][chosen][1] if chosen else []
+            kws = "".join(f"&lt;span class='kw'&gt;{c}…&lt;/span&gt;" for c in common)
+            verdict = (
+                f"&lt;div style='font-style:normal;margin-top:4px'&gt;Elige &lt;code&gt;{chosen}&lt;/code&gt;, porque su descripción "
+                f"coincide en: {kws}&lt;/div&gt;" if chosen else
+                f"&lt;div style='font-style:normal;margin-top:4px;color:{RED}'&gt;Ninguna supera el umbral "
+                f"({THRESHOLD}): no llama a ninguna herramienta.&lt;/div&gt;"
+            )
+            body += f"&lt;div class='sc'&gt;{''.join(rows)}&lt;/div&gt;{verdict}"
+        return f"&lt;div class='step think{cls}'&gt;&lt;div class='who'&gt;💭 El modelo decide&lt;/div&gt;{body}&lt;/div&gt;"
+    if r == "call":
+        bad = "" if s["right"] else " bad"
+        warn = "" if s["right"] else f"&lt;div style='color:{RED};font-weight:600'&gt;✘ Herramienta equivocada&lt;/div&gt;"
+        payload = {"tool_call": {"name": s["tool"], "arguments": s["args"]}}
+        return (f"&lt;div class='step call{bad}{cls}'&gt;&lt;div class='who'&gt;🛠 El modelo pide una herramienta&lt;/div&gt;"
+                f"{warn}&lt;pre class='js'&gt;{js(payload)}&lt;/pre&gt;&lt;/div&gt;")
+    if r == "result":
+        return (f"&lt;div class='step result{cls}'&gt;&lt;div class='who'&gt;📦 Tu código ejecuta &lt;code&gt;{s['tool']}&lt;/code&gt; "
+                f"y devuelve&lt;/div&gt;&lt;pre class='js'&gt;{js(s['result'])}&lt;/pre&gt;&lt;/div&gt;")
+    status = s["status"]
+    extra = {
+        "ok": "",
+        "fail": "",
+        "invented": f"&lt;div style='color:{RED};font-weight:600;margin-top:4px'&gt;⚠ Cifra inventada: "
+                    f"no viene de ninguna herramienta. Suena convincente, pero es una alucinación.&lt;/div&gt;",
+    }[status]
+    head = {"ok": "✔ Respuesta final", "fail": "✘ Respuesta final", "invented": "⚠ Respuesta final"}[status]
+    return f"&lt;div class='step answer {status}{cls}'&gt;&lt;div class='who'&gt;{head}&lt;/div&gt;{md(s['text'])}{extra}&lt;/div&gt;"
+
+
+def loop_svg(role, n_calls):
+    """Diagrama del bucle con la fase actual resaltada."""
+    nodes = {"user": (60, 60, "Usuario"), "llm": (200, 60, "LLM"),
+             "tools": (340, 60, "Herramientas"), "out": (200, 160, "Respuesta")}
+    active_node = {"user": "user", "think": "llm", "call": "tools", "result": "llm", "answer": "out"}[role]
+    active_edge = {"user": "u-l", "think": None, "call": "l-t", "result": "t-l", "answer": "l-o"}[role]
+    edges = {
+        "u-l": "M100,60 L156,60", "l-t": "M244,52 L296,52", "t-l": "M296,70 L244,70", "l-o": "M200,82 L200,136",
+    }
+    parts = ["&lt;defs&gt;" + "".join(
+        f"&lt;marker id='a{c}' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto'&gt;"
+        f"&lt;path d='M0,0 L10,5 L0,10 z' fill='{c2}'/&gt;&lt;/marker&gt;" for c, c2 in (("n", GRAY), ("h", ORANGE))) + "&lt;/defs&gt;"]
+    for k, d in edges.items():
+        on = k == active_edge
+        parts.append(f"&lt;path d='{d}' stroke='{ORANGE if on else GRAY}' stroke-width='{3.5 if on else 1.8}' "
+                     f"fill='none' marker-end='url(#a{'h' if on else 'n'})'/&gt;")
+    for k, (x, y, label) in nodes.items():
+        on = k == active_node
+        fill = {"user": BLUE, "llm": DARK, "tools": ORANGE, "out": GREEN}[k]
+        parts.append(
+            f"&lt;rect x='{x - 46}' y='{y - 20}' width='92' height='40' rx='10' fill='{fill}' "
+            f"fill-opacity='{1 if on else 0.25}' stroke='{'#111' if on else 'none'}' stroke-width='2'/&gt;"
+            f"&lt;text x='{x}' y='{y + 5}' text-anchor='middle' font-size='13' font-weight='600' "
+            f"fill='{'#fff' if on else '#374151'}'&gt;{label}&lt;/text&gt;"
+        )
+    parts.append(f"&lt;text x='340' y='100' text-anchor='middle' font-size='11' fill='#6b7280'&gt;vueltas: {n_calls}&lt;/text&gt;")
+    return (f"&lt;svg viewBox='0 0 400 190' width='100%' style='max-width:360px;display:block;margin:auto' "
+            f"font-family='system-ui,sans-serif'&gt;{''.join(parts)}&lt;/svg&gt;")
+
+
+ui.input_select("q", "Pregunta al agente", {str(i): Q["q"] for i, Q in enumerate(QUESTIONS)},
+                selected="0", width="100%")
+
+with ui.div(style="display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 6px"):
+    ui.input_action_button("prev", "◀", class_="btn-outline-primary btn-sm")
+    ui.input_action_button("next", "Siguiente paso ▶", class_="btn-primary btn-sm")
+    ui.input_action_button("all", "Ver todo", class_="btn-outline-secondary btn-sm")
+
+with ui.layout_columns(col_widths=(7, 5)):
+    @render.ui
+    def timeline():
+        tr, p = trace(), pos()
+        steps = "".join(render_step(s, i == p and p &gt; 0) for i, s in enumerate(tr[: p + 1]))
+        more = (f"&lt;p class='muted' style='text-align:center'&gt;Paso {p + 1} de {len(tr)} · pulsa «Siguiente paso»&lt;/p&gt;"
+                if p &lt; len(tr) - 1 else "")
+        return ui.HTML(steps + more)
+
+    @render.ui
+    def side():
+        tr, p = trace(), pos()
+        seen = tr[: p + 1]
+        n_calls = sum(s["role"] == "call" for s in seen)
+        n_msgs = sum(s["role"] != "think" for s in seen)
+        explain = {
+            "user": "El usuario pregunta. El modelo recibe la pregunta &lt;b&gt;y la lista de herramientas&lt;/b&gt; con sus descripciones.",
+            "think": "El modelo lee las descripciones y decide si necesita una herramienta y cuál.",
+            "call": "El modelo &lt;b&gt;no ejecuta nada&lt;/b&gt;: solo devuelve un JSON con el nombre y los argumentos.",
+            "result": "Tu código ejecuta la función y devuelve el resultado al modelo como un mensaje más. Vuelta al bucle.",
+            "answer": "Cuando ya no necesita más herramientas, el modelo responde y el bucle termina.",
+        }[seen[-1]["role"]]
+        return ui.HTML(
+            f"&lt;div class='card' style='position:sticky;top:6px'&gt;{loop_svg(seen[-1]['role'], n_calls)}"
+            f"&lt;p style='font-size:.88em;margin:6px 0'&gt;{explain}&lt;/p&gt;"
+            f"&lt;p class='muted' style='margin:0'&gt;Mensajes en la conversación: &lt;b&gt;{n_msgs}&lt;/b&gt;. "
+            f"Cada vuelta añade dos (petición y resultado), y el contexto crece.&lt;/p&gt;&lt;/div&gt;"
+        )
+
+
+ui.hr()
+ui.markdown("**Las herramientas que ve el modelo.** Edita una descripción, o prueba un preajuste, y vuelve a recorrer la traza.")
+
+
+@render.ui
+def presets():
+    cur = descs()
+    chips = "".join(
+        f"&lt;span class='chip{' on' if all(cur[t] == d[t] for t in TOOLS) else ''}' "
+        f"onclick=\"Shiny.setInputValue('preset', '{k}', {{priority: 'event'}})\"&gt;{name}&lt;/span&gt;"
+        for k, (name, d) in PRESETS.items()
+    )
+    return ui.HTML(f"&lt;div style='margin-bottom:6px'&gt;{chips}&lt;/div&gt;")
+
+
+for _t in TOOLS:
+    ui.input_text_area(f"d_{_t}", ui.HTML(f"&lt;code&gt;{_t}({SIGNATURES[_t]})&lt;/code&gt;"),
+                       DEFAULT_DESC[_t], rows=2, width="100%")</code></pre>
+<section id="qué-observar" class="level2">
+<h2 class="anchored" data-anchor-id="qué-observar">Qué observar</h2>
+<ol type="1">
+<li>Con la primera pregunta, recorre la traza: una sola vuelta. Fíjate en que la petición de herramienta es <strong>solo un JSON</strong> con el nombre y los argumentos; quien ejecuta la función es tu código.</li>
+<li>Cambia a la pregunta del <strong>crecimiento del Sur</strong>: hacen falta tres vueltas (dos consultas y un cálculo). Mira cómo crece el contador de mensajes: cada vuelta alarga el contexto, y por eso los agentes largos son lentos y caros.</li>
+<li>Prueba la <strong>frase de bienvenida</strong>: el modelo no necesita ninguna herramienta y responde directamente. Decidir <em>no</em> usar herramientas también es parte del trabajo.</li>
+<li>Pulsa <strong>Descripción vaga</strong> y repite la primera pregunta. <code>consultar_ventas</code> ya no dice para qué sirve, ninguna herramienta encaja y el modelo <strong>se inventa la cifra</strong>. La respuesta suena igual de segura que la buena.</li>
+<li>Pulsa <strong>Dos herramientas se pisan</strong>. Ahora el glosario dice tener «ventas por región» y el modelo lo elige para pedir las ventas: herramienta equivocada y error. Y la pregunta del <em>ticket medio</em> se queda sin herramienta, porque el glosario ya no dice que define términos.</li>
+<li>Escribe tus propias descripciones. Intenta que <code>calcular</code> «robe» la pregunta de las ventas.</li>
+</ol>
+</section>
+<section id="qué-has-visto" class="level2">
+<h2 class="anchored" data-anchor-id="qué-has-visto">Qué has visto</h2>
+<ul>
+<li>El modelo <strong>no ejecuta</strong> las herramientas: propone una llamada en JSON, y tu código decide si la ejecuta.</li>
+<li>Un agente es un <strong>bucle</strong>: pregunta → decisión → llamada → resultado → decisión… hasta que el modelo responde. Cada vuelta añade mensajes al contexto.</li>
+<li>El modelo elige leyendo <strong>descripciones</strong>. Una descripción vaga hace que no la use (y que invente); dos descripciones solapadas hacen que use la equivocada. Por eso la descripción de una herramienta es parte del prompt y merece el mismo cuidado.</li>
+</ul>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Qué es real y qué está simplificado
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>La selección por coincidencia de palabras es una caricatura de lo que hace un LLM. Un modelo real entiende sinónimos y contexto, y no tiene un umbral fijo, pero sí comete estos dos errores con descripciones vagas o solapadas.</li>
+<li>El formato del JSON está simplificado. Cada proveedor (OpenAI, Anthropic, Ollama…) usa su propio esquema, aunque la idea es la misma: nombre de la herramienta y argumentos.</li>
+<li>En un agente real el modelo no siempre se detiene ante un error: puede reintentar, probar otra herramienta o pedir aclaración. Aquí se para para que el fallo se vea.</li>
+</ul>
+</div>
+</div>
+<p>Para escribir las herramientas en código, vuelve a <a href="../bloque2/02e-agentes.html#sec-buena-herramienta">Cómo definir una buena herramienta</a>.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<footer class="footer-custom">
+  <div class="footer-logos">
+    <img src="../images/logo_cfp.png" alt="Formación Permanente · Universidad de Sevilla">
+  </div>
+  <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
+</footer>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Demo — Dentro de un agente: cómo elige y usa sus herramientas"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Recorre paso a paso la traza de un agente con tool calling y comprueba qué pasa cuando la descripción de una herramienta es vaga o se solapa con otra."</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> markdown</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Demo que acompaña a </span><span class="co">[</span><span class="ot">Diseño de agentes inteligentes</span><span class="co">](../bloque2/02e-agentes.qmd#sec-tool-calling)</span><span class="at"> y sirve de base para el </span><span class="co">[</span><span class="ot">HPD 2</span><span class="co">](../bloque2/hpd2-agente-tool-calling.qmd)</span><span class="at">. Se ejecuta en el navegador con Shinylive y no necesita clave de API.</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## El modelo de esta demo es simulado</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>Aquí no hay ningún LLM: el «modelo» elige herramienta contando cuántas palabras de lo que necesita coinciden con la **descripción** de cada herramienta. Un LLM real es mucho más listo, pero falla por la misma razón: **solo sabe lo que dicen el nombre y la descripción de la herramienta**.</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>Un agente con herramientas funciona en bucle: el modelo recibe la pregunta junto con la lista de herramientas, decide si necesita una, **pide** que se ejecute (el modelo no ejecuta nada: solo escribe un JSON), tu código la ejecuta y le devuelve el resultado, y el modelo decide si necesita otra vuelta o ya puede responder.</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>Elige una pregunta y pulsa **Siguiente paso** para recorrer la traza. A la derecha, el diagrama marca en qué parte del bucle estás.</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="in">```{shinylive-python}</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#| standalone: true</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#| viewerHeight: 1250</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">import</span> json</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="ex">import</span> math</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="ex">import</span> re</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="ex">import</span> unicodedata</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Datos de la empresa (lo que devuelven las herramientas) ──────────────────</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="ex">VENTAS</span> = {</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"norte"</span><span class="ex">,</span> <span class="st">"enero"</span><span class="kw">)</span><span class="bu">:</span> 120000, <span class="er">(</span><span class="st">"norte"</span><span class="ex">,</span> <span class="st">"febrero"</span><span class="kw">)</span><span class="bu">:</span> 135000, <span class="er">(</span><span class="st">"norte"</span><span class="ex">,</span> <span class="st">"marzo"</span><span class="kw">)</span><span class="bu">:</span> 142500,</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"sur"</span><span class="ex">,</span> <span class="st">"enero"</span><span class="kw">)</span><span class="bu">:</span> 98000, <span class="er">(</span><span class="st">"sur"</span><span class="ex">,</span> <span class="st">"febrero"</span><span class="kw">)</span><span class="bu">:</span> 107800, <span class="er">(</span><span class="st">"sur"</span><span class="ex">,</span> <span class="st">"marzo"</span><span class="kw">)</span><span class="bu">:</span> 101300,</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"este"</span><span class="ex">,</span> <span class="st">"enero"</span><span class="kw">)</span><span class="bu">:</span> 76000, <span class="er">(</span><span class="st">"este"</span><span class="ex">,</span> <span class="st">"febrero"</span><span class="kw">)</span><span class="bu">:</span> 81500, <span class="er">(</span><span class="st">"este"</span><span class="ex">,</span> <span class="st">"marzo"</span><span class="kw">)</span><span class="bu">:</span> 90200,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a><span class="ex">GLOSARIO</span> = {</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ticket medio"</span><span class="ex">:</span> <span class="st">"Importe medio por pedido: ventas totales divididas entre el número de pedidos."</span>,</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="st">"churn"</span><span class="ex">:</span> <span class="st">"Porcentaje de clientes que dejan de comprar en un periodo."</span>,</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="ex">TOOLS</span> = [<span class="st">"consultar_ventas"</span>, <span class="st">"calcular"</span>, <span class="st">"buscar_glosario"</span>]</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="ex">SIGNATURES</span> = {</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="st">"consultar_ventas"</span><span class="ex">:</span> <span class="st">"region: str, mes: str"</span>,</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="st">"calcular"</span><span class="ex">:</span> <span class="st">"expresion: str"</span>,</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    <span class="st">"buscar_glosario"</span><span class="ex">:</span> <span class="st">"termino: str"</span>,</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a><span class="ex">DEFAULT_DESC</span> = {</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="st">"consultar_ventas"</span><span class="ex">:</span> <span class="st">"Devuelve las ventas en euros de una región (Norte, Sur o Este) en un mes concreto."</span>,</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    <span class="st">"calcular"</span><span class="ex">:</span> <span class="st">"Evalúa una operación aritmética y devuelve el resultado. Úsala para porcentajes, sumas o divisiones."</span>,</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    <span class="st">"buscar_glosario"</span><span class="ex">:</span> <span class="st">"Busca la definición de una métrica o término de negocio en el glosario de la empresa."</span>,</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="ex">PRESETS</span> = {</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ok"</span><span class="ex">:</span> <span class="er">(</span><span class="st">"Descripciones buenas"</span><span class="ex">,</span> DEFAULT_DESC<span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    <span class="st">"vaga"</span><span class="ex">:</span> <span class="er">(</span><span class="st">"Descripción vaga"</span><span class="ex">,</span> {<span class="pp">**</span>DEFAULT_DESC, <span class="st">"consultar_ventas"</span>: <span class="st">"Herramienta útil para datos."</span>}<span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>    <span class="st">"solape"</span><span class="ex">:</span> <span class="er">(</span><span class="st">"Dos herramientas se pisan"</span><span class="ex">,</span> {</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        <span class="ex">**DEFAULT_DESC,</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>        <span class="st">"buscar_glosario"</span><span class="ex">:</span> <span class="st">"Glosario de ventas por región y mes."</span>,</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Preguntas: lo que el modelo necesita en cada paso (su «intención») ──────</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="co"># need: cómo formula el modelo lo que necesita; tool/args: la llamada correcta.</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a><span class="ex">QUESTIONS</span> = [</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>        <span class="st">"q"</span><span class="ex">:</span> <span class="st">"¿Cuánto vendimos en el Norte en marzo?"</span>,</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>        <span class="st">"steps"</span><span class="ex">:</span> [</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>            <span class="ex">{</span><span class="st">"need"</span><span class="ex">:</span> <span class="st">"Necesito las ventas de la región Norte en el mes de marzo."</span>,</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>             <span class="st">"tool"</span><span class="ex">:</span> <span class="st">"consultar_ventas"</span>, <span class="st">"args"</span>: {<span class="st">"region"</span>: <span class="st">"Norte"</span>, <span class="st">"mes"</span>: <span class="st">"marzo"</span>}, <span class="st">"short"</span>: <span class="st">"ventas Norte marzo"</span>},</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>        <span class="ex">],</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>        <span class="st">"answer"</span><span class="ex">:</span> <span class="st">"En marzo, la región Norte vendió **142.500 €**."</span>,</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        <span class="st">"invented"</span><span class="ex">:</span> <span class="st">"En marzo, la región Norte vendió unos **150.000 €**, una cifra en línea con meses anteriores."</span>,</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>    <span class="ex">},</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        <span class="st">"q"</span><span class="ex">:</span> <span class="st">"¿Cuánto crecieron las ventas del Sur de enero a febrero, en porcentaje?"</span>,</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        <span class="st">"steps"</span><span class="ex">:</span> [</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>            <span class="ex">{</span><span class="st">"need"</span><span class="ex">:</span> <span class="st">"Necesito las ventas de la región Sur en el mes de enero."</span>,</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>             <span class="st">"tool"</span><span class="ex">:</span> <span class="st">"consultar_ventas"</span>, <span class="st">"args"</span>: {<span class="st">"region"</span>: <span class="st">"Sur"</span>, <span class="st">"mes"</span>: <span class="st">"enero"</span>}, <span class="st">"short"</span>: <span class="st">"ventas Sur enero"</span>},</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>            <span class="ex">{</span><span class="st">"need"</span><span class="ex">:</span> <span class="st">"Necesito las ventas de la región Sur en el mes de febrero."</span>,</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>             <span class="st">"tool"</span><span class="ex">:</span> <span class="st">"consultar_ventas"</span>, <span class="st">"args"</span>: {<span class="st">"region"</span>: <span class="st">"Sur"</span>, <span class="st">"mes"</span>: <span class="st">"febrero"</span>}, <span class="st">"short"</span>: <span class="st">"ventas Sur febrero"</span>},</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>            <span class="ex">{</span><span class="st">"need"</span><span class="ex">:</span> <span class="st">"Ya tengo las dos cifras. Necesito calcular el porcentaje de crecimiento con una operación."</span>,</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>             <span class="st">"tool"</span><span class="ex">:</span> <span class="st">"calcular"</span>, <span class="st">"args"</span>: {<span class="st">"expresion"</span>: <span class="st">"(107800 - 98000) / 98000 * 100"</span>}, <span class="st">"short"</span>: <span class="st">"crecimiento porcentual"</span>},</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>        <span class="ex">],</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>        <span class="st">"answer"</span><span class="ex">:</span> <span class="st">"Las ventas del Sur crecieron un **10 %**: de 98.000 € en enero a 107.800 € en febrero."</span>,</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>        <span class="st">"invented"</span><span class="ex">:</span> <span class="st">"Las ventas del Sur crecieron aproximadamente un **15 %** de enero a febrero."</span>,</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>    <span class="ex">},</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>        <span class="st">"q"</span><span class="ex">:</span> <span class="st">"¿Qué significa «ticket medio»?"</span>,</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>        <span class="st">"steps"</span><span class="ex">:</span> [</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>            <span class="ex">{</span><span class="st">"need"</span><span class="ex">:</span> <span class="st">"Necesito la definición del término de negocio «ticket medio»."</span>,</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>             <span class="st">"tool"</span><span class="ex">:</span> <span class="st">"buscar_glosario"</span>, <span class="st">"args"</span>: {<span class="st">"termino"</span>: <span class="st">"ticket medio"</span>}, <span class="st">"short"</span>: <span class="st">"ticket medio"</span>},</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>        <span class="ex">],</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>        <span class="st">"answer"</span><span class="ex">:</span> <span class="st">"El **ticket medio** es el importe medio por pedido: las ventas totales divididas entre el número de pedidos."</span>,</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>        <span class="st">"invented"</span><span class="ex">:</span> <span class="st">"El ticket medio es el precio medio de los productos del catálogo."</span>,</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>    <span class="ex">},</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>        <span class="st">"q"</span><span class="ex">:</span> <span class="st">"Escribe una frase de bienvenida para el informe mensual."</span>,</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>        <span class="st">"steps"</span><span class="ex">:</span> [],</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>        <span class="st">"answer"</span><span class="ex">:</span> <span class="st">"«Bienvenidos al informe mensual: estas son las cifras clave y lo que nos dicen.»"</span>,</span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>        <span class="st">"invented"</span><span class="ex">:</span> <span class="st">""</span>,</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>    <span class="ex">},</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a><span class="ex">]</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a><span class="ex">STOP</span> = {<span class="st">"de"</span>, <span class="st">"la"</span>, <span class="st">"el"</span>, <span class="st">"en"</span>, <span class="st">"los"</span>, <span class="st">"las"</span>, <span class="st">"del"</span>, <span class="st">"un"</span>, <span class="st">"una"</span>, <span class="st">"y"</span>, <span class="st">"o"</span>, <span class="st">"a"</span>, <span class="st">"que"</span>, <span class="st">"con"</span>, <span class="st">"por"</span>,</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>        <span class="st">"para"</span><span class="ex">,</span> <span class="st">"su"</span>, <span class="st">"sus"</span>, <span class="st">"al"</span>, <span class="st">"es"</span>, <span class="st">"se"</span>, <span class="st">"lo"</span>, <span class="st">"ya"</span>, <span class="st">"mes"</span>, <span class="st">"necesito"</span>, <span class="st">"tengo"</span>, <span class="st">"dos"</span>, <span class="st">"cualquier"</span>}</span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a><span class="ex">THRESHOLD</span> = 0.35</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _norm<span class="er">(</span><span class="fu">w</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">""</span><span class="ex">.join</span><span class="er">(</span><span class="ex">c</span> for c in unicodedata.normalize<span class="er">(</span><span class="st">"NFD"</span><span class="ex">,</span> w.lower<span class="er">(</span><span class="kw">))</span> <span class="cf">if</span> <span class="ex">unicodedata.category</span><span class="er">(</span><span class="ex">c</span><span class="kw">)</span> <span class="ex">!=</span> <span class="st">"Mn"</span><span class="kw">)</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> stems<span class="er">(</span><span class="ex">text</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""Raíces de 5 letras de las palabras con contenido (simulación muy simple de «entender»)."""</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">{_norm</span><span class="er">(</span><span class="fu">w</span><span class="kw">)</span><span class="ex">[:5]</span> for w in re.findall<span class="er">(</span><span class="ex">r</span><span class="st">"\w+"</span><span class="ex">,</span> text<span class="kw">)</span> <span class="cf">if</span> <span class="ex">len</span><span class="er">(</span><span class="fu">w</span><span class="kw">)</span> <span class="op">&gt;</span> 2 <span class="ex">and</span> _norm<span class="er">(</span><span class="fu">w</span><span class="kw">)</span> <span class="ex">not</span> in STOP}</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> scores<span class="er">(</span><span class="ex">need,</span> descs<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""Puntuación de cada herramienta: coincidencias entre la necesidad y nombre + descripción."""</span></span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>    <span class="ex">n</span> = stems<span class="er">(</span><span class="ex">need</span><span class="kw">)</span></span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>    <span class="ex">out</span> = {}</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> TOOLS:</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>        <span class="ex">d</span> = stems<span class="er">(</span><span class="va">descs</span><span class="op">[</span>t<span class="op">]</span><span class="kw">)</span></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>        <span class="ex">common</span> = sorted<span class="er">(</span><span class="ex">n</span> <span class="kw">&amp;</span> <span class="ex">d</span><span class="kw">)</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>        <span class="va">out</span><span class="op">[</span>t<span class="op">]</span> <span class="ex">=</span> <span class="er">(</span><span class="ex">len</span><span class="er">(</span><span class="ex">common</span><span class="kw">)</span> <span class="ex">/</span> math.sqrt<span class="er">(</span><span class="ex">len</span><span class="er">(</span><span class="ex">d</span><span class="kw">)</span> <span class="ex">or</span> 1<span class="kw">)</span><span class="ex">,</span> common<span class="kw">)</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">out</span></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> run_tool<span class="er">(</span><span class="ex">tool,</span> args<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">tool</span> == <span class="st">"consultar_ventas"</span>:</span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>        <span class="ex">r,</span> m = str<span class="er">(</span><span class="ex">args.get</span><span class="er">(</span><span class="st">"region"</span><span class="ex">,</span> <span class="st">""</span><span class="kw">))</span><span class="fu">.lower()</span><span class="ex">,</span> str<span class="er">(</span><span class="ex">args.get</span><span class="er">(</span><span class="st">"mes"</span><span class="ex">,</span> <span class="st">""</span><span class="kw">))</span><span class="fu">.lower()</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">(</span><span class="ex">r,</span> m<span class="kw">)</span> <span class="er">in</span> <span class="ex">VENTAS:</span></span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="ex">{</span><span class="st">"region"</span><span class="ex">:</span> args<span class="pp">[</span><span class="st">"region"</span><span class="pp">]</span>, <span class="st">"mes"</span>: args<span class="pp">[</span><span class="st">"mes"</span><span class="pp">]</span>, <span class="st">"ventas_eur"</span>: VENTAS[<span class="er">(</span><span class="ex">r,</span> m<span class="kw">)</span><span class="ex">]}</span></span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">{</span><span class="st">"error"</span><span class="ex">:</span> <span class="st">"Faltan o no son válidos 'region' y 'mes'."</span>}</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">tool</span> == <span class="st">"calcular"</span>:</span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>        <span class="fu">expr</span> = str<span class="er">(</span><span class="ex">args.get</span><span class="er">(</span><span class="st">"expresion"</span><span class="ex">,</span> <span class="st">""</span><span class="kw">))</span></span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="ex">re.fullmatch</span><span class="er">(</span><span class="ex">r</span><span class="st">"[\d\s+\-*/().]+"</span><span class="ex">,</span> expr<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="ex">{</span><span class="st">"resultado"</span><span class="ex">:</span> round<span class="er">(</span><span class="bu">eval</span><span class="er">(</span><span class="fu">expr</span><span class="kw">)</span><span class="ex">,</span> 2<span class="kw">)}</span></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">{</span><span class="st">"error"</span><span class="ex">:</span> f<span class="st">"«{expr}» no es una operación aritmética."</span>}</span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">tool</span> == <span class="st">"buscar_glosario"</span>:</span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>        <span class="ex">term</span> = str<span class="er">(</span><span class="ex">args.get</span><span class="er">(</span><span class="st">"termino"</span><span class="ex">,</span> <span class="st">""</span><span class="kw">))</span><span class="fu">.lower()</span></span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="ex">term</span> in GLOSARIO:</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="ex">{</span><span class="st">"termino"</span><span class="ex">:</span> term, <span class="st">"definicion"</span>: GLOSARIO<span class="pp">[</span><span class="ss">term</span><span class="pp">]</span>}</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">{</span><span class="st">"error"</span><span class="ex">:</span> f<span class="st">"«{args.get('termino')}» no está en el glosario."</span>}</span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">{</span><span class="st">"error"</span><span class="ex">:</span> <span class="st">"Herramienta desconocida"</span>}</span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> wrong_args<span class="er">(</span><span class="ex">tool,</span> short<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""Argumentos con los que el modelo llamaría a una herramienta que no encaja."""</span></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">tool</span> == <span class="st">"consultar_ventas"</span>:</span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">{</span><span class="st">"region"</span><span class="ex">:</span> <span class="st">"?"</span>, <span class="st">"mes"</span>: <span class="st">"?"</span>}</span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>    <span class="ex">key</span> = {<span class="st">"calcular"</span>: <span class="st">"expresion"</span>, <span class="st">"buscar_glosario"</span>: <span class="st">"termino"</span>}<span class="pp">[</span><span class="ss">tool</span><span class="pp">]</span></span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">{key:</span> short}</span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> build_trace<span class="er">(</span><span class="ex">qi,</span> descs<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""Lista de pasos: dicts con role in {user, think, call, result, answer} y su contenido."""</span></span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>    <span class="ex">Q</span> = QUESTIONS<span class="pp">[</span><span class="ss">qi</span><span class="pp">]</span></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>    <span class="ex">trace</span> = [{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"text"</span>: Q<span class="pp">[</span><span class="st">"q"</span><span class="pp">]</span>}]</span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">not</span> Q<span class="pp">[</span><span class="st">"steps"</span><span class="pp">]</span>:</span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>        <span class="ex">trace.append</span><span class="er">(</span><span class="ex">{</span><span class="st">"role"</span><span class="ex">:</span> <span class="st">"think"</span>, <span class="st">"text"</span>: <span class="st">"Puedo responder con lo que sé: no necesito ninguna herramienta."</span>,</span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>                      <span class="st">"scores"</span><span class="ex">:</span> None}<span class="kw">)</span></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>        <span class="ex">trace.append</span><span class="er">(</span><span class="ex">{</span><span class="st">"role"</span><span class="ex">:</span> <span class="st">"answer"</span>, <span class="st">"text"</span>: Q<span class="pp">[</span><span class="st">"answer"</span><span class="pp">]</span>, <span class="st">"status"</span>: <span class="st">"ok"</span>}<span class="kw">)</span></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">trace</span></span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> st <span class="kw">in</span> Q<span class="pp">[</span><span class="st">"steps"</span><span class="pp">]</span>:</span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>        <span class="ex">sc</span> = scores<span class="er">(</span><span class="va">st</span><span class="op">[</span><span class="st">"need"</span><span class="op">]</span><span class="ex">,</span> descs<span class="kw">)</span></span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>        <span class="ex">best</span> = max<span class="er">(</span><span class="ex">TOOLS,</span> key=lambda t: sc<span class="pp">[</span><span class="ss">t</span><span class="pp">][</span><span class="ss">0</span><span class="pp">]</span><span class="kw">)</span></span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">sc</span><span class="op">[</span>best<span class="op">][</span><span class="dv">0</span><span class="op">]</span> <span class="op">&lt;</span> THRESHOLD:</span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>            <span class="ex">trace.append</span><span class="er">(</span><span class="ex">{</span><span class="st">"role"</span><span class="ex">:</span> <span class="st">"think"</span>, <span class="st">"text"</span>: st<span class="pp">[</span><span class="st">"need"</span><span class="pp">]</span> + <span class="st">" Ninguna herramienta parece servir, así que respondo con lo que creo saber."</span>,</span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>                          <span class="st">"scores"</span><span class="ex">:</span> sc, <span class="st">"chosen"</span>: None}<span class="kw">)</span></span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>            <span class="ex">trace.append</span><span class="er">(</span><span class="ex">{</span><span class="st">"role"</span><span class="ex">:</span> <span class="st">"answer"</span>, <span class="st">"text"</span>: Q<span class="pp">[</span><span class="st">"invented"</span><span class="pp">]</span>, <span class="st">"status"</span>: <span class="st">"invented"</span>}<span class="kw">)</span></span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="ex">trace</span></span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>        <span class="ex">trace.append</span><span class="er">(</span><span class="ex">{</span><span class="st">"role"</span><span class="ex">:</span> <span class="st">"think"</span>, <span class="st">"text"</span>: st<span class="pp">[</span><span class="st">"need"</span><span class="pp">]</span>, <span class="st">"scores"</span>: sc, <span class="st">"chosen"</span>: best}<span class="kw">)</span></span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>        <span class="ex">args</span> = st<span class="pp">[</span><span class="st">"args"</span><span class="pp">]</span> if best == st<span class="pp">[</span><span class="st">"tool"</span><span class="pp">]</span> else wrong_args<span class="er">(</span><span class="ex">best,</span> st<span class="pp">[</span><span class="st">"short"</span><span class="pp">]</span><span class="kw">)</span></span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>        <span class="ex">trace.append</span><span class="er">(</span><span class="ex">{</span><span class="st">"role"</span><span class="ex">:</span> <span class="st">"call"</span>, <span class="st">"tool"</span>: best, <span class="st">"args"</span>: args, <span class="st">"right"</span>: best == st<span class="pp">[</span><span class="st">"tool"</span><span class="pp">]</span>}<span class="kw">)</span></span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>        <span class="ex">res</span> = run_tool<span class="er">(</span><span class="ex">best,</span> args<span class="kw">)</span></span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>        <span class="ex">trace.append</span><span class="er">(</span><span class="ex">{</span><span class="st">"role"</span><span class="ex">:</span> <span class="st">"result"</span>, <span class="st">"tool"</span>: best, <span class="st">"result"</span>: res}<span class="kw">)</span></span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">"error"</span> in res:</span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>            <span class="ex">trace.append</span><span class="er">(</span><span class="ex">{</span><span class="st">"role"</span><span class="ex">:</span> <span class="st">"answer"</span>, <span class="st">"status"</span>: <span class="st">"fail"</span>,</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>                          <span class="st">"text"</span><span class="ex">:</span> <span class="st">"No he podido obtener el dato: la herramienta que elegí no era la adecuada."</span>}<span class="kw">)</span></span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="ex">trace</span></span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>    <span class="ex">trace.append</span><span class="er">(</span><span class="ex">{</span><span class="st">"role"</span><span class="ex">:</span> <span class="st">"answer"</span>, <span class="st">"text"</span>: Q<span class="pp">[</span><span class="st">"answer"</span><span class="pp">]</span>, <span class="st">"status"</span>: <span class="st">"ok"</span>}<span class="kw">)</span></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">trace</span></span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Interfaz ─────────────────────────────────────────────────────────────────</span></span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a><span class="ex">from</span> shiny import reactive</span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a><span class="ex">from</span> shiny.express import input, ui, render</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a><span class="ex">BLUE,</span> DARK, YELLOW, ORANGE, GREEN, RED, GRAY = <span class="er">(</span></span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#4B8BBE"</span><span class="ex">,</span> <span class="st">"#306998"</span>, <span class="st">"#FFD43B"</span>, <span class="st">"#e65100"</span>, <span class="st">"#2e7d32"</span>, <span class="st">"#c62828"</span>, <span class="st">"#9ca3af"</span><span class="kw">)</span></span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a><span class="ex">ui.tags.style</span><span class="er">(</span><span class="st">"""</span></span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a><span class="st">body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}</span></span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a><span class="st">.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}</span></span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a><span class="st">.muted{color:#6b7280;font-size:.85em}</span></span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a><span class="st">.chip{display:inline-block;border:1px solid #306998;color:#306998;background:#fff;border-radius:999px;</span></span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a><span class="st">  padding:2px 12px;margin:2px 6px 2px 0;font-size:.85em;cursor:pointer;user-select:none}</span></span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a><span class="st">.chip:hover{background:#e8f0f8}.chip.on{background:#306998;color:#fff}</span></span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a><span class="st">.step{border-radius:10px;padding:8px 12px;margin:8px 0;font-size:.92em}</span></span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a><span class="st">.step .who{font-size:.75em;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}</span></span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a><span class="st">.user{background:#4B8BBE;color:#fff;margin-left:22%}</span></span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a><span class="st">.think{background:#f3f4f6;font-style:italic}</span></span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a><span class="st">.call{background:#fff3e0;border:1.5px solid #e65100}</span></span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a><span class="st">.call.bad{border:2px solid #c62828;background:#ffebee}</span></span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a><span class="st">.result{background:#fffbe6;border:1.5px solid #e0b400}</span></span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a><span class="st">.answer{border:2px solid #2e7d32;background:#e8f5e9}</span></span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a><span class="st">.answer.fail{border-color:#e65100;background:#fff3e0}</span></span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a><span class="st">.answer.invented{border-color:#c62828;background:#ffebee}</span></span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a><span class="st">pre.js{margin:4px 0 0;font-size:.82em;background:none;border:none;padding:0;white-space:pre-wrap}</span></span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a><span class="st">.sc{display:grid;grid-template-columns:130px 1fr 34px;gap:2px 8px;align-items:center;font-style:normal;font-size:.85em;margin-top:6px}</span></span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a><span class="st">.track{height:10px;background:#e5e7eb;border-radius:3px;overflow:hidden}</span></span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a><span class="st">.fill{display:block;height:100%;border-radius:3px}</span></span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a><span class="st">.kw{display:inline-block;background:#FFD43B;border-radius:3px;padding:0 4px;margin:0 2px;font-size:.85em;font-style:normal}</span></span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a><span class="st">@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}</span></span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a><span class="st">.new{animation:pop .35s ease-out both}</span></span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a><span class="st">textarea{font-size:.88em!important}</span></span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span><span class="kw">)</span></span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a><span class="ex">pos</span> = reactive.value<span class="er">(</span><span class="ex">0</span><span class="kw">)</span></span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> descs<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">{t:</span> input<span class="pp">[</span><span class="ss">f</span><span class="st">"d_{t}"</span><span class="pp">]</span><span class="er">(</span><span class="kw">)</span> <span class="cf">for</span> t <span class="kw">in</span> TOOLS}</span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.calc</span></span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> trace<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">build_trace</span><span class="er">(</span><span class="ex">int</span><span class="er">(</span><span class="fu">input.q()</span><span class="kw">)</span><span class="ex">,</span> descs<span class="er">(</span><span class="kw">))</span></span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.q,</span> <span class="pp">*</span>[input<span class="pp">[</span><span class="ss">f</span><span class="st">"d_{t}"</span><span class="pp">]</span> for t in TOOLS]<span class="kw">)</span></span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _reset<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>    <span class="ex">pos.set</span><span class="er">(</span><span class="ex">0</span><span class="kw">)</span></span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.next</span><span class="kw">)</span></span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _next<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>    <span class="ex">pos.set</span><span class="er">(</span><span class="ex">min</span><span class="er">(</span><span class="fu">pos()</span> <span class="ex">+</span> 1, len<span class="er">(</span><span class="fu">trace()</span><span class="kw">)</span> <span class="ex">-</span> 1<span class="kw">))</span></span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.prev</span><span class="kw">)</span></span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _prev<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>    <span class="ex">pos.set</span><span class="er">(</span><span class="ex">max</span><span class="er">(</span><span class="fu">pos()</span> <span class="ex">-</span> 1, 0<span class="kw">))</span></span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.all</span><span class="kw">)</span></span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _all<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>    <span class="ex">pos.set</span><span class="er">(</span><span class="ex">len</span><span class="er">(</span><span class="fu">trace()</span><span class="kw">)</span> <span class="ex">-</span> 1<span class="kw">)</span></span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.preset</span><span class="kw">)</span></span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _preset<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t<span class="ex">,</span> d in PRESETS[input.preset<span class="er">(</span><span class="kw">)</span><span class="fu">][1].items()</span><span class="bu">:</span></span>
+<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>        <span class="ex">ui.update_text_area</span><span class="er">(</span><span class="ex">f</span><span class="st">"d_{t}"</span><span class="ex">,</span> value=d<span class="kw">)</span></span>
+<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> md<span class="er">(</span><span class="ex">text</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">re.sub</span><span class="er">(</span><span class="ex">r</span><span class="st">"\*\*(.+?)\*\*"</span><span class="ex">,</span> r<span class="st">"&lt;b&gt;\1&lt;/b&gt;"</span>, text<span class="kw">)</span></span>
+<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> js<span class="er">(</span><span class="ex">obj</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">json.dumps</span><span class="er">(</span><span class="ex">obj,</span> ensure_ascii=False, indent=1<span class="kw">)</span></span>
+<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> render_step<span class="er">(</span><span class="ex">s,</span> new<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a>    <span class="ex">cls</span> = <span class="st">" new"</span> if new else <span class="st">""</span></span>
+<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a>    <span class="ex">r</span> = s<span class="pp">[</span><span class="st">"role"</span><span class="pp">]</span></span>
+<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">r</span> == <span class="st">"user"</span>:</span>
+<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">f</span><span class="st">"&lt;div class='step user{cls}'&gt;&lt;div class='who'&gt;Usuario&lt;/div&gt;{s['text']}&lt;/div&gt;"</span></span>
+<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">r</span> == <span class="st">"think"</span>:</span>
+<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a>        <span class="ex">body</span> = s<span class="pp">[</span><span class="st">"text"</span><span class="pp">]</span></span>
+<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="ex">s.get</span><span class="er">(</span><span class="st">"scores"</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a>            <span class="ex">best</span> = max<span class="er">(</span><span class="va">v</span><span class="op">[</span><span class="dv">0</span><span class="op">]</span> <span class="cf">for</span> v <span class="kw">in</span> s<span class="pp">[</span><span class="st">"scores"</span><span class="pp">]</span>.values<span class="er">(</span><span class="kw">))</span> <span class="ex">or</span> 1</span>
+<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a>            <span class="ex">rows</span> = []</span>
+<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> t<span class="ex">,</span> <span class="er">(</span><span class="ex">v,</span> common<span class="kw">)</span> <span class="er">in</span> <span class="va">s</span><span class="op">[</span><span class="st">"scores"</span><span class="op">]</span><span class="fu">.items()</span><span class="bu">:</span></span>
+<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a>                <span class="fu">col</span> = GREEN if t == s.get<span class="er">(</span><span class="st">"chosen"</span><span class="kw">)</span> <span class="cf">else</span> <span class="ex">GRAY</span></span>
+<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a>                <span class="ex">rows.append</span><span class="er">(</span></span>
+<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a>                    <span class="ex">f</span><span class="st">"&lt;code&gt;{t}&lt;/code&gt;&lt;span class='track'&gt;&lt;span class='fill' "</span></span>
+<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a>                    <span class="ex">f</span><span class="st">"style='width:{100 * v / best:.0f}%;background:{col}'&gt;&lt;/span&gt;&lt;/span&gt;&lt;span&gt;{v:.2f}&lt;/span&gt;"</span></span>
+<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a>                <span class="kw">)</span></span>
+<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a>            <span class="ex">chosen</span> = s.get<span class="er">(</span><span class="st">"chosen"</span><span class="kw">)</span></span>
+<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a>            <span class="ex">common</span> = s<span class="pp">[</span><span class="st">"scores"</span><span class="pp">][</span><span class="ss">chosen</span><span class="pp">][</span><span class="ss">1</span><span class="pp">]</span> if chosen else []</span>
+<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a>            <span class="ex">kws</span> = <span class="st">""</span>.join<span class="er">(</span><span class="ex">f</span><span class="st">"&lt;span class='kw'&gt;{c}…&lt;/span&gt;"</span> for c in common<span class="kw">)</span></span>
+<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a>            <span class="ex">verdict</span> = <span class="er">(</span></span>
+<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a>                <span class="ex">f</span><span class="st">"&lt;div style='font-style:normal;margin-top:4px'&gt;Elige &lt;code&gt;{chosen}&lt;/code&gt;, porque su descripción "</span></span>
+<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a>                <span class="ex">f</span><span class="st">"coincide en: {kws}&lt;/div&gt;"</span> if chosen else</span>
+<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a>                <span class="ex">f</span><span class="st">"&lt;div style='font-style:normal;margin-top:4px;color:{RED}'&gt;Ninguna supera el umbral "</span></span>
+<span id="cb2-291"><a href="#cb2-291" aria-hidden="true" tabindex="-1"></a>                <span class="ex">f</span><span class="st">"({THRESHOLD}): no llama a ninguna herramienta.&lt;/div&gt;"</span></span>
+<span id="cb2-292"><a href="#cb2-292" aria-hidden="true" tabindex="-1"></a>            <span class="kw">)</span></span>
+<span id="cb2-293"><a href="#cb2-293" aria-hidden="true" tabindex="-1"></a>            <span class="ex">body</span> += f<span class="st">"&lt;div class='sc'&gt;{''.join(rows)}&lt;/div&gt;{verdict}"</span></span>
+<span id="cb2-294"><a href="#cb2-294" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">f</span><span class="st">"&lt;div class='step think{cls}'&gt;&lt;div class='who'&gt;💭 El modelo decide&lt;/div&gt;{body}&lt;/div&gt;"</span></span>
+<span id="cb2-295"><a href="#cb2-295" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">r</span> == <span class="st">"call"</span>:</span>
+<span id="cb2-296"><a href="#cb2-296" aria-hidden="true" tabindex="-1"></a>        <span class="ex">bad</span> = <span class="st">""</span> if s<span class="pp">[</span><span class="st">"right"</span><span class="pp">]</span> else <span class="st">" bad"</span></span>
+<span id="cb2-297"><a href="#cb2-297" aria-hidden="true" tabindex="-1"></a>        <span class="ex">warn</span> = <span class="st">""</span> if s<span class="pp">[</span><span class="st">"right"</span><span class="pp">]</span> else f<span class="st">"&lt;div style='color:{RED};font-weight:600'&gt;✘ Herramienta equivocada&lt;/div&gt;"</span></span>
+<span id="cb2-298"><a href="#cb2-298" aria-hidden="true" tabindex="-1"></a>        <span class="ex">payload</span> = {<span class="st">"tool_call"</span>: {<span class="st">"name"</span>: s<span class="pp">[</span><span class="st">"tool"</span><span class="pp">]</span>, <span class="st">"arguments"</span>: s<span class="pp">[</span><span class="st">"args"</span><span class="pp">]</span>}}</span>
+<span id="cb2-299"><a href="#cb2-299" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">(</span><span class="ex">f</span><span class="st">"&lt;div class='step call{bad}{cls}'&gt;&lt;div class='who'&gt;🛠 El modelo pide una herramienta&lt;/div&gt;"</span></span>
+<span id="cb2-300"><a href="#cb2-300" aria-hidden="true" tabindex="-1"></a>                <span class="ex">f</span><span class="st">"{warn}&lt;pre class='js'&gt;{js(payload)}&lt;/pre&gt;&lt;/div&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-301"><a href="#cb2-301" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">r</span> == <span class="st">"result"</span>:</span>
+<span id="cb2-302"><a href="#cb2-302" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="kw">(</span><span class="ex">f</span><span class="st">"&lt;div class='step result{cls}'&gt;&lt;div class='who'&gt;📦 Tu código ejecuta &lt;code&gt;{s['tool']}&lt;/code&gt; "</span></span>
+<span id="cb2-303"><a href="#cb2-303" aria-hidden="true" tabindex="-1"></a>                <span class="ex">f</span><span class="st">"y devuelve&lt;/div&gt;&lt;pre class='js'&gt;{js(s['result'])}&lt;/pre&gt;&lt;/div&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-304"><a href="#cb2-304" aria-hidden="true" tabindex="-1"></a>    <span class="ex">status</span> = s<span class="pp">[</span><span class="st">"status"</span><span class="pp">]</span></span>
+<span id="cb2-305"><a href="#cb2-305" aria-hidden="true" tabindex="-1"></a>    <span class="ex">extra</span> = {</span>
+<span id="cb2-306"><a href="#cb2-306" aria-hidden="true" tabindex="-1"></a>        <span class="st">"ok"</span><span class="ex">:</span> <span class="st">""</span>,</span>
+<span id="cb2-307"><a href="#cb2-307" aria-hidden="true" tabindex="-1"></a>        <span class="st">"fail"</span><span class="ex">:</span> <span class="st">""</span>,</span>
+<span id="cb2-308"><a href="#cb2-308" aria-hidden="true" tabindex="-1"></a>        <span class="st">"invented"</span><span class="ex">:</span> f<span class="st">"&lt;div style='color:{RED};font-weight:600;margin-top:4px'&gt;⚠ Cifra inventada: "</span></span>
+<span id="cb2-309"><a href="#cb2-309" aria-hidden="true" tabindex="-1"></a>                    <span class="ex">f</span><span class="st">"no viene de ninguna herramienta. Suena convincente, pero es una alucinación.&lt;/div&gt;"</span><span class="ex">,</span></span>
+<span id="cb2-310"><a href="#cb2-310" aria-hidden="true" tabindex="-1"></a>    <span class="ex">}[status]</span></span>
+<span id="cb2-311"><a href="#cb2-311" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span> = {<span class="st">"ok"</span>: <span class="st">"✔ Respuesta final"</span>, <span class="st">"fail"</span>: <span class="st">"✘ Respuesta final"</span>, <span class="st">"invented"</span>: <span class="st">"⚠ Respuesta final"</span>}<span class="pp">[</span><span class="ss">status</span><span class="pp">]</span></span>
+<span id="cb2-312"><a href="#cb2-312" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">f</span><span class="st">"&lt;div class='step answer {status}{cls}'&gt;&lt;div class='who'&gt;{head}&lt;/div&gt;{md(s['text'])}{extra}&lt;/div&gt;"</span></span>
+<span id="cb2-313"><a href="#cb2-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-314"><a href="#cb2-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-315"><a href="#cb2-315" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> loop_svg<span class="er">(</span><span class="ex">role,</span> n_calls<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-316"><a href="#cb2-316" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""Diagrama del bucle con la fase actual resaltada."""</span></span>
+<span id="cb2-317"><a href="#cb2-317" aria-hidden="true" tabindex="-1"></a>    <span class="ex">nodes</span> = {<span class="st">"user"</span>: <span class="er">(</span><span class="ex">60,</span> 60, <span class="st">"Usuario"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"llm"</span>: <span class="er">(</span><span class="ex">200,</span> 60, <span class="st">"LLM"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-318"><a href="#cb2-318" aria-hidden="true" tabindex="-1"></a>             <span class="st">"tools"</span><span class="ex">:</span> <span class="er">(</span><span class="ex">340,</span> 60, <span class="st">"Herramientas"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"out"</span>: <span class="er">(</span><span class="ex">200,</span> 160, <span class="st">"Respuesta"</span><span class="kw">)}</span></span>
+<span id="cb2-319"><a href="#cb2-319" aria-hidden="true" tabindex="-1"></a>    <span class="ex">active_node</span> = {<span class="st">"user"</span>: <span class="st">"user"</span>, <span class="st">"think"</span>: <span class="st">"llm"</span>, <span class="st">"call"</span>: <span class="st">"tools"</span>, <span class="st">"result"</span>: <span class="st">"llm"</span>, <span class="st">"answer"</span>: <span class="st">"out"</span>}<span class="pp">[</span><span class="ss">role</span><span class="pp">]</span></span>
+<span id="cb2-320"><a href="#cb2-320" aria-hidden="true" tabindex="-1"></a>    <span class="ex">active_edge</span> = {<span class="st">"user"</span>: <span class="st">"u-l"</span>, <span class="st">"think"</span>: None, <span class="st">"call"</span>: <span class="st">"l-t"</span>, <span class="st">"result"</span>: <span class="st">"t-l"</span>, <span class="st">"answer"</span>: <span class="st">"l-o"</span>}<span class="pp">[</span><span class="ss">role</span><span class="pp">]</span></span>
+<span id="cb2-321"><a href="#cb2-321" aria-hidden="true" tabindex="-1"></a>    <span class="ex">edges</span> = {</span>
+<span id="cb2-322"><a href="#cb2-322" aria-hidden="true" tabindex="-1"></a>        <span class="st">"u-l"</span><span class="ex">:</span> <span class="st">"M100,60 L156,60"</span>, <span class="st">"l-t"</span>: <span class="st">"M244,52 L296,52"</span>, <span class="st">"t-l"</span>: <span class="st">"M296,70 L244,70"</span>, <span class="st">"l-o"</span>: <span class="st">"M200,82 L200,136"</span>,</span>
+<span id="cb2-323"><a href="#cb2-323" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb2-324"><a href="#cb2-324" aria-hidden="true" tabindex="-1"></a>    <span class="ex">parts</span> = [<span class="st">"&lt;defs&gt;"</span> + <span class="st">""</span>.join<span class="er">(</span></span>
+<span id="cb2-325"><a href="#cb2-325" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;marker id='a{c}' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto'&gt;"</span></span>
+<span id="cb2-326"><a href="#cb2-326" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;path d='M0,0 L10,5 L0,10 z' fill='{c2}'/&gt;&lt;/marker&gt;"</span> for c, c2 in <span class="er">(</span><span class="kw">(</span><span class="st">"n"</span><span class="ex">,</span> GRAY<span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"h"</span><span class="ex">,</span> ORANGE<span class="kw">)))</span> <span class="ex">+</span> <span class="st">"&lt;/defs&gt;"</span>]</span>
+<span id="cb2-327"><a href="#cb2-327" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k<span class="ex">,</span> d in edges.items<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-328"><a href="#cb2-328" aria-hidden="true" tabindex="-1"></a>        <span class="ex">on</span> = k == active_edge</span>
+<span id="cb2-329"><a href="#cb2-329" aria-hidden="true" tabindex="-1"></a>        <span class="ex">parts.append</span><span class="er">(</span><span class="ex">f</span><span class="st">"&lt;path d='{d}' stroke='{ORANGE if on else GRAY}' stroke-width='{3.5 if on else 1.8}' "</span></span>
+<span id="cb2-330"><a href="#cb2-330" aria-hidden="true" tabindex="-1"></a>                     <span class="ex">f</span><span class="st">"fill='none' marker-end='url(#a{'h' if on else 'n'})'/&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-331"><a href="#cb2-331" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k<span class="ex">,</span> <span class="er">(</span><span class="ex">x,</span> y, label<span class="kw">)</span> <span class="er">in</span> <span class="fu">nodes.items()</span><span class="bu">:</span></span>
+<span id="cb2-332"><a href="#cb2-332" aria-hidden="true" tabindex="-1"></a>        <span class="ex">on</span> = k == active_node</span>
+<span id="cb2-333"><a href="#cb2-333" aria-hidden="true" tabindex="-1"></a>        <span class="ex">fill</span> = {<span class="st">"user"</span>: BLUE, <span class="st">"llm"</span>: DARK, <span class="st">"tools"</span>: ORANGE, <span class="st">"out"</span>: GREEN}<span class="pp">[</span><span class="ss">k</span><span class="pp">]</span></span>
+<span id="cb2-334"><a href="#cb2-334" aria-hidden="true" tabindex="-1"></a>        <span class="ex">parts.append</span><span class="er">(</span></span>
+<span id="cb2-335"><a href="#cb2-335" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;rect x='{x - 46}' y='{y - 20}' width='92' height='40' rx='10' fill='{fill}' "</span></span>
+<span id="cb2-336"><a href="#cb2-336" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"fill-opacity='{1 if on else 0.25}' stroke='{'#111' if on else 'none'}' stroke-width='2'/&gt;"</span></span>
+<span id="cb2-337"><a href="#cb2-337" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;text x='{x}' y='{y + 5}' text-anchor='middle' font-size='13' font-weight='600' "</span></span>
+<span id="cb2-338"><a href="#cb2-338" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"fill='{'#fff' if on else '#374151'}'&gt;{label}&lt;/text&gt;"</span></span>
+<span id="cb2-339"><a href="#cb2-339" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-340"><a href="#cb2-340" aria-hidden="true" tabindex="-1"></a>    <span class="ex">parts.append</span><span class="er">(</span><span class="ex">f</span><span class="st">"&lt;text x='340' y='100' text-anchor='middle' font-size='11' fill='#6b7280'&gt;vueltas: {n_calls}&lt;/text&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-341"><a href="#cb2-341" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">(</span><span class="ex">f</span><span class="st">"&lt;svg viewBox='0 0 400 190' width='100%' style='max-width:360px;display:block;margin:auto' "</span></span>
+<span id="cb2-342"><a href="#cb2-342" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"font-family='system-ui,sans-serif'&gt;{''.join(parts)}&lt;/svg&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-343"><a href="#cb2-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-344"><a href="#cb2-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-345"><a href="#cb2-345" aria-hidden="true" tabindex="-1"></a><span class="ex">ui.input_select</span><span class="er">(</span><span class="st">"q"</span><span class="ex">,</span> <span class="st">"Pregunta al agente"</span>, {str<span class="er">(</span><span class="ex">i</span><span class="kw">)</span><span class="bu">:</span> Q<span class="pp">[</span><span class="st">"q"</span><span class="pp">]</span> for i, Q in enumerate<span class="er">(</span><span class="ex">QUESTIONS</span><span class="kw">)</span><span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-346"><a href="#cb2-346" aria-hidden="true" tabindex="-1"></a>                <span class="va">selected</span><span class="op">=</span><span class="st">"0"</span>, <span class="va">width</span><span class="op">=</span><span class="st">"100%"</span><span class="kw">)</span></span>
+<span id="cb2-347"><a href="#cb2-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-348"><a href="#cb2-348" aria-hidden="true" tabindex="-1"></a><span class="ex">with</span> ui.div<span class="er">(</span><span class="va">style</span><span class="op">=</span><span class="st">"display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 6px"</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-349"><a href="#cb2-349" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ui.input_action_button</span><span class="er">(</span><span class="st">"prev"</span><span class="ex">,</span> <span class="st">"◀"</span>, class_=<span class="st">"btn-outline-primary btn-sm"</span><span class="kw">)</span></span>
+<span id="cb2-350"><a href="#cb2-350" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ui.input_action_button</span><span class="er">(</span><span class="st">"next"</span><span class="ex">,</span> <span class="st">"Siguiente paso ▶"</span>, class_=<span class="st">"btn-primary btn-sm"</span><span class="kw">)</span></span>
+<span id="cb2-351"><a href="#cb2-351" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ui.input_action_button</span><span class="er">(</span><span class="st">"all"</span><span class="ex">,</span> <span class="st">"Ver todo"</span>, class_=<span class="st">"btn-outline-secondary btn-sm"</span><span class="kw">)</span></span>
+<span id="cb2-352"><a href="#cb2-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-353"><a href="#cb2-353" aria-hidden="true" tabindex="-1"></a><span class="ex">with</span> ui.layout_columns<span class="er">(</span><span class="va">col_widths</span><span class="op">=</span><span class="va">(</span>7, 5<span class="va">)</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-354"><a href="#cb2-354" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@render.ui</span></span>
+<span id="cb2-355"><a href="#cb2-355" aria-hidden="true" tabindex="-1"></a>    <span class="ex">def</span> timeline<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-356"><a href="#cb2-356" aria-hidden="true" tabindex="-1"></a>        <span class="fu">tr</span>, p = trace<span class="er">(</span><span class="kw">)</span><span class="ex">,</span> pos<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-357"><a href="#cb2-357" aria-hidden="true" tabindex="-1"></a>        <span class="ex">steps</span> = <span class="st">""</span>.join<span class="er">(</span><span class="ex">render_step</span><span class="er">(</span><span class="ex">s,</span> i == p and p <span class="op">&gt;</span> 0<span class="kw">)</span> <span class="cf">for</span> i<span class="ex">,</span> s in enumerate<span class="er">(</span><span class="va">tr</span><span class="op">[</span>: p + 1<span class="op">]</span><span class="kw">))</span></span>
+<span id="cb2-358"><a href="#cb2-358" aria-hidden="true" tabindex="-1"></a>        <span class="fu">more</span> = <span class="er">(</span><span class="ex">f</span><span class="st">"&lt;p class='muted' style='text-align:center'&gt;Paso {p + 1} de {len(tr)} · pulsa «Siguiente paso»&lt;/p&gt;"</span></span>
+<span id="cb2-359"><a href="#cb2-359" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="ex">p</span> <span class="op">&lt;</span> len<span class="er">(</span><span class="fu">tr</span><span class="kw">)</span> <span class="ex">-</span> 1 else <span class="st">""</span><span class="kw">)</span></span>
+<span id="cb2-360"><a href="#cb2-360" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span><span class="ex">steps</span> + more<span class="kw">)</span></span>
+<span id="cb2-361"><a href="#cb2-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-362"><a href="#cb2-362" aria-hidden="true" tabindex="-1"></a>    <span class="ex">@render.ui</span></span>
+<span id="cb2-363"><a href="#cb2-363" aria-hidden="true" tabindex="-1"></a>    <span class="ex">def</span> side<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-364"><a href="#cb2-364" aria-hidden="true" tabindex="-1"></a>        <span class="fu">tr</span>, p = trace<span class="er">(</span><span class="kw">)</span><span class="ex">,</span> pos<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-365"><a href="#cb2-365" aria-hidden="true" tabindex="-1"></a>        <span class="ex">seen</span> = tr[: p + 1]</span>
+<span id="cb2-366"><a href="#cb2-366" aria-hidden="true" tabindex="-1"></a>        <span class="ex">n_calls</span> = sum<span class="er">(</span><span class="va">s</span><span class="op">[</span><span class="st">"role"</span><span class="op">]</span> <span class="ex">==</span> <span class="st">"call"</span> for s in seen<span class="kw">)</span></span>
+<span id="cb2-367"><a href="#cb2-367" aria-hidden="true" tabindex="-1"></a>        <span class="ex">n_msgs</span> = sum<span class="er">(</span><span class="va">s</span><span class="op">[</span><span class="st">"role"</span><span class="op">]</span> <span class="ex">!=</span> <span class="st">"think"</span> for s in seen<span class="kw">)</span></span>
+<span id="cb2-368"><a href="#cb2-368" aria-hidden="true" tabindex="-1"></a>        <span class="ex">explain</span> = {</span>
+<span id="cb2-369"><a href="#cb2-369" aria-hidden="true" tabindex="-1"></a>            <span class="st">"user"</span><span class="ex">:</span> <span class="st">"El usuario pregunta. El modelo recibe la pregunta &lt;b&gt;y la lista de herramientas&lt;/b&gt; con sus descripciones."</span>,</span>
+<span id="cb2-370"><a href="#cb2-370" aria-hidden="true" tabindex="-1"></a>            <span class="st">"think"</span><span class="ex">:</span> <span class="st">"El modelo lee las descripciones y decide si necesita una herramienta y cuál."</span>,</span>
+<span id="cb2-371"><a href="#cb2-371" aria-hidden="true" tabindex="-1"></a>            <span class="st">"call"</span><span class="ex">:</span> <span class="st">"El modelo &lt;b&gt;no ejecuta nada&lt;/b&gt;: solo devuelve un JSON con el nombre y los argumentos."</span>,</span>
+<span id="cb2-372"><a href="#cb2-372" aria-hidden="true" tabindex="-1"></a>            <span class="st">"result"</span><span class="ex">:</span> <span class="st">"Tu código ejecuta la función y devuelve el resultado al modelo como un mensaje más. Vuelta al bucle."</span>,</span>
+<span id="cb2-373"><a href="#cb2-373" aria-hidden="true" tabindex="-1"></a>            <span class="st">"answer"</span><span class="ex">:</span> <span class="st">"Cuando ya no necesita más herramientas, el modelo responde y el bucle termina."</span>,</span>
+<span id="cb2-374"><a href="#cb2-374" aria-hidden="true" tabindex="-1"></a>        <span class="ex">}[seen[-1][</span><span class="st">"role"</span><span class="ex">]]</span></span>
+<span id="cb2-375"><a href="#cb2-375" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span></span>
+<span id="cb2-376"><a href="#cb2-376" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;div class='card' style='position:sticky;top:6px'&gt;{loop_svg(seen[-1]['role'], n_calls)}"</span></span>
+<span id="cb2-377"><a href="#cb2-377" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;p style='font-size:.88em;margin:6px 0'&gt;{explain}&lt;/p&gt;"</span></span>
+<span id="cb2-378"><a href="#cb2-378" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;p class='muted' style='margin:0'&gt;Mensajes en la conversación: &lt;b&gt;{n_msgs}&lt;/b&gt;. "</span></span>
+<span id="cb2-379"><a href="#cb2-379" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"Cada vuelta añade dos (petición y resultado), y el contexto crece.&lt;/p&gt;&lt;/div&gt;"</span></span>
+<span id="cb2-380"><a href="#cb2-380" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-381"><a href="#cb2-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-382"><a href="#cb2-382" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-383"><a href="#cb2-383" aria-hidden="true" tabindex="-1"></a><span class="fu">ui.hr()</span></span>
+<span id="cb2-384"><a href="#cb2-384" aria-hidden="true" tabindex="-1"></a><span class="ex">ui.markdown</span><span class="er">(</span><span class="st">"**Las herramientas que ve el modelo.** Edita una descripción, o prueba un preajuste, y vuelve a recorrer la traza."</span><span class="kw">)</span></span>
+<span id="cb2-385"><a href="#cb2-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-386"><a href="#cb2-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-387"><a href="#cb2-387" aria-hidden="true" tabindex="-1"></a><span class="ex">@render.ui</span></span>
+<span id="cb2-388"><a href="#cb2-388" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> presets<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-389"><a href="#cb2-389" aria-hidden="true" tabindex="-1"></a>    <span class="ex">cur</span> = descs<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-390"><a href="#cb2-390" aria-hidden="true" tabindex="-1"></a>    <span class="ex">chips</span> = <span class="st">""</span>.join<span class="er">(</span></span>
+<span id="cb2-391"><a href="#cb2-391" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;span class='chip{' on' if all(cur[t] == d[t] for t in TOOLS) else ''}' "</span></span>
+<span id="cb2-392"><a href="#cb2-392" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"onclick=</span><span class="dt">\"</span><span class="st">Shiny.setInputValue('preset', '{k}', {{priority: 'event'}})</span><span class="dt">\"</span><span class="st">&gt;{name}&lt;/span&gt;"</span></span>
+<span id="cb2-393"><a href="#cb2-393" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k<span class="ex">,</span> <span class="er">(</span><span class="ex">name,</span> d<span class="kw">)</span> <span class="er">in</span> <span class="fu">PRESETS.items()</span></span>
+<span id="cb2-394"><a href="#cb2-394" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-395"><a href="#cb2-395" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span><span class="ex">f</span><span class="st">"&lt;div style='margin-bottom:6px'&gt;{chips}&lt;/div&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-396"><a href="#cb2-396" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-397"><a href="#cb2-397" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-398"><a href="#cb2-398" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _t <span class="kw">in</span> TOOLS:</span>
+<span id="cb2-399"><a href="#cb2-399" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ui.input_text_area</span><span class="er">(</span><span class="ex">f</span><span class="st">"d_{_t}"</span><span class="ex">,</span> ui.HTML<span class="er">(</span><span class="ex">f</span><span class="st">"&lt;code&gt;{_t}({SIGNATURES[_t]})&lt;/code&gt;"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-400"><a href="#cb2-400" aria-hidden="true" tabindex="-1"></a>                       <span class="va">DEFAULT_DESC</span><span class="op">[</span>_t<span class="op">]</span><span class="ex">,</span> rows=2, width=<span class="st">"100%"</span><span class="kw">)</span></span>
+<span id="cb2-401"><a href="#cb2-401" aria-hidden="true" tabindex="-1"></a><span class="kw">```</span></span>
+<span id="cb2-402"><a href="#cb2-402" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-403"><a href="#cb2-403" aria-hidden="true" tabindex="-1"></a><span class="co">## Qué observar</span></span>
+<span id="cb2-404"><a href="#cb2-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-405"><a href="#cb2-405" aria-hidden="true" tabindex="-1"></a><span class="ex">1.</span> Con la primera pregunta, recorre la traza: una sola vuelta. Fíjate en que la petición de herramienta es <span class="pp">**</span>solo un JSON<span class="pp">**</span> con el nombre y los argumentos<span class="kw">;</span> <span class="ex">quien</span> ejecuta la función es tu código.</span>
+<span id="cb2-406"><a href="#cb2-406" aria-hidden="true" tabindex="-1"></a><span class="ex">2.</span> Cambia a la pregunta del <span class="pp">**</span>crecimiento del Sur<span class="pp">**</span>: hacen falta tres vueltas <span class="er">(</span><span class="ex">dos</span> consultas y un cálculo<span class="kw">)</span><span class="bu">.</span> Mira cómo crece el contador de mensajes: cada vuelta alarga el contexto, y por eso los agentes largos son lentos y caros.</span>
+<span id="cb2-407"><a href="#cb2-407" aria-hidden="true" tabindex="-1"></a><span class="ex">3.</span> Prueba la <span class="pp">**</span>frase de bienvenida<span class="pp">**</span>: el modelo no necesita ninguna herramienta y responde directamente. Decidir <span class="pp">*</span>no<span class="pp">*</span> usar herramientas también es parte del trabajo.</span>
+<span id="cb2-408"><a href="#cb2-408" aria-hidden="true" tabindex="-1"></a><span class="ex">4.</span> Pulsa <span class="pp">**</span>Descripción vaga<span class="pp">**</span> y repite la primera pregunta. <span class="kw">`</span>consultar_ventas<span class="kw">`</span> <span class="ex">ya</span> no dice para qué sirve, ninguna herramienta encaja y el modelo <span class="pp">**</span>se inventa la cifra<span class="pp">**</span>. La respuesta suena igual de segura que la buena.</span>
+<span id="cb2-409"><a href="#cb2-409" aria-hidden="true" tabindex="-1"></a><span class="ex">5.</span> Pulsa <span class="pp">**</span>Dos herramientas se pisan<span class="pp">**</span>. Ahora el glosario dice tener «ventas por región» y el modelo lo elige para pedir las ventas: herramienta equivocada y error. Y la pregunta del <span class="pp">*</span>ticket medio<span class="pp">*</span> se queda sin herramienta, porque el glosario ya no dice que define términos.</span>
+<span id="cb2-410"><a href="#cb2-410" aria-hidden="true" tabindex="-1"></a><span class="ex">6.</span> Escribe tus propias descripciones. Intenta que <span class="kw">`</span>calcular<span class="kw">`</span> <span class="ex">«robe»</span> la pregunta de las ventas.</span>
+<span id="cb2-411"><a href="#cb2-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-412"><a href="#cb2-412" aria-hidden="true" tabindex="-1"></a><span class="co">## Qué has visto</span></span>
+<span id="cb2-413"><a href="#cb2-413" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-414"><a href="#cb2-414" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> El modelo <span class="pp">**</span>no ejecuta<span class="pp">**</span> las herramientas: propone una llamada en JSON, y tu código decide si la ejecuta.</span>
+<span id="cb2-415"><a href="#cb2-415" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> Un agente es un <span class="pp">**</span>bucle<span class="pp">**</span>: pregunta → decisión → llamada → resultado → decisión… hasta que el modelo responde. Cada vuelta añade mensajes al contexto.</span>
+<span id="cb2-416"><a href="#cb2-416" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> El modelo elige leyendo <span class="pp">**</span>descripciones<span class="pp">**</span>. Una descripción vaga hace que no la use <span class="er">(</span><span class="ex">y</span> que invente<span class="kw">);</span> <span class="ex">dos</span> descripciones solapadas hacen que use la equivocada. Por eso la descripción de una herramienta es parte del prompt y merece el mismo cuidado.</span>
+<span id="cb2-417"><a href="#cb2-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-418"><a href="#cb2-418" aria-hidden="true" tabindex="-1"></a><span class="ex">:::</span> {.callout-warning}</span>
+<span id="cb2-419"><a href="#cb2-419" aria-hidden="true" tabindex="-1"></a><span class="co">## Qué es real y qué está simplificado</span></span>
+<span id="cb2-420"><a href="#cb2-420" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-421"><a href="#cb2-421" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> La selección por coincidencia de palabras es una caricatura de lo que hace un LLM. Un modelo real entiende sinónimos y contexto, y no tiene un umbral fijo, pero sí comete estos dos errores con descripciones vagas o solapadas.</span>
+<span id="cb2-422"><a href="#cb2-422" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> El formato del JSON está simplificado. Cada proveedor <span class="er">(</span><span class="ex">OpenAI,</span> Anthropic, Ollama…<span class="kw">)</span> <span class="ex">usa</span> su propio esquema, aunque la idea es la misma: nombre de la herramienta y argumentos.</span>
+<span id="cb2-423"><a href="#cb2-423" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> En un agente real el modelo no siempre se detiene ante un error: puede reintentar, probar otra herramienta o pedir aclaración. Aquí se para para que el fallo se vea.</span>
+<span id="cb2-424"><a href="#cb2-424" aria-hidden="true" tabindex="-1"></a><span class="ex">:::</span></span>
+<span id="cb2-425"><a href="#cb2-425" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-426"><a href="#cb2-426" aria-hidden="true" tabindex="-1"></a><span class="ex">Para</span> escribir las herramientas en código, vuelve a [Cómo definir una buena herramienta]<span class="er">(</span><span class="ex">../bloque2/02e-agentes.qmd#sec-buena-herramienta</span><span class="kw">)</span><span class="bu">.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -522,6 +522,12 @@ window.Quarto = {
  <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -704,10 +710,10 @@ window.Quarto = {
 <p>Activa antes la GPU gratuita en <em>Entorno de ejecución → Cambiar tipo de entorno de ejecución → GPU T4</em>: con ella, calcular los embeddings pasa de minutos a segundos. Si Colab no te da GPU libre, el taller funciona igual con CPU, solo que esas celdas tardan más. Ejecuta <strong>ya</strong> la celda de instalación de más abajo y sigue leyendo mientras termina: tarda unos 2 minutos. Si al acabar aparece un aviso en rojo sobre <em>dependency conflicts</em> (<code>google-colab</code>, <code>requests</code>, <code>opentelemetry</code>), ignóralo: son paquetes que trae Colab y no afectan a este taller.</p>
 </div>
 </div>
-<div id="b2585ced" class="cell" data-execution_count="1">
+<div id="b05bfb4c" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q chromadb<span class="op">==</span><span class="fl">1.5.9</span> sentence<span class="op">-</span>transformers<span class="op">==</span><span class="fl">5.5.1</span> fpdf2<span class="op">==</span><span class="fl">2.8.7</span> arxiv<span class="op">==</span><span class="fl">4.0.0</span> mteb<span class="op">==</span><span class="fl">2.12.30</span> matplotlib scikit<span class="op">-</span>learn <span class="st">"pandas&lt;3"</span> langchain<span class="op">==</span><span class="fl">1.3.2</span> langchain<span class="op">-</span>community<span class="op">==</span><span class="fl">0.3.31</span> langchain<span class="op">-</span>text<span class="op">-</span>splitters<span class="op">==</span><span class="fl">1.1.2</span> pypdf<span class="op">==</span><span class="fl">6.12.2</span> langchain<span class="op">-</span>core<span class="op">==</span><span class="fl">1.4.0</span> langgraph<span class="op">==</span><span class="fl">1.2.2</span> openai<span class="op">==</span><span class="fl">2.38.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="c0e7486d" class="cell" data-execution_count="2">
+<div id="d8791c5d" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> shutil</span>
@@ -765,7 +771,7 @@ window.Quarto = {
 <section id="sec-hpd1-1-1-corpus" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-1-1-corpus">1.1 Corpus: abstracts reales de ArXiv</h2>
 <p>Usamos <code>arxiv</code> para descargar los abstracts de 3 papers clave del módulo. Con <code>fpdf2</code> los convertimos en PDFs para que el pipeline de ingesta (carga → chunking → indexación) sea idéntico al que usarás con documentos reales.</p>
-<div id="49b0c255" class="cell" data-execution_count="3">
+<div id="dd097805" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> PDF(FPDF):</span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -806,7 +812,7 @@ window.Quarto = {
 <section id="sec-hpd1-1-2-carga" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-1-2-carga">1.2 Carga de PDFs con LangChain</h2>
 <p><code>PyPDFLoader</code> carga documentos PDF y devuelve una lista de objetos <code>Document</code> de LangChain. Cada <code>Document</code> tiene <code>.page_content</code> (texto) y <code>.metadata</code> (fuente, nº de página, etc.).</p>
-<div id="36543548" class="cell" data-execution_count="4">
+<div id="c03df5a7" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> cargar_pdfs(dir_path: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>:</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Carga todos los PDFs de un directorio usando PyPDFLoader de LangChain.</span></span>
@@ -859,7 +865,7 @@ window.Quarto = {
 <section id="sec-hpd1-1-3-chunking" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-1-3-chunking">1.3 Chunking con RecursiveCharacterTextSplitter</h2>
 <p>En vez de partir a mano por palabras, usamos <code>RecursiveCharacterTextSplitter</code> de LangChain: intenta cortar por párrafos (<code>\n\n</code>), luego por saltos de línea, luego por frases (<code>.</code>) y por último por espacios. Así los chunks mantienen sentido y no se cortan a mitad de una frase.</p>
-<div id="dfbf764d" class="cell" data-execution_count="5">
+<div id="b93c9f21" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># </span><span class="al">TODO</span><span class="co">: Crear un RecursiveCharacterTextSplitter configurando:</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="co">#   chunk_size       — caracteres por chunk</span></span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">#   chunk_overlap    — caracteres de solapamiento</span></span>
@@ -892,7 +898,7 @@ window.Quarto = {
 <p>La familia E5 se entrenó con un prefijo distinto para consultas (<code>query:</code>) y documentos (<code>passage:</code>), y su ficha pide usarlos. Las funciones <code>embed_queries</code> y <code>embed_passages</code> de la celda de configuración ya lo hacen por ti. ¿Importan mucho? <strong>Mídelo, no lo asumas:</strong> en una prueba nuestra con <code>e5-small-v2</code> sobre 5.400 documentos de FiQA, omitirlos cambió el recall@10 en medio punto (0,716 frente a 0,721). Esa prueba usa <strong>otra muestra</strong> de FiQA, distinta de la del entregable (otras consultas y otro tamaño de corpus), así que sus cifras <strong>no son comparables</strong> con las de las 50 consultas del entregable. Poco, pero otros modelos y otros corpus pueden comportarse distinto, y seguir la ficha del modelo no cuesta nada.</p>
 </div>
 </div>
-<div id="f38fca5e" class="cell" data-execution_count="6">
+<div id="53f93774" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>collection <span class="op">=</span> client.get_or_create_collection(</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"hpd1_sintetico"</span>,</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    metadata<span class="op">=</span>{<span class="st">"hnsw:space"</span>: <span class="st">"cosine"</span>}</span>
@@ -933,7 +939,7 @@ window.Quarto = {
 <section id="sec-hpd1-1-5-busqueda" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-1-5-busqueda">1.5 Búsqueda semántica</h2>
 <p>La consulta se codifica y se recuperan los <code>k</code> chunks más similares por distancia coseno. Modelo y corpus están en inglés, así que la consulta también (recuerda: <a href="../bloque1/01c-embeddings.html#sec-fallo-idioma">modelo e idioma deben ir a juego</a>; en el ejercicio E1 lo pondrás a prueba).</p>
-<div id="241b79e4" class="cell" data-execution_count="7">
+<div id="effced08" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> buscar(collection, query: <span class="bu">str</span>, k: <span class="bu">int</span> <span class="op">=</span> <span class="dv">5</span>) <span class="op">-&gt;</span> <span class="bu">dict</span>:</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">    Realiza una búsqueda semántica en una colección vectorial.</span></span>
@@ -1020,7 +1026,7 @@ Table&nbsp;1: Comparativa entre similitud coseno y distancia coseno
 <section id="sec-hpd1-1-6-tabular" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-1-6-tabular">1.6 Más allá del texto: embeddings de datos tabulares</h2>
 <p>Hasta ahora hemos hecho embeddings de PDFs. Pero ¿y si tus datos están en un Excel? La buena noticia: el pipeline no cambia. Solo cambia cómo conviertes cada fila en texto.</p>
-<div id="08cf5884" class="cell" data-execution_count="8">
+<div id="26a82ba2" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dataset tabular de ejemplo: empleados</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>df_empleados <span class="op">=</span> pd.DataFrame({</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"nombre"</span>:       [<span class="st">"Ana García"</span>, <span class="st">"Carlos Ruiz"</span>, <span class="st">"Beatriz López"</span>, <span class="st">"David Martín"</span>],</span>
@@ -1044,7 +1050,7 @@ Table&nbsp;1: Comparativa entre similitud coseno y distancia coseno
 <span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>embeddings_tab <span class="op">=</span> embed_passages(df_empleados[<span class="st">"documento"</span>].tolist())</span>
 <span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Embeddings tabulares: </span><span class="sc">{</span>embeddings_tab<span class="sc">.</span>shape<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="a58268f8" class="cell" data-execution_count="9">
+<div id="081a6ba5" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Indexar en Chroma — idéntico a como hiciste con PDFs</span></span>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>collection_tab <span class="op">=</span> client.get_or_create_collection(</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    name<span class="op">=</span><span class="st">"hpd1_tabular"</span>,</span>
@@ -1144,7 +1150,7 @@ Table&nbsp;2: Modelos de embeddings recomendados por tipo de dato
 </div>
 <div class="callout-body-container callout-body">
 <p>Este enfoque no sabe que 55000 está numéricamente más cerca de 52000 que de 12000. Compruébalo:</p>
-<div id="ac1c2864" class="cell" data-execution_count="10">
+<div id="6d2d18d7" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> consulta <span class="kw">in</span> [<span class="st">"empleado con salario de 51000 euros"</span>, <span class="st">"empleado con salario de 12000 euros"</span>]:</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    res <span class="op">=</span> collection_tab.query(query_embeddings<span class="op">=</span>[embed_queries([consulta])[<span class="dv">0</span>].tolist()], n_results<span class="op">=</span><span class="dv">4</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="sc">{</span>consulta<span class="sc">}</span><span class="ss">"</span>)</span>
@@ -1178,7 +1184,7 @@ Table&nbsp;2: Modelos de embeddings recomendados por tipo de dato
 <p><strong>¿Cómo decidimos qué chunk es relevante?</strong> <em>Por su contenido</em>: un chunk es relevante para una pregunta si pertenece al documento correcto y contiene alguna de las frases clave que anotamos a mano. Así el ground truth sigue siendo válido aunque cambies <code>CHUNK_SIZE</code> (si lo definiéramos con identificadores como <code>doc_chunk_3</code>, cada cambio de troceado lo invalidaría).</p>
 </div>
 </div>
-<div id="50d3dd2b" class="cell" data-execution_count="11">
+<div id="52d25f6e" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ids_relevantes(collection, fuente_id, frases):</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""IDs de los chunks del documento `fuente_id` cuyo texto contiene alguna de las frases (ground truth por contenido)."""</span></span>
 <span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    datos <span class="op">=</span> collection.get(include<span class="op">=</span>[<span class="st">"documents"</span>, <span class="st">"metadatas"</span>])</span>
@@ -1265,7 +1271,7 @@ Table&nbsp;2: Modelos de embeddings recomendados por tipo de dato
 </section>
 <section id="sec-hpd1-limpieza-p1" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-limpieza-p1">Limpieza parte 1</h2>
-<div id="5e44ad70" class="cell" data-execution_count="12">
+<div id="39a45045" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>client.delete_collection(<span class="st">"hpd1_sintetico"</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>client.delete_collection(<span class="st">"hpd1_tabular"</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>shutil.rmtree(CORPUS_SINTETICO)</span>
@@ -1279,7 +1285,7 @@ Table&nbsp;2: Modelos de embeddings recomendados por tipo de dato
 <p>En esta segunda parte repetimos el pipeline sobre un corpus real: 6 papers descargados de ArXiv. Además añadimos una evaluación profesional con MTEB para validar la calidad del modelo de embeddings.</p>
 <section id="sec-hpd1-2-1-corpus-real" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-2-1-corpus-real">2.1 Corpus real — Descarga de ArXiv</h2>
-<div id="eaeb62ab" class="cell" data-execution_count="13">
+<div id="a1879856" class="cell" data-execution_count="13">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>PAPERS <span class="op">=</span> {</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1706.03762"</span>: <span class="st">"Attention Is All You Need (@vaswani2017attention)"</span>,</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"1810.04805"</span>: <span class="st">"BERT: Pre-training of Deep Bidirectional Transformers (@devlin2019bert)"</span>,</span>
@@ -1333,7 +1339,7 @@ Table&nbsp;2: Modelos de embeddings recomendados por tipo de dato
 </section>
 <section id="sec-hpd1-2-2-carga-real" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-2-2-carga-real">2.2 Carga, chunking e indexación del corpus real</h2>
-<div id="5192b1aa" class="cell" data-execution_count="14">
+<div id="f0fc3faf" class="cell" data-execution_count="14">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>docs_real <span class="op">=</span> cargar_pdfs(CORPUS_REAL)</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Documentos reales cargados: </span><span class="sc">{</span><span class="bu">len</span>(docs_real)<span class="sc">}</span><span class="ss">"</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1374,7 +1380,7 @@ Table&nbsp;2: Modelos de embeddings recomendados por tipo de dato
 </section>
 <section id="sec-hpd1-2-3-busqueda-real" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-2-3-busqueda-real">2.3 Búsqueda semántica sobre papers reales</h2>
-<div id="ef933946" class="cell" data-execution_count="15">
+<div id="81b3b8b1" class="cell" data-execution_count="15">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>consultas <span class="op">=</span> [</span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"How does multi-head attention work?"</span>,</span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"How is BERT pre-trained with masked language modeling?"</span>,</span>
@@ -1399,7 +1405,7 @@ Table&nbsp;2: Modelos de embeddings recomendados por tipo de dato
 <section id="sec-hpd1-2-4-recall-real" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-2-4-recall-real">2.4 Evaluación sobre el corpus real</h2>
 <p>Ahora los papers están completos y cada pregunta tiene decenas de chunks relevantes. Esto cambia qué métrica tiene sentido: con 25 chunks relevantes y <span class="math inline">\(k=5\)</span>, <strong>recall@5 no puede superar 0,20</strong>. Aquí <code>hit@k</code> y <code>MRR</code> cuentan la historia útil: <em>¿aparece algo bueno arriba?</em></p>
-<div id="1f44e2f5" class="cell" data-execution_count="16">
+<div id="157e4518" class="cell" data-execution_count="16">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Consultas "fáciles" (la pregunta usa el vocabulario del paper) y "difíciles" (paráfrasis, siglas, términos exactos)</span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>QUERIES_REAL <span class="op">=</span> {</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># fáciles</span></span>
@@ -1442,7 +1448,7 @@ Table&nbsp;2: Modelos de embeddings recomendados por tipo de dato
 <section id="sec-hpd1-2-5-hibrida" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-2-5-hibrida">2.5 Línea base léxica y búsqueda híbrida</h2>
 <p>Una evaluación solo vale en comparación. Construimos una <strong>línea base léxica</strong> (BM25, explicado en <a href="../bloque1/01e-recuperacion.html#sec-bm25">01e</a>) y una <strong>búsqueda híbrida</strong> que fusiona los rankings de BM25 y del modelo denso con <em>Reciprocal Rank Fusion</em>. La implementación está dada: tu trabajo es interpretarla.</p>
-<div id="e85c104a" class="cell" data-execution_count="17">
+<div id="7d6c3da5" class="cell" data-execution_count="17">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
 <span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
@@ -1591,7 +1597,7 @@ Note
 </div>
 </div>
 </div>
-<div id="054addfd" class="cell" data-execution_count="18">
+<div id="71042fc3" class="cell" data-execution_count="18">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> mteb</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>STS_TASKS <span class="op">=</span> [<span class="st">"BIOSSES"</span>, <span class="st">"STS12"</span>]</span>
@@ -1623,7 +1629,7 @@ Note
 </section>
 <section id="sec-hpd1-limpieza-final" class="level2">
 <h2 class="anchored" data-anchor-id="sec-hpd1-limpieza-final">Limpieza final</h2>
-<div id="0b1bcef0" class="cell" data-execution_count="19">
+<div id="ebac0524" class="cell" data-execution_count="19">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Limpiando recursos temporales..."</span>)</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>client.delete_collection(<span class="st">"hpd1_real"</span>)</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>shutil.rmtree(BASE_DIR)</span>

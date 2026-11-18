@@ -493,6 +493,12 @@ div.csl-indent {
  <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -600,10 +606,10 @@ div.csl-indent {
 <blockquote class="blockquote">
 <p>Este tema forma parte del Bloque 2 — Orquestación. Se recomienda haber completado el <a href="../bloque1/01-fundamentos.html">Bloque 1</a> primero.</p>
 </blockquote>
-<div id="11bfa803" class="cell" data-execution_count="1">
+<div id="70ea384f" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q openai python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="31aa64d5" class="cell" data-execution_count="2">
+<div id="a857a51e" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">Setup compartido para la API key de Llamus en todos los notebooks.</span></span>
@@ -661,7 +667,7 @@ div.csl-indent {
 Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="63feec23" class="cell" data-execution_count="3">
+<div id="02ca9c7a" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -730,7 +736,7 @@ Figure&nbsp;1
 <section id="sec-primer-contacto-llm" class="level3">
 <h3 class="anchored" data-anchor-id="sec-primer-contacto-llm">Primer contacto: llamada a un LLM</h3>
 <p>Antes de profundizar, veamos cómo invocar un LLM desde Python con la API de OpenAI (compatible con Llamus US, Ollama local, etc.):</p>
-<div id="cc320748" class="cell" data-execution_count="4">
+<div id="accf18af" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -741,7 +747,7 @@ Figure&nbsp;1
 <span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>La desviación estándar es una medida que indica qué tan dispersos o alejados están los datos de un conjunto con respecto a su promedio.</code></pre>
+<pre><code>La desviación estándar es una medida estadística que indica qué tan dispersos están los datos de un conjunto con respecto a su promedio.</code></pre>
 </div>
 </div>
 <p>Este es el patrón base para todo lo que veremos: <code>model</code> + <code>messages</code> → respuesta. Los <code>messages</code> pueden tener varios roles:</p>
@@ -789,7 +795,7 @@ Table&nbsp;1: Roles de los mensajes en la API de chat
 <section id="sec-few-shot" class="level3">
 <h3 class="anchored" data-anchor-id="sec-few-shot">Few-shot prompting</h3>
 <p>El few-shot consiste en incluir ejemplos dentro del prompt para que el modelo entienda exactamente qué formato y estilo esperamos. Es como enseñarle con el ejemplo.</p>
-<div id="f1dc6c78" class="cell" data-execution_count="5">
+<div id="14be0b4a" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -876,7 +882,7 @@ Table&nbsp;2: Comparativa de estrategias de prompting por número de ejemplos
 </div>
 </figure>
 </div>
-<div id="8326100d" class="cell" data-execution_count="6">
+<div id="6e4bbaa3" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -903,7 +909,7 @@ Table&nbsp;2: Comparativa de estrategias de prompting por número de ejemplos
 <div class="cell-output cell-output-stdout">
 <pre><code>Zero-shot: La traducción es:
 
-**The cat is on the roof.**
+**"The cat is on the roof."**
 One-shot: "The cat is on the roof"</code></pre>
 </div>
 </div>
@@ -911,7 +917,7 @@ One-shot: "The cat is on the roof"</code></pre>
 <section id="sec-cot" class="level3">
 <h3 class="anchored" data-anchor-id="sec-cot">Chain-of-Thought (CoT)</h3>
 <p>El Chain-of-Thought consiste en pedir al modelo que razone paso a paso antes de dar la respuesta final. La clave está en añadir algo como <em>“pensemos paso a paso”</em> o incluir ejemplos donde se muestra el razonamiento.</p>
-<div id="ec9946ef" class="cell" data-execution_count="7">
+<div id="0e09217b" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -938,38 +944,36 @@ One-shot: "The cat is on the roof"</code></pre>
 <span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta_cot.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Aquí tienes la resolución paso a paso siguiendo tus instrucciones:
+<pre><code>Aquí tienes la resolución del problema siguiendo los pasos solicitados:
 
 ### 1. Calcula cuánto ha avanzado el primer tren cuando sale el segundo
-*   El primer tren sale a las **08:00**.
-*   El segundo tren sale a las **09:00**.
-*   El primer tren ha estado viajando solo durante **1 hora**.
-*   Distancia = Velocidad $\times$ Tiempo
-*   $120\text{ km/h} \times 1\text{ h} = \mathbf{120\text{ km}}$
+El primer tren sale a las 08:00 y el segundo a las 09:00. Esto significa que el primer tren viaja solo durante **1 hora**.
+*   **Velocidad del primer tren:** $120\text{ km/h}$
+*   **Tiempo de ventaja:** $1\text{ hora}$
+*   **Distancia recorrida:** $120\text{ km/h} \times 1\text{ h} = \mathbf{120\text{ km}}$
 
 ### 2. Calcula la distancia restante entre ambos en ese momento
-*   La distancia total inicial es de **620 km**.
-*   Restamos lo que ya recorrió el primer tren:
-*   $620\text{ km} - 120\text{ km} = \mathbf{500\text{ km}}$ (Esta es la distancia que separa a ambos trenes a las 09:00).
+A las 09:00, el primer tren ya ha recorrido $120\text{ km}$. Debemos restarle esto a la distancia total para saber qué distancia separa a ambos trenes en el momento en que el segundo empieza a moverse.
+*   **Distancia total:** $620\text{ km}$
+*   **Distancia ya recorrida:** $120\text{ km}$
+*   **Distancia restante:** $620\text{ km} - 120\text{ km} = \mathbf{500\text{ km}}$
 
 ### 3. Calcula el tiempo hasta que se cruzan
-Para saber cuánto tardan en encontrarse una vez que ambos están en movimiento, usamos la **velocidad relativa** (la suma de ambas velocidades, ya que van uno hacia el otro):
+A partir de las 09:00, ambos trenes se mueven el uno hacia el otro. Para saber cuánto tardarán en encontrarse, sumamos sus velocidades (velocidad relativa):
+*   **Velocidad combinada:** $120\text{ km/h} + 150\text{ km/h} = \mathbf{270\text{ km/h}}$
+*   **Tiempo necesario:** $\text{Distancia restante} / \text{Velocidad combinada}$
+*   $\text{Tiempo} = 500\text{ km} / 270\text{ km/h} \approx \mathbf{1,8518\text{ horas}}$
 
-*   Velocidad combinada = $120\text{ km/h} + 150\text{ km/h} = \mathbf{270\text{ km/h}}$
-*   $\text{Tiempo} = \frac{\text{Distancia restante}}{\text{Velocidad combinada}}$
-*   $\text{Tiempo} = \frac{500\text{ km}}{270\text{ km/h}} \approx 1.8518\text{ horas}$
-
-**Convertimos ese tiempo a horas y minutos:**
-*   $1\text{ hora}$ completa.
-*   $0.8518 \text{ horas} \times 60 \text{ minutos} \approx \mathbf{51 \text{ minutos}}$
+**Convertimos ese decimal a minutos para ser exactos:**
+*   $1\text{ hora}$ entera.
+*   $0,8518 \times 60\text{ minutos} \approx \mathbf{51\text{ minutos}}$
+*   El tiempo transcurrido desde las 09:00 es de **1 hora y 51 minutos**.
 
 ### 4. Suma el tiempo a la hora de salida
-Tomamos la hora en la que ambos empezaron a moverse hacia el encuentro (las **09:00**) y le sumamos el tiempo calculado:
-
+Tomamos la hora en la que ambos estaban en movimiento (09:00) y le sumamos el tiempo que tardaron en encontrarse:
 *   $09:00 + 1\text{ hora y } 51\text{ minutos} = \mathbf{10:51}$
 
-**Respuesta:**
-Los trenes se cruzan a las **10:51**.</code></pre>
+**Respuesta:** Los trenes se cruzan a las **10:51**.</code></pre>
 </div>
 </div>
 <div id="fig-cot" class="quarto-float quarto-figure quarto-figure-center anchored">
@@ -1043,7 +1047,7 @@ Figure&nbsp;3
 </figcaption>
 </figure>
 </div>
-<div id="397941de" class="cell" data-execution_count="8">
+<div id="6461c1e9" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1065,80 +1069,70 @@ Figure&nbsp;3
 <span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>    )</span>
 <span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Para un equipo de **Data Science**, el perfil suele ser analítico, orientado a la resolución de problemas, con alta capacidad de concentración pero también con una carga cognitiva elevada debido al trabajo con abstracciones y pantallas.
+<pre><code>Para un equipo de **Data Science**, es fundamental equilibrar el alto nivel de carga cognitiva y la naturaleza sedentaria de su trabajo con actividades que permitan la desconexión, la interacción social orgánica y, si es posible, el uso de la lógica desde un ángulo lúdico o sensorial.
 
-Aquí tienes tres propuestas diseñadas para equilibrar la cohesión de equipo con el tipo de mentalidad de este perfil.
-
----
-
-### Propuesta 1: "The Logic Escape" (Enfoque Intelectual)
-**Actividad:** Un *Escape Room* temático o un juego de pistas basado en lógica y resolución de acertijos. Se divide al equipo en 4 grupos de 5 personas. Deben resolver una serie de retos lógicos, patrones y descifrado de códigos para "escapar" o cumplir una misión.
-
-*   **Pros:**
-    *   **Engagement:** Muy alto. Aprovecha sus habilidades naturales de pensamiento lateral y deducción.
-    *   **Coste:** Medio (depende de si se contrata un local profesional o se diseña uno *in-house*).
-    *   **Logística:** Sencilla si se alquila un espacio profesional.
-*   **Contras:**
-    *   **Riesgo:** Puede sentirse "demasiado parecido al trabajo" si los retos son puramente matemáticos o de código, generando fatiga mental en lugar de relax.
-
-### Propuesta 2: "The Sensory Lab" (Enfoque Creativo/Sensorial)
-**Actividad:** Un taller de cocina colaborativa (ej. hacer sushi, pasta fresca o una cata de vinos/café guiada). El equipo se divide en brigadas donde cada uno tiene un rol (líder de línea, preparación, emplatado) para lograr un resultado final común.
-
-*   **Pros:**
-    *   **Engagement:** Muy alto. Rompe totalmente con el entorno digital y obliga a usar los cinco sentidos.
-    *   **Coste:** Medio/Alto (ingredientes y profesional).
-    *   **Logística:** Requiere un espacio adecuado (cocina profesional o taller).
-*   **Contras:**
-    *   **Logística:** Puede haber restricciones por alergias o dietas (vegetarianos, celíacos, etc.).
-
-### Propuesta 3: "The Strategy Board Games" (Enfoque Social/Relajado)
-**Actividad:** Una tarde de juegos de mesa de estrategia cooperativa (tipo *Pandemic* o *Catan*) o competitiva. Se organizan mesas con diferentes niveles de dificultad y un facilitador que guía las reglas.
-
-*   **Pros:**
-    *   **Engagement:** Medio/Alto. Muy cómodo para perfiles introvertidos que prefieren reglas claras.
-    *   **Coste:** Muy bajo (solo compra de juegos o alquiler de kits).
-    *   **Logística:** Extremadamente sencilla (se puede hacer en la oficina o un café).
-*   **Contras:**
-    *   **Engagement:** Puede ser poco estimulante para quienes buscan una experiencia "fuera de lo común" o una desconexión total de la lógica.
+Aquí tienes la propuesta:
 
 ---
 
-### El Ganador: **Propuesta 2: "The Sensory Lab" (Taller de Cocina Colaborativa)**
+### 1. Los tres enfoques
+
+#### Enfoque A: "The Logic Escape" (Intelectual / Gamificado)
+**Actividad:** Un *Escape Room* temático o un juego de misterio de "asesinato" basado en pistas. El equipo debe resolver acertijos lógicos, descifrar patrones y utilizar el pensamiento deductivo para "ganar".
+*   **Pros:** Muy alto *engagement* para perfiles analíticos; refuerza la resolución de problemas en grupo.
+*   **Contras:** Puede sentirse "demasiado parecido al trabajo" si no se gestiona bien el tono; requiere un espacio físico específico.
+*   **Coste/Logística:** Coste medio (pago de la sala/servicio); logística sencilla (solo desplazarse).
+
+#### Enfoque B: "Sensory Connection" (Desconexión / Creativo)
+**Actividad:** Un taller de cocina colaborativa o de mixología (creación de cócteles/mocktails). El equipo se divide en grupos para crear un "producto" final siguiendo instrucciones que varían según la creatividad que aporten.
+*   **Pros:** Desconexión total de las pantallas; estimula otros sentidos; fomenta la comunicación no técnica y relajada.
+*   **Contras:** Coste más elevado por los ingredientes y el personal; requiere más logística (espacio con cocina/barra).
+*   **Coste/Logística:** Coste alto; logística compleja.
+
+#### Enfoque C: "The Strategy Build" (Construcción / Abstracto)
+**Actividad:** *Lego Serious Play*. Utilizando piezas de Lego, los miembros del equipo deben construir modelos que representen conceptos abstractos (ej: "nuestro flujo de trabajo", "un desafío del futuro") para luego compartirlos.
+*   **Pros:** Excelente para la comunicación de ideas complejas; es una actividad muy estructurada que los científicos de datos suelen valorar.
+*   **Contras:** Puede ser percibido como "demasiado serio" o poco divertido por algunos perfiles; requiere un facilitador experto.
+*   **Coste/Logística:** Coste medio (facilitador + material); logística media.
+
+---
+
+### 2. El Ganador: Enfoque B (Sensory Connection - Taller de Cocina/Mixología)
 
 **Justificación:**
-Los equipos de Data Science pasan la mayor parte del día en un entorno de **abstracción pura** (modelos, código, datos que no se pueden tocar). Para un team building efectivo en este perfil, el mayor beneficio no viene de "usar más el cerebro para la lógica", sino de la **desconexión cognitiva y el anclaje sensorial**. La cocina ofrece una gratificación instantánea y tangible, fomenta la comunicación no verbal y permite la socialización orgánica mientras se comparte el producto final (la comida).
+Para un equipo de Data Science, el mayor riesgo de *burnout* es la fatiga mental por abstracción constante. Mientras que el Enfoque A y C siguen estimulando el área prefrontal (lógica/estrategia), el **Enfoque B ofrece un "reinicio" sensorial**. Al trabajar con texturas, sabores y procesos manuales, se logra una desconexión real que permite que el *bonding* (la unión del equipo) ocurra de forma natural a través de la conversación informal, sin la presión de "tener que resolver un problema".
 
 ---
 
-### Desarrollo Detallado: "The Data Chef Challenge" (4 Horas)
+### 3. Desarrollo detallado: "The Data Chef Challenge" (4 Horas)
 
-**Objetivo:** Fomentar la colaboración, la gestión de roles bajo presión y la comunicación efectiva a través de una experiencia táctil y deliciosa.
+Este plan está diseñado para maximizar la interacción y minimizar el estrés.
 
-#### Cronograma de la jornada (Total: 4 horas)
+#### **Cronograma (Total: 4 horas)**
 
-**1. Bienvenida y "Data Warm-up" (30 min)**
-*   **00:00 - 00:15:** Recepción con una bebida ligera.
-*   **00:15 - 00:30:** Dinámica de integración rápida: "El ingrediente secreto". Cada persona debe decir su nombre y un ingrediente que represente su personalidad (ej. "Soy Juan y soy como la pimienta: aporto energía y un toque picante"). Esto rompe el hielo de forma ligera.
+**00:00 - 00:30 | Bienvenida y "Icebreaker" No-Digital**
+*   **Actividad:** Llegada con una bebida de bienvenida. Dinámica rápida de "Curiosidades Inesperadas": Cada persona debe decir un dato sobre sí mismo que no tenga nada que ver con la tecnología o los datos (ej: "Sé tocar el ukelele" o "Hice un viaje de mochilero por Vietnam").
+*   **Objetivo:** Romper el hielo y humanizar a los compañeros fuera de su rol profesional.
 
-**2. El Desafío Culinario (2 horas)**
-*   **00:30 - 00:45:** **Briefing del Chef:** Se presentan los ingredientes y la receta final. Se explican las reglas: "No es una competencia de quién es mejor cocinero, sino de cómo el equipo gestiona los recursos para que todos los platos salgan perfectos".
-*   **00:45 - 02:30:** **La Acción:** El equipo de 20 personas se divide en 4 "Brigadas" de 5 personas. Cada brigada debe preparar una parte del menú (ej. Entrantes, Plato Principal, Guarnición, Postre) o trabajar de forma coordinada en un menú completo.
-    *   *Roles asignados:* El Chef (líder), el Sous-chef (gestor de tiempos/recursos), los Prep-cooks (ejecución) y el Steward (limpieza/orden). Rotar roles ayuda a entender la importancia de cada función.
+**00:30 - 02:30 | El Desafío Principal: "The Flavor Algorithm"**
+*   **Dinámica:** Se divide a las 20 personas en 4 equipos de 5 integrantes.
+*   **El Reto:** Cada equipo recibe una "caja misteriosa" con ingredientes base y una lista de restricciones (ej: "un ingrediente ácido", "un elemento crujiente"). Deben crear un plato o un cóctel de autor.
+*   **El giro:** No hay un manual estricto. Deben negociar entre ellos qué ingredientes combinar. Esto fomenta la toma de decisiones y la gestión de opiniones divergentes en un entorno de bajo riesgo.
+*   **Rol del facilitador:** Un chef o experto que guíe la técnica pero deje la creatividad al equipo.
 
-**3. El Banquete de Conexión (1 hora)**
-*   **02:30 - 03:30:** **Degustación:** Se disponen mesas largas donde todos se sientan juntos. La clave aquí es que no se come por grupos, sino que se mezclan las brigadas. Es el momento de la charla relajada, sin hablar de modelos de regresión o despliegues de producción.
+**02:30 - 03:30 | El Banquete (Socialización Real)**
+*   **Actividad:** Se sientan todos juntos a la mesa para degustar lo preparado por todos los equipos.
+*   **Dinámica:** Cada equipo presenta su "creación", explicando la "lógica" detrás de sus sabores (esto permite que usen su lenguaje natural de forma divertida).
+*   **Objetivo:** Celebración y disfrute compartido. Es el momento donde se crean los vínculos más fuertes.
 
-**4. Cierre y Reflexión (30 min)**
-*   **03:30 - 03:50:** **Debriefing ligero:** El facilitador hace dos preguntas al grupo:
-    1.  "¿Cuál fue el mayor 'bug' (error) que cometieron en la cocina y cómo lo solucionaron?"
-    2.  "¿Quién fue el 'líder de datos' (el que mejor organizó los ingredientes/tiempos)?"
-*   **03:50 - 04:00:** Entrega de un pequeño detalle (ej. un kit de especias gourmet) y despedida.
+**03:30 - 04:00 | Cierre y "Debrief" Positivo**
+*   **Actividad:** Un cierre breve donde cada uno dice una cosa que haya aprendido de un compañero durante la actividad (ej: "Me ha sorprendido la capacidad de organización de X").
+*   **Objetivo:** Reforzar la validación positiva entre compañeros y cerrar la jornada con una nota alta de satisfacción.
 
-#### Requerimientos Logísticos para el Organizador:
-1.  **Espacio:** Taller de cocina para 20 personas o un salón con estaciones de cocina portátiles.
-2.  **Personal:** 1 Chef profesional y 1 facilitador/coordinador.
-3.  **Presupuesto:** Debe incluir: Alquiler de espacio + Ingredientes + Bebidas + Kit de regalo final.
-4.  **Gestión de Riesgos:** Formulario previo de alergias alimentarias (obligatorio).</code></pre>
+#### **Requerimientos para el éxito:**
+1.  **Espacio:** Un taller de cocina profesional o un salón de eventos con catering equipado.
+2.  **Presupuesto sugerido:** Incluir coste de ingredientes de alta calidad, servicio de chef/barman y el espacio.
+3.  **Regla de oro:** **Prohibido el uso de teléfonos móviles** durante las 4 horas para garantizar la presencia plena.</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -1158,7 +1152,7 @@ Note
 <section id="sec-output-structuring" class="level3">
 <h3 class="anchored" data-anchor-id="sec-output-structuring">Output Structuring con JSON Schema</h3>
 <p>Forzar que el modelo devuelva JSON nos permite integrar el LLM en pipelines automatizados. La API de OpenAI ofrece el parámetro <code>response_format</code> para garantizar JSON válido:</p>
-<div id="e302eb21" class="cell" data-execution_count="9">
+<div id="3c3f68b3" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1238,7 +1232,7 @@ Note
 <li><strong>Controla la diversidad</strong> con temperatura: baja produce datos conservadores, alta inyecta variedad</li>
 <li><strong>Itera en batch</strong> para generar cientos o miles de registros</li>
 </ol>
-<div id="c6460cb7" class="cell" data-execution_count="10">
+<div id="eac03433" class="cell" data-execution_count="10">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1286,20 +1280,20 @@ Note
 <span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(respuesta.choices[<span class="dv">0</span>].message.content[:<span class="dv">200</span>])</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code> id  edad  ingresos_anuales provincia segmento
-  1    22           15500.0    Madrid    basic
-  2    29           26000.0 Barcelona estandar
-  3    35           38500.0  Valencia estandar
-  4    41           49000.0   Sevilla estandar
-  5    48           62000.0    Bilbao  premium
-  6    55           75000.0    Málaga  premium
-  7    62           88000.0  Zaragoza  premium
-  8    38           45000.0    Madrid estandar
-  9    25           21000.0 Barcelona    basic
- 10    70          105000.0   Sevilla  premium
+  1    22           14500.0  Valencia    basic
+  2    35           32000.0    Madrid estandar
+  3    48           58000.0 Barcelona estandar
+  4    55           82000.0    Bilbao  premium
+  5    29           21000.0   Sevilla    basic
+  6    63           95000.0    Málaga  premium
+  7    41           46000.0  Zaragoza estandar
+  8    31           27500.0    Madrid    basic
+  9    72          108000.0 Barcelona  premium
+ 10    50           64000.0  Valencia estandar
 
 10 registros generados
-   Edad: 22-70 (media 42)
-   Ingresos: 15500-105000 (media 52500)</code></pre>
+   Edad: 22-72 (media 45)
+   Ingresos: 14500-108000 (media 54800)</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
@@ -1339,7 +1333,7 @@ Note
 <section id="sec-role-prompting" class="level3">
 <h3 class="anchored" data-anchor-id="sec-role-prompting">Role Prompting</h3>
 <p>Asignar un rol al modelo en el mensaje <code>system</code> cambia radicalmente su comportamiento. No es magia: el modelo, entrenado con textos de diversos perfiles, “activa” los patrones asociados a ese rol.</p>
-<div id="161b9fcd" class="cell" data-execution_count="11">
+<div id="cb929d18" class="cell" data-execution_count="11">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> consultar_como(rol, pregunta):</span>
 <span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> client.chat.completions.create(</span>
 <span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>        model<span class="op">=</span>os.getenv(<span class="st">"LLM_MODEL"</span>, <span class="st">"gemma4:26b"</span>),</span>
@@ -1374,130 +1368,154 @@ Note
 <span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>    ))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== SIN ROL ===
-Desde un punto de vista estadístico, la respuesta corta es: **No es recomendable usar la media para describir el "centro" de un conjunto de datos si estos contienen outliers (valores atípicos), a menos que tengas una razón muy específica para hacerlo.**
+Desde un punto de vista estadístico, mi "opinión" técnica es que **usar la media para describir el centro de un conjunto de datos con outliers (valores atípicos) suele ser un error**, ya que puede conducir a conclusiones muy equivocadas.
 
-Aquí te explico el porqué, los riesgos y qué deberías usar en su lugar.
+Aquí te explico el porqué, cuándo es un problema y qué deberías usar en su lugar.
 
 ---
 
-### 1. El problema: La sensibilidad de la media
-La media aritmética es una medida de tendencia central que **no es robusta**. Esto significa que su valor depende de la magnitud de cada uno de los datos.
+### 1. El problema: La falta de "robustez"
+La media aritmética es muy **sensible**. Para calcularla, sumas todos los valores y los divides por el total. Esto significa que cada dato, por muy extremo que sea, tiene un peso en el resultado final.
 
-Si tienes un conjunto de datos, la media intenta "equilibrar" la suma total. Un solo valor extremadamente alto o bajo "tira" de la media hacia él, desplazándola de la zona donde se concentra la mayoría de los datos.
+Si tienes un valor extremadamente alto o bajo, la media se "deforma" hacia ese valor, alejándose de lo que la mayoría de los datos representan. A esto se le llama **sesgo**.
 
-**Ejemplo clásico:**
-Imagina los salarios de 5 personas en una pequeña oficina:
-*   Persona A: \$1,000
-*   Persona B: \$1,200
-*   Persona C: \$1,100
-*   Persona D: \$1,300
-*   **Persona E (El jefe): \$20,000**
+#### El ejemplo clásico: Los salarios
+Imagina un grupo de 5 personas en una habitación:
+*   4 personas ganan \$1,000 al mes.
+*   1 persona (un millonario) gana \$1,000,000 al mes.
 
-1.  **La Media es: \$4,920.** Si dices "el salario promedio en esta oficina es de casi \$5,000", estás dando una imagen falsa. Nadie gana cerca de eso; la mayoría gana alrededor de \$1,100.
-2.  **La Mediana es: \$1,200.** Este valor representa mucho mejor la realidad de la mayoría de los empleados.
+**Cálculo:**
+*   **Media:** \$200,800.
+*   **Mediana:** \$1,000.
 
-### 2. ¿Cuándo SÍ podrías usar la media a pesar de los outliers?
-No siempre es un error. Hay casos donde el outlier es el dato más importante:
+Si dices: *"El sueldo promedio en esta habitación es de \$200,800"*, estás mintiendo sobre la realidad del grupo. El "promedio" no representa a nadie en la habitación. En este caso, la media es un **mal descriptor de la tendencia central**.
 
-*   **Análisis de Riesgo o Seguros:** Si eres una aseguradora, no te importa el "cliente promedio"; te interesa el cliente con el accidente más catastrófico (el outlier), porque ese evento determinará tu pérdida.
-*   **Gestión de Recursos:** Si estás calculando cuánta electricidad necesita un edificio, el consumo pico (el outlier) es más relevante que el consumo medio para evitar un apagón.
-*   **Si el outlier es un error de medición:** Si sabes con certeza que el dato es un error (ej. una persona que midió 5 metros por un error del sensor), debes eliminarlo o corregirlo antes de calcular la media.
+---
 
-### 3. Alternativas recomendadas
+### 2. ¿Qué deberías usar en su lugar?
 
-Si tu objetivo es describir qué es lo "normal" o "típico" en tus datos, utiliza estas opciones:
+Dependiendo de tu objetivo, tienes varias alternativas:
 
-1.  **La Mediana (La mejor opción):** Es altamente robusta. No le importa qué tan grande es el valor máximo, solo le importa cuántos datos hay a la izquierda y a la derecha.
-2.  **Media Truncada (Trimmed Mean):** Consiste en eliminar un porcentaje de los valores más altos y más bajos (por ejemplo, el 5% superior y el 5% inferior) y luego calcular la media de lo que queda. Es un excelente equilibrio.
-3.  **Media Winsorizada:** Similar a la truncada, pero en lugar de eliminar los valores extremos, los "sustituyes" por el valor más cercano que no sea un outlier.
-4.  **Uso de la Mediana + Desviación Absoluta de la Mediana (MAD):** Si vas a usar la mediana para el centro, no uses la Desviación Estándar para la dispersión (porque la desviación estándar también es sensible a outliers). Usa el **MAD**, que es la versión robusta de la desviación.
+#### A. La Mediana (La opción más segura)
+La mediana es una medida de **tendencia central robusta**. No le importa qué tan grande es el valor más alto, solo le importa qué valor está justo en medio de la lista ordenada. En el ejemplo anterior, la mediana (\$1,000) describe perfectamente al grupo.
 
-### Resumen de decisión
+#### B. La Media Recortada (Trimmed Mean)
+Si no quieres ignorar los datos por completo, puedes usar la media recortada. Consiste en eliminar un pequeño porcentaje de los valores más altos y más bajos (por ejemplo, el 5% superior y el 5% inferior) y luego calcular la media con el resto. Esto elimina el ruido de los outliers sin perder la estructura de los datos.
+
+#### C. La Media Winsorizada
+Similar a la anterior, pero en lugar de eliminar los valores extremos, los **reemplazas** por el valor más cercano que no sea un outlier (por ejemplo, el percentil 5 o 95). Esto mantiene el tamaño de la muestra intacto.
+
+---
+
+### 3. ¿Cuándo SÍ es correcto usar la media con outliers?
+
+No siempre debes ignorar los outliers. Hay casos donde el outlier **es** la información más importante:
+
+1.  **Gestión de Riesgos y Seguros:** Si eres una aseguradora, te interesa saber la media de los costos de accidentes, incluyendo los accidentes catastróficos (outliers). Si ignoras los outliers, quebrarás.
+2.  **Presupuestos y Totales:** Si quieres saber cuánto dinero necesitas para pagar la nómina de una empresa, necesitas la suma total (y por tanto la media real). El hecho de que el CEO gane mucho es un dato que no puedes omitir de tu presupuesto.
+3.  **Detección de Anomalías:** En ciberseguridad o control de calidad, el outlier es precisamente lo que estás buscando. El objetivo es estudiar el valor atípico, no "limpiarlo".
+
+### Resumen rápido
 
 | Situación | ¿Usar la Media? | Recomendación |
 | :--- | :--- | :--- |
-| Los datos son simétricos y sin outliers | **SÍ** | Es la medida más eficiente. |
-| Los datos tienen outliers y quieres saber lo "típico" | **NO** | Usa la **Mediana**. |
-| Los datos tienen outliers y quieres saber el "impacto total" | **SÍ** | La media captura la magnitud total. |
-| Los outliers son errores de entrada | **NO** | Limpia los datos primero. |
+| Datos simétricos sin outliers | **Sí** | Es la medida más eficiente. |
+| Datos con outliers (ej. salarios, precios) | **No** | Usa la **Mediana**. |
+| Quieres eliminar el ruido pero mantener la muestra | **A medias** | Usa **Media Recortada**. |
+| Estás analizando riesgos o totales financieros | **Sí** | El outlier es parte del costo real. |
 
 === ANALISTA SENIOR ===
-Desde mi experiencia en el sector financiero, donde la gestión del riesgo y la precisión de los modelos pueden significar la diferencia entre la solvencia y la quiebra, te daré una respuesta directa: **Usar la media aritmética en presencia de *outliers* sin un análisis previo es un error metodológico grave que induce a sesgos de decisión.**
+Desde una perspectiva de análisis de datos de alto nivel, mi respuesta es categórica: **utilizar la media aritmética como medida de tendencia central en presencia de *outliers* (valores atípicos) sin un tratamiento previo es un error metodológico grave que conduce a conclusiones sesgadas y decisiones financieras erróneas.**
 
-En estadística, la media es un estimador **no robusto**. Esto significa que su valor es altamente sensible a los valores extremos. Un solo dato atípico puede "arrastrar" la media hacia él, alejándola de la verdadera tendencia central de la masa de datos.
+En finanzas, donde la gestión del riesgo y la precisión en la estimación de expectativas son vitales, confiar en una media "contaminada" puede ocultar la realidad operativa o, peor aún, inflar artificialmente el rendimiento esperado.
 
-Aquí te detallo el análisis técnico, las alternativas y el protocolo que aplicamos en entornos de alta exigencia.
+Aquí te presento el desglose técnico de por qué ocurre esto y cuáles son las alternativas robustas que aplicamos en entornos profesionales.
 
 ---
 
-### 1. El Problema: La sensibilidad de la función de pérdida
-La media aritmética minimiza la suma de los cuadrados de las desviaciones. Matemáticamente, esto implica que al elevar la diferencia al cuadrado, los valores alejados del centro penalizan la función de manera desproporcionada. 
+### 1. El problema técnico: El "Breakdown Point"
+La media aritmética tiene un **punto de ruptura (*breakdown point*) de $1/n$**. Esto significa que un solo valor extremadamente grande o pequeño puede desplazar la media de forma indefinida, independientemente del tamaño de la muestra.
 
-Si estás analizando retornos de activos y un día ocurre un "Black Swan" (un evento de cola extrema), la media de tus retornos mensuales se verá completamente distorsionada, dándote una falsa sensación de rendimiento (o de riesgo) que no representa la experiencia típica de tu cartera.
+Desde el rigor estadístico, la media es un estimador eficiente para distribuciones normales, pero es extremadamente sensible a la **asimetría (*skewness*)**. Si tienes una distribución con cola larga (como es común en los rendimientos de activos financieros o en la distribución de ingresos), la media no representará el "valor típico", sino que será un valor "atrapado" por el extremo.
 
-### 2. Alternativas Robustas
-Cuando detectamos *outliers*, no buscamos "limpiar" los datos para que la media "se vea bien", sino elegir un estadístico que sea **resistente a la influencia de la cola**.
+### 2. Ejemplo Concreto: El sesgo en el análisis de carteras
+Imagina que estás analizando el rendimiento mensual de un fondo de inversión de 10 activos durante un año:
+*   9 activos rindieron un **1%** mensual.
+*   1 activo (un "Unicornio" o un evento de volatilidad extrema) rindió un **150%**.
 
-*   **La Mediana (Medida de tendencia central robusta):** Es el estadístico por excelencia cuando hay ruido. Al basarse en la posición y no en el valor absoluto, la mediana ignora la magnitud de los extremos.
-    *   *Ejemplo:* En un análisis de salarios, la media suele estar inflada por unos pocos ejecutivos con sueldos astronómicos. La mediana te dice qué gana realmente el "empleado típico".
-*   **Media Recortada (*Trimmed Mean*):** Consiste en eliminar un porcentaje fijo de los valores más altos y más bajos (por ejemplo, un 5% en cada extremo) y calcular la media del resto. Es un excelente equilibrio entre la media y la mediana.
-*   **Media Winsorizada (*Winsorized Mean*):** En lugar de eliminar los valores, los "capamos". Sustituimos los valores atípicos por el valor más cercano que no sea un *outlier* (por ejemplo, el percentil 95). Esto mantiene el tamaño de la muestra pero limita el sesgo.
-*   **Media Geométrica:** Crucial en finanzas para calcular tasas de crecimiento compuesto. Aunque es sensible a valores cercanos a cero, gestiona mejor la naturaleza multiplicativa de los retornos financieros que la media aritmética.
+**Cálculo:**
+*   **Media:** $(9 \times 1\% + 150\%) / 10 = \mathbf{15.9\%}$
+*   **Mediana:** $\mathbf{1\%}$
 
-### 3. Ejemplo Concreto: Gestión de Riesgo de Crédito
-Imagina que estás modelando la probabilidad de impago (*Probability of Default*) de una cartera de préstamos:
+Si presentas el **15.9%** como el rendimiento "típico" del fondo a un comité de riesgos, estás cometiendo un error de reporte. El 15.9% es un valor que ningún inversor promedio experimentó; es una distorsión causada por un evento único. La mediana, en cambio, te da la realidad de la experiencia del fondo.
 
-1.  **Escenario A (Media):** Tienes 100 préstamos. 99 se pagan bien y 1 es un fraude masivo de 1 millón de dólares. La media de pérdida te dirá que "en promedio todos somos riesgosos", lo que te llevará a subir las tasas de interés para clientes sanos de forma injustificada.
-2.  **Escenario B (Mediana/Robustez):** Al usar medidas robustas, el modelo identifica que la "experiencia típica" del cliente es de riesgo cero, y el evento de 1 millón se trata como un evento de **cola (tail risk)** que se gestiona con capital de reserva, no con una alteración del perfil de riesgo del cliente promedio.
+---
 
-### 4. Protocolo de Decisión (El "Workflow" del Analista Senior)
+### 3. Alternativas Robustas (Tu kit de herramientas)
 
-Antes de decidir qué usar, te sugiero seguir este rigor:
+Cuando detectamos *outliers*, no simplemente los "borramos" (lo cual también es un error si no se justifica), sino que cambiamos el estimador o tratamos el dato.
 
-1.  **Detección:** No confíes solo en la intuición. Usa el **Rango Intercuartílico (IQR)** para identificar valores fuera de $[Q1 - 1.5 \cdot IQR, Q3 + 1.5 \cdot IQR]$ o utiliza el **Z-Score** (si la distribución es aproximadamente normal).
-2.  **Investigación de la causa:**
-    *   ¿Es un **error de entrada de datos**? (Ej: un decimal mal puesto). Si es así, corrígelo o elimínalo.
-    *   ¿Es un **error de medición**? (Ej: un sensor falló). Elimínalo.
-    *   ¿Es un **evento real pero extremo**? (Ej: un crash de mercado). **¡No lo elimines!** Si lo eliminas, estás ignorando el riesgo de cola (*Fat Tails*). En este caso, usa medidas robustas para la tendencia central, pero usa la media para calcular el riesgo (Varianza/Desviación estándar) porque en finanzas, el riesgo *está* en el outlier.
-3.  **Reporte dual:** En un informe profesional, nunca des una sola cifra si hay sospecha de sesgo. Presenta siempre: *"La media es X, pero la mediana (que es más representativa de la tendencia central) es Y"*.
+#### A. La Mediana (Estimador de posición)
+Es la opción más sencilla y robusta. No le importa cuán grande sea el valor máximo, solo le importa cuántos datos hay por encima y por debajo. Es el estándar para reportar salarios o precios de activos con mucha volatilidad.
 
-**Conclusión:** Si los datos tienen *outliers*, la media es una mentira estadística si se presenta como la "verdad absoluta". Usa la mediana para entender el centro y usa modelos de cola (como la distribución t de Student) para entender el riesgo.
+#### B. Media Truncada (*Trimmed Mean*)
+Consiste en eliminar un porcentaje fijo de los valores más altos y más bajos (por ejemplo, el 5% superior y el 5% inferior) y luego calcular la media de los valores restantes.
+*   **Uso:** Muy común en modelos de previsión de crecimiento para evitar que un trimestre extraordinario distorsione la proyección de largo plazo.
+
+#### C. Media Winsorizada (*Winsorized Mean*)
+A diferencia de la truncada, aquí no eliminamos los datos, sino que los **reemplazamos**. Los valores que están fuera de un percentil específico (ej. el percentil 95) se transforman en el valor de ese percentil.
+*   **Ventaja:** Mantienes el tamaño de la muestra ($n$), lo que preserva el poder estadístico de tus pruebas de hipótesis, pero limitas el impacto de los extremos.
+
+#### D. Estimadores M (*M-Estimators*)
+En análisis de regresión avanzada, utilizamos estimadores de máxima verosimilitud que asignan pesos menores a los valores que se alejan de la tendencia central. En lugar de tratar a todos los puntos por igual, el algoritmo "castiga" la influencia de los *outliers*.
+
+---
+
+### 4. El matiz de experto: ¿Cuándo SÍ debemos mirar el *outlier*?
+
+Como analista senior, debo advertirte: **No confundas un error de datos con un evento de cola (*tail event*).**
+
+1.  **Si el *outlier* es un error de entrada de datos (Data Entry Error):** Elimínalo o corrígelo inmediatamente. No tiene valor informativo.
+2.  **Si el *outlier* es un evento real (ej. un *Flash Crash* o un Cisne Negro):** No lo ignores. En gestión de riesgos (como en el cálculo del **VaR - Value at Risk**), el objetivo no es saber qué es lo "típico", sino precisamente qué tan catastrófico puede ser el extremo.
+
+**Conclusión:** Si tu objetivo es **describir la tendencia central** de una población, usa la **mediana** o la **media winsorizada**. Si tu objetivo es **gestionar el riesgo**, estudia el *outlier* con lupa; ahí es donde se pierde el dinero.
 
 === PROFESOR DIVULGADOR ===
-¡Hola! Qué buena pregunta. Esa es, de hecho, la primera "trampa" en la que caemos todos cuando empezamos a analizar datos. Siéntate, que esto es fundamental para que no te engañen con las noticias o los informes financieros.
+¡Hola! Esa es una de las preguntas más importantes que te vas a hacer en este curso. De hecho, entender esto es lo que diferencia a alguien que solo "calcula números" de alguien que realmente "entiende los datos".
 
-Para entenderlo, imagina que la **media** es como un grupo de amigos que deciden ir a cenar y, al final, dividen la cuenta de forma que todos paguen lo mismo. Es justa, pero tiene un problema: **es muy sensible a los "personajes excéntricos"**.
+Para que me entiendas: **usar la media cuando hay *outliers* (valores atípicos) es como intentar describir el clima de una ciudad basándote en un día de huracán.** El dato está ahí, es real, pero no te dice nada de lo que pasa normalmente.
 
-### El problema: El "Efecto Bill Gates"
+Te lo voy a explicar con un ejemplo que nunca olvidarás.
 
-Imagina que estamos en un aula con 10 estudiantes. Todos tienen un presupuesto mensual para gastos de 100 euros. Si calculamos la **media**, el promedio es 100 euros. Todo lógico, ¿verdad?
+### El ejemplo de la cena con Bill Gates
 
-Pero de repente, entra por la puerta **Bill Gates**. 
+Imagina que estás en una pequeña cafetería con 5 estudiantes. Todos tienen unos **10 euros** en el bolsillo. Si calculamos la media de lo que tienen, la cuenta es clara:
+*   $(10 + 10 + 10 + 10 + 10) / 5 = \mathbf{10 \text{ euros}}$.
+*   La media nos dice la verdad: el estudiante "típico" tiene 10 euros.
 
-Si Bill Gates se sienta con nosotros y decimos: *"Vamos a calcular el promedio de dinero que hay en este salón"*, el resultado va a ser de millones de euros. Si alguien te pregunta: *"¿Cómo es la vida de un estudiante de este salón?"*, y tú respondes: *"Bueno, el promedio es que cada uno tiene 10 millones de euros"*, **estarías mintiendo**, aunque matemáticamente sea cierto.
+Pero, de repente, entra **Bill Gates** por la puerta. Él tiene **1.000.000 de euros**. Ahora hagamos la cuenta de nuevo:
+*   $(10 + 10 + 10 + 10 + 10 + 1.000.000) / 6 = \mathbf{166.683 \text{ euros}}$.
 
-Ese valor extremo (Bill Gates) es nuestro **outlier** (o valor atípico). El problema es que la media intenta "acomodar" a ese valor tan loco dentro de su cálculo, y termina arrastrando el resultado hacia él, dándote una imagen distorsionada de la realidad.
+Si tú me dices: *"El promedio de dinero de las personas en esta cafetería es de 166.683 euros"*, me estarías mintiendo, aunque el cálculo matemático sea correcto. **La media ha sido "secuestrada" por el valor atípico.** Ese número no representa a nadie en la sala. Es un valor que no es ni pobre ni rico; es simplemente un error de interpretación.
 
-### La solución: El "Héroe" llamado Mediana
+### ¿Qué pasa en la vida real?
 
-Cuando hay outliers, yo siempre te voy a recomendar que mires también la **mediana**.
+En estadística, cuando un dato es extremadamente alto o bajo comparado con los demás, decimos que la media es **sensible** o **no robusta**.
 
-Si usamos la analogía anterior: la mediana es como si nos pusiéramos todos en fila por orden de cuánto dinero tenemos y yo simplemente mirara **quién es la persona que está justo en el medio**.
+Si estás analizando sueldos en un país, la media te va a dar una idea de la riqueza total, pero te va a ocultar la realidad de la mayoría de la gente porque los sueldos de los multimillonarios "inflan" el promedio.
 
-En nuestra clase con Bill Gates, si nos ponemos en fila, Bill Gates estará al final de la fila, pero la persona que está en el centro de la fila seguirá siendo un estudiante con 100 euros. La mediana no se deja engañar por el millonario; ella se queda con el "centro" real de la población.
+### ¿Qué deberías usar entonces?
 
-### Entonces, ¿qué te aconsejo como profesor?
+Cuando veas que tus datos tienen valores locos o extremos, tienes dos caminos:
 
-Cuando estés analizando datos, sigue esta regla de oro:
+1.  **La Mediana (Tu mejor amiga):** La mediana es el valor que está justo en el medio cuando ordenas los datos de menor a mayor. En el ejemplo de Bill Gates, si ordenamos: $10, 10, \mathbf{10}, 10, 10, 1.000.000$, la mediana sigue siendo **10**. ¡La mediana es "robusta"! No le importa si Bill Gates es un trillonario o si es un astronauta; ella solo mira quién está en el centro.
+2.  **Limpiar los datos:** Si el *outlier* es un error (por ejemplo, alguien escribió que un perro pesa 500kg por error de dedo), lo correcto es corregirlo o eliminarlo. Pero si el dato es real (un terremoto, un gran millonario), no lo borres, simplemente elige una medida más inteligente.
 
-1.  **Si ves que la media y la mediana son muy diferentes**, ¡CUIDADO! Tienes outliers que te están engañando. Es como si la media te dijera que eres rico, pero tu cuenta bancaria te diga que no.
-2.  **No ignores el outlier de inmediato.** Antes de borrarlo, pregúntate: ¿Es un error de dedo (alguien escribió 1000 en vez de 10)? Si es un error, bórralo. ¿Es un valor real pero extremo? Entonces no lo borres, pero **no uses solo la media para describir tus datos**.
-3.  **Usa la mediana para describir el "centro"** si los datos son rebeldes.
-4.  **Usa la media solo si tus datos son "comportados"** (es decir, si la mayoría de los valores están cerca unos de otros y no hay saltos absurdos).
+**Resumen para tu examen:**
+*   **La Media:** Es muy sensible. Úsala cuando tus datos sean "bien portados" (sin valores extremos).
+*   **La Mediana:** Es muy resistente. Úsala cuando tus datos tengan valores locos o "rebeldes" (*outliers*).
 
-**En resumen:** La media es muy inteligente para hacer cálculos matemáticos avanzados, pero es muy "susceptibles" a los chismes (los outliers). La mediana, en cambio, es más "terca" y prefiere quedarse con la realidad del grupo.
-
-¿Te ha quedado claro con el ejemplo de Bill Gates o prefieres que probemos con otro?</code></pre>
+¿Te ha quedado claro con el ejemplo de Bill Gates o quieres que probemos con otro?</code></pre>
 </div>
 </div>
 </section>
@@ -1553,7 +1571,7 @@ Table&nbsp;3: Técnicas avanzadas de prompting y cuándo aplicarlas
 </div>
 </figure>
 </div>
-<div id="83e48959" class="cell" data-execution_count="12">
+<div id="0d63323b" class="cell" data-execution_count="12">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -1572,41 +1590,42 @@ Table&nbsp;3: Técnicas avanzadas de prompting y cuándo aplicarlas
 <span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>        messages<span class="op">=</span>[{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: prompt_step_back}]</span>
 <span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    ).choices[<span class="dv">0</span>].message.content)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Aquí tienes la respuesta estructurada según tus instrucciones:
+<pre><code>Aquí tienes las respuestas siguiendo el orden solicitado:
 
 ### 1. ¿Qué es un número primo de Mersenne?
 Un **número primo de Mersenne** es un número primo que tiene la forma específica:
 $$M_n = 2^n - 1$$
-donde $n$ es un número entero. 
-
-Es importante destacar una propiedad fundamental: para que $M_n$ sea un número primo, el exponente **$n$ también debe ser un número primo**. Sin embargo, que $n$ sea primo no garantiza automáticamente que $2^n - 1$ sea primo (por ejemplo, $2^{11} - 1 = 2047$, y aunque 11 es primo, 2047 no lo es, ya que es $23 \times 89$).
-
----
+Donde $n$ es un número entero. Para que $M_n$ sea un número primo, es una condición necesaria (aunque no suficiente) que el exponente $n$ también sea un número primo.
 
 ### 2. ¿Cómo se comprueba si un número es primo de Mersenne?
 Para determinar si un número $N$ es un primo de Mersenne, se debe seguir este proceso lógico:
 
-1.  **Verificar la forma de Mersenne:** Comprobar si el número puede escribirse como $2^n - 1$. Esto se hace sumando 1 al número ($N + 1$) y verificando si el resultado es una **potencia de 2** (es decir, si es $2, 4, 8, 16, 32, 64, \dots$).
-2.  **Identificar el exponente ($n$):** Si es una potencia de 2, encontrar el valor de $n$ tal que $2^n = N + 1$.
-3.  **Comprobar si $n$ es primo:** Si el exponente $n$ no es un número primo, el número $N$ no puede ser un primo de Mersenne.
-4.  **Verificar la primalidad de $N$:** Si $n$ es primo, se debe confirmar que el número resultante $N$ sea efectivamente un número primo (usualmente mediante pruebas matemáticas avanzadas como el test de Lucas-Lehmer).
+1.  **Verificar la forma:** Intentar resolver la ecuación $N = 2^n - 1$ para encontrar el valor de $n$. Esto se hace sumando 1 al número y verificando si el resultado es una potencia exacta de 2 ($N + 1 = 2^n$).
+2.  **Comprobar la integridad de $n$:** Si el valor de $n$ obtenido no es un número entero, entonces el número no pertenece a la familia de los números de Mersenne.
+3.  **Verificar la condición de $n$:** Si $n$ es un entero, este debe ser un número primo para que $N$ sea un candidato a primo de Mersenne.
+4.  **Prueba de primalidad:** Si se cumplen los pasos anteriores, se debe aplicar un test de primalidad (como el test de Lucas-Lehmer) para confirmar que el resultado de $2^n - 1$ es efectivamente un número primo.
 
 ---
 
-### 3. Aplicación del método a 17
+### 3. Aplicación del método a 17 y conclusión
 
-Vamos a aplicar los pasos al número **17**:
+**Paso 1: Intentar expresar 17 en la forma $2^n - 1$**
+Planteamos la ecuación:
+$$17 = 2^n - 1$$
 
-*   **Paso 1: ¿Es de la forma $2^n - 1$?**
-    Sumamos 1 al número: $17 + 1 = 18$.
-    Ahora, buscamos si 18 es una potencia de 2.
-    Las potencias de 2 cercanas son:
-    $2^4 = 16$
-    $2^5 = 32$
-    Como podemos ver, **18 no es una potencia de 2**.
+Sumamos 1 a ambos lados para despejar la potencia:
+$$17 + 1 = 2^n$$
+$$18 = 2^n$$
 
-*   **Conclusión:**
-    Dado que 17 no puede expresarse de la forma $2^n - 1$ con un exponente entero, **17 NO es un número primo de Mersenne**. (Aunque 17 es un número primo, no cumple con la estructura requerida para ser un primo de Mersenne).</code></pre>
+**Paso 2: Comprobar si 18 es una potencia de 2**
+Buscamos potencias de 2 cercanas a 18:
+*   $2^4 = 16$
+*   $2^5 = 32$
+
+Como vemos, $16 &lt; 18 &lt; 32$. No existe ningún número entero $n$ que satisfaga la igualdad $2^n = 18$. Si lo calculamos con logaritmos, $n = \log_2(18) \approx 4.17$.
+
+**Conclusión:**
+Dado que $n$ no es un número entero, el número 17 no tiene la forma $2^n - 1$. Por lo tanto, **17 no es un número primo de Mersenne.**</code></pre>
 </div>
 </div>
 </section>

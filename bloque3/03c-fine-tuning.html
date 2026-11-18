@@ -493,6 +493,12 @@ div.csl-indent {
  <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -598,10 +604,10 @@ div.csl-indent {
 <p>Este tema forma parte del Bloque 3 — Aplicaciones. Se recomienda haber completado los <a href="../bloque1/01-fundamentos.html">Bloques 1</a> y <a href="../bloque2/02-orquestacion.html">2</a> primero.</p>
 <p><strong>Lectura previa recomendada:</strong> <a href="../bloque3/03c-previo-cabezas.html">Del estado oculto a la salida: cabezas y objetivos de entrenamiento</a>, que explica qué son una cabeza de salida, SFT, PPO y DPO.</p>
 </blockquote>
-<div id="754123b0" class="cell" data-execution_count="1">
+<div id="71aca67e" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q transformers peft bitsandbytes trl datasets torch accelerate python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="03e8276c" class="cell" data-execution_count="2">
+<div id="a2adcb66" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">Setup compartido para la API key de Llamus en todos los notebooks.</span></span>
@@ -989,7 +995,7 @@ Table&nbsp;3: Parámetros clave de LoRA y su impacto en VRAM y capacidad
 </div>
 </figure>
 </div>
-<div id="f9241a53" class="cell" data-execution_count="3">
+<div id="1f585fbc" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>config <span class="op">=</span> LoraConfig(</span>
@@ -1114,7 +1120,7 @@ Table&nbsp;4: Comparativa de VRAM necesaria para fine-tuning de un modelo 7B
 </figure>
 </div>
 <p>Con QLoRA puedes hacer fine-tuning de un modelo 7B en una GPU de Colab gratuita (T4, 16 GB VRAM).</p>
-<div id="3ce2eceb" class="cell" data-execution_count="4">
+<div id="f020927f" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModelForCausalLM, BitsAndBytesConfig</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>bnb_config <span class="op">=</span> BitsAndBytesConfig(</span>
@@ -1260,7 +1266,7 @@ Figure&nbsp;5
 </figure>
 </div>
 <p>El siguiente ejemplo muestra un fine-tuning mínimo con TRL (Supervised Fine-Tuning) sobre un modelo pequeño. Está diseñado para ejecutarse en Colab con GPU T4 gratuita.</p>
-<div id="5dc24fbd" class="cell" data-execution_count="5">
+<div id="0721e8c5" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> transformers <span class="im">import</span> AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig</span>
 <span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> peft <span class="im">import</span> LoraConfig, get_peft_model</span>
 <span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> trl <span class="im">import</span> SFTConfig, SFTTrainer</span>

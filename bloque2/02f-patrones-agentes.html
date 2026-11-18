@@ -522,6 +522,12 @@ window.Quarto = {
  <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -631,10 +637,10 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p>Este tema forma parte del Bloque 2 — Orquestación. Se recomienda haber visto <a href="../bloque2/02e-agentes.html">02e — Diseño de Agentes Inteligentes</a> primero, donde ya implementamos agentes ReAct con tool calling. Aquí damos un paso atrás: ¿qué arquitecturas existen para orquestar LLM? Esta taxonomía de patrones será la base del <a href="../evaluables/proyecto-final.html">proyecto integrador final</a>, donde elegirás un patrón (o propondrás uno propio) para resolver tu problema.</p>
 </blockquote>
-<div id="cf86557e" class="cell" data-execution_count="1">
+<div id="c9c8bbbe" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q langchain langchain<span class="op">-</span>openai langchain<span class="op">-</span>community python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="af8623a7" class="cell" data-execution_count="2">
+<div id="40fdff73" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">Setup compartido para la API key de Llamus en todos los notebooks.</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).</span></span>
@@ -691,7 +697,7 @@ window.Quarto = {
 Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="998920eb" class="cell" data-execution_count="3">
+<div id="29f5e4ae" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_openai <span class="im">import</span> ChatOpenAI</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -1280,7 +1286,7 @@ Table&nbsp;4: Cuándo usar cada patrón de diseño
 <section id="sec-ejemplo-chaining" class="level3">
 <h3 class="anchored" data-anchor-id="sec-ejemplo-chaining">Prompt chaining con LCEL</h3>
 <p>Doble llamada: primero un borrador, luego una revisión que lo mejora. El resultado del primer paso es el contexto del segundo.</p>
-<div id="4a87bec8" class="cell" data-execution_count="4">
+<div id="908cbfb4" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.prompts <span class="im">import</span> ChatPromptTemplate</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.output_parsers <span class="im">import</span> StrOutputParser</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1309,51 +1315,52 @@ Table&nbsp;4: Cuándo usar cada patrón de diseño
 <span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(cadena.invoke({<span class="st">"texto"</span>: texto}))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== Paso 1: borrador ===
-Como redactor técnico, he preparado tres versiones dependiendo del contexto en el que necesites presentar esta información: una **ejecutiva directa**, una **estructurada para informes** y una **estilo ...
+Como redactor técnico, he preparado dos versiones del resumen ejecutivo: una de **estilo narrativo** (ideal para informes o introducciones de presentaciones) y una de **estilo estructurado** (ideal pa ...
 
 === Paso 2: versión final ===
-Como editor senior, he revisado tu borrador para elevar el tono profesional, eliminar redundancias y asegurar que cada versión cumpla con un propósito comunicativo distinto. He ajustado la terminología para que suene más estratégica y menos descriptiva.
+Como editor senior, he procesado tu borrador para dotarlo de mayor autoridad, eliminar redundancias y asegurar que cada opción cumpla con su propósito comunicativo de manera impecable.
 
 Aquí tienes la versión optimizada:
 
 ***
 
-### Propuestas de Resumen Ejecutivo
+Presento tres propuestas de resumen ejecutivo, adaptadas según el tono y el perfil del lector objetivo:
 
-A continuación, se presentan tres variantes de la información, adaptadas según el canal y el interlocutor:
+### Opción 1: Formato Narrativo
+*Ideal para informes de gestión y documentos con contexto institucional.*
 
-#### 1. Formato Ejecutivo (Alta Dirección)
-*Ideal para informes de gestión, juntas directivas o reportes anuales. El tono es institucional y enfocado en resultados.*
+**Resumen Ejecutivo**
+La compañía muestra un sólido desempeño operativo, alcanzando una plantilla de 120 empleados tras un crecimiento del 15% en el presente ejercicio. Este avance respalda la hoja de ruta estratégica de la organización, cuyo principal objetivo es la expansión hacia el mercado de Latinoamérica (LATAM) para el año 2026.
 
-**Resumen de Gestión y Proyección Estratégica**
-La organización mantiene una sólida posición operativa con una plantilla de 120 colaboradores, tras consolidar un crecimiento del 15% en el presente ejercicio. Este desempeño financiero y operativo constituye la base para la ejecución del plan de expansión hacia el mercado de Latinoamérica (LATAM), programado para 2026.
+---
 
-#### 2. Formato Técnico (Dashboards y Reportes de KPI)
-*Ideal para presentaciones de métricas, paneles de control o equipos de operaciones. El tono es directo y orientado a datos.*
+### Opción 2: Formato Ejecutivo
+*Ideal para presentaciones de alta dirección y toma de decisiones rápidas.*
 
-**Estado de Situación y Objetivos de Expansión**
-* **Fuerza Laboral:** 120 colaboradores.
-* **Crecimiento Anual (YoY):** +15%.
-* **Objetivo Estratégico:** Expansión de mercado (LATAM).
-* **Horizonte de Ejecución:** 2026.
+**Resumen Ejecutivo: Desempeño y Proyección Estratégica**
+Tras registrar un crecimiento del 15%, la empresa ha consolidado una fuerza laboral de 120 colaboradores. Este sólido desempeño sustenta el siguiente objetivo estratégico: la internacionalización hacia la región de LATAM, proyectada para 2026.
 
-#### 3. Formato Narrativo Estratégico (Comunicación Interna/Email)
-*Ideal para anuncios corporativos, introducciones de presentaciones o correos informativos. El tono es motivador y conecta el presente con el futuro.*
+---
 
-**Resumen de Situación**
-Gracias a un crecimiento del 15% durante este ejercicio, la empresa ha fortalecido su capacidad operativa, alcanzando los 120 colaboradores. Este sólido impulso permite iniciar la fase de preparación para nuestro próximo gran hito: la expansión hacia el mercado latinoamericano en 2026.
+### Opción 3: Formato Técnico/Estructurado
+*Ideal para planes de negocio, reportes de KPIs o documentos de consulta rápida.*
+
+**Resumen Ejecutivo**
+* **Fuerza laboral:** 120 empleados (+15% anual).
+* **Estrategia principal:** Expansión al mercado de Latinoamérica (LATAM).
+* **Horizonte temporal:** 2026.
 
 ***
 
 ### Conclusión y Recomendaciones del Editor
 
-Para elegir la versión adecuada, evalúa el **objetivo de la comunicación** y el **perfil del lector**:
+Para elegir la opción correcta, debe evaluar el **canal de comunicación** y el **nivel de la audiencia**:
 
-1.  **Usa el Formato Ejecutivo** cuando necesites transmitir **autoridad y estabilidad**. Es el formato de "lectura rápida" para directivos que buscan confirmar que los objetivos se están cumpliendo sin entrar en detalles operativos.
-2.  **Usa el Formato Técnico** cuando el objetivo sea la **eficiencia informativa**. Es ideal para contextos donde la precisión del dato es más importante que el contexto narrativo (ej. diapositivas de un *business review*).
-3.  **Usa el Formato Narrativo** cuando busques **alineación de equipos**. Al conectar el dato actual (crecimiento) con el propósito futuro (expansión), ayudas a construir una visión compartida dentro de la organización.
+1.  **Use el Formato Narrativo** si el documento será leído en su totalidad (ej. una memoria anual). Su valor reside en la capacidad de contar una historia de éxito y dar fluidez a la lectura.
+2.  **Use el Formato Ejecutivo** si el destinatario es un directivo con poco tiempo (C-Level). Este formato elimina el "ruido" y se enfoca en la relación directa entre el logro actual y la visión de futuro.
+3.  **Use el Formato Técnico** si el resumen forma parte de un anexo, un reporte de métricas o una presentación de diapositivas con mucha carga de datos. Su objetivo es la eficiencia máxima y la consulta rápida de datos clave.
 
-**Consejo pro:** Si el informe es para inversores, te sugiero añadir una breve mención al *porqué* del crecimiento (ej. "...impulsado por la optimización de procesos" o "...debido a la captación de nuevos clientes") para dar mayor peso a la cifra del 15%.</code></pre>
+**Sugerencia adicional:** Si el documento es para un mercado internacional, asegúrese de definir si "LATAM" es la terminología aceptada por su audiencia o si prefiere el uso de "América Latina" para mantener la máxima formalidad.</code></pre>
 </div>
 </div>
 <p>Si el borrador no supera una validación (p.&nbsp;ej. longitud mínima), un paso programático puede reenviarlo al generador antes de pasar al siguiente — ese es el <em>gate</em> del patrón.</p>
@@ -1361,7 +1368,7 @@ Para elegir la versión adecuada, evalúa el **objetivo de la comunicación** y 
 <section id="sec-ejemplo-routing" class="level3">
 <h3 class="anchored" data-anchor-id="sec-ejemplo-routing">Routing con LangChain</h3>
 <p>Un clasificador decide qué prompt especializado recibe cada pregunta:</p>
-<div id="40d28d79" class="cell" data-execution_count="5">
+<div id="103514ff" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dos manejadores especializados</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>prompt_facto <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"Responde con datos concretos y precisos. Si no los sabes, dilo."</span>),</span>
@@ -1399,67 +1406,70 @@ Para elegir la versión adecuada, evalúa el **objetivo de la comunicación** y 
 <pre><code>
 PREGUNTA: ¿Cuál es la población de Sevilla?
 → Ruta: factual
-→ Respuesta: Según los datos oficiales del Instituto Nacional de Estadística (INE) de España, correspondientes al 1 de enero de 2023, la población del municipio de Sevilla es de **684.025 habitantes**.
+→ Respuesta: De acuerdo con los datos más recientes del Instituto Nacional de Estadística (INE) correspondientes al año 2023, la población del municipio de Sevilla es de **684.032 habitantes**.
 
 PREGUNTA: ¿Por qué crees que bajaron las ventas?
 → Ruta: analitica
-→ Respuesta: Dado que no cuento con los datos específicos de tu negocio (sector, producto, histórico de ventas o contexto geográfico), he diseñado un **marco de análisis estructural**. 
+→ Respuesta: Para ofrecerte un análisis riguroso, es necesario entender que una caída en las ventas rara vez se debe a un único factor. Generalmente, es el resultado de una combinación de variables internas y externas.
 
-Para determinar por qué bajaron las ventas, debemos realizar una autopsia de la operación dividiéndola en tres dimensiones: **Causas (el diagnóstico), Tendencias (el entorno) y Recomendaciones (la solución).**
-
----
-
-### 1. Análisis de Causas (¿Qué falló?)
-
-Las causas de una caída en ventas suelen dividirse en dos grandes grupos: factores internos (bajo tu control) y factores externos (fuera de tu control).
-
-#### A. Factores Internos (Diagnóstico Operativo)
-*   **Falla en el Embudo de Conversión (Funnel):** No es que no haya clientes, es que no están convirtiendo. Puede haber un problema en la atención al cliente, un proceso de cierre de ventas lento o una web/tienda con mala experiencia de usuario.
-*   **Problemas de Producto/Precio:** El producto puede haber entrado en su etapa de declive (obsolescencia), la calidad pudo haber bajado, o el precio dejó de ser competitivo frente a la inflación o la competencia.
-*   **Rotación de Talento y Capacitación:** Si el equipo de ventas ha cambiado o no está motivado/capacitado, la calidad del cierre de ventas disminuye drásticamente.
-*   **Falta de Stock o Logística:** La incapacidad de entregar lo que el cliente pide por quiebres de inventario.
-
-#### B. Factores Externos (Diagnóstico de Mercado)
-*   **Cambios Macroeconómicos:** La inflación reduce el poder adquisitivo; las tasas de interés altas frenan el consumo de bienes duraderos.
-*   **Acción de la Competencia:** Un competidor nuevo entró con precios agresivos o un competidor existente lanzó una campaña de marketing masiva que "robó" tu atención.
-*   **Estacionalidad:** Un descenso natural por la época del año que no fue previsto en el presupuesto.
+Como no tengo los datos específicos de tu negocio (sector, producto, tiempo de caída), he diseñado un **marco de análisis estructural** que puedes aplicar para identificar tu problema exacto.
 
 ---
 
-### 2. Análisis de Tendencias (¿Hacia dónde va el mercado?)
+### 1. Análisis de Causas (El "¿Por qué?")
 
-A veces las ventas no bajan porque tu negocio sea malo, sino porque el mercado se está moviendo en otra dirección. Debes identificar si estás siendo víctima de una tendencia:
+Podemos dividir las causas en dos grandes grupos: **Factores Internos** (lo que puedes controlar) y **Factores Externos** (lo que el mercado te impone).
 
-*   **Cambio en los Hábitos de Consumo:** El cliente está migrando del modelo de "propiedad" al de "suscripción" o de "tienda física" a "social commerce" (comprar por TikTok/Instagram).
-*   **Sensibilidad al Valor (Value for Money):** Tras periodos de crisis, los consumidores dejan de buscar "estatus" para buscar "utilidad y ahorro". Si tu producto es percibido como un lujo prescindible, las ventas caerán.
-*   **Digitalización Forzada:** Si tu competencia está utilizando Inteligencia Artificial para personalizar ofertas y tú sigues con un marketing tradicional, la brecha de ventas se ampliará.
-*   **Sostenibilidad y Ética:** Los consumidores actuales penalizan a las marcas que no demuestran transparencia o responsabilidad ambiental.
+#### A. Causas Internas (Controlables)
+*   **Degradación del Producto/Servicio:** ¿Ha bajado la calidad? ¿Se ha quedado el producto obsoleto frente a nuevas tecnologías?
+*   **Estrategia de Precios:** ¿Un competidor bajó precios o tu producto ahora se percibe como "caro" para el valor que ofrece?
+*   **Fallas en el Funnel de Ventas (Conversión):** Quizás recibes la misma cantidad de clientes, pero no cierras la venta. Puede ser por mala atención, procesos de pago complejos o falta de stock.
+*   **Marketing Ineficiente:** El costo de adquisición de clientes (CAC) subió o tus campañas dejaron de llegar al público objetivo.
+*   **Rotación de Personal:** La pérdida de vendedores clave o la falta de capacitación afecta directamente el cierre de ventas.
 
----
-
-### 3. Recomendaciones (Plan de Acción)
-
-Para revertir la tendencia, te sugiero seguir este orden de prioridad:
-
-#### Fase 1: Diagnóstico de Datos (Inmediato)
-1.  **Auditoría de KPIs:** Identifica exactamente *dónde* se perdió el dinero. ¿Bajaron los leads (prospectos), bajó la tasa de conversión o bajó el ticket promedio?
-2.  **Escucha Activa (Feedback):** Llama a tus clientes perdidos. Pregunta directamente: *"¿Por qué no volviste a comprar?"*. La respuesta real suele estar en la insatisfacción con el servicio o el precio.
-
-#### Fase 2: Optimización de Recursos (Corto Plazo)
-3.  **Estrategia de Retención (Upselling/Cross-selling):** Es 7 veces más barato venderle a un cliente actual que conseguir uno nuevo. Crea ofertas para tu base de datos existente.
-4.  **Revisión de la Propuesta de Valor:** Si el problema es el precio, no bajes el precio (eso destruye el margen); mejora el *valor percibido* (añade un servicio, una garantía o un beneficio extra).
-
-#### Fase 3: Crecimiento Estratégico (Mediano Plazo)
-5.  **Diversificación de Canales:** Si tus ventas caen en el canal físico, acelera el e-commerce. Si caen en la publicidad pagada, busca marketing de contenidos o alianzas.
-6.  **Capacitación del Equipo:** Implementa programas de entrenamiento en técnicas de venta consultiva y manejo de objeciones.
+#### B. Causas Externas (No Controlables)
+*   **Ciclo Económico:** Inflación, pérdida del poder adquisitivo del consumidor o cambios en las tasas de interés.
+*   **Nuevos Competidores:** La entrada de un actor con precios agresivos o una propuesta de valor más moderna.
+*   **Estacionalidad:** ¿Es una caída esperada por la época del año o es una caída atípica?
+*   **Cambios en el Comportamiento del Consumidor:** Un cambio en las preferencias (ej. la gente dejó de comprar X para comprar Y) o un cambio en el canal (de tienda física a e-commerce).
 
 ---
 
-**Resumen para tu toma de decisiones:**
-Si quieres que te ayude con un análisis más profundo, por favor indícame:
-1. **¿Qué vendes?**
-2. **¿En qué periodo notaste la caída?**
-3. **¿Has hecho cambios recientes en precios o equipo?**</code></pre>
+### 2. Tendencias Actuales del Mercado (El Contexto)
+
+Si tu caída es generalizada en tu industria, es probable que estés siendo afectado por estas tendencias globales:
+
+1.  **Consumo Consciente y Selectivo:** Los consumidores están filtrando más sus gastos. No solo buscan precio, sino propósito, sostenibilidad y experiencia.
+2.  **Omnicanalidad Obligatoria:** Ya no basta con tener una tienda o una web; el cliente espera una experiencia fluida entre el mundo online y offline.
+3.  **Economía de la Atención:** El exceso de oferta hace que retener la atención del cliente sea más caro y difícil. Si tu marketing no es disruptivo, simplemente no existes.
+4.  **Digitalización del Proceso de Decisión:** El cliente llega a tu negocio ya "educado". Ya investigó en Google, leyó reseñas y comparó precios. Si no tienes una buena reputación digital, la venta se pierde antes de empezar.
+
+---
+
+### 3. Recomendaciones (El "¿Qué hacer?")
+
+Para revertir la situación, te sugiero seguir este plan de acción:
+
+#### Fase 1: Diagnóstico Basado en Datos (Inmediato)
+*   **Audita tu Funnel:** Revisa en qué punto exacto se pierden los clientes. ¿Es en el tráfico (nadie llega), en la conversión (llegan pero no compran) o en la retención (compran una vez y no vuelven)?
+*   **Análisis de Cohortes:** Mira si la caída viene de clientes nuevos o de la pérdida de clientes recurrentes.
+*   **Escucha Activa (Feedback):** Pregunta directamente a los clientes que no compraron o que se fueron. La verdad suele estar en las quejas no atendidas.
+
+#### Fase 2: Ajuste Estratégico (Corto Plazo)
+*   **Optimización de la Oferta:** Si el problema es el precio, no necesariamente bajes el precio; añade valor (combos, garantías, servicios adicionales) para mejorar la percepción de valor.
+*   **Fidelización (Retention Marketing):** Es mucho más barato venderle a un cliente actual que conseguir uno nuevo. Implementa programas de lealtad o campañas de re-activación.
+*   **Revisión de Canales:** Si el tráfico bajó, diversifica tus fuentes de adquisición (Ads, SEO, Redes Sociales, Alianzas).
+
+#### Fase 3: Optimización Operativa (Mediano Plazo)
+*   **Capacitación de Fuerza de Ventas:** Asegúrate de que tu equipo no solo "despache", sino que sepa detectar necesidades y resolver objeciones.
+*   **Mejora de la Experiencia del Cliente (CX):** Elimina cualquier "fricción" en el proceso de compra (tienda desordenada, web lenta, falta de medios de pago).
+
+---
+
+**¿Te gustaría que profundicemos en alguno de estos puntos?** Para un análisis más exacto, podrías decirme:
+1. *¿A qué se dedica tu empresa?*
+2. *¿La caída fue repentina o gradual?*
+3. *¿Has notado si el problema es que llega menos gente o que los que llegan no compran?*</code></pre>
 </div>
 </div>
 <p>Fíjate en que el routing suele costar solo 1 llamada extra (la clasificación) y evita que un prompt genérico degrade las respuestas especializadas — por eso aparece como complejidad “baja” en <a href="#tbl-guia-seleccion" class="quarto-xref">Table&nbsp;4</a>.</p>
