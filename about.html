@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -74,10 +77,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f97a59afa23c78b76dca51217b896fc0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -178,6 +181,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Visión general</span></a>
   </div>
@@ -208,20 +217,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+  <a href="./bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HPD 1 — Embeddings</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd1-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 1</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd1-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 1</span></a>
+  <a href="./evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
   </div>
 </li>
       </ul>
@@ -273,38 +282,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd2-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 2</span></a>
+  <a href="./evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd2-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 2</span></a>
+  <a href="./bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./bloque2/hpd3-servidor-mcp.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HPD 3 — Servidor MCP</span></a>
+  <a href="./bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd3-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 3</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd3-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 3</span></a>
+  <a href="./evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
   </div>
 </li>
       </ul>
@@ -338,26 +347,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Fine-tuning eficiente</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd4-rag-mixto.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HPD 4 — RAG Mixto</span></a>
+  <a href="./evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd4-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios — Datos Sintéticos</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd4-datos-sinteticos-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión — Datos Sintéticos</span></a>
+  <a href="./evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
   </div>
 </li>
       </ul>
@@ -374,7 +383,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Teoría y Despliegue</span></a>
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
   </div>
 </li>
       </ul>
@@ -382,7 +427,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
- <span class="menu-text">Evaluación</span></a>
+ <span class="menu-text">Demos interactivas</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -390,8 +435,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./05-evaluacion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Evaluación y Proyecto</span></a>
+  <a href="./demos/atencion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
       </ul>
@@ -399,12 +474,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
- <span class="menu-text">Recursos</span></a>
+ <span class="menu-text">Evaluación</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./06-herramientas.html" class="sidebar-item-text sidebar-link">
@@ -429,7 +527,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#autoría" id="toc-autoría" class="nav-link active" data-scroll-target="#autoría">Autoría</a></li>
+  <li><a href="#sec-autoria" id="toc-sec-autoria" class="nav-link active" data-scroll-target="#sec-autoria">Autoría</a></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="about.ipynb" download="about.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
@@ -458,8 +556,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Módulo 10 del Máster en Data Science &amp; Big Data.</p>
 <p><strong>IA Generativa para Data Science</strong> — 3,0 ECTS | 75 horas | Modalidad a distancia | Nivel técnico.</p>
 <hr>
-<section id="autoría" class="level2">
-<h2 class="anchored" data-anchor-id="autoría">Autoría</h2>
+<section id="sec-autoria" class="level2">
+<h2 class="anchored" data-anchor-id="sec-autoria">Autoría</h2>
 <p><strong>Departamento de Ciencias de la Computación e Inteligencia Artificial</strong><br>
 Universidad de Sevilla</p>
 <ul>
@@ -571,16 +669,16 @@ Universidad de Sevilla</p>
     }
     function toggleCodeHandler(show) {
       return function(e) {
-        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
-        for (let i=0; i<detailsSrc.length; i++) {
-          const details = detailsSrc[i].parentElement;
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
           if (show) {
             details.open = true;
           } else {
             details.removeAttribute("open");
           }
         }
-        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
         const fromCls = show ? "hidden" : "unhidden";
         const toCls = show ? "unhidden" : "hidden";
         for (let i=0; i<cellCodeDivs.length; i++) {
@@ -940,7 +1038,7 @@ Universidad de Sevilla</p>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>---</span>
 <span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## Autoría</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="fu">## Autoría {#sec-autoria}</span></span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>**Departamento de Ciencias de la Computación e Inteligencia Artificial**  </span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>Universidad de Sevilla</span>

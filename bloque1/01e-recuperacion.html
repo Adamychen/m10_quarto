@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>01e — De documentos a recuperación: trocear, buscar y medir – Módulo 10 — IA Generativa para Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script><script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<meta name="mermaid-theme" content="neutral">
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.min.js" integrity="sha384-c9c+LnTbwQ3aujuU7ULEPVvgLs+Fn6fJUvIGTsuu1ZcCf11fiEubah0ttpca4ntM sha384-6V1/AdqZRWk1KAlWbKBlGhN7VG4iE/yAZcO6NZPMF8od0vukrvr0tg4qY6NSrItx" crossorigin="anonymous"></script>
+
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+<script src="https://cdn.jsdelivr.net/npm/@jupyter-widgets/html-manager@*/dist/embed-amd.js" crossorigin="anonymous"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque1/00-panorama.html">Bloque 1 — Fundamentos</a></li><li class="breadcrumb-item"><a href="../bloque1/01e-recuperacion.html">De documentos a recuperación</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Módulo 10 — IA Generativa para Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inicio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acerca de</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 1 — Fundamentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01a-transformer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01b-llms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs e inferencia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01c-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01d-vectordb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bases de datos vectoriales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 2 — Orquestación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02-orquestacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02a-prompt-engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prompt Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02b-langchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LangChain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02c-llamaindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LlamaIndex</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02d-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02e-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentes Inteligentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 3 — Aplicaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03-aplicaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03b-rag-avanzado.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAG Avanzado</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03a-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tuning eficiente</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 4 — Gobernanza</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Demos interactivas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Evaluación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../06-herramientas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Herramientas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../07-bibliografia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliografía</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#sec-pipeline-recuperacion" id="toc-sec-pipeline-recuperacion" class="nav-link active" data-scroll-target="#sec-pipeline-recuperacion">El pipeline completo</a></li>
+  <li><a href="#sec-chunking" id="toc-sec-chunking" class="nav-link" data-scroll-target="#sec-chunking">Trocear documentos: el tamaño del chunk importa</a></li>
+  <li><a href="#sec-bm25" id="toc-sec-bm25" class="nav-link" data-scroll-target="#sec-bm25">Buscar con palabras: BM25</a></li>
+  <li><a href="#sec-hibrida" id="toc-sec-hibrida" class="nav-link" data-scroll-target="#sec-hibrida">Búsqueda híbrida: lo mejor de los dos mundos</a></li>
+  <li><a href="#sec-metricas-recuperacion" id="toc-sec-metricas-recuperacion" class="nav-link" data-scroll-target="#sec-metricas-recuperacion">Medir: ¿funciona la recuperación?</a></li>
+  <li><a href="#sec-sin-respuesta" id="toc-sec-sin-respuesta" class="nav-link" data-scroll-target="#sec-sin-respuesta">Qué hacer cuando no hay respuesta</a></li>
+  <li><a href="#sec-comprueba-01e" id="toc-sec-comprueba-01e" class="nav-link" data-scroll-target="#sec-comprueba-01e">Comprueba lo aprendido</a></li>
+  <li><a href="#sec-referencias-01e" id="toc-sec-referencias-01e" class="nav-link" data-scroll-target="#sec-referencias-01e">Referencias de esta página</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Otros formatos</h2><ul><li><a href="01e-recuperacion.ipynb" download="01e-recuperacion.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque1/00-panorama.html">Bloque 1 — Fundamentos</a></li><li class="breadcrumb-item"><a href="../bloque1/01e-recuperacion.html">De documentos a recuperación</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">01e — De documentos a recuperación: trocear, buscar y medir</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Código</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p><a href="https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01e-recuperacion.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid"></a></p>
+<blockquote class="blockquote">
+<p>Este tema forma parte del Bloque 1 — Fundamentos. Se recomienda haber visto <a href="../bloque1/01c-embeddings.html">01c-embeddings.qmd</a> y <a href="../bloque1/01d-vectordb.html">01d-vectordb.qmd</a> primero.</p>
+</blockquote>
+<div class="callout callout-style-default callout-tip no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Qué aprenderás
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>En 01c y 01d hemos visto cómo convertir texto en vectores y guardarlos. Falta lo que decide, en la práctica, si un buscador sirve o no:</p>
+<ul>
+<li><strong>Trocear</strong> los documentos largos (<em>chunking</em>) y por qué el tamaño importa.</li>
+<li><strong>Buscar con palabras</strong> (BM25), <strong>con significado</strong> (embeddings) y <strong>con las dos a la vez</strong> (búsqueda híbrida).</li>
+<li><strong>Medir</strong> si la recuperación funciona, con métricas que puedas calcular tú mismo.</li>
+</ul>
+<p>Este es el puente entre la teoría del bloque y el <a href="../bloque1/hpd1-embeddings.html">HPD 1</a>, y la base de todo el RAG del Bloque 3.</p>
+</div>
+</div>
+<div id="0452ec0c" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q sentence<span class="op">-</span>transformers langchain<span class="op">-</span>text<span class="op">-</span>splitters matplotlib</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div id="acc249ea" class="cell" data-execution_count="2">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>modelo <span class="op">=</span> SentenceTransformer(<span class="st">"paraphrase-multilingual-MiniLM-L12-v2"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Modelo cargado."</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<script type="application/vnd.jupyter.widget-view+json">
+{"model_id":"9176c4e54c8541cb90cce00b1d796472","version_major":2,"version_minor":0,"quarto_mimetype":"application/vnd.jupyter.widget-view+json"}
+</script>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Modelo cargado.</code></pre>
+</div>
+</div>
+<section id="sec-pipeline-recuperacion" class="level2">
+<h2 class="anchored" data-anchor-id="sec-pipeline-recuperacion">El pipeline completo</h2>
+<div id="fig-pipeline-recuperacion" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pipeline-recuperacion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    D[Documentos&lt;br/&gt;PDF, web, tablas]:::input --&gt; T[Trocear&lt;br/&gt;chunks]:::proc
+    T --&gt; E[Embeddings&lt;br/&gt;de cada chunk]:::proc
+    E --&gt; I[(Índice&lt;br/&gt;vectorial)]:::doc
+    Q[Pregunta]:::input --&gt; QE[Embedding&lt;br/&gt;de la pregunta]:::proc
+    QE --&gt; B[Buscar&lt;br/&gt;top-k]:::proc
+    I --&gt; B
+    B --&gt; R[Chunks&lt;br/&gt;recuperados]:::out
+    R --&gt; M["Medir:&lt;br/&gt;hit@k, MRR"]:::obs
+
+    classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef proc  fill:#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px
+    classDef doc   fill:#FFD43B,stroke:#b8860b,color:#000,stroke-width:1.5px
+    classDef out   fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
+    classDef obs   fill:#e65100,stroke:#bf360c,color:#fff,stroke-width:1.5px
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-pipeline-recuperacion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;1
+</figcaption>
+</figure>
+</div>
+<p>En 01c y 01d trabajamos con frases cortas, que ya eran la unidad de búsqueda. Los documentos reales (contratos, manuales, artículos) son mucho más largos que el límite de tokens de un modelo de embeddings, y además contienen muchos temas. Antes de indexarlos hay que partirlos.</p>
+</section>
+<section id="sec-chunking" class="level2">
+<h2 class="anchored" data-anchor-id="sec-chunking">Trocear documentos: el tamaño del chunk importa</h2>
+<p>Un <em>chunk</em> es un fragmento del documento que se indexa por separado. Tres razones obligan a trocear:</p>
+<ol type="1">
+<li><strong>El límite del modelo.</strong> Lo que supera el límite de tokens no se ve (Caso 5 de <a href="../bloque1/01c-embeddings.html#sec-fallo-truncado">01c</a>).</li>
+<li><strong>La dilución.</strong> El embedding de un texto largo es una especie de promedio: si habla de cinco temas, no representa bien ninguno.</li>
+<li><strong>El coste.</strong> Cada chunk recuperado se pasa al LLM (ver <a href="../bloque1/01b-llms.html#sec-tokens-coste-memoria">Tokens, dinero y memoria</a> en 01b); cuanto más texto sobrante, más caro y más fácil que el modelo se distraiga.</li>
+</ol>
+<p>Pero partir demasiado también rompe cosas: si la respuesta queda cortada entre dos fragmentos, ninguno la contiene entera. Lo vemos con un contrato breve del banco y seis preguntas cuya respuesta sabemos dónde está.</p>
+<div id="ec9f8cef" class="cell" data-execution_count="3">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>contrato <span class="op">=</span> <span class="st">"""Objeto. Estas condiciones regulan la cuenta corriente del cliente y los servicios asociados de banca digital.</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="st">Comisiones. El mantenimiento de la cuenta es gratuito si el cliente tiene la nómina domiciliada; en caso contrario se cobrarán 3 euros al mes. Las transferencias SEPA cuestan 0,50 euros por operación y las transferencias internacionales el 2 </span><span class="sc">% d</span><span class="st">el importe, con un mínimo de 5 euros.</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">Tarjetas. La tarjeta de débito se emite sin coste. En caso de pérdida o robo, el cliente debe bloquearla de inmediato desde la app o llamando al teléfono de atención 24 horas. El banco no será responsable de los cargos posteriores a la comunicación.</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st">Límites. El límite diario de retirada en cajeros es de 600 euros y el de pagos con tarjeta es de 3.000 euros por operación. Los límites pueden ampliarse temporalmente previa solicitud en la app.</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="st">Seguridad. Para cambiar la contraseña, el cliente accede a Ajustes &gt; Seguridad. El banco nunca solicitará claves por teléfono ni por correo electrónico.</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="st">Reclamaciones. El cliente puede reclamar durante un año mediante el formulario web. El banco responderá en un máximo de 15 días hábiles.</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a><span class="st">Cancelación. El cliente puede cancelar la cuenta en cualquier momento sin penalización, siempre que el saldo sea cero. El banco podrá cancelarla con un preaviso de 30 días."""</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a><span class="co"># (pregunta, fragmento exacto que contiene la respuesta)</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>preguntas_contrato <span class="op">=</span> [</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Cuánto cuesta mantener la cuenta si no tengo nómina?"</span>, <span class="st">"3 euros al mes"</span>),</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Qué tengo que hacer si me roban la tarjeta?"</span>, <span class="st">"bloquearla de inmediato"</span>),</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Cuál es el límite para pagar con tarjeta?"</span>, <span class="st">"3.000 euros por operación"</span>),</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿En cuántos días me responden una reclamación?"</span>, <span class="st">"15 días hábiles"</span>),</span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Cuánto preaviso da el banco para cancelar mi cuenta?"</span>, <span class="st">"30 días"</span>),</span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Cobran un mínimo en las transferencias internacionales?"</span>, <span class="st">"mínimo de 5 euros"</span>),</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El contrato tiene </span><span class="sc">{</span><span class="bu">len</span>(contrato)<span class="sc">}</span><span class="ss"> caracteres y </span><span class="sc">{</span><span class="bu">len</span>(preguntas_contrato)<span class="sc">}</span><span class="ss"> preguntas de prueba."</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>El contrato tiene 1306 caracteres y 6 preguntas de prueba.</code></pre>
+</div>
+</div>
+<p>Ahora partimos el contrato con distintos tamaños y medimos dos cosas: (1) si el chunk más parecido a la pregunta <strong>contiene</strong> la respuesta y (2) <strong>cuánto texto</strong> le entregaríamos al LLM.</p>
+<div id="f01e33b8" class="cell" data-execution_count="4">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_text_splitters <span class="im">import</span> RecursiveCharacterTextSplitter</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'chunk_size'</span><span class="sc">:&gt;10}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'overlap'</span><span class="sc">:&gt;8}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'nº chunks'</span><span class="sc">:&gt;10}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'car./chunk'</span><span class="sc">:&gt;11}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'tokens/chunk'</span><span class="sc">:&gt;13}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'acierto top-1'</span><span class="sc">:&gt;14}</span><span class="ss">"</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> tamano, solape <span class="kw">in</span> [(<span class="dv">80</span>, <span class="dv">0</span>), (<span class="dv">150</span>, <span class="dv">20</span>), (<span class="dv">300</span>, <span class="dv">50</span>), (<span class="dv">600</span>, <span class="dv">100</span>), (<span class="dv">1200</span>, <span class="dv">200</span>), (<span class="dv">5000</span>, <span class="dv">0</span>)]:</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    splitter <span class="op">=</span> RecursiveCharacterTextSplitter(chunk_size<span class="op">=</span>tamano, chunk_overlap<span class="op">=</span>solape)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    chunks <span class="op">=</span> splitter.split_text(contrato)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    emb <span class="op">=</span> modelo.encode(chunks, normalize_embeddings<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    aciertos <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pregunta, evidencia <span class="kw">in</span> preguntas_contrato:</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        q <span class="op">=</span> modelo.encode([pregunta], normalize_embeddings<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        mejor <span class="op">=</span> chunks[<span class="bu">int</span>(np.argmax((q <span class="op">@</span> emb.T)[<span class="dv">0</span>]))]</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        aciertos <span class="op">+=</span> evidencia <span class="kw">in</span> mejor</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    tokens <span class="op">=</span> np.mean([<span class="bu">len</span>(modelo.tokenizer(c)[<span class="st">"input_ids"</span>]) <span class="cf">for</span> c <span class="kw">in</span> chunks])</span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>tamano<span class="sc">:&gt;10}</span><span class="ss"> </span><span class="sc">{</span>solape<span class="sc">:&gt;8}</span><span class="ss"> </span><span class="sc">{</span><span class="bu">len</span>(chunks)<span class="sc">:&gt;10}</span><span class="ss"> </span><span class="sc">{</span>np<span class="sc">.</span>mean([<span class="bu">len</span>(c) <span class="cf">for</span> c <span class="kw">in</span> chunks])<span class="sc">:&gt;11.0f}</span><span class="ss"> </span><span class="sc">{</span>tokens<span class="sc">:&gt;13.0f}</span><span class="ss"> </span><span class="sc">{</span>aciertos<span class="sc">:&gt;11}</span><span class="ss">/</span><span class="sc">{</span><span class="bu">len</span>(preguntas_contrato)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Límite del modelo de embeddings: </span><span class="sc">{</span>modelo<span class="sc">.</span>max_seq_length<span class="sc">}</span><span class="ss"> tokens"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>chunk_size  overlap  nº chunks  car./chunk  tokens/chunk  acierto top-1
+        80        0         20          64            16           1/6</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[transformers] Token indices sequence length is longer than the specified maximum sequence length for this model (248 &gt; 128). Running this sequence through the model will result in indexing errors</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       150       20         13         107            26           4/6
+       300       50          6         216            50           6/6
+       600      100          3         434            97           6/6
+      1200      200          2         721           160           6/6
+      5000        0          1        1306           288           6/6
+
+Límite del modelo de embeddings: 128 tokens</code></pre>
+</div>
+</div>
+<p>Cómo leer la tabla:</p>
+<ul>
+<li><strong>Chunks muy pequeños (80–150 caracteres):</strong> la respuesta queda partida entre fragmentos y el acierto se hunde (1 de 6 y 4 de 6).</li>
+<li><strong>Chunks medianos (300–600 caracteres):</strong> acierto completo y cada chunk entrega solo un párrafo, y cabe en el límite del modelo.</li>
+<li><strong>Chunks enormes (1.200 y 5.000 caracteres):</strong> el acierto es perfecto, <strong>pero es una ilusión de este ejemplo</strong>: con un solo documento pequeño, devolver “todo” siempre contiene la respuesta. Fíjate en las dos columnas de al lado: el LLM recibiría el contrato entero para responder una pregunta de una línea, y los chunks de más de 128 tokens superan el límite del modelo, así que su parte final ni siquiera cuenta en el embedding.</li>
+</ul>
+<p>No hay un tamaño universal. Para texto normal, entre 200 y 1.000 caracteres (o 100–300 tokens) con un solape del 10–20 % es un punto de partida razonable. <strong>Lo que decide es medirlo con tus preguntas</strong> (ejercicio A2 del HPD 1).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>¿Para qué sirve el solapamiento?
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Si cortas justo en mitad de una frase importante, ninguno de los dos chunks la contiene. El solape repite el final de un chunk al principio del siguiente. Cuesta algo de espacio extra pero protege las fronteras. La demo <a href="../demos/chunking.html">Trocear documentos para RAG</a> te deja ajustar tamaño y solape y ver cuándo se parte la respuesta.</p>
+</div>
+</div>
+</section>
+<section id="sec-bm25" class="level2">
+<h2 class="anchored" data-anchor-id="sec-bm25">Buscar con palabras: BM25</h2>
+<p>Los embeddings entienden paráfrasis, pero fallan con códigos, siglas y cifras (casos 2 y 3 de <a href="../bloque1/01c-embeddings.html#sec-cuando-fallan">01c</a>). Para eso existe una familia de métodos mucho más antigua y todavía imbatible en lo suyo: la <strong>búsqueda léxica</strong>. Su representante estándar es <strong>BM25</strong> <span class="citation" data-cites="robertson2009bm25">(<a href="#ref-robertson2009bm25" role="doc-biblioref">Robertson &amp; Zaragoza, 2009</a>)</span>, una evolución de TF-IDF que:</p>
+<ul>
+<li>da más peso a las palabras <strong>raras</strong> (IDF), como TF-IDF;</li>
+<li>hace que repetir una palabra muchas veces aporte cada vez menos (la saturación, controlada por <span class="math inline">\(k_1\)</span>);</li>
+<li>penaliza los documentos largos respecto a los cortos (controlado por <span class="math inline">\(b\)</span>).</li>
+</ul>
+<p><span class="math display">\[
+\operatorname{BM25}(q, d) = \sum_{t \in q} \operatorname{IDF}(t) \cdot \frac{f(t,d)\,(k_1+1)}{f(t,d) + k_1\left(1 - b + b\,\frac{|d|}{\text{avgdl}}\right)}
+\]</span></p>
+<p>donde <span class="math inline">\(f(t,d)\)</span> es cuántas veces aparece el término <span class="math inline">\(t\)</span> en el documento <span class="math inline">\(d\)</span>, <span class="math inline">\(|d|\)</span> su longitud y <span class="math inline">\(\text{avgdl}\)</span> la longitud media. Son 15 líneas de Python:</p>
+<div id="cd2e31fc" class="cell" data-execution_count="5">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>PALABRAS_VACIAS <span class="op">=</span> <span class="bu">set</span>(<span class="st">"el la los las un una unos unas de del al a en y o que qué me mi tu te se es por con para si su sus lo como cuánto cuál cómo cada"</span>.split())</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tokenizar(texto):</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    palabras <span class="op">=</span> re.findall(<span class="vs">r"</span><span class="pp">[a-záéíóúñü0-9</span><span class="ch">\-</span><span class="pp">]</span><span class="op">+</span><span class="vs">"</span>, texto.lower())</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [p <span class="cf">for</span> p <span class="kw">in</span> palabras <span class="cf">if</span> p <span class="kw">not</span> <span class="kw">in</span> PALABRAS_VACIAS]</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BM25:</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, documentos, k1<span class="op">=</span><span class="fl">1.5</span>, b<span class="op">=</span><span class="fl">0.75</span>):</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.docs <span class="op">=</span> [tokenizar(d) <span class="cf">for</span> d <span class="kw">in</span> documentos]</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.k1, <span class="va">self</span>.b <span class="op">=</span> k1, b</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.N <span class="op">=</span> <span class="bu">len</span>(<span class="va">self</span>.docs)</span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.avgdl <span class="op">=</span> <span class="bu">sum</span>(<span class="bu">len</span>(d) <span class="cf">for</span> d <span class="kw">in</span> <span class="va">self</span>.docs) <span class="op">/</span> <span class="va">self</span>.N</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.df <span class="op">=</span> Counter(p <span class="cf">for</span> d <span class="kw">in</span> <span class="va">self</span>.docs <span class="cf">for</span> p <span class="kw">in</span> <span class="bu">set</span>(d))</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> idf(<span class="va">self</span>, palabra):</span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> math.log(<span class="dv">1</span> <span class="op">+</span> (<span class="va">self</span>.N <span class="op">-</span> <span class="va">self</span>.df[palabra] <span class="op">+</span> <span class="fl">0.5</span>) <span class="op">/</span> (<span class="va">self</span>.df[palabra] <span class="op">+</span> <span class="fl">0.5</span>))</span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> puntuaciones(<span class="va">self</span>, consulta):</span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a>        resultado <span class="op">=</span> np.zeros(<span class="va">self</span>.N)</span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, doc <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="va">self</span>.docs):</span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>            frecuencias <span class="op">=</span> Counter(doc)</span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> p <span class="kw">in</span> tokenizar(consulta):</span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> p <span class="kw">in</span> frecuencias:</span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>                    f <span class="op">=</span> frecuencias[p]</span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>                    norm <span class="op">=</span> f <span class="op">+</span> <span class="va">self</span>.k1 <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> <span class="va">self</span>.b <span class="op">+</span> <span class="va">self</span>.b <span class="op">*</span> <span class="bu">len</span>(doc) <span class="op">/</span> <span class="va">self</span>.avgdl)</span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>                    resultado[i] <span class="op">+=</span> <span class="va">self</span>.idf(p) <span class="op">*</span> f <span class="op">*</span> (<span class="va">self</span>.k1 <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> norm</span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> resultado</span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"BM25 listo."</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>BM25 listo.</code></pre>
+</div>
+</div>
+<p>Lo probamos sobre el buscador de preguntas frecuentes (el mismo corpus de 01c y 01d):</p>
+<div id="3ab2d2f0" class="cell" data-execution_count="6">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>faq <span class="op">=</span> [</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Puedes pagar con tarjeta de crédito o débito en cualquier comercio adherido."</span>,</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">"No se admite el pago con tarjeta en operaciones superiores a 3.000 euros; usa transferencia."</span>,</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Para pedir un reembolso, solicita la devolución en la app en un plazo de 14 días."</span>,</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La comisión por transferencia SEPA es de 0,50 euros por operación."</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Las transferencias internacionales tienen una comisión del 2 </span><span class="sc">% d</span><span class="st">el importe."</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Si pierdes tu tarjeta, bloquéala desde la app o llama al teléfono de atención 24 horas."</span>,</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El IBAN es el código que identifica tu cuenta bancaria en transferencias nacionales e internacionales."</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Para cambiar tu contraseña, entra en Ajustes &gt; Seguridad y pulsa «Restablecer»."</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El límite diario de retirada en cajeros es de 600 euros."</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Abrir una cuenta nueva es gratis y se completa en cinco minutos con tu DNI."</span>,</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Los préstamos personales se conceden en 24 horas si tienes la nómina domiciliada."</span>,</span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La hipoteca a tipo variable se revisa cada seis meses según el Euríbor."</span>,</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Error E-4021: la operación fue rechazada por saldo insuficiente."</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Error E-4012: la tarjeta ha caducado y debe renovarse."</span>,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>bm25 <span class="op">=</span> BM25(faq)</span>
+<span id="cb13-18"><a href="#cb13-18" aria-hidden="true" tabindex="-1"></a>emb_faq <span class="op">=</span> modelo.encode(faq, normalize_embeddings<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb13-19"><a href="#cb13-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-20"><a href="#cb13-20" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> top_lexico(consulta, k<span class="op">=</span><span class="dv">2</span>):</span>
+<span id="cb13-21"><a href="#cb13-21" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> bm25.puntuaciones(consulta)</span>
+<span id="cb13-22"><a href="#cb13-22" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [(<span class="bu">int</span>(i), <span class="bu">float</span>(p[i])) <span class="cf">for</span> i <span class="kw">in</span> np.argsort(<span class="op">-</span>p)[:k] <span class="cf">if</span> p[i] <span class="op">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb13-23"><a href="#cb13-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-24"><a href="#cb13-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> top_denso(consulta, k<span class="op">=</span><span class="dv">2</span>):</span>
+<span id="cb13-25"><a href="#cb13-25" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> (modelo.encode([consulta], normalize_embeddings<span class="op">=</span><span class="va">True</span>) <span class="op">@</span> emb_faq.T)[<span class="dv">0</span>]</span>
+<span id="cb13-26"><a href="#cb13-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [(<span class="bu">int</span>(i), <span class="bu">float</span>(p[i])) <span class="cf">for</span> i <span class="kw">in</span> np.argsort(<span class="op">-</span>p)[:k]]</span>
+<span id="cb13-27"><a href="#cb13-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-28"><a href="#cb13-28" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> consulta <span class="kw">in</span> [<span class="st">"¿qué significa el error E-4012?"</span>, <span class="st">"Euríbor"</span>, <span class="st">"he olvidado mi clave de acceso"</span>]:</span>
+<span id="cb13-29"><a href="#cb13-29" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Consulta: </span><span class="sc">{</span>consulta<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb13-30"><a href="#cb13-30" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"  BM25 :"</span>, [(i, <span class="bu">round</span>(s, <span class="dv">2</span>)) <span class="cf">for</span> i, s <span class="kw">in</span> top_lexico(consulta)] <span class="kw">or</span> <span class="st">"sin coincidencias"</span>)</span>
+<span id="cb13-31"><a href="#cb13-31" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"  Denso:"</span>, [(i, <span class="bu">round</span>(s, <span class="dv">2</span>)) <span class="cf">for</span> i, s <span class="kw">in</span> top_denso(consulta)])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Consulta: ¿qué significa el error E-4012?
+  BM25 : [(13, 4.31), (12, 1.88)]
+  Denso: [(12, 0.68), (13, 0.59)]
+
+Consulta: Euríbor
+  BM25 : [(11, 2.28)]
+  Denso: [(6, 0.18), (8, 0.17)]
+
+Consulta: he olvidado mi clave de acceso
+  BM25 : sin coincidencias
+  Denso: [(7, 0.52), (13, 0.38)]</code></pre>
+</div>
+</div>
+<p>Fíjate en el patrón:</p>
+<ul>
+<li><code>E-4012</code> y <code>Euríbor</code> son identificadores y nombres propios: BM25 los encuentra al instante; el embedding puede dudar (en el primer caso devuelve antes el documento <code>E-4021</code>).</li>
+<li>«clave de acceso» no comparte ninguna palabra con «contraseña»: BM25 <strong>no encuentra nada</strong>, el embedding sí.</li>
+</ul>
+<p>Cada método falla donde el otro acierta. De ahí la idea más práctica de esta página.</p>
+</section>
+<section id="sec-hibrida" class="level2">
+<h2 class="anchored" data-anchor-id="sec-hibrida">Búsqueda híbrida: lo mejor de los dos mundos</h2>
+<p>Combinar los dos rankings tiene un problema: las puntuaciones no son comparables (BM25 va de 0 a decenas, el coseno de 0 a 1). Una solución sencilla y robusta es <strong>ignorar las puntuaciones y fusionar solo las posiciones</strong>: <em>Reciprocal Rank Fusion</em> (RRF) <span class="citation" data-cites="cormack2009rrf">(<a href="#ref-cormack2009rrf" role="doc-biblioref">Cormack et&nbsp;al., 2009</a>)</span>. Cada documento recibe <span class="math inline">\(\frac{1}{c + \text{posición}}\)</span> en cada ranking (con <span class="math inline">\(c = 60\)</span> habitualmente) y se suman:</p>
+<p><span class="math display">\[
+\operatorname{RRF}(d) = \sum_{r \in \text{rankings}} \frac{1}{c + \operatorname{pos}_r(d)}
+\]</span></p>
+<p>Un documento que aparece arriba en <strong>los dos</strong> rankings gana; uno que solo aparece en uno, queda en medio.</p>
+<div id="2a4eaa9a" class="cell" data-execution_count="7">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ranking_lexico(consulta):</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> bm25.puntuaciones(consulta)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="bu">int</span>(i) <span class="cf">for</span> i <span class="kw">in</span> np.argsort(<span class="op">-</span>p) <span class="cf">if</span> p[i] <span class="op">&gt;</span> <span class="dv">0</span>]       <span class="co"># solo documentos con alguna coincidencia</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ranking_denso(consulta):</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> (modelo.encode([consulta], normalize_embeddings<span class="op">=</span><span class="va">True</span>) <span class="op">@</span> emb_faq.T)[<span class="dv">0</span>]</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="bu">int</span>(i) <span class="cf">for</span> i <span class="kw">in</span> np.argsort(<span class="op">-</span>p)]</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ranking_hibrido(consulta, c<span class="op">=</span><span class="dv">60</span>):</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>    puntos <span class="op">=</span> Counter()</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ranking <span class="kw">in</span> (ranking_lexico(consulta), ranking_denso(consulta)):</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> posicion, doc <span class="kw">in</span> <span class="bu">enumerate</span>(ranking, start<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>            puntos[doc] <span class="op">+=</span> <span class="dv">1</span> <span class="op">/</span> (c <span class="op">+</span> posicion)</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [doc <span class="cf">for</span> doc, _ <span class="kw">in</span> puntos.most_common()]</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Híbrido para «¿qué significa el error E-4012?»:"</span>, ranking_hibrido(<span class="st">"¿qué significa el error E-4012?"</span>)[:<span class="dv">3</span>])</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Híbrido para «¿qué significa el error E-4012?»: [13, 12, 3]</code></pre>
+</div>
+</div>
+</section>
+<section id="sec-metricas-recuperacion" class="level2">
+<h2 class="anchored" data-anchor-id="sec-metricas-recuperacion">Medir: ¿funciona la recuperación?</h2>
+<p>Hasta ahora hemos mirado ejemplos sueltos. Para decidir entre métodos necesitamos un <strong>conjunto de prueba</strong>: preguntas para las que sabemos qué documento es el correcto (el <em>ground truth</em>, que construye una persona). Las métricas más usadas son:</p>
+<div id="tbl-metricas-recuperacion" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-metricas-recuperacion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;1: Métricas de recuperación más usadas
+</figcaption>
+<div aria-describedby="tbl-metricas-recuperacion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Métrica</th>
+<th>Qué responde</th>
+<th>Cuándo usarla</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>hit@k</strong></td>
+<td>¿Hay al menos un documento relevante entre los <span class="math inline">\(k\)</span> primeros?</td>
+<td>Cuando basta con encontrar <em>una</em> respuesta buena (casi todo RAG)</td>
+</tr>
+<tr class="even">
+<td><strong>recall@k</strong></td>
+<td>¿Qué fracción de <strong>todos</strong> los relevantes está en los <span class="math inline">\(k\)</span> primeros?</td>
+<td>Cuando hay varios documentos relevantes y quieres encontrarlos todos</td>
+</tr>
+<tr class="odd">
+<td><strong>MRR</strong> (<em>mean reciprocal rank</em>)</td>
+<td>¿En qué posición aparece el primer relevante? Promedio de <span class="math inline">\(1/\text{posición}\)</span></td>
+<td>Cuando importa que el primero sea bueno</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p>Una trampa clásica: si una pregunta tiene <strong>2 documentos relevantes</strong> y evalúas con <span class="math inline">\(k=1\)</span>, el recall@1 solo puede valer 0,5 como máximo, aunque el sistema sea perfecto. Con <span class="math inline">\(k\)</span> pequeño suele ser más informativo el hit@k.</p>
+<p>Construimos 12 preguntas de prueba sobre el buscador del banco (algunas con paráfrasis, otras con códigos y nombres propios) y comparamos los tres métodos:</p>
+<div id="52dfef7a" class="cell" data-execution_count="8">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="co"># (pregunta, índice del documento correcto en `faq`)</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>prueba <span class="op">=</span> [</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿qué significa el error E-4012?"</span>, <span class="dv">13</span>), (<span class="st">"error E-4021"</span>, <span class="dv">12</span>),</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Quiero que me devuelvan el dinero de una compra"</span>, <span class="dv">2</span>), (<span class="st">"he olvidado mi clave de acceso"</span>, <span class="dv">7</span>),</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Cuánto cuesta una transferencia SEPA?"</span>, <span class="dv">3</span>), (<span class="st">"¿Cómo bloqueo mi tarjeta si la pierdo?"</span>, <span class="dv">5</span>),</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Qué es el IBAN?"</span>, <span class="dv">6</span>), (<span class="st">"¿Cada cuánto se revisa la hipoteca variable?"</span>, <span class="dv">11</span>),</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"comisión del 2 </span><span class="sc">% e</span><span class="st">n transferencias internacionales"</span>, <span class="dv">4</span>), (<span class="st">"Euríbor"</span>, <span class="dv">11</span>),</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"rechazo por falta de fondos"</span>, <span class="dv">12</span>), (<span class="st">"mi plástico caducó"</span>, <span class="dv">13</span>),</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> posicion_correcta(ranking, correcto):</span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ranking.index(correcto) <span class="op">+</span> <span class="dv">1</span> <span class="cf">if</span> correcto <span class="kw">in</span> ranking <span class="cf">else</span> <span class="va">None</span>   <span class="co"># None = no aparece</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluar(funcion_ranking):</span>
+<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>    posiciones <span class="op">=</span> [posicion_correcta(funcion_ranking(q), c) <span class="cf">for</span> q, c <span class="kw">in</span> prueba]</span>
+<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>    hit1 <span class="op">=</span> np.mean([p <span class="op">==</span> <span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> posiciones])</span>
+<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>    hit3 <span class="op">=</span> np.mean([p <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">and</span> p <span class="op">&lt;=</span> <span class="dv">3</span> <span class="cf">for</span> p <span class="kw">in</span> posiciones])</span>
+<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a>    mrr <span class="op">=</span> np.mean([<span class="dv">1</span> <span class="op">/</span> p <span class="cf">if</span> p <span class="cf">else</span> <span class="dv">0</span> <span class="cf">for</span> p <span class="kw">in</span> posiciones])</span>
+<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> hit1, hit3, mrr</span>
+<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'Método'</span><span class="sc">:&lt;10}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'hit@1'</span><span class="sc">:&gt;6}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'hit@3'</span><span class="sc">:&gt;6}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'MRR'</span><span class="sc">:&gt;6}</span><span class="ss">"</span>)</span>
+<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> nombre, f <span class="kw">in</span> [(<span class="st">"BM25"</span>, ranking_lexico), (<span class="st">"Denso"</span>, ranking_denso), (<span class="st">"Híbrido"</span>, ranking_hibrido)]:</span>
+<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>    h1, h3, mrr <span class="op">=</span> evaluar(f)</span>
+<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>nombre<span class="sc">:&lt;10}</span><span class="ss"> </span><span class="sc">{</span>h1<span class="sc">:&gt;6.2f}</span><span class="ss"> </span><span class="sc">{</span>h3<span class="sc">:&gt;6.2f}</span><span class="ss"> </span><span class="sc">{</span>mrr<span class="sc">:&gt;6.2f}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copiar al portapapeles" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Método      hit@1  hit@3    MRR
+BM25         0.58   0.67   0.61
+Denso        0.75   0.92   0.85
+Híbrido      0.83   1.00   0.92</code></pre>
+</div>
+</div>
+<p>Con esta prueba pequeña, el patrón es el esperado: <strong>BM25 solo se queda corto</strong> (no encuentra paráfrasis), <strong>el denso falla en códigos y nombres propios</strong>, y <strong>la fusión mejora a los dos</strong>. Cuidado con sacar conclusiones fuertes: son solo 12 preguntas que hemos escrito nosotros, y con un conjunto tan pequeño una pregunta cambia las cifras en 8 puntos. Para decidir en un proyecto real hacen falta más preguntas, escritas por quienes usarán el sistema.</p>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Advertencia</span>El ground truth define lo que mides
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Define cuál es “el documento correcto” <strong>por su contenido</strong> (por ejemplo, “el chunk que contiene la frase X”), nunca por una posición o un identificador que cambia si modificas el tamaño del chunk. Si cada vez que cambias el troceado cambian los identificadores, tus métricas dejan de ser comparables. Es el error más común al evaluar un pipeline de recuperación, y el HPD 1 te lo hará comprobar.</p>
+</div>
+</div>
+</section>
+<section id="sec-sin-respuesta" class="level2">
+<h2 class="anchored" data-anchor-id="sec-sin-respuesta">Qué hacer cuando no hay respuesta</h2>
+<p>Todo lo anterior supone que la respuesta existe en el corpus. En la práctica, muchas preguntas no la tienen, y el buscador devolverá igualmente los <span class="math inline">\(k\)</span> vecinos más cercanos (Caso 6 de <a href="../bloque1/01c-embeddings.html#sec-fallo-sin-respuesta">01c</a>). Dos defensas habituales:</p>
+<ul>
+<li><strong>Umbral de similitud, calibrado.</strong> Probando con preguntas con y sin respuesta, elige el valor del coseno por debajo del cual no pasas el resultado al LLM. Es específico de cada modelo y corpus.</li>
+<li><strong>Pedir al LLM que diga «no lo sé»</strong> cuando el contexto no contiene la respuesta, y evaluarlo (Bloque 3, con RAGAS, y <a href="../bloque4/04b-alucinaciones.html">Bloque 4</a>).</li>
+</ul>
+</section>
+<section id="sec-comprueba-01e" class="level2">
+<h2 class="anchored" data-anchor-id="sec-comprueba-01e">Comprueba lo aprendido</h2>
+<div class="callout callout-style-default callout-note callout-titled" title="1. Indexas manuales de 80 páginas sin trocear. ¿Qué dos cosas pueden ir mal?">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Indexas manuales de 80 páginas sin trocear. ¿Qué dos cosas pueden ir mal?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Primero, el modelo de embeddings solo ve los primeros 128–512 tokens (según el modelo), así que casi todo el manual es invisible. Segundo, aunque lo viera, el embedding de un texto con decenas de temas no representa bien ninguno, y cada resultado entregaría al LLM un manual entero.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="2. Los usuarios de tu buscador escriben mucho referencias de pedido como «PED-2024-00871». ¿Qué método usarías y por qué?">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Los usuarios de tu buscador escriben mucho referencias de pedido como «PED-2024-00871». ¿Qué método usarías y por qué?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Búsqueda léxica (BM25) o, mejor, híbrida. Los identificadores exactos son terreno de la coincidencia de palabras; un embedding trataría «PED-2024-00871» y «PED-2024-00817» como casi idénticos.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="3. Tu hit@3 pasa de 0,83 a 0,92 al cambiar de método sobre 12 preguntas. ¿Es una mejora real?">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Tu hit@3 pasa de 0,83 a 0,92 al cambiar de método sobre 12 preguntas. ¿Es una mejora real?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Probablemente no se pueda afirmar. Con 12 preguntas, 0,83 → 0,92 es una sola pregunta más acertada. Habría que repetir con más preguntas (decenas o cientos) y mirar si la mejora es consistente.</p>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="4. En una evaluación cada pregunta tiene 3 documentos relevantes. Calculas recall@1 y obtienes 0,33 como máximo. ¿Es un fallo del sistema?">
+<div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>En una evaluación cada pregunta tiene 3 documentos relevantes. Calculas recall@1 y obtienes 0,33 como máximo. ¿Es un fallo del sistema?
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>No.&nbsp;Con <span class="math inline">\(k=1\)</span> solo puedes recuperar 1 de los 3 relevantes, así que 1/3 es el máximo posible. Para esa evaluación conviene recall@3 o hit@1.</p>
+</div>
+</div>
+</div>
+<hr>
+<blockquote class="blockquote">
+<p>Ya tienes todas las piezas teóricas del bloque. Pasa al taller: <strong><a href="../bloque1/hpd1-embeddings.html">HPD 1 — Pipeline de embeddings y búsqueda semántica</a></strong>.</p>
+</blockquote>
+</section>
+<section id="sec-referencias-01e" class="level2">
+<h2 class="anchored" data-anchor-id="sec-referencias-01e">Referencias de esta página</h2>
+<ul>
+<li><span class="citation" data-cites="robertson2009bm25">Robertson &amp; Zaragoza (<a href="#ref-robertson2009bm25" role="doc-biblioref">2009</a>)</span></li>
+<li><span class="citation" data-cites="cormack2009rrf">Cormack et&nbsp;al. (<a href="#ref-cormack2009rrf" role="doc-biblioref">2009</a>)</span></li>
+<li><span class="citation" data-cites="karpukhin2020dpr">Karpukhin et&nbsp;al. (<a href="#ref-karpukhin2020dpr" role="doc-biblioref">2020</a>)</span></li>
+</ul>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-cormack2009rrf" class="csl-entry" role="listitem">
+Cormack, G. V., Clarke, C. L. A., &amp; Buettcher, S. (2009). Reciprocal Rank Fusion Outperforms Condorcet and Individual Rank Learning Methods. <em>Proceedings of the 32nd International ACM SIGIR Conference on Research and Development in Information Retrieval</em>, 758-759. <a href="https://doi.org/10.1145/1571941.1572114">https://doi.org/10.1145/1571941.1572114</a>
+</div>
+<div id="ref-karpukhin2020dpr" class="csl-entry" role="listitem">
+Karpukhin, V., Oguz, B., Min, S., Lewis, P., Wu, L., Edunov, S., Chen, D., &amp; Yih, W. (2020). Dense Passage Retrieval for Open-Domain Question Answering. <em>Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP)</em>, 6769-6781. <a href="https://doi.org/10.18653/v1/2020.emnlp-main.550">https://doi.org/10.18653/v1/2020.emnlp-main.550</a>
+</div>
+<div id="ref-robertson2009bm25" class="csl-entry" role="listitem">
+Robertson, S., &amp; Zaragoza, H. (2009). The Probabilistic Relevance Framework: <span>BM25</span> and Beyond. <em>Foundations and Trends in Information Retrieval</em>, <em>3</em>(4), 333-389. <a href="https://doi.org/10.1561/1500000019">https://doi.org/10.1561/1500000019</a>
+</div>
+</div>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<footer class="footer-custom">
+  <div class="footer-logos">
+    <img src="../images/logo_cfp.png" alt="Formación Permanente · Universidad de Sevilla">
+  </div>
+  <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
+</footer>
+<script type="application/vnd.jupyter.widget-state+json">
+{"state":{"0476a5134b0946f3b3f91dbadb34da23":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"053c4ba5b6204d879e0995979d30732e":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"08d8183c3ed74927bba96f4180ed33a4":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","background":null,"description_width":"","font_size":null,"text_color":null}},"2378fddaf2dd4aa2b7e841e6d69576c7":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"2cd4a136c9a748689ecbd4d9214b9323":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"338e1664800046eb84e7286393005a2d":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"ProgressStyleModel","state":{"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"ProgressStyleModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"StyleView","bar_color":null,"description_width":""}},"68f938c6be6a4b9183a6cdec48844546":{"model_module":"@jupyter-widgets/base","model_module_version":"2.0.0","model_name":"LayoutModel","state":{"_model_module":"@jupyter-widgets/base","_model_module_version":"2.0.0","_model_name":"LayoutModel","_view_count":null,"_view_module":"@jupyter-widgets/base","_view_module_version":"2.0.0","_view_name":"LayoutView","align_content":null,"align_items":null,"align_self":null,"border_bottom":null,"border_left":null,"border_right":null,"border_top":null,"bottom":null,"display":null,"flex":null,"flex_flow":null,"grid_area":null,"grid_auto_columns":null,"grid_auto_flow":null,"grid_auto_rows":null,"grid_column":null,"grid_gap":null,"grid_row":null,"grid_template_areas":null,"grid_template_columns":null,"grid_template_rows":null,"height":null,"justify_content":null,"justify_items":null,"left":null,"margin":null,"max_height":null,"max_width":null,"min_height":null,"min_width":null,"object_fit":null,"object_position":null,"order":null,"overflow":null,"padding":null,"right":null,"top":null,"visibility":null,"width":null}},"9176c4e54c8541cb90cce00b1d796472":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HBoxModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HBoxModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HBoxView","box_style":"","children":["IPY_MODEL_e1dd312df7c0402fb5db18c2baa42175","IPY_MODEL_b3e1a9e048ce430c9406bcacde64540e","IPY_MODEL_ca29d49b67cc4f2d89e960b63b0a8bf9"],"layout":"IPY_MODEL_053c4ba5b6204d879e0995979d30732e","tabbable":null,"tooltip":null}},"b3e1a9e048ce430c9406bcacde64540e":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"FloatProgressModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"FloatProgressModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"ProgressView","bar_style":"success","description":"","description_allow_html":false,"layout":"IPY_MODEL_2378fddaf2dd4aa2b7e841e6d69576c7","max":199,"min":0,"orientation":"horizontal","style":"IPY_MODEL_338e1664800046eb84e7286393005a2d","tabbable":null,"tooltip":null,"value":199}},"ca29d49b67cc4f2d89e960b63b0a8bf9":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_68f938c6be6a4b9183a6cdec48844546","placeholder":"​","style":"IPY_MODEL_0476a5134b0946f3b3f91dbadb34da23","tabbable":null,"tooltip":null,"value":" 199/199 [00:00&lt;00:00, 12805.76it/s]"}},"e1dd312df7c0402fb5db18c2baa42175":{"model_module":"@jupyter-widgets/controls","model_module_version":"2.0.0","model_name":"HTMLModel","state":{"_dom_classes":[],"_model_module":"@jupyter-widgets/controls","_model_module_version":"2.0.0","_model_name":"HTMLModel","_view_count":null,"_view_module":"@jupyter-widgets/controls","_view_module_version":"2.0.0","_view_name":"HTMLView","description":"","description_allow_html":false,"layout":"IPY_MODEL_2cd4a136c9a748689ecbd4d9214b9323","placeholder":"​","style":"IPY_MODEL_08d8183c3ed74927bba96f4180ed33a4","tabbable":null,"tooltip":null,"value":"Loading weights: 100%"}}},"version_major":2,"version_minor":0}
+</script>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Ejecutar el código</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb19" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "01e — De documentos a recuperación: trocear, buscar y medir"</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> jupyter</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> es</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="al">![](https://colab.research.google.com/assets/colab-badge.svg)</span><span class="co">](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01e-recuperacion.ipynb)</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Este tema forma parte del Bloque 1 — Fundamentos. Se recomienda haber visto </span><span class="co">[</span><span class="ot">01c-embeddings.qmd</span><span class="co">](01c-embeddings.qmd)</span><span class="at"> y </span><span class="co">[</span><span class="ot">01d-vectordb.qmd</span><span class="co">](01d-vectordb.qmd)</span><span class="at"> primero.</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip icon=false}</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a><span class="fu">## Qué aprenderás</span></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>En 01c y 01d hemos visto cómo convertir texto en vectores y guardarlos. Falta lo que decide, en la práctica, si un buscador sirve o no:</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Trocear** los documentos largos (*chunking*) y por qué el tamaño importa.</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Buscar con palabras** (BM25), **con significado** (embeddings) y **con las dos a la vez** (búsqueda híbrida).</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Medir** si la recuperación funciona, con métricas que puedas calcular tú mismo.</span>
+<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>Este es el puente entre la teoría del bloque y el <span class="co">[</span><span class="ot">HPD 1</span><span class="co">](hpd1-embeddings.qmd)</span>, y la base de todo el RAG del Bloque 3.</span>
+<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q sentence<span class="op">-</span>transformers langchain<span class="op">-</span>text<span class="op">-</span>splitters matplotlib</span>
+<span id="cb19-30"><a href="#cb19-30" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-31"><a href="#cb19-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-34"><a href="#cb19-34" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb19-35"><a href="#cb19-35" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb19-36"><a href="#cb19-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb19-37"><a href="#cb19-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-38"><a href="#cb19-38" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb19-39"><a href="#cb19-39" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
+<span id="cb19-40"><a href="#cb19-40" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb19-41"><a href="#cb19-41" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb19-42"><a href="#cb19-42" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb19-43"><a href="#cb19-43" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb19-44"><a href="#cb19-44" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> collections <span class="im">import</span> Counter</span>
+<span id="cb19-45"><a href="#cb19-45" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb19-46"><a href="#cb19-46" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
+<span id="cb19-47"><a href="#cb19-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-48"><a href="#cb19-48" aria-hidden="true" tabindex="-1"></a>modelo <span class="op">=</span> SentenceTransformer(<span class="st">"paraphrase-multilingual-MiniLM-L12-v2"</span>)</span>
+<span id="cb19-49"><a href="#cb19-49" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Modelo cargado."</span>)</span>
+<span id="cb19-50"><a href="#cb19-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-51"><a href="#cb19-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-52"><a href="#cb19-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## El pipeline completo {#sec-pipeline-recuperacion}</span></span>
+<span id="cb19-53"><a href="#cb19-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-54"><a href="#cb19-54" aria-hidden="true" tabindex="-1"></a>::: {#fig-pipeline-recuperacion}</span>
+<span id="cb19-57"><a href="#cb19-57" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb19-58"><a href="#cb19-58" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb19-59"><a href="#cb19-59" aria-hidden="true" tabindex="-1"></a>    D[Documentos&lt;br/&gt;PDF, web, tablas]:::input --&gt; T[Trocear&lt;br/&gt;chunks]:::proc</span>
+<span id="cb19-60"><a href="#cb19-60" aria-hidden="true" tabindex="-1"></a>    T --&gt; E[Embeddings&lt;br/&gt;de cada chunk]:::proc</span>
+<span id="cb19-61"><a href="#cb19-61" aria-hidden="true" tabindex="-1"></a>    E --&gt; I[(Índice&lt;br/&gt;vectorial)]:::doc</span>
+<span id="cb19-62"><a href="#cb19-62" aria-hidden="true" tabindex="-1"></a>    Q[Pregunta]:::input --&gt; QE[Embedding&lt;br/&gt;de la pregunta]:::proc</span>
+<span id="cb19-63"><a href="#cb19-63" aria-hidden="true" tabindex="-1"></a>    QE --&gt; B[Buscar&lt;br/&gt;top<span class="ot">-k</span>]:::proc</span>
+<span id="cb19-64"><a href="#cb19-64" aria-hidden="true" tabindex="-1"></a>    I --&gt; B</span>
+<span id="cb19-65"><a href="#cb19-65" aria-hidden="true" tabindex="-1"></a>    B --&gt; R[Chunks&lt;br/&gt;recuperados]:::out</span>
+<span id="cb19-66"><a href="#cb19-66" aria-hidden="true" tabindex="-1"></a>    R --&gt; M[<span class="ot">"</span><span class="st">Medir:&lt;br/&gt;hit</span><span class="dt">@k</span><span class="st">, MRR</span><span class="ot">"</span>]:::obs</span>
+<span id="cb19-67"><a href="#cb19-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-68"><a href="#cb19-68" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb19-69"><a href="#cb19-69" aria-hidden="true" tabindex="-1"></a>    classDef proc  fill:<span class="co">#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb19-70"><a href="#cb19-70" aria-hidden="true" tabindex="-1"></a>    classDef doc   fill:<span class="co">#FFD43B,stroke:#b8860b,color:#000,stroke-width:1.5px</span></span>
+<span id="cb19-71"><a href="#cb19-71" aria-hidden="true" tabindex="-1"></a>    classDef out   fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
+<span id="cb19-72"><a href="#cb19-72" aria-hidden="true" tabindex="-1"></a>    classDef obs   fill:<span class="co">#e65100,stroke:#bf360c,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb19-73"><a href="#cb19-73" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-74"><a href="#cb19-74" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb19-75"><a href="#cb19-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-76"><a href="#cb19-76" aria-hidden="true" tabindex="-1"></a>En 01c y 01d trabajamos con frases cortas, que ya eran la unidad de búsqueda. Los documentos reales (contratos, manuales, artículos) son mucho más largos que el límite de tokens de un modelo de embeddings, y además contienen muchos temas. Antes de indexarlos hay que partirlos.</span>
+<span id="cb19-77"><a href="#cb19-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-78"><a href="#cb19-78" aria-hidden="true" tabindex="-1"></a><span class="fu">## Trocear documentos: el tamaño del chunk importa {#sec-chunking}</span></span>
+<span id="cb19-79"><a href="#cb19-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-80"><a href="#cb19-80" aria-hidden="true" tabindex="-1"></a>Un *chunk* es un fragmento del documento que se indexa por separado. Tres razones obligan a trocear:</span>
+<span id="cb19-81"><a href="#cb19-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-82"><a href="#cb19-82" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**El límite del modelo.** Lo que supera el límite de tokens no se ve (Caso 5 de <span class="co">[</span><span class="ot">01c</span><span class="co">](01c-embeddings.qmd#sec-fallo-truncado)</span>).</span>
+<span id="cb19-83"><a href="#cb19-83" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**La dilución.** El embedding de un texto largo es una especie de promedio: si habla de cinco temas, no representa bien ninguno.</span>
+<span id="cb19-84"><a href="#cb19-84" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**El coste.** Cada chunk recuperado se pasa al LLM (ver <span class="co">[</span><span class="ot">Tokens, dinero y memoria</span><span class="co">](01b-llms.qmd#sec-tokens-coste-memoria)</span> en 01b); cuanto más texto sobrante, más caro y más fácil que el modelo se distraiga.</span>
+<span id="cb19-85"><a href="#cb19-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-86"><a href="#cb19-86" aria-hidden="true" tabindex="-1"></a>Pero partir demasiado también rompe cosas: si la respuesta queda cortada entre dos fragmentos, ninguno la contiene entera. Lo vemos con un contrato breve del banco y seis preguntas cuya respuesta sabemos dónde está.</span>
+<span id="cb19-87"><a href="#cb19-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-90"><a href="#cb19-90" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb19-91"><a href="#cb19-91" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb19-92"><a href="#cb19-92" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb19-93"><a href="#cb19-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-94"><a href="#cb19-94" aria-hidden="true" tabindex="-1"></a>contrato <span class="op">=</span> <span class="st">"""Objeto. Estas condiciones regulan la cuenta corriente del cliente y los servicios asociados de banca digital.</span></span>
+<span id="cb19-95"><a href="#cb19-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-96"><a href="#cb19-96" aria-hidden="true" tabindex="-1"></a><span class="st">Comisiones. El mantenimiento de la cuenta es gratuito si el cliente tiene la nómina domiciliada; en caso contrario se cobrarán 3 euros al mes. Las transferencias SEPA cuestan 0,50 euros por operación y las transferencias internacionales el 2 </span><span class="sc">% d</span><span class="st">el importe, con un mínimo de 5 euros.</span></span>
+<span id="cb19-97"><a href="#cb19-97" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-98"><a href="#cb19-98" aria-hidden="true" tabindex="-1"></a><span class="st">Tarjetas. La tarjeta de débito se emite sin coste. En caso de pérdida o robo, el cliente debe bloquearla de inmediato desde la app o llamando al teléfono de atención 24 horas. El banco no será responsable de los cargos posteriores a la comunicación.</span></span>
+<span id="cb19-99"><a href="#cb19-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-100"><a href="#cb19-100" aria-hidden="true" tabindex="-1"></a><span class="st">Límites. El límite diario de retirada en cajeros es de 600 euros y el de pagos con tarjeta es de 3.000 euros por operación. Los límites pueden ampliarse temporalmente previa solicitud en la app.</span></span>
+<span id="cb19-101"><a href="#cb19-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-102"><a href="#cb19-102" aria-hidden="true" tabindex="-1"></a><span class="st">Seguridad. Para cambiar la contraseña, el cliente accede a Ajustes &gt; Seguridad. El banco nunca solicitará claves por teléfono ni por correo electrónico.</span></span>
+<span id="cb19-103"><a href="#cb19-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-104"><a href="#cb19-104" aria-hidden="true" tabindex="-1"></a><span class="st">Reclamaciones. El cliente puede reclamar durante un año mediante el formulario web. El banco responderá en un máximo de 15 días hábiles.</span></span>
+<span id="cb19-105"><a href="#cb19-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-106"><a href="#cb19-106" aria-hidden="true" tabindex="-1"></a><span class="st">Cancelación. El cliente puede cancelar la cuenta en cualquier momento sin penalización, siempre que el saldo sea cero. El banco podrá cancelarla con un preaviso de 30 días."""</span></span>
+<span id="cb19-107"><a href="#cb19-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-108"><a href="#cb19-108" aria-hidden="true" tabindex="-1"></a><span class="co"># (pregunta, fragmento exacto que contiene la respuesta)</span></span>
+<span id="cb19-109"><a href="#cb19-109" aria-hidden="true" tabindex="-1"></a>preguntas_contrato <span class="op">=</span> [</span>
+<span id="cb19-110"><a href="#cb19-110" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Cuánto cuesta mantener la cuenta si no tengo nómina?"</span>, <span class="st">"3 euros al mes"</span>),</span>
+<span id="cb19-111"><a href="#cb19-111" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Qué tengo que hacer si me roban la tarjeta?"</span>, <span class="st">"bloquearla de inmediato"</span>),</span>
+<span id="cb19-112"><a href="#cb19-112" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Cuál es el límite para pagar con tarjeta?"</span>, <span class="st">"3.000 euros por operación"</span>),</span>
+<span id="cb19-113"><a href="#cb19-113" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿En cuántos días me responden una reclamación?"</span>, <span class="st">"15 días hábiles"</span>),</span>
+<span id="cb19-114"><a href="#cb19-114" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Cuánto preaviso da el banco para cancelar mi cuenta?"</span>, <span class="st">"30 días"</span>),</span>
+<span id="cb19-115"><a href="#cb19-115" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Cobran un mínimo en las transferencias internacionales?"</span>, <span class="st">"mínimo de 5 euros"</span>),</span>
+<span id="cb19-116"><a href="#cb19-116" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb19-117"><a href="#cb19-117" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"El contrato tiene </span><span class="sc">{</span><span class="bu">len</span>(contrato)<span class="sc">}</span><span class="ss"> caracteres y </span><span class="sc">{</span><span class="bu">len</span>(preguntas_contrato)<span class="sc">}</span><span class="ss"> preguntas de prueba."</span>)</span>
+<span id="cb19-118"><a href="#cb19-118" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-119"><a href="#cb19-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-120"><a href="#cb19-120" aria-hidden="true" tabindex="-1"></a>Ahora partimos el contrato con distintos tamaños y medimos dos cosas: (1) si el chunk más parecido a la pregunta **contiene** la respuesta y (2) **cuánto texto** le entregaríamos al LLM.</span>
+<span id="cb19-121"><a href="#cb19-121" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-124"><a href="#cb19-124" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb19-125"><a href="#cb19-125" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb19-126"><a href="#cb19-126" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb19-127"><a href="#cb19-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-128"><a href="#cb19-128" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_text_splitters <span class="im">import</span> RecursiveCharacterTextSplitter</span>
+<span id="cb19-129"><a href="#cb19-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-130"><a href="#cb19-130" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'chunk_size'</span><span class="sc">:&gt;10}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'overlap'</span><span class="sc">:&gt;8}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'nº chunks'</span><span class="sc">:&gt;10}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'car./chunk'</span><span class="sc">:&gt;11}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'tokens/chunk'</span><span class="sc">:&gt;13}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'acierto top-1'</span><span class="sc">:&gt;14}</span><span class="ss">"</span>)</span>
+<span id="cb19-131"><a href="#cb19-131" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> tamano, solape <span class="kw">in</span> [(<span class="dv">80</span>, <span class="dv">0</span>), (<span class="dv">150</span>, <span class="dv">20</span>), (<span class="dv">300</span>, <span class="dv">50</span>), (<span class="dv">600</span>, <span class="dv">100</span>), (<span class="dv">1200</span>, <span class="dv">200</span>), (<span class="dv">5000</span>, <span class="dv">0</span>)]:</span>
+<span id="cb19-132"><a href="#cb19-132" aria-hidden="true" tabindex="-1"></a>    splitter <span class="op">=</span> RecursiveCharacterTextSplitter(chunk_size<span class="op">=</span>tamano, chunk_overlap<span class="op">=</span>solape)</span>
+<span id="cb19-133"><a href="#cb19-133" aria-hidden="true" tabindex="-1"></a>    chunks <span class="op">=</span> splitter.split_text(contrato)</span>
+<span id="cb19-134"><a href="#cb19-134" aria-hidden="true" tabindex="-1"></a>    emb <span class="op">=</span> modelo.encode(chunks, normalize_embeddings<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb19-135"><a href="#cb19-135" aria-hidden="true" tabindex="-1"></a>    aciertos <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb19-136"><a href="#cb19-136" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pregunta, evidencia <span class="kw">in</span> preguntas_contrato:</span>
+<span id="cb19-137"><a href="#cb19-137" aria-hidden="true" tabindex="-1"></a>        q <span class="op">=</span> modelo.encode([pregunta], normalize_embeddings<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb19-138"><a href="#cb19-138" aria-hidden="true" tabindex="-1"></a>        mejor <span class="op">=</span> chunks[<span class="bu">int</span>(np.argmax((q <span class="op">@</span> emb.T)[<span class="dv">0</span>]))]</span>
+<span id="cb19-139"><a href="#cb19-139" aria-hidden="true" tabindex="-1"></a>        aciertos <span class="op">+=</span> evidencia <span class="kw">in</span> mejor</span>
+<span id="cb19-140"><a href="#cb19-140" aria-hidden="true" tabindex="-1"></a>    tokens <span class="op">=</span> np.mean([<span class="bu">len</span>(modelo.tokenizer(c)[<span class="st">"input_ids"</span>]) <span class="cf">for</span> c <span class="kw">in</span> chunks])</span>
+<span id="cb19-141"><a href="#cb19-141" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>tamano<span class="sc">:&gt;10}</span><span class="ss"> </span><span class="sc">{</span>solape<span class="sc">:&gt;8}</span><span class="ss"> </span><span class="sc">{</span><span class="bu">len</span>(chunks)<span class="sc">:&gt;10}</span><span class="ss"> </span><span class="sc">{</span>np<span class="sc">.</span>mean([<span class="bu">len</span>(c) <span class="cf">for</span> c <span class="kw">in</span> chunks])<span class="sc">:&gt;11.0f}</span><span class="ss"> </span><span class="sc">{</span>tokens<span class="sc">:&gt;13.0f}</span><span class="ss"> </span><span class="sc">{</span>aciertos<span class="sc">:&gt;11}</span><span class="ss">/</span><span class="sc">{</span><span class="bu">len</span>(preguntas_contrato)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb19-142"><a href="#cb19-142" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Límite del modelo de embeddings: </span><span class="sc">{</span>modelo<span class="sc">.</span>max_seq_length<span class="sc">}</span><span class="ss"> tokens"</span>)</span>
+<span id="cb19-143"><a href="#cb19-143" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-144"><a href="#cb19-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-145"><a href="#cb19-145" aria-hidden="true" tabindex="-1"></a>Cómo leer la tabla:</span>
+<span id="cb19-146"><a href="#cb19-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-147"><a href="#cb19-147" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Chunks muy pequeños (80–150 caracteres):** la respuesta queda partida entre fragmentos y el acierto se hunde (1 de 6 y 4 de 6).</span>
+<span id="cb19-148"><a href="#cb19-148" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Chunks medianos (300–600 caracteres):** acierto completo y cada chunk entrega solo un párrafo, y cabe en el límite del modelo.</span>
+<span id="cb19-149"><a href="#cb19-149" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Chunks enormes (1.200 y 5.000 caracteres):** el acierto es perfecto, **pero es una ilusión de este ejemplo**: con un solo documento pequeño, devolver "todo" siempre contiene la respuesta. Fíjate en las dos columnas de al lado: el LLM recibiría el contrato entero para responder una pregunta de una línea, y los chunks de más de 128 tokens superan el límite del modelo, así que su parte final ni siquiera cuenta en el embedding.</span>
+<span id="cb19-150"><a href="#cb19-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-151"><a href="#cb19-151" aria-hidden="true" tabindex="-1"></a>No hay un tamaño universal. Para texto normal, entre 200 y 1.000 caracteres (o 100–300 tokens) con un solape del 10–20 % es un punto de partida razonable. **Lo que decide es medirlo con tus preguntas** (ejercicio A2 del HPD 1).</span>
+<span id="cb19-152"><a href="#cb19-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-153"><a href="#cb19-153" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb19-154"><a href="#cb19-154" aria-hidden="true" tabindex="-1"></a><span class="fu">## ¿Para qué sirve el solapamiento?</span></span>
+<span id="cb19-155"><a href="#cb19-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-156"><a href="#cb19-156" aria-hidden="true" tabindex="-1"></a>Si cortas justo en mitad de una frase importante, ninguno de los dos chunks la contiene. El solape repite el final de un chunk al principio del siguiente. Cuesta algo de espacio extra pero protege las fronteras. La demo <span class="co">[</span><span class="ot">Trocear documentos para RAG</span><span class="co">](../demos/chunking.qmd)</span> te deja ajustar tamaño y solape y ver cuándo se parte la respuesta.</span>
+<span id="cb19-157"><a href="#cb19-157" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb19-158"><a href="#cb19-158" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-159"><a href="#cb19-159" aria-hidden="true" tabindex="-1"></a><span class="fu">## Buscar con palabras: BM25 {#sec-bm25}</span></span>
+<span id="cb19-160"><a href="#cb19-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-161"><a href="#cb19-161" aria-hidden="true" tabindex="-1"></a>Los embeddings entienden paráfrasis, pero fallan con códigos, siglas y cifras (casos 2 y 3 de <span class="co">[</span><span class="ot">01c</span><span class="co">](01c-embeddings.qmd#sec-cuando-fallan)</span>). Para eso existe una familia de métodos mucho más antigua y todavía imbatible en lo suyo: la **búsqueda léxica**. Su representante estándar es **BM25** <span class="co">[</span><span class="ot">@robertson2009bm25</span><span class="co">]</span>, una evolución de TF-IDF que:</span>
+<span id="cb19-162"><a href="#cb19-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-163"><a href="#cb19-163" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>da más peso a las palabras **raras** (IDF), como TF-IDF;</span>
+<span id="cb19-164"><a href="#cb19-164" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>hace que repetir una palabra muchas veces aporte cada vez menos (la saturación, controlada por $k_1$);</span>
+<span id="cb19-165"><a href="#cb19-165" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>penaliza los documentos largos respecto a los cortos (controlado por $b$).</span>
+<span id="cb19-166"><a href="#cb19-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-167"><a href="#cb19-167" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb19-168"><a href="#cb19-168" aria-hidden="true" tabindex="-1"></a>\operatorname{BM25}(q, d) = \sum_{t \in q} \operatorname{IDF}(t) \cdot \frac{f(t,d)\,(k_1+1)}{f(t,d) + k_1\left(1 - b + b\,\frac{|d|}{\text{avgdl}}\right)}</span>
+<span id="cb19-169"><a href="#cb19-169" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb19-170"><a href="#cb19-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-171"><a href="#cb19-171" aria-hidden="true" tabindex="-1"></a>donde $f(t,d)$ es cuántas veces aparece el término $t$ en el documento $d$, $|d|$ su longitud y $\text{avgdl}$ la longitud media. Son 15 líneas de Python:</span>
+<span id="cb19-172"><a href="#cb19-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-175"><a href="#cb19-175" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb19-176"><a href="#cb19-176" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb19-177"><a href="#cb19-177" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb19-178"><a href="#cb19-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-179"><a href="#cb19-179" aria-hidden="true" tabindex="-1"></a>PALABRAS_VACIAS <span class="op">=</span> <span class="bu">set</span>(<span class="st">"el la los las un una unos unas de del al a en y o que qué me mi tu te se es por con para si su sus lo como cuánto cuál cómo cada"</span>.split())</span>
+<span id="cb19-180"><a href="#cb19-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-181"><a href="#cb19-181" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> tokenizar(texto):</span>
+<span id="cb19-182"><a href="#cb19-182" aria-hidden="true" tabindex="-1"></a>    palabras <span class="op">=</span> re.findall(<span class="vs">r"</span><span class="pp">[a-záéíóúñü0-9</span><span class="ch">\-</span><span class="pp">]</span><span class="op">+</span><span class="vs">"</span>, texto.lower())</span>
+<span id="cb19-183"><a href="#cb19-183" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [p <span class="cf">for</span> p <span class="kw">in</span> palabras <span class="cf">if</span> p <span class="kw">not</span> <span class="kw">in</span> PALABRAS_VACIAS]</span>
+<span id="cb19-184"><a href="#cb19-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-185"><a href="#cb19-185" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> BM25:</span>
+<span id="cb19-186"><a href="#cb19-186" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, documentos, k1<span class="op">=</span><span class="fl">1.5</span>, b<span class="op">=</span><span class="fl">0.75</span>):</span>
+<span id="cb19-187"><a href="#cb19-187" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.docs <span class="op">=</span> [tokenizar(d) <span class="cf">for</span> d <span class="kw">in</span> documentos]</span>
+<span id="cb19-188"><a href="#cb19-188" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.k1, <span class="va">self</span>.b <span class="op">=</span> k1, b</span>
+<span id="cb19-189"><a href="#cb19-189" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.N <span class="op">=</span> <span class="bu">len</span>(<span class="va">self</span>.docs)</span>
+<span id="cb19-190"><a href="#cb19-190" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.avgdl <span class="op">=</span> <span class="bu">sum</span>(<span class="bu">len</span>(d) <span class="cf">for</span> d <span class="kw">in</span> <span class="va">self</span>.docs) <span class="op">/</span> <span class="va">self</span>.N</span>
+<span id="cb19-191"><a href="#cb19-191" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.df <span class="op">=</span> Counter(p <span class="cf">for</span> d <span class="kw">in</span> <span class="va">self</span>.docs <span class="cf">for</span> p <span class="kw">in</span> <span class="bu">set</span>(d))</span>
+<span id="cb19-192"><a href="#cb19-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-193"><a href="#cb19-193" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> idf(<span class="va">self</span>, palabra):</span>
+<span id="cb19-194"><a href="#cb19-194" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> math.log(<span class="dv">1</span> <span class="op">+</span> (<span class="va">self</span>.N <span class="op">-</span> <span class="va">self</span>.df[palabra] <span class="op">+</span> <span class="fl">0.5</span>) <span class="op">/</span> (<span class="va">self</span>.df[palabra] <span class="op">+</span> <span class="fl">0.5</span>))</span>
+<span id="cb19-195"><a href="#cb19-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-196"><a href="#cb19-196" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> puntuaciones(<span class="va">self</span>, consulta):</span>
+<span id="cb19-197"><a href="#cb19-197" aria-hidden="true" tabindex="-1"></a>        resultado <span class="op">=</span> np.zeros(<span class="va">self</span>.N)</span>
+<span id="cb19-198"><a href="#cb19-198" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, doc <span class="kw">in</span> <span class="bu">enumerate</span>(<span class="va">self</span>.docs):</span>
+<span id="cb19-199"><a href="#cb19-199" aria-hidden="true" tabindex="-1"></a>            frecuencias <span class="op">=</span> Counter(doc)</span>
+<span id="cb19-200"><a href="#cb19-200" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> p <span class="kw">in</span> tokenizar(consulta):</span>
+<span id="cb19-201"><a href="#cb19-201" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> p <span class="kw">in</span> frecuencias:</span>
+<span id="cb19-202"><a href="#cb19-202" aria-hidden="true" tabindex="-1"></a>                    f <span class="op">=</span> frecuencias[p]</span>
+<span id="cb19-203"><a href="#cb19-203" aria-hidden="true" tabindex="-1"></a>                    norm <span class="op">=</span> f <span class="op">+</span> <span class="va">self</span>.k1 <span class="op">*</span> (<span class="dv">1</span> <span class="op">-</span> <span class="va">self</span>.b <span class="op">+</span> <span class="va">self</span>.b <span class="op">*</span> <span class="bu">len</span>(doc) <span class="op">/</span> <span class="va">self</span>.avgdl)</span>
+<span id="cb19-204"><a href="#cb19-204" aria-hidden="true" tabindex="-1"></a>                    resultado[i] <span class="op">+=</span> <span class="va">self</span>.idf(p) <span class="op">*</span> f <span class="op">*</span> (<span class="va">self</span>.k1 <span class="op">+</span> <span class="dv">1</span>) <span class="op">/</span> norm</span>
+<span id="cb19-205"><a href="#cb19-205" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> resultado</span>
+<span id="cb19-206"><a href="#cb19-206" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"BM25 listo."</span>)</span>
+<span id="cb19-207"><a href="#cb19-207" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-208"><a href="#cb19-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-209"><a href="#cb19-209" aria-hidden="true" tabindex="-1"></a>Lo probamos sobre el buscador de preguntas frecuentes (el mismo corpus de 01c y 01d):</span>
+<span id="cb19-210"><a href="#cb19-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-213"><a href="#cb19-213" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb19-214"><a href="#cb19-214" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb19-215"><a href="#cb19-215" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb19-216"><a href="#cb19-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-217"><a href="#cb19-217" aria-hidden="true" tabindex="-1"></a>faq <span class="op">=</span> [</span>
+<span id="cb19-218"><a href="#cb19-218" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Puedes pagar con tarjeta de crédito o débito en cualquier comercio adherido."</span>,</span>
+<span id="cb19-219"><a href="#cb19-219" aria-hidden="true" tabindex="-1"></a>    <span class="st">"No se admite el pago con tarjeta en operaciones superiores a 3.000 euros; usa transferencia."</span>,</span>
+<span id="cb19-220"><a href="#cb19-220" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Para pedir un reembolso, solicita la devolución en la app en un plazo de 14 días."</span>,</span>
+<span id="cb19-221"><a href="#cb19-221" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La comisión por transferencia SEPA es de 0,50 euros por operación."</span>,</span>
+<span id="cb19-222"><a href="#cb19-222" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Las transferencias internacionales tienen una comisión del 2 </span><span class="sc">% d</span><span class="st">el importe."</span>,</span>
+<span id="cb19-223"><a href="#cb19-223" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Si pierdes tu tarjeta, bloquéala desde la app o llama al teléfono de atención 24 horas."</span>,</span>
+<span id="cb19-224"><a href="#cb19-224" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El IBAN es el código que identifica tu cuenta bancaria en transferencias nacionales e internacionales."</span>,</span>
+<span id="cb19-225"><a href="#cb19-225" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Para cambiar tu contraseña, entra en Ajustes &gt; Seguridad y pulsa «Restablecer»."</span>,</span>
+<span id="cb19-226"><a href="#cb19-226" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El límite diario de retirada en cajeros es de 600 euros."</span>,</span>
+<span id="cb19-227"><a href="#cb19-227" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Abrir una cuenta nueva es gratis y se completa en cinco minutos con tu DNI."</span>,</span>
+<span id="cb19-228"><a href="#cb19-228" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Los préstamos personales se conceden en 24 horas si tienes la nómina domiciliada."</span>,</span>
+<span id="cb19-229"><a href="#cb19-229" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La hipoteca a tipo variable se revisa cada seis meses según el Euríbor."</span>,</span>
+<span id="cb19-230"><a href="#cb19-230" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Error E-4021: la operación fue rechazada por saldo insuficiente."</span>,</span>
+<span id="cb19-231"><a href="#cb19-231" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Error E-4012: la tarjeta ha caducado y debe renovarse."</span>,</span>
+<span id="cb19-232"><a href="#cb19-232" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb19-233"><a href="#cb19-233" aria-hidden="true" tabindex="-1"></a>bm25 <span class="op">=</span> BM25(faq)</span>
+<span id="cb19-234"><a href="#cb19-234" aria-hidden="true" tabindex="-1"></a>emb_faq <span class="op">=</span> modelo.encode(faq, normalize_embeddings<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb19-235"><a href="#cb19-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-236"><a href="#cb19-236" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> top_lexico(consulta, k<span class="op">=</span><span class="dv">2</span>):</span>
+<span id="cb19-237"><a href="#cb19-237" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> bm25.puntuaciones(consulta)</span>
+<span id="cb19-238"><a href="#cb19-238" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [(<span class="bu">int</span>(i), <span class="bu">float</span>(p[i])) <span class="cf">for</span> i <span class="kw">in</span> np.argsort(<span class="op">-</span>p)[:k] <span class="cf">if</span> p[i] <span class="op">&gt;</span> <span class="dv">0</span>]</span>
+<span id="cb19-239"><a href="#cb19-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-240"><a href="#cb19-240" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> top_denso(consulta, k<span class="op">=</span><span class="dv">2</span>):</span>
+<span id="cb19-241"><a href="#cb19-241" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> (modelo.encode([consulta], normalize_embeddings<span class="op">=</span><span class="va">True</span>) <span class="op">@</span> emb_faq.T)[<span class="dv">0</span>]</span>
+<span id="cb19-242"><a href="#cb19-242" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [(<span class="bu">int</span>(i), <span class="bu">float</span>(p[i])) <span class="cf">for</span> i <span class="kw">in</span> np.argsort(<span class="op">-</span>p)[:k]]</span>
+<span id="cb19-243"><a href="#cb19-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-244"><a href="#cb19-244" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> consulta <span class="kw">in</span> [<span class="st">"¿qué significa el error E-4012?"</span>, <span class="st">"Euríbor"</span>, <span class="st">"he olvidado mi clave de acceso"</span>]:</span>
+<span id="cb19-245"><a href="#cb19-245" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Consulta: </span><span class="sc">{</span>consulta<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb19-246"><a href="#cb19-246" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"  BM25 :"</span>, [(i, <span class="bu">round</span>(s, <span class="dv">2</span>)) <span class="cf">for</span> i, s <span class="kw">in</span> top_lexico(consulta)] <span class="kw">or</span> <span class="st">"sin coincidencias"</span>)</span>
+<span id="cb19-247"><a href="#cb19-247" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"  Denso:"</span>, [(i, <span class="bu">round</span>(s, <span class="dv">2</span>)) <span class="cf">for</span> i, s <span class="kw">in</span> top_denso(consulta)])</span>
+<span id="cb19-248"><a href="#cb19-248" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-249"><a href="#cb19-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-250"><a href="#cb19-250" aria-hidden="true" tabindex="-1"></a>Fíjate en el patrón:</span>
+<span id="cb19-251"><a href="#cb19-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-252"><a href="#cb19-252" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`E-4012`</span> y <span class="in">`Euríbor`</span> son identificadores y nombres propios: BM25 los encuentra al instante; el embedding puede dudar (en el primer caso devuelve antes el documento <span class="in">`E-4021`</span>).</span>
+<span id="cb19-253"><a href="#cb19-253" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>«clave de acceso» no comparte ninguna palabra con «contraseña»: BM25 **no encuentra nada**, el embedding sí.</span>
+<span id="cb19-254"><a href="#cb19-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-255"><a href="#cb19-255" aria-hidden="true" tabindex="-1"></a>Cada método falla donde el otro acierta. De ahí la idea más práctica de esta página.</span>
+<span id="cb19-256"><a href="#cb19-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-257"><a href="#cb19-257" aria-hidden="true" tabindex="-1"></a><span class="fu">## Búsqueda híbrida: lo mejor de los dos mundos {#sec-hibrida}</span></span>
+<span id="cb19-258"><a href="#cb19-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-259"><a href="#cb19-259" aria-hidden="true" tabindex="-1"></a>Combinar los dos rankings tiene un problema: las puntuaciones no son comparables (BM25 va de 0 a decenas, el coseno de 0 a 1). Una solución sencilla y robusta es **ignorar las puntuaciones y fusionar solo las posiciones**: *Reciprocal Rank Fusion* (RRF) <span class="co">[</span><span class="ot">@cormack2009rrf</span><span class="co">]</span>. Cada documento recibe $\frac{1}{c + \text{posición}}$ en cada ranking (con $c = 60$ habitualmente) y se suman:</span>
+<span id="cb19-260"><a href="#cb19-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-261"><a href="#cb19-261" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb19-262"><a href="#cb19-262" aria-hidden="true" tabindex="-1"></a>\operatorname{RRF}(d) = \sum_{r \in \text{rankings}} \frac{1}{c + \operatorname{pos}_r(d)}</span>
+<span id="cb19-263"><a href="#cb19-263" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb19-264"><a href="#cb19-264" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-265"><a href="#cb19-265" aria-hidden="true" tabindex="-1"></a>Un documento que aparece arriba en **los dos** rankings gana; uno que solo aparece en uno, queda en medio.</span>
+<span id="cb19-266"><a href="#cb19-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-269"><a href="#cb19-269" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb19-270"><a href="#cb19-270" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb19-271"><a href="#cb19-271" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb19-272"><a href="#cb19-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-273"><a href="#cb19-273" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ranking_lexico(consulta):</span>
+<span id="cb19-274"><a href="#cb19-274" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> bm25.puntuaciones(consulta)</span>
+<span id="cb19-275"><a href="#cb19-275" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="bu">int</span>(i) <span class="cf">for</span> i <span class="kw">in</span> np.argsort(<span class="op">-</span>p) <span class="cf">if</span> p[i] <span class="op">&gt;</span> <span class="dv">0</span>]       <span class="co"># solo documentos con alguna coincidencia</span></span>
+<span id="cb19-276"><a href="#cb19-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-277"><a href="#cb19-277" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ranking_denso(consulta):</span>
+<span id="cb19-278"><a href="#cb19-278" aria-hidden="true" tabindex="-1"></a>    p <span class="op">=</span> (modelo.encode([consulta], normalize_embeddings<span class="op">=</span><span class="va">True</span>) <span class="op">@</span> emb_faq.T)[<span class="dv">0</span>]</span>
+<span id="cb19-279"><a href="#cb19-279" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [<span class="bu">int</span>(i) <span class="cf">for</span> i <span class="kw">in</span> np.argsort(<span class="op">-</span>p)]</span>
+<span id="cb19-280"><a href="#cb19-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-281"><a href="#cb19-281" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ranking_hibrido(consulta, c<span class="op">=</span><span class="dv">60</span>):</span>
+<span id="cb19-282"><a href="#cb19-282" aria-hidden="true" tabindex="-1"></a>    puntos <span class="op">=</span> Counter()</span>
+<span id="cb19-283"><a href="#cb19-283" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> ranking <span class="kw">in</span> (ranking_lexico(consulta), ranking_denso(consulta)):</span>
+<span id="cb19-284"><a href="#cb19-284" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> posicion, doc <span class="kw">in</span> <span class="bu">enumerate</span>(ranking, start<span class="op">=</span><span class="dv">1</span>):</span>
+<span id="cb19-285"><a href="#cb19-285" aria-hidden="true" tabindex="-1"></a>            puntos[doc] <span class="op">+=</span> <span class="dv">1</span> <span class="op">/</span> (c <span class="op">+</span> posicion)</span>
+<span id="cb19-286"><a href="#cb19-286" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> [doc <span class="cf">for</span> doc, _ <span class="kw">in</span> puntos.most_common()]</span>
+<span id="cb19-287"><a href="#cb19-287" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-288"><a href="#cb19-288" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Híbrido para «¿qué significa el error E-4012?»:"</span>, ranking_hibrido(<span class="st">"¿qué significa el error E-4012?"</span>)[:<span class="dv">3</span>])</span>
+<span id="cb19-289"><a href="#cb19-289" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-290"><a href="#cb19-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-291"><a href="#cb19-291" aria-hidden="true" tabindex="-1"></a><span class="fu">## Medir: ¿funciona la recuperación? {#sec-metricas-recuperacion}</span></span>
+<span id="cb19-292"><a href="#cb19-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-293"><a href="#cb19-293" aria-hidden="true" tabindex="-1"></a>Hasta ahora hemos mirado ejemplos sueltos. Para decidir entre métodos necesitamos un **conjunto de prueba**: preguntas para las que sabemos qué documento es el correcto (el *ground truth*, que construye una persona). Las métricas más usadas son:</span>
+<span id="cb19-294"><a href="#cb19-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-295"><a href="#cb19-295" aria-hidden="true" tabindex="-1"></a>: Métricas de recuperación más usadas {#tbl-metricas-recuperacion}</span>
+<span id="cb19-296"><a href="#cb19-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-297"><a href="#cb19-297" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Métrica <span class="pp">|</span> Qué responde <span class="pp">|</span> Cuándo usarla <span class="pp">|</span></span>
+<span id="cb19-298"><a href="#cb19-298" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb19-299"><a href="#cb19-299" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **hit@k** <span class="pp">|</span> ¿Hay al menos un documento relevante entre los $k$ primeros? <span class="pp">|</span> Cuando basta con encontrar *una* respuesta buena (casi todo RAG) <span class="pp">|</span></span>
+<span id="cb19-300"><a href="#cb19-300" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **recall@k** | ¿Qué fracción de **todos** los relevantes está en los $k$ primeros? <span class="pp">|</span> Cuando hay varios documentos relevantes y quieres encontrarlos todos <span class="pp">|</span></span>
+<span id="cb19-301"><a href="#cb19-301" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **MRR** (*mean reciprocal rank*) <span class="pp">|</span> ¿En qué posición aparece el primer relevante? Promedio de $1/\text{posición}$ <span class="pp">|</span> Cuando importa que el primero sea bueno <span class="pp">|</span></span>
+<span id="cb19-302"><a href="#cb19-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-303"><a href="#cb19-303" aria-hidden="true" tabindex="-1"></a>Una trampa clásica: si una pregunta tiene **2 documentos relevantes** y evalúas con $k=1$, el recall@1 solo puede valer 0,5 como máximo, aunque el sistema sea perfecto. Con $k$ pequeño suele ser más informativo el hit@k.</span>
+<span id="cb19-304"><a href="#cb19-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-305"><a href="#cb19-305" aria-hidden="true" tabindex="-1"></a>Construimos 12 preguntas de prueba sobre el buscador del banco (algunas con paráfrasis, otras con códigos y nombres propios) y comparamos los tres métodos:</span>
+<span id="cb19-306"><a href="#cb19-306" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-309"><a href="#cb19-309" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb19-310"><a href="#cb19-310" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb19-311"><a href="#cb19-311" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb19-312"><a href="#cb19-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-313"><a href="#cb19-313" aria-hidden="true" tabindex="-1"></a><span class="co"># (pregunta, índice del documento correcto en `faq`)</span></span>
+<span id="cb19-314"><a href="#cb19-314" aria-hidden="true" tabindex="-1"></a>prueba <span class="op">=</span> [</span>
+<span id="cb19-315"><a href="#cb19-315" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿qué significa el error E-4012?"</span>, <span class="dv">13</span>), (<span class="st">"error E-4021"</span>, <span class="dv">12</span>),</span>
+<span id="cb19-316"><a href="#cb19-316" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"Quiero que me devuelvan el dinero de una compra"</span>, <span class="dv">2</span>), (<span class="st">"he olvidado mi clave de acceso"</span>, <span class="dv">7</span>),</span>
+<span id="cb19-317"><a href="#cb19-317" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Cuánto cuesta una transferencia SEPA?"</span>, <span class="dv">3</span>), (<span class="st">"¿Cómo bloqueo mi tarjeta si la pierdo?"</span>, <span class="dv">5</span>),</span>
+<span id="cb19-318"><a href="#cb19-318" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"¿Qué es el IBAN?"</span>, <span class="dv">6</span>), (<span class="st">"¿Cada cuánto se revisa la hipoteca variable?"</span>, <span class="dv">11</span>),</span>
+<span id="cb19-319"><a href="#cb19-319" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"comisión del 2 </span><span class="sc">% e</span><span class="st">n transferencias internacionales"</span>, <span class="dv">4</span>), (<span class="st">"Euríbor"</span>, <span class="dv">11</span>),</span>
+<span id="cb19-320"><a href="#cb19-320" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"rechazo por falta de fondos"</span>, <span class="dv">12</span>), (<span class="st">"mi plástico caducó"</span>, <span class="dv">13</span>),</span>
+<span id="cb19-321"><a href="#cb19-321" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb19-322"><a href="#cb19-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-323"><a href="#cb19-323" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> posicion_correcta(ranking, correcto):</span>
+<span id="cb19-324"><a href="#cb19-324" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> ranking.index(correcto) <span class="op">+</span> <span class="dv">1</span> <span class="cf">if</span> correcto <span class="kw">in</span> ranking <span class="cf">else</span> <span class="va">None</span>   <span class="co"># None = no aparece</span></span>
+<span id="cb19-325"><a href="#cb19-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-326"><a href="#cb19-326" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> evaluar(funcion_ranking):</span>
+<span id="cb19-327"><a href="#cb19-327" aria-hidden="true" tabindex="-1"></a>    posiciones <span class="op">=</span> [posicion_correcta(funcion_ranking(q), c) <span class="cf">for</span> q, c <span class="kw">in</span> prueba]</span>
+<span id="cb19-328"><a href="#cb19-328" aria-hidden="true" tabindex="-1"></a>    hit1 <span class="op">=</span> np.mean([p <span class="op">==</span> <span class="dv">1</span> <span class="cf">for</span> p <span class="kw">in</span> posiciones])</span>
+<span id="cb19-329"><a href="#cb19-329" aria-hidden="true" tabindex="-1"></a>    hit3 <span class="op">=</span> np.mean([p <span class="kw">is</span> <span class="kw">not</span> <span class="va">None</span> <span class="kw">and</span> p <span class="op">&lt;=</span> <span class="dv">3</span> <span class="cf">for</span> p <span class="kw">in</span> posiciones])</span>
+<span id="cb19-330"><a href="#cb19-330" aria-hidden="true" tabindex="-1"></a>    mrr <span class="op">=</span> np.mean([<span class="dv">1</span> <span class="op">/</span> p <span class="cf">if</span> p <span class="cf">else</span> <span class="dv">0</span> <span class="cf">for</span> p <span class="kw">in</span> posiciones])</span>
+<span id="cb19-331"><a href="#cb19-331" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> hit1, hit3, mrr</span>
+<span id="cb19-332"><a href="#cb19-332" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-333"><a href="#cb19-333" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span><span class="st">'Método'</span><span class="sc">:&lt;10}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'hit@1'</span><span class="sc">:&gt;6}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'hit@3'</span><span class="sc">:&gt;6}</span><span class="ss"> </span><span class="sc">{</span><span class="st">'MRR'</span><span class="sc">:&gt;6}</span><span class="ss">"</span>)</span>
+<span id="cb19-334"><a href="#cb19-334" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> nombre, f <span class="kw">in</span> [(<span class="st">"BM25"</span>, ranking_lexico), (<span class="st">"Denso"</span>, ranking_denso), (<span class="st">"Híbrido"</span>, ranking_hibrido)]:</span>
+<span id="cb19-335"><a href="#cb19-335" aria-hidden="true" tabindex="-1"></a>    h1, h3, mrr <span class="op">=</span> evaluar(f)</span>
+<span id="cb19-336"><a href="#cb19-336" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>nombre<span class="sc">:&lt;10}</span><span class="ss"> </span><span class="sc">{</span>h1<span class="sc">:&gt;6.2f}</span><span class="ss"> </span><span class="sc">{</span>h3<span class="sc">:&gt;6.2f}</span><span class="ss"> </span><span class="sc">{</span>mrr<span class="sc">:&gt;6.2f}</span><span class="ss">"</span>)</span>
+<span id="cb19-337"><a href="#cb19-337" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb19-338"><a href="#cb19-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-339"><a href="#cb19-339" aria-hidden="true" tabindex="-1"></a>Con esta prueba pequeña, el patrón es el esperado: **BM25 solo se queda corto** (no encuentra paráfrasis), **el denso falla en códigos y nombres propios**, y **la fusión mejora a los dos**. Cuidado con sacar conclusiones fuertes: son solo 12 preguntas que hemos escrito nosotros, y con un conjunto tan pequeño una pregunta cambia las cifras en 8 puntos. Para decidir en un proyecto real hacen falta más preguntas, escritas por quienes usarán el sistema.</span>
+<span id="cb19-340"><a href="#cb19-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-341"><a href="#cb19-341" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb19-342"><a href="#cb19-342" aria-hidden="true" tabindex="-1"></a><span class="fu">## El ground truth define lo que mides</span></span>
+<span id="cb19-343"><a href="#cb19-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-344"><a href="#cb19-344" aria-hidden="true" tabindex="-1"></a>Define cuál es "el documento correcto" **por su contenido** (por ejemplo, "el chunk que contiene la frase X"), nunca por una posición o un identificador que cambia si modificas el tamaño del chunk. Si cada vez que cambias el troceado cambian los identificadores, tus métricas dejan de ser comparables. Es el error más común al evaluar un pipeline de recuperación, y el HPD 1 te lo hará comprobar.</span>
+<span id="cb19-345"><a href="#cb19-345" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb19-346"><a href="#cb19-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-347"><a href="#cb19-347" aria-hidden="true" tabindex="-1"></a><span class="fu">## Qué hacer cuando no hay respuesta {#sec-sin-respuesta}</span></span>
+<span id="cb19-348"><a href="#cb19-348" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-349"><a href="#cb19-349" aria-hidden="true" tabindex="-1"></a>Todo lo anterior supone que la respuesta existe en el corpus. En la práctica, muchas preguntas no la tienen, y el buscador devolverá igualmente los $k$ vecinos más cercanos (Caso 6 de <span class="co">[</span><span class="ot">01c</span><span class="co">](01c-embeddings.qmd#sec-fallo-sin-respuesta)</span>). Dos defensas habituales:</span>
+<span id="cb19-350"><a href="#cb19-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-351"><a href="#cb19-351" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Umbral de similitud, calibrado.** Probando con preguntas con y sin respuesta, elige el valor del coseno por debajo del cual no pasas el resultado al LLM. Es específico de cada modelo y corpus.</span>
+<span id="cb19-352"><a href="#cb19-352" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Pedir al LLM que diga «no lo sé»** cuando el contexto no contiene la respuesta, y evaluarlo (Bloque 3, con RAGAS, y <span class="co">[</span><span class="ot">Bloque 4</span><span class="co">](../bloque4/04b-alucinaciones.qmd)</span>).</span>
+<span id="cb19-353"><a href="#cb19-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-354"><a href="#cb19-354" aria-hidden="true" tabindex="-1"></a><span class="fu">## Comprueba lo aprendido {#sec-comprueba-01e}</span></span>
+<span id="cb19-355"><a href="#cb19-355" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-356"><a href="#cb19-356" aria-hidden="true" tabindex="-1"></a>::: {.callout-note collapse="true" title="1. Indexas manuales de 80 páginas sin trocear. ¿Qué dos cosas pueden ir mal?"}</span>
+<span id="cb19-357"><a href="#cb19-357" aria-hidden="true" tabindex="-1"></a>Primero, el modelo de embeddings solo ve los primeros 128–512 tokens (según el modelo), así que casi todo el manual es invisible. Segundo, aunque lo viera, el embedding de un texto con decenas de temas no representa bien ninguno, y cada resultado entregaría al LLM un manual entero.</span>
+<span id="cb19-358"><a href="#cb19-358" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb19-359"><a href="#cb19-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-360"><a href="#cb19-360" aria-hidden="true" tabindex="-1"></a>::: {.callout-note collapse="true" title="2. Los usuarios de tu buscador escriben mucho referencias de pedido como «PED-2024-00871». ¿Qué método usarías y por qué?"}</span>
+<span id="cb19-361"><a href="#cb19-361" aria-hidden="true" tabindex="-1"></a>Búsqueda léxica (BM25) o, mejor, híbrida. Los identificadores exactos son terreno de la coincidencia de palabras; un embedding trataría «PED-2024-00871» y «PED-2024-00817» como casi idénticos.</span>
+<span id="cb19-362"><a href="#cb19-362" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb19-363"><a href="#cb19-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-364"><a href="#cb19-364" aria-hidden="true" tabindex="-1"></a>::: {.callout-note collapse="true" title="3. Tu hit@3 pasa de 0,83 a 0,92 al cambiar de método sobre 12 preguntas. ¿Es una mejora real?"}</span>
+<span id="cb19-365"><a href="#cb19-365" aria-hidden="true" tabindex="-1"></a>Probablemente no se pueda afirmar. Con 12 preguntas, 0,83 → 0,92 es una sola pregunta más acertada. Habría que repetir con más preguntas (decenas o cientos) y mirar si la mejora es consistente.</span>
+<span id="cb19-366"><a href="#cb19-366" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb19-367"><a href="#cb19-367" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-368"><a href="#cb19-368" aria-hidden="true" tabindex="-1"></a>::: {.callout-note collapse="true" title="4. En una evaluación cada pregunta tiene 3 documentos relevantes. Calculas recall@1 y obtienes 0,33 como máximo. ¿Es un fallo del sistema?"}</span>
+<span id="cb19-369"><a href="#cb19-369" aria-hidden="true" tabindex="-1"></a>No. Con $k=1$ solo puedes recuperar 1 de los 3 relevantes, así que 1/3 es el máximo posible. Para esa evaluación conviene recall@3 o hit@1.</span>
+<span id="cb19-370"><a href="#cb19-370" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb19-371"><a href="#cb19-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-372"><a href="#cb19-372" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb19-373"><a href="#cb19-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-374"><a href="#cb19-374" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Ya tienes todas las piezas teóricas del bloque. Pasa al taller: **[HPD 1 — Pipeline de embeddings y búsqueda semántica](hpd1-embeddings.qmd)**.</span></span>
+<span id="cb19-375"><a href="#cb19-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-376"><a href="#cb19-376" aria-hidden="true" tabindex="-1"></a><span class="fu">## Referencias de esta página {#sec-referencias-01e}</span></span>
+<span id="cb19-377"><a href="#cb19-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-378"><a href="#cb19-378" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@robertson2009bm25</span>
+<span id="cb19-379"><a href="#cb19-379" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@cormack2009rrf</span>
+<span id="cb19-380"><a href="#cb19-380" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@karpukhin2020dpr</span>
+<span id="cb19-381"><a href="#cb19-381" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-382"><a href="#cb19-382" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb19-383"><a href="#cb19-383" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-384"><a href="#cb19-384" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb19-385"><a href="#cb19-385" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code></pre></div><button title="Copiar al portapapeles" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

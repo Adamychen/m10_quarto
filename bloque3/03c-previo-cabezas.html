@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="es" xml:lang="es"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>03c (previo) — Del estado oculto a la salida: cabezas y objetivos de entrenamiento – Módulo 10 — IA Generativa para Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No se han encontrado resultados",
+    "search-matching-documents-text": "documentos encontrados",
+    "search-copy-link-title": "Copiar el enlace en la búsqueda",
+    "search-hide-matches-text": "Ocultar resultados adicionales",
+    "search-more-match-text": "resultado adicional en este documento",
+    "search-more-matches-text": "resultados adicionales en este documento",
+    "search-clear-button-title": "Borrar",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancelar",
+    "search-submit-button-title": "Enviar",
+    "search-label": "Buscar"
+  }
+}</script>
+<meta name="mermaid-theme" content="neutral">
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque3/03-aplicaciones.html">Bloque 3 — Aplicaciones</a></li><li class="breadcrumb-item"><a href="../bloque3/03c-previo-cabezas.html">Previo: cabezas y objetivos</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Alternar barra lateral" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Buscar" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Módulo 10 — IA Generativa para Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Buscar"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inicio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acerca de</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 1 — Fundamentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01a-transformer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01b-llms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs e inferencia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01c-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01d-vectordb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bases de datos vectoriales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 2 — Orquestación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02-orquestacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02a-prompt-engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prompt Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02b-langchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LangChain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02c-llamaindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LlamaIndex</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02d-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02e-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentes Inteligentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 3 — Aplicaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03-aplicaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03b-rag-avanzado.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAG Avanzado</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03a-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tuning eficiente</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 4 — Gobernanza</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Demos interactivas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Evaluación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Alternar sección">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../06-herramientas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Herramientas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../07-bibliografia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliografía</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">En esta página</h2>
+   
+  <ul>
+  <li><a href="#sec-estados-ocultos" id="toc-sec-estados-ocultos" class="nav-link active" data-scroll-target="#sec-estados-ocultos">1. Del texto a los estados ocultos</a></li>
+  <li><a href="#sec-lm-head" id="toc-sec-lm-head" class="nav-link" data-scroll-target="#sec-lm-head">2. LM head: predecir el siguiente token</a>
+  <ul class="collapse">
+  <li><a href="#sec-weight-tying" id="toc-sec-weight-tying" class="nav-link" data-scroll-target="#sec-weight-tying">Weight tying</a></li>
+  </ul></li>
+  <li><a href="#sec-sft-misma-lm-head" id="toc-sec-sft-misma-lm-head" class="nav-link" data-scroll-target="#sec-sft-misma-lm-head">3. SFT: la misma LM head, una pérdida distinta</a></li>
+  <li><a href="#sec-value-head" id="toc-sec-value-head" class="nav-link" data-scroll-target="#sec-value-head">4. Value head: estimar el valor de un estado</a></li>
+  <li><a href="#sec-reward-head" id="toc-sec-reward-head" class="nav-link" data-scroll-target="#sec-reward-head">5. Reward head: puntuar una respuesta</a></li>
+  <li><a href="#sec-ppo-dpo" id="toc-sec-ppo-dpo" class="nav-link" data-scroll-target="#sec-ppo-dpo">6. PPO y DPO: dos rutas de optimización</a></li>
+  <li><a href="#sec-cabezas-y-lora" id="toc-sec-cabezas-y-lora" class="nav-link" data-scroll-target="#sec-cabezas-y-lora">7. Dónde encaja LoRA</a></li>
+  <li><a href="#sec-resumen-cabezas" id="toc-sec-resumen-cabezas" class="nav-link" data-scroll-target="#sec-resumen-cabezas">8. Resumen: tres cabezas y varias fases</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Otros formatos</h2><ul><li><a href="03c-previo-cabezas.ipynb" download="03c-previo-cabezas.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque3/03-aplicaciones.html">Bloque 3 — Aplicaciones</a></li><li class="breadcrumb-item"><a href="../bloque3/03c-previo-cabezas.html">Previo: cabezas y objetivos</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">03c (previo) — Del estado oculto a la salida: cabezas y objetivos de entrenamiento</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Código</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>Esta página es el <strong>previo conceptual de <a href="../bloque3/03c-fine-tuning.html">03c — Fine-tuning eficiente</a></strong>: explica qué es una cabeza de salida y qué significan SFT, PPO y DPO antes de ajustar un modelo. Se recomienda haber leído antes <a href="../bloque1/01a-transformer.html">01a — Arquitectura Transformer</a> y <a href="../bloque1/01b-llms.html">01b — LLM e inferencia</a>. Es lectura recomendada, no obligatoria.</p>
+</blockquote>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Nota</span>Qué aprenderás
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>En <a href="../bloque1/01a-transformer.html#sec-vistazo-transformer">01a - Cómo funciona un Transformer de un vistazo</a> vimos cómo una secuencia de tokens se transforma en estados ocultos contextualizados. En esta página seguimos el recorrido hasta la salida del modelo.</p>
+<p>La idea central es sencilla, pero conviene separar dos niveles que suelen mezclarse:</p>
+<ul>
+<li>El <em>backbone</em> es el conjunto de capas Transformer que construye una representación contextual para cada posición.</li>
+<li>Una cabeza de salida transforma esas representaciones en el resultado que necesita una tarea.</li>
+<li>SFT, PPO y DPO no son cabezas distintas, sino procedimientos y objetivos de entrenamiento.</li>
+</ul>
+<p>Esta distinción permite entender por qué un mismo modelo puede producir tokens, estimar el valor de un estado o puntuar una respuesta.</p>
+</div>
+</div>
+<section id="sec-estados-ocultos" class="level2">
+<h2 class="anchored" data-anchor-id="sec-estados-ocultos">1. Del texto a los estados ocultos</h2>
+<p>Para concretar la explicación, pensemos en un Transformer causal de tipo <em>decoder-only</em>. Después de procesar una secuencia de longitud <span class="math inline">\(T\)</span>, el <em>backbone</em> produce una matriz de estados ocultos:</p>
+<p><span class="math display">\[
+H = (\mathbf{h}_1, \mathbf{h}_2, \ldots, \mathbf{h}_T)
+\in \mathbb{R}^{B \times T \times d}
+\]</span></p>
+<p>Aquí, <span class="math inline">\(B\)</span> es el tamaño del lote, <span class="math inline">\(T\)</span> la longitud de la secuencia y <span class="math inline">\(d\)</span> la dimensión del modelo. Cada vector <span class="math inline">\(\mathbf{h}_t\)</span> resume la información que el modelo ha construido en la posición <span class="math inline">\(t\)</span>. En un modelo causal, esa información solo puede depender de los tokens anteriores y del token actual.</p>
+<p>El <em>backbone</em> no produce directamente una respuesta en lenguaje natural. Produce representaciones numéricas que otra capa debe interpretar. Esa capa es la cabeza de salida.</p>
+<div id="fig-backbone-cabezas" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-backbone-cabezas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    A[Tokens]:::input --&gt; B[Backbone&lt;br/&gt;Transformer&lt;br/&gt;x L capas]:::proc
+    B --&gt; C["H&lt;br/&gt;estados ocultos&lt;br/&gt;contextualizados"]:::doc
+    C --&gt; D{Cabeza de&lt;br/&gt;salida}:::proc
+    D --&gt;|LM head| E["Logits por token&lt;br/&gt;B x T x vocabulario"]:::out
+    D --&gt;|Value head| F["Valor por estado&lt;br/&gt;B x T x 1"]:::obs
+    D --&gt;|Reward head| G["Puntuación por secuencia&lt;br/&gt;B x 1"]:::obs
+
+    classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef proc  fill:#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px
+    classDef doc   fill:#FFD43B,stroke:#b8860b,color:#000,stroke-width:1.5px
+    classDef out   fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
+    classDef obs   fill:#e65100,stroke:#bf360c,color:#fff,stroke-width:1.5px
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-backbone-cabezas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;1: El backbone produce estados ocultos que distintas cabezas transforman en salidas diferentes.
+</figcaption>
+</figure>
+</div>
+<p>Como muestra <a href="#fig-backbone-cabezas" class="quarto-xref">Figura&nbsp;1</a>, las cabezas no reciben necesariamente la misma parte de <span class="math inline">\(H\)</span>. La <em>LM head</em> utiliza todos los estados para producir una distribución por token; la <em>value head</em> suele producir un valor por posición; la <em>reward head</em> resume la secuencia completa en un único escalar.</p>
+<p>La separación es conceptual. En una implementación concreta, el <em>backbone</em> puede congelarse, ajustarse mediante adaptadores o copiarse para formar modelos especializados. Lo importante es distinguir la representación compartida de la capa que la convierte en una salida.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Una regla útil
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Si la salida es una distribución sobre tokens, probablemente estamos ante una <em>LM head</em>. Si la salida es un escalar que resume un estado o una secuencia, probablemente estamos ante una cabeza de valor o de recompensa.</p>
+</div>
+</div>
+</section>
+<section id="sec-lm-head" class="level2">
+<h2 class="anchored" data-anchor-id="sec-lm-head">2. LM head: predecir el siguiente token</h2>
+<p>La <em>LM head</em> es una proyección lineal desde la dimensión del modelo hasta el tamaño del vocabulario. Para cada posición, transforma el estado oculto en un vector de logits:</p>
+<p><span class="math display">\[
+\mathbf{z}_t = W_{\text{LM}}\mathbf{h}_t + \mathbf{b}
+\in \mathbb{R}^{|\mathcal{V}|}
+\]</span></p>
+<p>La función <em>softmax</em> convierte esos logits en probabilidades:</p>
+<p><span class="math display">\[
+P(x_{t+1} \mid x_{\leq t})
+= \operatorname{softmax}(\mathbf{z}_t)
+\]</span></p>
+<p>El modelo no genera una frase completa de una sola vez. En cada paso calcula una distribución, selecciona o muestrea un token y lo incorpora al contexto. Después vuelve a calcular la salida para predecir el siguiente token.</p>
+<p>Durante el preentrenamiento, la pérdida causal compara la distribución producida en cada posición con el token que debería aparecer a continuación:</p>
+<p><span class="math display">\[
+\mathcal{L}_{\text{LM}}
+= -\frac{1}{T}\sum_{t=1}^{T}
+\log P(x_{t+1}\mid x_{\leq t})
+\]</span></p>
+<p>Por eso la salida de la <em>LM head</em> tiene una dimensión grande: si el vocabulario contiene <span class="math inline">\(|\mathcal{V}|\)</span> tokens, cada posición produce ese número de logits.</p>
+<div id="fig-alineacion-sft" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-alineacion-sft-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../images/01e-alineacion-sft.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-alineacion-sft-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;2: Una misma secuencia puede dar lugar a logits por posición, una máscara de pérdida SFT, valores por estado o una recompensa por secuencia.
+</figcaption>
+</figure>
+</div>
+<p>La figura <a href="#fig-alineacion-sft" class="quarto-xref">Figura&nbsp;2</a> reúne las salidas en una misma secuencia. La fila de logits conserva una salida para cada posición; la máscara SFT selecciona cuáles de esas posiciones contribuyen a la pérdida; la <em>value head</em> mantiene una estimación por estado; y la <em>reward head</em> resume la trayectoria completa en un único escalar.</p>
+<section id="sec-weight-tying" class="level3">
+<h3 class="anchored" data-anchor-id="sec-weight-tying">Weight tying</h3>
+<p>Muchos LLM comparten los pesos de la tabla de embeddings con la proyección de salida. En ese caso:</p>
+<p><span class="math display">\[
+W_{\text{LM}} = E^{\mathsf{T}}
+\]</span></p>
+<p>Esta decisión reduce el número de parámetros y conecta geométricamente la representación de entrada con la representación de salida. No es una propiedad obligatoria, pero sí una práctica habitual en modelos de lenguaje causales.</p>
+</section>
+</section>
+<section id="sec-sft-misma-lm-head" class="level2">
+<h2 class="anchored" data-anchor-id="sec-sft-misma-lm-head">3. SFT: la misma LM head, una pérdida distinta</h2>
+<p>El ajuste fino supervisado, o SFT (<em>Supervised Fine-Tuning</em>), enseña al modelo a responder a instrucciones mediante ejemplos de conversación o de formato instrucción-respuesta. No requiere una cabeza arquitectónica nueva: se sigue utilizando la <em>LM head</em>.</p>
+<p>Lo que cambia es el conjunto de datos y la máscara de la pérdida. El prompt proporciona el contexto, pero normalmente se calcula la pérdida solo sobre los tokens que debe producir el asistente:</p>
+<p><span class="math display">\[
+\mathcal{L}_{\text{SFT}}
+= -\frac{1}{\sum_{t=1}^{T}m_t}
+\sum_{t=1}^{T}m_t\log P(y_t\mid x, y_{&lt;t})
+\]</span></p>
+<p>La máscara <span class="math inline">\(m_t\)</span> vale cero para los tokens que no queremos utilizar como objetivo y uno para los tokens de la respuesta. En muchas implementaciones, los objetivos ignorados se representan con el valor <code>-100</code>.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Token</th>
+<th style="text-align: right;"><code>&lt;user&gt;</code></th>
+<th style="text-align: right;"><code>explica</code></th>
+<th style="text-align: right;"><code>&lt;assistant&gt;</code></th>
+<th style="text-align: right;"><code>La</code></th>
+<th style="text-align: right;"><code>atención</code></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Máscara <span class="math inline">\(m_t\)</span></td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">1</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr class="even">
+<td>Etiqueta</td>
+<td style="text-align: right;"><code>-100</code></td>
+<td style="text-align: right;"><code>-100</code></td>
+<td style="text-align: right;"><code>-100</code></td>
+<td style="text-align: right;"><code>La</code></td>
+<td style="text-align: right;"><code>atención</code></td>
+</tr>
+</tbody>
+</table>
+<p>El formato conversacional también importa. Los tokens especiales, las plantillas de chat y la forma de separar las intervenciones indican al modelo qué parte corresponde al usuario y cuál al asistente. La máscara no convierte por sí sola un modelo en un asistente; funciona junto con datos de instrucciones y un procedimiento de entrenamiento supervisado.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Importante</span>SFT no es una cuarta cabeza
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>La expresión “SFT head” resulta cómoda como abreviatura, pero es arquitectónicamente imprecisa. SFT describe una fase de entrenamiento de la <em>LM head</em>, no una capa de salida independiente.</p>
+</div>
+</div>
+</section>
+<section id="sec-value-head" class="level2">
+<h2 class="anchored" data-anchor-id="sec-value-head">4. Value head: estimar el valor de un estado</h2>
+<p>En aprendizaje por refuerzo, el modelo necesita algo más que una distribución sobre tokens. También puede necesitar una estimación de lo prometedor que es el estado actual. La función de valor de una política <span class="math inline">\(\pi\)</span> se define como el retorno esperado a partir de ese estado:</p>
+<p><span class="math display">\[
+V^{\pi}(s_t)
+= \mathbb{E}_{\pi}\left[
+\sum_{k=0}^{\infty}\gamma^k r_{t+k}
+\mid s_t
+\right]
+\]</span></p>
+<p>Una <em>value head</em> suele ser una capa lineal <span class="math inline">\(d \to 1\)</span> aplicada a cada estado oculto:</p>
+<p><span class="math display">\[
+V(s_t) = \mathbf{w}_{\text{value}}^{\mathsf{T}}\mathbf{h}_t + b
+\in \mathbb{R}
+\]</span></p>
+<p>La <em>value head</em> no sustituye necesariamente a la <em>LM head</em>. En un modelo actor-crítico, ambas ramas pueden coexistir:</p>
+<pre class="text"><code>Backbone
+|-- LM head       -&gt; distribución de acciones, normalmente tokens
+`-- Value head    -&gt; V(s_t), valor estimado del estado</code></pre>
+<p>La política utiliza los logits para elegir tokens. El crítico utiliza los valores para calcular ventajas y estabilizar la actualización de la política. En PPO, por ejemplo, la pérdida de valor puede expresarse como un error cuadrático entre el valor predicho y un retorno estimado:</p>
+<p><span class="math display">\[
+\mathcal{L}_{V}
+= \frac{1}{T}\sum_{t=1}^{T}
+\left(V(s_t)-R_t\right)^2
+\]</span></p>
+<p>La forma exacta de la cabeza y su inicialización dependen de la biblioteca y del algoritmo. Lo esencial es que produce un escalar por estado y que su función es distinta de la predicción del siguiente token.</p>
+<div id="fig-value-reward" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-value-reward-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="../images/01e-value-reward.svg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-value-reward-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;3: Diferencia entre el valor estimado en cada estado y la recompensa asignada a una respuesta completa.
+</figcaption>
+</figure>
+</div>
+<p>Como muestra <a href="#fig-value-reward" class="quarto-xref">Figura&nbsp;3</a>, la <em>value head</em> responde a una pregunta local: qué retorno se espera desde cada estado. La <em>reward head</em> responde a una pregunta global: qué puntuación recibe la respuesta completa. El modelo de recompensa puede comparar después dos respuestas mediante la diferencia entre sus puntuaciones.</p>
+</section>
+<section id="sec-reward-head" class="level2">
+<h2 class="anchored" data-anchor-id="sec-reward-head">5. Reward head: puntuar una respuesta</h2>
+<p>Un modelo de recompensa asigna una puntuación a una respuesta completa. Se entrena a partir de preferencias: dada una entrada <span class="math inline">\(x\)</span>, una persona o un proceso de evaluación indica cuál de dos respuestas es preferible, <span class="math inline">\(y^+\)</span> o <span class="math inline">\(y^-\)</span>.</p>
+<p>El modelo de recompensa puede compartir una arquitectura de lenguaje con el modelo base y sustituir la proyección al vocabulario por una capa escalar. En modelos <em>decoder-only</em> es habitual utilizar el estado del último token válido, el token de fin de secuencia o alguna forma de <em>pooling</em>:</p>
+<p><span class="math display">\[
+r_{\theta}(x,y)
+= \mathbf{w}_{\text{reward}}^{\mathsf{T}}\mathbf{h}_{\text{pool}} + b
+\in \mathbb{R}
+\]</span></p>
+<p>En el modelo de Bradley-Terry, la probabilidad de preferir la respuesta elegida se modela como:</p>
+<p><span class="math display">\[
+P(y^+ \succ y^- \mid x)
+= \sigma\left(
+r_{\theta}(x,y^+) - r_{\theta}(x,y^-)
+\right)
+\]</span></p>
+<p>La pérdida correspondiente es:</p>
+<p><span class="math display">\[
+\mathcal{L}_{\text{RM}}
+= -\log \sigma\left(
+r_{\theta}(x,y^+) - r_{\theta}(x,y^-)
+\right)
+\]</span></p>
+<p>La puntuación no debe interpretarse automáticamente como una medida absoluta de calidad. El objetivo principal es ordenar respuestas de acuerdo con los patrones de preferencia presentes en los datos.</p>
+</section>
+<section id="sec-ppo-dpo" class="level2">
+<h2 class="anchored" data-anchor-id="sec-ppo-dpo">6. PPO y DPO: dos rutas de optimización</h2>
+<p>La <em>reward head</em> y la <em>value head</em> aparecen sobre todo cuando se utiliza una ruta de aprendizaje por refuerzo como PPO. La relación entre componentes y fases se entiende mejor separando las dos rutas:</p>
+<div id="fig-rutas-preferencias" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rutas-preferencias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    PREF["Preferencias&lt;br/&gt;chosen / rejected"]:::doc
+
+    subgraph PPO_route["Ruta PPO / RLHF"]
+        P1["Política tras SFT"]:::input --&gt; Y1["Respuesta&lt;br/&gt;generada"]:::doc
+        Y1 --&gt; RM["Reward model&lt;br/&gt;r(x,y)"]:::proc
+        P1 --&gt; VH["Value head&lt;br/&gt;V(s_t)"]:::proc
+        RM --&gt; PPO["PPO&lt;br/&gt;recompensa + ventajas"]:::obs
+        VH --&gt; PPO
+        PPO --&gt; OUT1["Política&lt;br/&gt;actualizada"]:::out
+    end
+
+    subgraph DPO_route["Ruta DPO"]
+        P2["Política tras SFT"]:::input --&gt; DPO["DPO&lt;br/&gt;pérdida directa"]:::proc
+        REF["Política de&lt;br/&gt;referencia"]:::doc --&gt; DPO
+        DPO --&gt; OUT2["Política&lt;br/&gt;actualizada"]:::out
+    end
+
+    PREF --&gt; RM
+    PREF --&gt; DPO
+
+    classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef proc  fill:#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px
+    classDef doc   fill:#FFD43B,stroke:#b8860b,color:#000,stroke-width:1.5px
+    classDef out   fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
+    classDef obs   fill:#e65100,stroke:#bf360c,color:#fff,stroke-width:1.5px
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-rutas-preferencias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figura&nbsp;4: PPO y DPO utilizan las preferencias mediante rutas de optimización diferentes.
+</figcaption>
+</figure>
+</div>
+<p>En RLHF con PPO, el <em>reward model</em> transforma la respuesta en una señal de recompensa y la <em>value head</em> ayuda a estimar las ventajas durante la actualización de la política. Esta familia de métodos se popularizó en trabajos de alineamiento con preferencias humanas <span class="citation" data-cites="ouyang2022training schulman2017proximal">(<a href="#ref-ouyang2022training" role="doc-biblioref"><span class="nocase">Ouyang et&nbsp;al.</span>, 2022</a>; <a href="#ref-schulman2017proximal" role="doc-biblioref">Schulman et&nbsp;al., 2017</a>)</span>.</p>
+<p>DPO (<em>Direct Preference Optimization</em>) utiliza directamente los pares de preferencias y una política de referencia congelada. No necesita entrenar un <em>reward model</em> separado como paso intermedio <span class="citation" data-cites="rafailov2023direct">(<a href="#ref-rafailov2023direct" role="doc-biblioref">Rafailov et&nbsp;al., 2023</a>)</span>. Por tanto, no conviene presentar la <em>reward head</em> como una pieza necesaria de todo sistema de alineamiento.</p>
+</section>
+<section id="sec-cabezas-y-lora" class="level2">
+<h2 class="anchored" data-anchor-id="sec-cabezas-y-lora">7. Dónde encaja LoRA</h2>
+<p>El ajuste eficiente de parámetros introduce otra distinción. LoRA (<em>Low-Rank Adaptation</em>) no significa necesariamente entrenar solo la cabeza de salida. Lo habitual es añadir matrices de bajo rango en módulos seleccionados del <em>backbone</em>, por ejemplo en las proyecciones de consulta y valor de la atención <span class="citation" data-cites="hu2022lora">(<a href="#ref-hu2022lora" role="doc-biblioref">Hu et&nbsp;al., 2022</a>)</span>.</p>
+<p>El modelo base puede permanecer congelado mientras se entrenan esos adaptadores. El resultado sigue utilizando la misma LM head, pero el <em>backbone</em> produce estados ocultos diferentes porque los adaptadores han modificado su transformación. En prompt tuning, en cambio, se aprenden vectores adicionales que se incorporan a la entrada <span class="citation" data-cites="lester2021prompttuning">(<a href="#ref-lester2021prompttuning" role="doc-biblioref">Lester et&nbsp;al., 2021</a>)</span>.</p>
+<p>La explicación detallada de LoRA aparece en <a href="../bloque3/03c-fine-tuning.html#sec-lora">03c - Fine-tuning eficiente</a>. Aquí basta con conservar la separación:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Concepto</th>
+<th>Qué describe</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Cabeza</td>
+<td>Componente que transforma estados ocultos en una salida</td>
+</tr>
+<tr class="even">
+<td>SFT</td>
+<td>Objetivo supervisado para entrenar una política</td>
+</tr>
+<tr class="odd">
+<td>LoRA</td>
+<td>Forma de adaptar determinados pesos con pocos parámetros</td>
+</tr>
+<tr class="even">
+<td>PPO</td>
+<td>Algoritmo de optimización mediante aprendizaje por refuerzo</td>
+</tr>
+<tr class="odd">
+<td>DPO</td>
+<td>Optimización directa a partir de preferencias</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sec-resumen-cabezas" class="level2">
+<h2 class="anchored" data-anchor-id="sec-resumen-cabezas">8. Resumen: tres cabezas y varias fases</h2>
+<p>La comparación arquitectónica se resume en <a href="#tbl-cabezas-resumen" class="quarto-xref">Tabla&nbsp;1</a>. SFT aparece como fase de entrenamiento, no como una cabeza adicional.</p>
+<div id="tbl-cabezas-resumen" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-cabezas-resumen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Tabla&nbsp;1: Componentes de salida y objetivos de entrenamiento
+</figcaption>
+<div aria-describedby="tbl-cabezas-resumen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Componente o fase</th>
+<th>Salida principal</th>
+<th>Señal de entrenamiento</th>
+<th>Función</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>LM head</td>
+<td>Un vector de logits por posición</td>
+<td>Cross-entropy causal</td>
+<td>Predecir el siguiente token</td>
+</tr>
+<tr class="even">
+<td>SFT</td>
+<td>La misma salida de la LM head</td>
+<td>Cross-entropy enmascarada</td>
+<td>Aprender a seguir instrucciones</td>
+</tr>
+<tr class="odd">
+<td>Value head</td>
+<td>Un escalar por estado</td>
+<td>Error sobre retornos estimados</td>
+<td>Estimar el valor para el crítico</td>
+</tr>
+<tr class="even">
+<td>Reward head</td>
+<td>Un escalar por secuencia</td>
+<td>Preferencias entre respuestas</td>
+<td>Ordenar respuestas según una señal de recompensa</td>
+</tr>
+<tr class="odd">
+<td>PPO</td>
+<td>Política más value head y reward model</td>
+<td>Objetivo de aprendizaje por refuerzo</td>
+<td>Optimizar la política mediante recompensas</td>
+</tr>
+<tr class="even">
+<td>DPO</td>
+<td>Política y referencia</td>
+<td>Pares de preferencias</td>
+<td>Optimizar directamente la preferencia relativa</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>La idea que conviene conservar
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>El <em>backbone</em> construye representaciones contextuales. La cabeza determina cómo se leen esas representaciones. SFT, PPO, DPO y LoRA describen formas de entrenar o adaptar el sistema; no son nombres alternativos para cabezas de salida.</p>
+</div>
+</div>
+<p>Esta distinción conecta la página con el resto del módulo:</p>
+<ul>
+<li>En el Bloque 2, las llamadas a un LLM utilizan la política y su <em>LM head</em> para producir tokens.</li>
+<li>En la página siguiente de este bloque (<a href="../bloque3/03c-fine-tuning.html">03c</a>), SFT y LoRA permiten adaptar el comportamiento a instrucciones o datos de dominio.</li>
+<li>En el Bloque 4, los modelos de recompensa y los evaluadores <em>LLM-as-a-judge</em> pueden proporcionar señales de evaluación, pero no son equivalentes por definición.</li>
+</ul>
+<p>La pregunta práctica que debe guiar la lectura de un paper es: ¿qué representación produce el modelo, qué salida se calcula a partir de ella y con qué señal se entrenan sus parámetros?</p>
+<hr>
+<blockquote class="blockquote">
+<p>Continúa con <strong><a href="../bloque3/03c-fine-tuning.html">03c — Fine-tuning eficiente</a></strong>, donde aplicarás SFT y LoRA.</p>
+</blockquote>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-hu2022lora" class="csl-entry" role="listitem">
+Hu, E. J., Shen, Y., Wallis, P., Allen-Zhu, Z., Li, Y., Wang, S., Wang, L., &amp; Chen, W. (2022). <span>LoRA</span>: Low-Rank Adaptation of Large Language Models. <em>International Conference on Learning Representations (ICLR)</em>. <a href="https://arxiv.org/abs/2106.09685">https://arxiv.org/abs/2106.09685</a>
+</div>
+<div id="ref-lester2021prompttuning" class="csl-entry" role="listitem">
+Lester, B., Al-Rfou, R., &amp; Constant, N. (2021). The Power of Scale for Parameter-Efficient Prompt Tuning. <em>Proceedings of the 2021 Conference on Empirical Methods in Natural Language Processing (EMNLP)</em>, 3045-3059. <a href="https://doi.org/10.18653/v1/2021.emnlp-main.243">https://doi.org/10.18653/v1/2021.emnlp-main.243</a>
+</div>
+<div id="ref-ouyang2022training" class="csl-entry" role="listitem">
+<span class="nocase">Ouyang, L., Wu, J., Jiang, X., Almeida, D., Wainwright, C., Mishkin, P., Zhang, C., Agarwal, S., Slama, K., Ray, A., et&nbsp;al.</span> (2022). Training Language Models to Follow Instructions with Human Feedback. <em>Advances in Neural Information Processing Systems</em>, <em>35</em>. <a href="https://arxiv.org/abs/2203.02155">https://arxiv.org/abs/2203.02155</a>
+</div>
+<div id="ref-rafailov2023direct" class="csl-entry" role="listitem">
+Rafailov, R., Sharma, A., Mitchell, E., Manning, C. D., Ermon, S., &amp; Finn, C. (2023). Direct Preference Optimization: Your Language Model is Secretly a Reward Model. <em>Advances in Neural Information Processing Systems</em>, <em>36</em>. <a href="https://arxiv.org/abs/2305.18290">https://arxiv.org/abs/2305.18290</a>
+</div>
+<div id="ref-schulman2017proximal" class="csl-entry" role="listitem">
+Schulman, J., Wolski, F., Dhariwal, P., Radford, A., &amp; Klimov, O. (2017). Proximal Policy Optimization Algorithms. <em>arXiv preprint arXiv:1707.06347</em>. <a href="https://arxiv.org/abs/1707.06347">https://arxiv.org/abs/1707.06347</a>
+</div>
+</div>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<footer class="footer-custom">
+  <div class="footer-logos">
+    <img src="../images/logo_cfp.png" alt="Formación Permanente · Universidad de Sevilla">
+  </div>
+  <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
+</footer>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copiado");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copiado");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Ejecutar el código</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "03c (previo) — Del estado oculto a la salida: cabezas y objetivos de entrenamiento"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> es</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Esta página es el **previo conceptual de [03c — Fine-tuning eficiente](03c-fine-tuning.qmd)**: explica qué es una cabeza de salida y qué significan SFT, PPO y DPO antes de ajustar un modelo. Se recomienda haber leído antes </span><span class="co">[</span><span class="ot">01a — Arquitectura Transformer</span><span class="co">](../bloque1/01a-transformer.qmd)</span><span class="at"> y </span><span class="co">[</span><span class="ot">01b — LLM e inferencia</span><span class="co">](../bloque1/01b-llms.qmd)</span><span class="at">. Es lectura recomendada, no obligatoria.</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="fu">## Qué aprenderás</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>En <span class="co">[</span><span class="ot">01a - Cómo funciona un Transformer de un vistazo</span><span class="co">](../bloque1/01a-transformer.qmd#sec-vistazo-transformer)</span> vimos cómo una secuencia de tokens se transforma en estados ocultos contextualizados. En esta página seguimos el recorrido hasta la salida del modelo.</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>La idea central es sencilla, pero conviene separar dos niveles que suelen mezclarse:</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El *backbone* es el conjunto de capas Transformer que construye una representación contextual para cada posición.</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Una cabeza de salida transforma esas representaciones en el resultado que necesita una tarea.</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>SFT, PPO y DPO no son cabezas distintas, sino procedimientos y objetivos de entrenamiento.</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>Esta distinción permite entender por qué un mismo modelo puede producir tokens, estimar el valor de un estado o puntuar una respuesta.</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. Del texto a los estados ocultos {#sec-estados-ocultos}</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>Para concretar la explicación, pensemos en un Transformer causal de tipo *decoder-only*. Después de procesar una secuencia de longitud $T$, el *backbone* produce una matriz de estados ocultos:</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>H = (\mathbf{h}_1, \mathbf{h}_2, \ldots, \mathbf{h}_T)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>\in \mathbb{R}^{B \times T \times d}</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>Aquí, $B$ es el tamaño del lote, $T$ la longitud de la secuencia y $d$ la dimensión del modelo. Cada vector $\mathbf{h}_t$ resume la información que el modelo ha construido en la posición $t$. En un modelo causal, esa información solo puede depender de los tokens anteriores y del token actual.</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>El *backbone* no produce directamente una respuesta en lenguaje natural. Produce representaciones numéricas que otra capa debe interpretar. Esa capa es la cabeza de salida.</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>::: {#fig-backbone-cabezas fig-cap="El backbone produce estados ocultos que distintas cabezas transforman en salidas diferentes."}</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    A[Tokens]:::input --&gt; B[Backbone&lt;br/&gt;Transformer&lt;br/&gt;x L capas]:::proc</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    B --&gt; C[<span class="ot">"</span><span class="st">H&lt;br/&gt;estados ocultos&lt;br/&gt;contextualizados</span><span class="ot">"</span>]:::doc</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    C --&gt; D{Cabeza de&lt;br/&gt;salida}:::proc</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>    D --&gt;|LM head| E[<span class="ot">"</span><span class="st">Logits por token&lt;br/&gt;B x T x vocabulario</span><span class="ot">"</span>]:::out</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    D --&gt;|Value head| F[<span class="ot">"</span><span class="st">Valor por estado&lt;br/&gt;B x T x 1</span><span class="ot">"</span>]:::obs</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    D --&gt;|Reward head| G[<span class="ot">"</span><span class="st">Puntuación por secuencia&lt;br/&gt;B x 1</span><span class="ot">"</span>]:::obs</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>    classDef proc  fill:<span class="co">#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    classDef doc   fill:<span class="co">#FFD43B,stroke:#b8860b,color:#000,stroke-width:1.5px</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    classDef out   fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    classDef obs   fill:<span class="co">#e65100,stroke:#bf360c,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>Como muestra @fig-backbone-cabezas, las cabezas no reciben necesariamente la misma parte de $H$. La *LM head* utiliza todos los estados para producir una distribución por token; la *value head* suele producir un valor por posición; la *reward head* resume la secuencia completa en un único escalar.</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>La separación es conceptual. En una implementación concreta, el *backbone* puede congelarse, ajustarse mediante adaptadores o copiarse para formar modelos especializados. Lo importante es distinguir la representación compartida de la capa que la convierte en una salida.</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="fu">## Una regla útil</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>Si la salida es una distribución sobre tokens, probablemente estamos ante una *LM head*. Si la salida es un escalar que resume un estado o una secuencia, probablemente estamos ante una cabeza de valor o de recompensa.</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2. LM head: predecir el siguiente token {#sec-lm-head}</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>La *LM head* es una proyección lineal desde la dimensión del modelo hasta el tamaño del vocabulario. Para cada posición, transforma el estado oculto en un vector de logits:</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>\mathbf{z}_t = W_{\text{LM}}\mathbf{h}_t + \mathbf{b}</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>\in \mathbb{R}^{|\mathcal{V}|}</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>La función *softmax* convierte esos logits en probabilidades:</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>P(x_{t+1} \mid x_{\leq t})</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>= \operatorname{softmax}(\mathbf{z}_t)</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>El modelo no genera una frase completa de una sola vez. En cada paso calcula una distribución, selecciona o muestrea un token y lo incorpora al contexto. Después vuelve a calcular la salida para predecir el siguiente token.</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>Durante el preentrenamiento, la pérdida causal compara la distribución producida en cada posición con el token que debería aparecer a continuación:</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>\mathcal{L}_{\text{LM}}</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>= -\frac{1}{T}\sum_{t=1}^{T}</span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>\log P(x_{t+1}\mid x_{\leq t})</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>Por eso la salida de la *LM head* tiene una dimensión grande: si el vocabulario contiene $|\mathcal{V}|$ tokens, cada posición produce ese número de logits.</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a><span class="al">![Una misma secuencia puede dar lugar a logits por posición, una máscara de pérdida SFT, valores por estado o una recompensa por secuencia.](../images/01e-alineacion-sft.svg)</span>{#fig-alineacion-sft}</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>La figura @fig-alineacion-sft reúne las salidas en una misma secuencia. La fila de logits conserva una salida para cada posición; la máscara SFT selecciona cuáles de esas posiciones contribuyen a la pérdida; la *value head* mantiene una estimación por estado; y la *reward head* resume la trayectoria completa en un único escalar.</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a><span class="fu">### Weight tying {#sec-weight-tying}</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>Muchos LLM comparten los pesos de la tabla de embeddings con la proyección de salida. En ese caso:</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>W_{\text{LM}} = E^{\mathsf{T}}</span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>Esta decisión reduce el número de parámetros y conecta geométricamente la representación de entrada con la representación de salida. No es una propiedad obligatoria, pero sí una práctica habitual en modelos de lenguaje causales.</span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a><span class="fu">## 3. SFT: la misma LM head, una pérdida distinta {#sec-sft-misma-lm-head}</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>El ajuste fino supervisado, o SFT (*Supervised Fine-Tuning*), enseña al modelo a responder a instrucciones mediante ejemplos de conversación o de formato instrucción-respuesta. No requiere una cabeza arquitectónica nueva: se sigue utilizando la *LM head*.</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>Lo que cambia es el conjunto de datos y la máscara de la pérdida. El prompt proporciona el contexto, pero normalmente se calcula la pérdida solo sobre los tokens que debe producir el asistente:</span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>\mathcal{L}_{\text{SFT}}</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>= -\frac{1}{\sum_{t=1}^{T}m_t}</span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>\sum_{t=1}^{T}m_t\log P(y_t\mid x, y_{&lt;t})</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>La máscara $m_t$ vale cero para los tokens que no queremos utilizar como objetivo y uno para los tokens de la respuesta. En muchas implementaciones, los objetivos ignorados se representan con el valor <span class="in">`-100`</span>.</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Token <span class="pp">|</span> <span class="in">`&lt;user&gt;`</span> <span class="pp">|</span> <span class="in">`explica`</span> <span class="pp">|</span> <span class="in">`&lt;assistant&gt;`</span> <span class="pp">|</span> <span class="in">`La`</span> <span class="pp">|</span> <span class="in">`atención`</span> <span class="pp">|</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---:|---:|---:|---:|---:|</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Máscara $m_t$ <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 0 <span class="pp">|</span> 1 <span class="pp">|</span> 1 <span class="pp">|</span></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Etiqueta <span class="pp">|</span> <span class="in">`-100`</span> <span class="pp">|</span> <span class="in">`-100`</span> <span class="pp">|</span> <span class="in">`-100`</span> <span class="pp">|</span> <span class="in">`La`</span> <span class="pp">|</span> <span class="in">`atención`</span> <span class="pp">|</span></span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>El formato conversacional también importa. Los tokens especiales, las plantillas de chat y la forma de separar las intervenciones indican al modelo qué parte corresponde al usuario y cuál al asistente. La máscara no convierte por sí sola un modelo en un asistente; funciona junto con datos de instrucciones y un procedimiento de entrenamiento supervisado.</span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a><span class="fu">## SFT no es una cuarta cabeza</span></span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>La expresión "SFT head" resulta cómoda como abreviatura, pero es arquitectónicamente imprecisa. SFT describe una fase de entrenamiento de la *LM head*, no una capa de salida independiente.</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a><span class="fu">## 4. Value head: estimar el valor de un estado {#sec-value-head}</span></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>En aprendizaje por refuerzo, el modelo necesita algo más que una distribución sobre tokens. También puede necesitar una estimación de lo prometedor que es el estado actual. La función de valor de una política $\pi$ se define como el retorno esperado a partir de ese estado:</span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>V^{\pi}(s_t)</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>= \mathbb{E}_{\pi}\left[</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>\sum_{k=0}^{\infty}\gamma^k r_{t+k}</span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>\mid s_t</span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>\right]</span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>Una *value head* suele ser una capa lineal $d \to 1$ aplicada a cada estado oculto:</span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>V(s_t) = \mathbf{w}_{\text{value}}^{\mathsf{T}}\mathbf{h}_t + b</span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>\in \mathbb{R}</span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>La *value head* no sustituye necesariamente a la *LM head*. En un modelo actor-crítico, ambas ramas pueden coexistir:</span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a><span class="in">```text</span></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a><span class="in">Backbone</span></span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a><span class="in">|-- LM head       -&gt; distribución de acciones, normalmente tokens</span></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a><span class="in">`-- Value head    -&gt; V(s_t), valor estimado del estado</span></span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>La política utiliza los logits para elegir tokens. El crítico utiliza los valores para calcular ventajas y estabilizar la actualización de la política. En PPO, por ejemplo, la pérdida de valor puede expresarse como un error cuadrático entre el valor predicho y un retorno estimado:</span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>\mathcal{L}_{V}</span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>= \frac{1}{T}\sum_{t=1}^{T}</span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>\left(V(s_t)-R_t\right)^2</span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>La forma exacta de la cabeza y su inicialización dependen de la biblioteca y del algoritmo. Lo esencial es que produce un escalar por estado y que su función es distinta de la predicción del siguiente token.</span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a><span class="al">![Diferencia entre el valor estimado en cada estado y la recompensa asignada a una respuesta completa.](../images/01e-value-reward.svg)</span>{#fig-value-reward}</span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>Como muestra @fig-value-reward, la *value head* responde a una pregunta local: qué retorno se espera desde cada estado. La *reward head* responde a una pregunta global: qué puntuación recibe la respuesta completa. El modelo de recompensa puede comparar después dos respuestas mediante la diferencia entre sus puntuaciones.</span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a><span class="fu">## 5. Reward head: puntuar una respuesta {#sec-reward-head}</span></span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>Un modelo de recompensa asigna una puntuación a una respuesta completa. Se entrena a partir de preferencias: dada una entrada $x$, una persona o un proceso de evaluación indica cuál de dos respuestas es preferible, $y^+$ o $y^-$.</span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>El modelo de recompensa puede compartir una arquitectura de lenguaje con el modelo base y sustituir la proyección al vocabulario por una capa escalar. En modelos *decoder-only* es habitual utilizar el estado del último token válido, el token de fin de secuencia o alguna forma de *pooling*:</span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>r_{\theta}(x,y)</span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>= \mathbf{w}_{\text{reward}}^{\mathsf{T}}\mathbf{h}_{\text{pool}} + b</span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>\in \mathbb{R}</span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>En el modelo de Bradley-Terry, la probabilidad de preferir la respuesta elegida se modela como:</span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>P(y^+ \succ y^- \mid x)</span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>= \sigma\left(</span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>r_{\theta}(x,y^+) - r_{\theta}(x,y^-)</span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a>\right)</span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>La pérdida correspondiente es:</span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>\mathcal{L}_{\text{RM}}</span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>= -\log \sigma\left(</span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>r_{\theta}(x,y^+) - r_{\theta}(x,y^-)</span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>\right)</span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a>$$</span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>La puntuación no debe interpretarse automáticamente como una medida absoluta de calidad. El objetivo principal es ordenar respuestas de acuerdo con los patrones de preferencia presentes en los datos.</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a><span class="fu">## 6. PPO y DPO: dos rutas de optimización {#sec-ppo-dpo}</span></span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>La *reward head* y la *value head* aparecen sobre todo cuando se utiliza una ruta de aprendizaje por refuerzo como PPO. La relación entre componentes y fases se entiende mejor separando las dos rutas:</span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>::: {#fig-rutas-preferencias fig-cap="PPO y DPO utilizan las preferencias mediante rutas de optimización diferentes."}</span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>    PREF[<span class="ot">"</span><span class="st">Preferencias&lt;br/&gt;chosen / rejected</span><span class="ot">"</span>]:::doc</span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>    subgraph PPO_route[<span class="ot">"</span><span class="st">Ruta PPO / RLHF</span><span class="ot">"</span>]</span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>        P1[<span class="ot">"</span><span class="st">Política tras SFT</span><span class="ot">"</span>]:::input --&gt; Y1[<span class="ot">"</span><span class="st">Respuesta&lt;br/&gt;generada</span><span class="ot">"</span>]:::doc</span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>        Y1 --&gt; RM[<span class="ot">"</span><span class="st">Reward model&lt;br/&gt;r(x,y)</span><span class="ot">"</span>]:::proc</span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>        P1 --&gt; VH[<span class="ot">"</span><span class="st">Value head&lt;br/&gt;V(s_t)</span><span class="ot">"</span>]:::proc</span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a>        RM --&gt; PPO[<span class="ot">"</span><span class="st">PPO&lt;br/&gt;recompensa + ventajas</span><span class="ot">"</span>]:::obs</span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>        VH --&gt; PPO</span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>        PPO --&gt; OUT1[<span class="ot">"</span><span class="st">Política&lt;br/&gt;actualizada</span><span class="ot">"</span>]:::out</span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>    subgraph DPO_route[<span class="ot">"</span><span class="st">Ruta DPO</span><span class="ot">"</span>]</span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>        P2[<span class="ot">"</span><span class="st">Política tras SFT</span><span class="ot">"</span>]:::input --&gt; DPO[<span class="ot">"</span><span class="st">DPO&lt;br/&gt;pérdida directa</span><span class="ot">"</span>]:::proc</span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>        REF[<span class="ot">"</span><span class="st">Política de&lt;br/&gt;referencia</span><span class="ot">"</span>]:::doc --&gt; DPO</span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>        DPO --&gt; OUT2[<span class="ot">"</span><span class="st">Política&lt;br/&gt;actualizada</span><span class="ot">"</span>]:::out</span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a>    PREF --&gt; RM</span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>    PREF --&gt; DPO</span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>    classDef proc  fill:<span class="co">#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>    classDef doc   fill:<span class="co">#FFD43B,stroke:#b8860b,color:#000,stroke-width:1.5px</span></span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>    classDef out   fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>    classDef obs   fill:<span class="co">#e65100,stroke:#bf360c,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>En RLHF con PPO, el *reward model* transforma la respuesta en una señal de recompensa y la *value head* ayuda a estimar las ventajas durante la actualización de la política. Esta familia de métodos se popularizó en trabajos de alineamiento con preferencias humanas <span class="co">[</span><span class="ot">@ouyang2022training; @schulman2017proximal</span><span class="co">]</span>.</span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>DPO (*Direct Preference Optimization*) utiliza directamente los pares de preferencias y una política de referencia congelada. No necesita entrenar un *reward model* separado como paso intermedio [@rafailov2023direct]. Por tanto, no conviene presentar la *reward head* como una pieza necesaria de todo sistema de alineamiento.</span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a><span class="fu">## 7. Dónde encaja LoRA {#sec-cabezas-y-lora}</span></span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>El ajuste eficiente de parámetros introduce otra distinción. LoRA (*Low-Rank Adaptation*) no significa necesariamente entrenar solo la cabeza de salida. Lo habitual es añadir matrices de bajo rango en módulos seleccionados del *backbone*, por ejemplo en las proyecciones de consulta y valor de la atención <span class="co">[</span><span class="ot">@hu2022lora</span><span class="co">]</span>.</span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a>El modelo base puede permanecer congelado mientras se entrenan esos adaptadores. El resultado sigue utilizando la misma LM head, pero el *backbone* produce estados ocultos diferentes porque los adaptadores han modificado su transformación. En prompt tuning, en cambio, se aprenden vectores adicionales que se incorporan a la entrada <span class="co">[</span><span class="ot">@lester2021prompttuning</span><span class="co">]</span>.</span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a>La explicación detallada de LoRA aparece en <span class="co">[</span><span class="ot">03c - Fine-tuning eficiente</span><span class="co">](03c-fine-tuning.qmd#sec-lora)</span>. Aquí basta con conservar la separación:</span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Concepto <span class="pp">|</span> Qué describe <span class="pp">|</span></span>
+<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cabeza <span class="pp">|</span> Componente que transforma estados ocultos en una salida <span class="pp">|</span></span>
+<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> SFT <span class="pp">|</span> Objetivo supervisado para entrenar una política <span class="pp">|</span></span>
+<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> LoRA <span class="pp">|</span> Forma de adaptar determinados pesos con pocos parámetros <span class="pp">|</span></span>
+<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> PPO <span class="pp">|</span> Algoritmo de optimización mediante aprendizaje por refuerzo <span class="pp">|</span></span>
+<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> DPO <span class="pp">|</span> Optimización directa a partir de preferencias <span class="pp">|</span></span>
+<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a><span class="fu">## 8. Resumen: tres cabezas y varias fases {#sec-resumen-cabezas}</span></span>
+<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a>La comparación arquitectónica se resume en @tbl-cabezas-resumen. SFT aparece como fase de entrenamiento, no como una cabeza adicional.</span>
+<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a>: Componentes de salida y objetivos de entrenamiento {#tbl-cabezas-resumen}</span>
+<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Componente o fase <span class="pp">|</span> Salida principal <span class="pp">|</span> Señal de entrenamiento <span class="pp">|</span> Función <span class="pp">|</span></span>
+<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> LM head <span class="pp">|</span> Un vector de logits por posición <span class="pp">|</span> Cross-entropy causal <span class="pp">|</span> Predecir el siguiente token <span class="pp">|</span></span>
+<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> SFT <span class="pp">|</span> La misma salida de la LM head <span class="pp">|</span> Cross-entropy enmascarada <span class="pp">|</span> Aprender a seguir instrucciones <span class="pp">|</span></span>
+<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Value head <span class="pp">|</span> Un escalar por estado <span class="pp">|</span> Error sobre retornos estimados <span class="pp">|</span> Estimar el valor para el crítico <span class="pp">|</span></span>
+<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reward head <span class="pp">|</span> Un escalar por secuencia <span class="pp">|</span> Preferencias entre respuestas <span class="pp">|</span> Ordenar respuestas según una señal de recompensa <span class="pp">|</span></span>
+<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> PPO <span class="pp">|</span> Política más value head y reward model <span class="pp">|</span> Objetivo de aprendizaje por refuerzo <span class="pp">|</span> Optimizar la política mediante recompensas <span class="pp">|</span></span>
+<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> DPO <span class="pp">|</span> Política y referencia <span class="pp">|</span> Pares de preferencias <span class="pp">|</span> Optimizar directamente la preferencia relativa <span class="pp">|</span></span>
+<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a><span class="fu">## La idea que conviene conservar</span></span>
+<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a>El *backbone* construye representaciones contextuales. La cabeza determina cómo se leen esas representaciones. SFT, PPO, DPO y LoRA describen formas de entrenar o adaptar el sistema; no son nombres alternativos para cabezas de salida.</span>
+<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a>Esta distinción conecta la página con el resto del módulo:</span>
+<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>En el Bloque 2, las llamadas a un LLM utilizan la política y su *LM head* para producir tokens.</span>
+<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>En la página siguiente de este bloque (<span class="co">[</span><span class="ot">03c</span><span class="co">](03c-fine-tuning.qmd)</span>), SFT y LoRA permiten adaptar el comportamiento a instrucciones o datos de dominio.</span>
+<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>En el Bloque 4, los modelos de recompensa y los evaluadores *LLM-as-a-judge* pueden proporcionar señales de evaluación, pero no son equivalentes por definición.</span>
+<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-291"><a href="#cb2-291" aria-hidden="true" tabindex="-1"></a>La pregunta práctica que debe guiar la lectura de un paper es: ¿qué representación produce el modelo, qué salida se calcula a partir de ella y con qué señal se entrenan sus parámetros?</span>
+<span id="cb2-292"><a href="#cb2-292" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-293"><a href="#cb2-293" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb2-294"><a href="#cb2-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-295"><a href="#cb2-295" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Continúa con **[03c — Fine-tuning eficiente](03c-fine-tuning.qmd)**, donde aplicarás SFT y LoRA.</span></span>
+<span id="cb2-296"><a href="#cb2-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-297"><a href="#cb2-297" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb2-298"><a href="#cb2-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-299"><a href="#cb2-299" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb2-300"><a href="#cb2-300" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code></pre></div><button title="Copiar al portapapeles" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

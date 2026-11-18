@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>ideas_demos – Módulo 10 — IA Generativa para Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item">
+      Módulo 10 — IA Generativa para Data Science
+      </li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Módulo 10 — IA Generativa para Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inicio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acerca de</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 1 — Fundamentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque1/01a-transformer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque1/01b-llms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs e inferencia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque1/01c-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque1/01d-vectordb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bases de datos vectoriales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 2 — Orquestación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque2/02-orquestacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque2/02a-prompt-engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prompt Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque2/02b-langchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LangChain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque2/02c-llamaindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LlamaIndex</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque2/02d-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque2/02e-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentes Inteligentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 3 — Aplicaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque3/03-aplicaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque3/03b-rag-avanzado.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAG Avanzado</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque3/03a-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tuning eficiente</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 4 — Gobernanza</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Demos interactivas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/atencion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Evaluación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06-herramientas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Herramientas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07-bibliografia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliografía</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#ideas-de-demos-interactivas-módulo-10" id="toc-ideas-de-demos-interactivas-módulo-10" class="nav-link active" data-scroll-target="#ideas-de-demos-interactivas-módulo-10">Ideas de demos interactivas — Módulo 10</a>
+  <ul class="collapse">
+  <li><a href="#estado-actual" id="toc-estado-actual" class="nav-link" data-scroll-target="#estado-actual">Estado actual</a></li>
+  <li><a href="#principios-de-diseño" id="toc-principios-de-diseño" class="nav-link" data-scroll-target="#principios-de-diseño">Principios de diseño</a></li>
+  <li><a href="#prioridad-recomendada" id="toc-prioridad-recomendada" class="nav-link" data-scroll-target="#prioridad-recomendada">Prioridad recomendada</a></li>
+  <li><a href="#bloque-1-fundamentos" id="toc-bloque-1-fundamentos" class="nav-link" data-scroll-target="#bloque-1-fundamentos">Bloque 1 — Fundamentos</a>
+  <ul class="collapse">
+  <li><a href="#atención-con-palabras-clicables-dos-subdemos" id="toc-atención-con-palabras-clicables-dos-subdemos" class="nav-link" data-scroll-target="#atención-con-palabras-clicables-dos-subdemos">Atención con palabras clicables (dos subdemos)</a></li>
+  <li><a href="#creatividad-temperatura" id="toc-creatividad-temperatura" class="nav-link" data-scroll-target="#creatividad-temperatura">Creatividad / temperatura</a></li>
+  <li><a href="#ventana-de-contexto-la-mochila" id="toc-ventana-de-contexto-la-mochila" class="nav-link" data-scroll-target="#ventana-de-contexto-la-mochila">Ventana de contexto: la mochila</a></li>
+  <li><a href="#búsqueda-vectorial-en-un-mapa" id="toc-búsqueda-vectorial-en-un-mapa" class="nav-link" data-scroll-target="#búsqueda-vectorial-en-un-mapa">Búsqueda vectorial en un mapa</a></li>
+  <li><a href="#taller-hpd-1-apoyo" id="toc-taller-hpd-1-apoyo" class="nav-link" data-scroll-target="#taller-hpd-1-apoyo">Taller HPD 1 (apoyo)</a></li>
+  </ul></li>
+  <li><a href="#bloque-2-orquestación" id="toc-bloque-2-orquestación" class="nav-link" data-scroll-target="#bloque-2-orquestación">Bloque 2 — Orquestación</a>
+  <ul class="collapse">
+  <li><a href="#anatomía-del-tool-calling" id="toc-anatomía-del-tool-calling" class="nav-link" data-scroll-target="#anatomía-del-tool-calling">Anatomía del tool calling</a></li>
+  <li><a href="#prompt-lab" id="toc-prompt-lab" class="nav-link" data-scroll-target="#prompt-lab">Prompt lab</a></li>
+  <li><a href="#traza-de-un-agente" id="toc-traza-de-un-agente" class="nav-link" data-scroll-target="#traza-de-un-agente">Traza de un agente</a></li>
+  <li><a href="#inspector-de-mcp" id="toc-inspector-de-mcp" class="nav-link" data-scroll-target="#inspector-de-mcp">Inspector de MCP</a></li>
+  <li><a href="#grafo-de-langgraph-interactivo" id="toc-grafo-de-langgraph-interactivo" class="nav-link" data-scroll-target="#grafo-de-langgraph-interactivo">Grafo de LangGraph interactivo</a></li>
+  </ul></li>
+  <li><a href="#bloque-3-aplicaciones" id="toc-bloque-3-aplicaciones" class="nav-link" data-scroll-target="#bloque-3-aplicaciones">Bloque 3 — Aplicaciones</a>
+  <ul class="collapse">
+  <li><a href="#pipeline-rag-con-palancas" id="toc-pipeline-rag-con-palancas" class="nav-link" data-scroll-target="#pipeline-rag-con-palancas">Pipeline RAG con palancas</a></li>
+  <li><a href="#comparador-híbrido-bm25-densa-rrf" id="toc-comparador-híbrido-bm25-densa-rrf" class="nav-link" data-scroll-target="#comparador-híbrido-bm25-densa-rrf">Comparador híbrido (BM25 + densa + RRF)</a></li>
+  <li><a href="#fine-tuning-y-lora" id="toc-fine-tuning-y-lora" class="nav-link" data-scroll-target="#fine-tuning-y-lora">Fine-tuning y LoRA</a></li>
+  <li><a href="#calidad-de-datos-sintéticos" id="toc-calidad-de-datos-sintéticos" class="nav-link" data-scroll-target="#calidad-de-datos-sintéticos">Calidad de datos sintéticos</a></li>
+  </ul></li>
+  <li><a href="#bloque-4-gobernanza-ce-6" id="toc-bloque-4-gobernanza-ce-6" class="nav-link" data-scroll-target="#bloque-4-gobernanza-ce-6">Bloque 4 — Gobernanza (CE-6)</a>
+  <ul class="collapse">
+  <li><a href="#juez-llm-con-sesgo-de-posición" id="toc-juez-llm-con-sesgo-de-posición" class="nav-link" data-scroll-target="#juez-llm-con-sesgo-de-posición">Juez LLM con sesgo de posición</a></li>
+  <li><a href="#detector-de-alucinaciones-por-grounding" id="toc-detector-de-alucinaciones-por-grounding" class="nav-link" data-scroll-target="#detector-de-alucinaciones-por-grounding">Detector de alucinaciones por grounding</a></li>
+  <li><a href="#anonimización-de-pii" id="toc-anonimización-de-pii" class="nav-link" data-scroll-target="#anonimización-de-pii">Anonimización de PII</a></li>
+  <li><a href="#auditoría-de-sesgo" id="toc-auditoría-de-sesgo" class="nav-link" data-scroll-target="#auditoría-de-sesgo">Auditoría de sesgo</a></li>
+  <li><a href="#calculadora-de-despliegue" id="toc-calculadora-de-despliegue" class="nav-link" data-scroll-target="#calculadora-de-despliegue">Calculadora de despliegue</a></li>
+  <li><a href="#model-card-apoyo" id="toc-model-card-apoyo" class="nav-link" data-scroll-target="#model-card-apoyo">Model Card (apoyo)</a></li>
+  </ul></li>
+  <li><a href="#resumen-por-capítulo" id="toc-resumen-por-capítulo" class="nav-link" data-scroll-target="#resumen-por-capítulo">Resumen por capítulo</a></li>
+  <li><a href="#notas-técnicas" id="toc-notas-técnicas" class="nav-link" data-scroll-target="#notas-técnicas">Notas técnicas</a></li>
+  </ul></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="ideas_demos.ipynb" download="ideas_demos.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block"><h1 class="title display-7"></h1></header><div class="quarto-title-block"><div class="quarto-title-tools-only"><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+
+
+
+
+<section id="ideas-de-demos-interactivas-módulo-10" class="level1">
+<h1>Ideas de demos interactivas — Módulo 10</h1>
+<p>Catálogo de demos candidatas para el curso, organizado por bloque. Pensado para un <strong>perfil general de máster de formación permanente</strong>: la demo no enseña la mecánica (fórmulas, álgebra) sino que deja al alumno <strong>tocar algo y ver una consecuencia</strong>.</p>
+<section id="estado-actual" class="level2">
+<h2 class="anchored" data-anchor-id="estado-actual">Estado actual</h2>
+<p>Demos ya existentes en <code>demos/</code> (Bloque 1, corren en el navegador con Shinylive):</p>
+<ul>
+<li><code>bpe.qmd</code> — Tokenización BPE</li>
+<li><code>chunking.qmd</code> — Estrategias de chunking</li>
+<li><code>embeddings.qmd</code> — Embeddings y similitud (datos precalculados con <code>scripts/build_demo_data.py</code>)</li>
+<li><code>atencion.qmd</code> — Atención (1): la idea, ilustrativa, con interruptor «LLM generativo» (pesos diseñados a mano)</li>
+<li><code>atencion-modelo-real.qmd</code> — Atención (2): seis cabezas de BETO reales (datos con <code>scripts/build_attention_data.py</code>)</li>
+</ul>
+<p>Los Bloques 2, 3 y 4 no tienen demos todavía. La demo de atención (partes 1 y 2) está hecha; el resto de este catálogo está pendiente.</p>
+</section>
+<section id="principios-de-diseño" class="level2">
+<h2 class="anchored" data-anchor-id="principios-de-diseño">Principios de diseño</h2>
+<ol type="1">
+<li><strong>Una idea por demo.</strong> Si hay más de dos controles, sobra uno.</li>
+<li><strong>Cada demo termina con «qué has visto».</strong> Dos líneas que fijen el mensaje.</li>
+<li><strong>Ejemplos cotidianos y en español</strong>, no vectores abstractos.</li>
+<li><strong>Resultado inmediato.</strong> Sin esperar a un modelo: todo precalculado y reproducido.</li>
+<li><strong>Detalle numérico opcional</strong>, plegado, para los curiosos.</li>
+<li><strong>Un fallo visible.</strong> Lo que más se recuerda es cuándo y por qué falla el sistema.</li>
+<li><strong>Sin API key en el navegador.</strong> Datos o respuestas reales grabadas una vez con un script (patrón de <code>build_demo_data.py</code>) e inyectadas en el <code>.qmd</code>, de forma determinista.</li>
+<li><strong>Honestidad sobre los límites.</strong> Si la demo usa un caso real elegido por su claridad, decirlo.</li>
+</ol>
+</section>
+<section id="prioridad-recomendada" class="level2">
+<h2 class="anchored" data-anchor-id="prioridad-recomendada">Prioridad recomendada</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Demo</th>
+<th>Bloque</th>
+<th>Por qué primero</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Atención con palabras clicables</td>
+<td>1 — <code>01a-transformer</code></td>
+<td>La más difícil de explicar sin demo y la más lucida con ella</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Creatividad / temperatura</td>
+<td>1 — <code>01b-llms</code></td>
+<td>Muy barata; explica un parámetro que usarán a diario</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Juez LLM con sesgo de posición</td>
+<td>4 — <code>04a-evaluacion</code></td>
+<td>Muy memorable; enlaza con el proyecto final</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</section>
+<section id="bloque-1-fundamentos" class="level2">
+<h2 class="anchored" data-anchor-id="bloque-1-fundamentos">Bloque 1 — Fundamentos</h2>
+<section id="atención-con-palabras-clicables-dos-subdemos" class="level3">
+<h3 class="anchored" data-anchor-id="atención-con-palabras-clicables-dos-subdemos">Atención con palabras clicables (dos subdemos)</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque1/01a-transformer.qmd</code></li>
+<li><strong>Idea:</strong> una frase donde el alumno pulsa una palabra y ve de qué otras palabras «se fija».</li>
+<li><strong>Se evita:</strong> Q/K/V, softmax, matrices. Casilla opcional «ver los números».</li>
+<li><strong>Estructura:</strong> dos partes, porque mezclar «idea limpia» y «realidad ruidosa» en una sola demo se estorba. Se pueden publicar por separado.</li>
+</ul>
+<p><strong>Parte 1 — «Qué es la atención» (ilustrativa, una cabeza)</strong> - Pesos diseñados a mano, declarado abiertamente: etiqueta visible «ilustración» y aviso de que es una simplificación. - <strong>Ejemplos:</strong> «El banco cerró porque estaba en quiebra» frente a «Me senté en el banco del parque»; un pronombre («La maleta no cabía en el coche porque <em>era</em> muy grande» → <em>era</em> apunta a <em>maleta</em>). - <strong>Secuencia guiada:</strong> pulsa <em>banco</em> en la 1.ª frase → pulsa <em>banco</em> en la 2.ª → ¿mismo significado? → caso del pronombre. - <strong>Mensaje:</strong> el significado de una palabra depende de las que la rodean. - Sin selector de cabeza, sin tokens partidos. Termina con enlace a la parte 2: «¿Y en un modelo real?». - Sin dependencias: se puede construir ya.</p>
+<p><strong>Parte 2 — «Qué hace un modelo real» (multi-cabeza)</strong> - Pesos reales de un modelo <strong>codificador</strong> (BERT), con selector de capa/cabeza y tokens reales (enlaza con la demo de BPE). - <strong>Mensaje:</strong> en un modelo real hay muchas cabezas y cada una hace algo distinto (token anterior, siguiente, sintaxis, correferencia); algunas no son interpretables. Encaja con la sección de multi-head attention. - Mostrar solo 2–3 cabezas elegidas con etiqueta descriptiva; el resto en «explorar», para no desanimar. - <strong>Modelo:</strong> no Qwen3. Es un decodificador con atención causal: cada palabra solo mira a las anteriores, así que <em>banco</em> no vería <em>parque</em>. Un codificador tiene atención bidireccional y encaja con la intuición. - Preferido: <code>dccuchile/bert-base-spanish-wwm-cased</code> (BETO, ~110 M, solo español). - Alternativas: <code>google-bert/bert-base-multilingual-cased</code>, <code>FacebookAI/xlm-roberta-base</code>. - <strong>Datos:</strong> extraídos con <code>output_attentions=True</code> (<code>attn_implementation="eager"</code>) en un script offline y precalculados; el navegador no necesita el modelo. - <strong>Aclarar siempre que es un BERT, no un LLM autorregresivo.</strong> Riesgo: que el alumno asuma que los LLM (ChatGPT, Qwen, Llama…) miran en ambos sentidos como esta demo. - Etiqueta fija y visible en la demo: «Modelo: BERT (codificador). Mira antes <strong>y</strong> después. Los LLM generativos son decodificadores y solo miran hacia atrás». - Interruptor «Ver como un LLM generativo» que aplica la máscara causal: al pulsar <em>banco</em> en «Me senté en el banco del parque», <em>parque</em> queda tachada porque aún no existe. Es un ejemplo directo de por qué un LLM no puede usar el contexto posterior al generar. - Enlazar con el apartado de encoder vs decoder de <code>01a-transformer.qmd</code>. - La máscara se aplica sobre los pesos del propio BERT; se avisa de que es una ilustración (un decodificador real se entrena así, no se enmascara a posteriori). También puede hacerse en la parte 1. - <strong>Resultado de la prueba de viabilidad</strong> (BETO, 5 frases, <code>scripts/probe_attention.py</code>): - Se ven con claridad cabezas posicionales (token anterior: L00H10, L03H08; token siguiente: L05H07, L01H08; <code>[CLS]</code>/<code>[SEP]</code>: L10H05/H07/H08/H09). - <strong>No</strong> aparece una cabeza que desambigüe «banco» ni que resuelva pronombres (<em>era</em> → <em>maleta</em>): el efecto no es visible en los pesos crudos. Por eso la parte 1 es ilustrativa y la parte 2 promete solo «tipos de cabezas». - Segunda prueba (frases sintácticas, pares no adyacentes): L6H10 (sujeto→verbo) y L1H3 (objeto→verbo) aparecen en las dos pruebas con criterios distintos, pero con 3–4 casos y frases con las que se eligieron (circular). En la demo se presentan como «tendencia», y ~50 % de su atención va a <code>[CLS]</code>/<code>[SEP]</code>. - Ampliación pendiente (opcional): validar con ~30–40 frases por relación de un treebank (p.&nbsp;ej. UD Spanish-GSD). - <strong>Cautelas:</strong> - BERT concentra mucha atención en <code>[CLS]</code>, <code>[SEP]</code> y puntuación (Clark et al., 2019, <em>What Does BERT Look At?</em>): ocultarlos/atenuarlos o explicarlos. - No está garantizado que una cabeza desambigüe «banco»; la correferencia y los patrones sintácticos son más probables. Decidir frases y cabezas finales tras la prueba de viabilidad (<code>scripts/probe_attention.py</code>). - Considerar añadir Clark et al.&nbsp;(2019) a <code>references.bib</code>.</p>
+</section>
+<section id="creatividad-temperatura" class="level3">
+<h3 class="anchored" data-anchor-id="creatividad-temperatura">Creatividad / temperatura</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque1/01b-llms.qmd</code></li>
+<li><strong>Idea:</strong> botón «continuar la frase» que escribe la siguiente palabra; un slider de «creatividad» de «predecible» a «caótico». El alumno genera 10 veces y compara.</li>
+<li><strong>Mensaje:</strong> el modelo no «decide», saca una palabra de un abanico de probabilidades. A 0 siempre sale lo mismo; a valores altos aparece lo absurdo.</li>
+<li><strong>Extensión:</strong> top-k y top-p como «recortar el abanico» (barras que se acortan).</li>
+<li><strong>Datos:</strong> distribuciones de siguiente token precalculadas para 3–4 frases.</li>
+</ul>
+</section>
+<section id="ventana-de-contexto-la-mochila" class="level3">
+<h3 class="anchored" data-anchor-id="ventana-de-contexto-la-mochila">Ventana de contexto: la mochila</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque1/01b-llms.qmd</code></li>
+<li><strong>Idea:</strong> el alumno arrastra documentos a una «mochila» con capacidad limitada y ve qué cabe y qué se queda fuera.</li>
+<li><strong>Mensaje:</strong> el contexto es finito y lo del medio se pierde con más facilidad («lost in the middle»).</li>
+<li><strong>Extensión:</strong> barra de coste y latencia según longitud (tokens → euros). Tamaño del KV-cache como dato plegado.</li>
+</ul>
+</section>
+<section id="búsqueda-vectorial-en-un-mapa" class="level3">
+<h3 class="anchored" data-anchor-id="búsqueda-vectorial-en-un-mapa">Búsqueda vectorial en un mapa</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque1/01d-vectordb.qmd</code> (amplía <code>demos/embeddings.qmd</code>)</li>
+<li><strong>Idea:</strong> mapa 2D de puntos; el alumno escribe una consulta, aparece como un punto y se iluminan sus vecinos.</li>
+<li><strong>Mensaje:</strong> buscar por significado es buscar «lo más cercano».</li>
+<li><strong>Extensión:</strong> exacta vs aproximada (HNSW/IVF) con un control «más rápido ↔︎ más exacto» que muestre qué vecinos se pierden. Recall frente a latencia como dato plegado.</li>
+</ul>
+</section>
+<section id="taller-hpd-1-apoyo" class="level3">
+<h3 class="anchored" data-anchor-id="taller-hpd-1-apoyo">Taller HPD 1 (apoyo)</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque1/hpd1-embeddings.qmd</code></li>
+<li><strong>Idea:</strong> reutilizar la demo de mapa de búsqueda como paso previo al taller, para que el alumno llegue con la intuición antes de escribir el pipeline.</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="bloque-2-orquestación" class="level2">
+<h2 class="anchored" data-anchor-id="bloque-2-orquestación">Bloque 2 — Orquestación</h2>
+<section id="anatomía-del-tool-calling" class="level3">
+<h3 class="anchored" data-anchor-id="anatomía-del-tool-calling">Anatomía del tool calling</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque2/02e-agentes.qmd</code>, base de <code>hpd2-agente-tool-calling.qmd</code> y <code>hpd4-servidor-mcp.qmd</code> (evaluables)</li>
+<li><strong>Idea:</strong> mostrar paso a paso el esquema de la herramienta, la petición del modelo, la ejecución y la respuesta, con un LLM simulado. El alumno edita la <strong>descripción</strong> de la herramienta y ve cuándo falla la selección.</li>
+<li><strong>Mensaje:</strong> el modelo decide qué herramienta usar leyendo su descripción; una descripción ambigua produce llamadas equivocadas.</li>
+<li><strong>Por qué importa:</strong> el error típico de los alumnos en HPD2/HPD4 está justo aquí.</li>
+</ul>
+</section>
+<section id="prompt-lab" class="level3">
+<h3 class="anchored" data-anchor-id="prompt-lab">Prompt lab</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque2/02a-prompt-engineering.qmd</code></li>
+<li><strong>Idea:</strong> el mismo problema resuelto con zero-shot, few-shot, CoT y salida estructurada. Respuestas reales pregrabadas; el alumno puntúa y compara.</li>
+<li><strong>Mensaje:</strong> pequeñas diferencias en el prompt cambian mucho el resultado, y cada técnica tiene su caso de uso.</li>
+</ul>
+</section>
+<section id="traza-de-un-agente" class="level3">
+<h3 class="anchored" data-anchor-id="traza-de-un-agente">Traza de un agente</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque2/02e-agentes.qmd</code>, <code>02f-patrones-agentes.qmd</code></li>
+<li><strong>Idea:</strong> reproducir una conversación paso a paso: pensando → usa herramienta → resultado → respuesta, con botón «siguiente».</li>
+<li><strong>Fallos incorporados:</strong> bucle infinito, herramienta equivocada, error de parseo, alucinación de una herramienta inexistente.</li>
+<li><strong>Mensaje:</strong> un agente es un bucle, y los bucles pueden fallar de formas muy concretas.</li>
+</ul>
+</section>
+<section id="inspector-de-mcp" class="level3">
+<h3 class="anchored" data-anchor-id="inspector-de-mcp">Inspector de MCP</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque2/02d-mcp.qmd</code>, <code>hpd4-servidor-mcp.qmd</code></li>
+<li><strong>Idea:</strong> simulador del handshake y de <code>tools/list</code> entre cliente y servidor (JSON-RPC), mostrando qué se dicen y en qué orden.</li>
+<li><strong>Mensaje:</strong> MCP es un protocolo estándar de descubrimiento y uso de herramientas, no magia.</li>
+</ul>
+</section>
+<section id="grafo-de-langgraph-interactivo" class="level3">
+<h3 class="anchored" data-anchor-id="grafo-de-langgraph-interactivo">Grafo de LangGraph interactivo</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque2/hpd3-workflows-langgraph.qmd</code> (no evaluable), <code>02f-patrones-agentes.qmd</code></li>
+<li><strong>Idea:</strong> editar nodos y aristas condicionales y ver cómo evoluciona el estado al ejecutar.</li>
+<li><strong>Mensaje:</strong> un workflow es un grafo con estado; las decisiones están en las aristas.</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="bloque-3-aplicaciones" class="level2">
+<h2 class="anchored" data-anchor-id="bloque-3-aplicaciones">Bloque 3 — Aplicaciones</h2>
+<section id="pipeline-rag-con-palancas" class="level3">
+<h3 class="anchored" data-anchor-id="pipeline-rag-con-palancas">Pipeline RAG con palancas</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque3/03b-rag-avanzado.qmd</code>, <code>evaluables/hpd5-rag-mixto.qmd</code></li>
+<li><strong>Idea:</strong> el alumno mueve tamaño de fragmento, top-k, reranker y umbral, y ve cómo cambian el contexto recuperado y la respuesta.</li>
+<li><strong>Fallo visible:</strong> el fragmento correcto no entra en el top-k y la respuesta falla.</li>
+<li><strong>Mensaje:</strong> la calidad de un RAG depende más de la recuperación que del modelo.</li>
+<li><strong>Conexión:</strong> reutiliza el chunking de <code>demos/chunking.qmd</code>.</li>
+</ul>
+</section>
+<section id="comparador-híbrido-bm25-densa-rrf" class="level3">
+<h3 class="anchored" data-anchor-id="comparador-híbrido-bm25-densa-rrf">Comparador híbrido (BM25 + densa + RRF)</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque3/03b-rag-avanzado.qmd</code></li>
+<li><strong>Idea:</strong> la misma consulta con búsqueda por palabras y por significado; rankings distintos; la fusión de rankings en directo.</li>
+<li><strong>Mensaje:</strong> cada método acierta donde el otro falla (nombres propios y códigos frente a paráfrasis).</li>
+</ul>
+</section>
+<section id="fine-tuning-y-lora" class="level3">
+<h3 class="anchored" data-anchor-id="fine-tuning-y-lora">Fine-tuning y LoRA</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque3/03c-fine-tuning.qmd</code></li>
+<li><strong>Idea:</strong> un modelo gigante «congelado» con una pequeña pieza acoplada, que es lo único que se entrena. Slider del tamaño de esa pieza, con porcentaje de parámetros entrenados y memoria como barras.</li>
+<li><strong>Extensión:</strong> comparación full fine-tuning vs LoRA vs QLoRA.</li>
+<li><strong>Mensaje:</strong> se puede adaptar un modelo enorme entrenando una fracción mínima.</li>
+</ul>
+</section>
+<section id="calidad-de-datos-sintéticos" class="level3">
+<h3 class="anchored" data-anchor-id="calidad-de-datos-sintéticos">Calidad de datos sintéticos</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque3/03a-datos-sinteticos.qmd</code></li>
+<li><strong>Idea:</strong> inspeccionar un lote generado y detectar duplicados, colapso de diversidad y sesgos (diversidad léxica, distribución de etiquetas).</li>
+<li><strong>Mensaje:</strong> generar muchos datos no es generar buenos datos.</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="bloque-4-gobernanza-ce-6" class="level2">
+<h2 class="anchored" data-anchor-id="bloque-4-gobernanza-ce-6">Bloque 4 — Gobernanza (CE-6)</h2>
+<section id="juez-llm-con-sesgo-de-posición" class="level3">
+<h3 class="anchored" data-anchor-id="juez-llm-con-sesgo-de-posición">Juez LLM con sesgo de posición</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque4/04a-evaluacion.qmd</code>, <code>evaluables/proyecto-final.qmd</code></li>
+<li><strong>Idea:</strong> el alumno ve dos respuestas y elige la mejor; luego se intercambia el orden y el «juez» cambia de opinión.</li>
+<li><strong>Otros sesgos:</strong> de longitud (la respuesta más larga gana) y de autopreferencia.</li>
+<li><strong>Mensaje:</strong> un LLM-as-judge no es neutral; hay que controlarlo (intercambiar orden, rúbricas, calibrar con humanos).</li>
+<li><strong>Datos:</strong> veredictos reales grabados.</li>
+</ul>
+</section>
+<section id="detector-de-alucinaciones-por-grounding" class="level3">
+<h3 class="anchored" data-anchor-id="detector-de-alucinaciones-por-grounding">Detector de alucinaciones por grounding</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque4/04b-alucinaciones.qmd</code></li>
+<li><strong>Idea:</strong> una respuesta con afirmaciones marcadas como soportadas o no por el contexto, con las citas resaltadas.</li>
+<li><strong>Mensaje:</strong> una respuesta fluida no es una respuesta verdadera; el grounding permite comprobarla.</li>
+</ul>
+</section>
+<section id="anonimización-de-pii" class="level3">
+<h3 class="anchored" data-anchor-id="anonimización-de-pii">Anonimización de PII</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque4/04c-privacidad.qmd</code></li>
+<li><strong>Idea:</strong> pegar un texto y ver qué detectan reglas (regex) y NER, con falsos positivos y falsos negativos visibles.</li>
+<li><strong>Extensión:</strong> compromiso privacidad-utilidad con ruido de privacidad diferencial (ε), como slider.</li>
+<li><strong>Mensaje:</strong> anonimizar bien es difícil y siempre hay lo que se escapa.</li>
+</ul>
+</section>
+<section id="auditoría-de-sesgo" class="level3">
+<h3 class="anchored" data-anchor-id="auditoría-de-sesgo">Auditoría de sesgo</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque4/04d-sesgo.qmd</code></li>
+<li><strong>Idea:</strong> plantillas de prompt con atributos intercambiados (género, origen) y comparación lado a lado de las salidas, con una métrica sencilla de disparidad.</li>
+<li><strong>Mensaje:</strong> el sesgo se detecta comparando, no leyendo una sola respuesta.</li>
+</ul>
+</section>
+<section id="calculadora-de-despliegue" class="level3">
+<h3 class="anchored" data-anchor-id="calculadora-de-despliegue">Calculadora de despliegue</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque4/04f-despliegue.qmd</code></li>
+<li><strong>Idea:</strong> coste por petición, tasa de aciertos de caché y comparación API vs on-premise (VRAM necesaria según cuantización).</li>
+<li><strong>Mensaje:</strong> el coste y la viabilidad dependen de decisiones de despliegue concretas.</li>
+</ul>
+</section>
+<section id="model-card-apoyo" class="level3">
+<h3 class="anchored" data-anchor-id="model-card-apoyo">Model Card (apoyo)</h3>
+<ul>
+<li><strong>Capítulo:</strong> <code>bloque4/04e-documentacion.qmd</code></li>
+<li><strong>Idea (por explorar):</strong> rellenar una Model Card guiada con un caso de uso y ver qué riesgos quedan sin documentar.</li>
+</ul>
+<hr>
+</section>
+</section>
+<section id="resumen-por-capítulo" class="level2">
+<h2 class="anchored" data-anchor-id="resumen-por-capítulo">Resumen por capítulo</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Capítulo</th>
+<th>Demo(s)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>01a-transformer</code></td>
+<td>Atención con palabras clicables</td>
+</tr>
+<tr class="even">
+<td><code>01b-llms</code></td>
+<td>Creatividad/temperatura; mochila de contexto</td>
+</tr>
+<tr class="odd">
+<td><code>01d-vectordb</code></td>
+<td>Búsqueda vectorial en un mapa</td>
+</tr>
+<tr class="even">
+<td><code>02a-prompt-engineering</code></td>
+<td>Prompt lab</td>
+</tr>
+<tr class="odd">
+<td><code>02d-mcp</code> / <code>hpd4</code></td>
+<td>Inspector de MCP</td>
+</tr>
+<tr class="even">
+<td><code>02e-agentes</code> / <code>hpd2</code></td>
+<td>Anatomía del tool calling; traza de un agente</td>
+</tr>
+<tr class="odd">
+<td><code>02f-patrones-agentes</code> / <code>hpd3</code></td>
+<td>Traza de un agente; grafo de LangGraph</td>
+</tr>
+<tr class="even">
+<td><code>03a-datos-sinteticos</code></td>
+<td>Calidad de datos sintéticos</td>
+</tr>
+<tr class="odd">
+<td><code>03b-rag-avanzado</code> / <code>hpd5</code></td>
+<td>RAG con palancas; comparador híbrido</td>
+</tr>
+<tr class="even">
+<td><code>03c-fine-tuning</code></td>
+<td>LoRA</td>
+</tr>
+<tr class="odd">
+<td><code>04a-evaluacion</code></td>
+<td>Juez LLM con sesgo de posición</td>
+</tr>
+<tr class="even">
+<td><code>04b-alucinaciones</code></td>
+<td>Detector por grounding</td>
+</tr>
+<tr class="odd">
+<td><code>04c-privacidad</code></td>
+<td>Anonimización de PII</td>
+</tr>
+<tr class="even">
+<td><code>04d-sesgo</code></td>
+<td>Auditoría de sesgo</td>
+</tr>
+<tr class="odd">
+<td><code>04e-documentacion</code></td>
+<td>Model Card guiada (por explorar)</td>
+</tr>
+<tr class="even">
+<td><code>04f-despliegue</code></td>
+<td>Calculadora de despliegue</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="notas-técnicas" class="level2">
+<h2 class="anchored" data-anchor-id="notas-técnicas">Notas técnicas</h2>
+<ul>
+<li>Las demos van en <code>demos/</code> como <code>.qmd</code> con Shinylive; los datos precalculados se generan con scripts en <code>scripts/</code> (ver <code>build_demo_data.py</code>) y se insertan entre marcadores <code>DATA-START</code> / <code>DATA-END</code>.</li>
+<li>Hay que añadir cada demo al sidebar en <code>_quarto.yml</code> y enlazarla desde el capítulo correspondiente.</li>
+<li>Las demos que dependen de un LLM usan respuestas grabadas una sola vez, para que sean deterministas y no requieran <code>LLM_API_KEY</code>.</li>
+</ul>
+
+
+<!-- -->
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<footer class="footer-custom">
+  <div class="footer-logos">
+    <img src="./images/logo_cfp.png" alt="Formación Permanente · Universidad de Sevilla">
+  </div>
+  <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
+</footer>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu"># Ideas de demos interactivas — Módulo 10</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Catálogo de demos candidatas para el curso, organizado por bloque. Pensado para un **perfil general de máster de formación permanente**: la demo no enseña la mecánica (fórmulas, álgebra) sino que deja al alumno **tocar algo y ver una consecuencia**.</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">## Estado actual</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>Demos ya existentes en <span class="in">`demos/`</span> (Bloque 1, corren en el navegador con Shinylive):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`bpe.qmd`</span> — Tokenización BPE</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`chunking.qmd`</span> — Estrategias de chunking</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`embeddings.qmd`</span> — Embeddings y similitud (datos precalculados con <span class="in">`scripts/build_demo_data.py`</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`atencion.qmd`</span> — Atención (1): la idea, ilustrativa, con interruptor «LLM generativo» (pesos diseñados a mano)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span><span class="in">`atencion-modelo-real.qmd`</span> — Atención (2): seis cabezas de BETO reales (datos con <span class="in">`scripts/build_attention_data.py`</span>)</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>Los Bloques 2, 3 y 4 no tienen demos todavía. La demo de atención (partes 1 y 2) está hecha; el resto de este catálogo está pendiente.</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## Principios de diseño</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Una idea por demo.** Si hay más de dos controles, sobra uno.</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Cada demo termina con «qué has visto».** Dos líneas que fijen el mensaje.</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Ejemplos cotidianos y en español**, no vectores abstractos.</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Resultado inmediato.** Sin esperar a un modelo: todo precalculado y reproducido.</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Detalle numérico opcional**, plegado, para los curiosos.</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Un fallo visible.** Lo que más se recuerda es cuándo y por qué falla el sistema.</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="ss">7. </span>**Sin API key en el navegador.** Datos o respuestas reales grabadas una vez con un script (patrón de <span class="in">`build_demo_data.py`</span>) e inyectadas en el <span class="in">`.qmd`</span>, de forma determinista.</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ss">8. </span>**Honestidad sobre los límites.** Si la demo usa un caso real elegido por su claridad, decirlo.</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">## Prioridad recomendada</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> # <span class="pp">|</span> Demo <span class="pp">|</span> Bloque <span class="pp">|</span> Por qué primero <span class="pp">|</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 1 <span class="pp">|</span> Atención con palabras clicables <span class="pp">|</span> 1 — <span class="in">`01a-transformer`</span> <span class="pp">|</span> La más difícil de explicar sin demo y la más lucida con ella <span class="pp">|</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 2 <span class="pp">|</span> Creatividad / temperatura <span class="pp">|</span> 1 — <span class="in">`01b-llms`</span> <span class="pp">|</span> Muy barata; explica un parámetro que usarán a diario <span class="pp">|</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 3 <span class="pp">|</span> Juez LLM con sesgo de posición <span class="pp">|</span> 4 — <span class="in">`04a-evaluacion`</span> <span class="pp">|</span> Muy memorable; enlaza con el proyecto final <span class="pp">|</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bloque 1 — Fundamentos</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="fu">### Atención con palabras clicables (dos subdemos)</span></span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque1/01a-transformer.qmd`</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** una frase donde el alumno pulsa una palabra y ve de qué otras palabras «se fija».</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Se evita:** Q/K/V, softmax, matrices. Casilla opcional «ver los números».</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Estructura:** dos partes, porque mezclar «idea limpia» y «realidad ruidosa» en una sola demo se estorba. Se pueden publicar por separado.</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>**Parte 1 — «Qué es la atención» (ilustrativa, una cabeza)**</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Pesos diseñados a mano, declarado abiertamente: etiqueta visible «ilustración» y aviso de que es una simplificación.</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Ejemplos:** «El banco cerró porque estaba en quiebra» frente a «Me senté en el banco del parque»; un pronombre («La maleta no cabía en el coche porque *era* muy grande» → *era* apunta a *maleta*).</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Secuencia guiada:** pulsa *banco* en la 1.ª frase → pulsa *banco* en la 2.ª → ¿mismo significado? → caso del pronombre.</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** el significado de una palabra depende de las que la rodean.</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Sin selector de cabeza, sin tokens partidos. Termina con enlace a la parte 2: «¿Y en un modelo real?».</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Sin dependencias: se puede construir ya.</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>**Parte 2 — «Qué hace un modelo real» (multi-cabeza)**</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Pesos reales de un modelo **codificador** (BERT), con selector de capa/cabeza y tokens reales (enlaza con la demo de BPE).</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** en un modelo real hay muchas cabezas y cada una hace algo distinto (token anterior, siguiente, sintaxis, correferencia); algunas no son interpretables. Encaja con la sección de multi-head attention.</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Mostrar solo 2–3 cabezas elegidas con etiqueta descriptiva; el resto en «explorar», para no desanimar.</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Modelo:** no Qwen3. Es un decodificador con atención causal: cada palabra solo mira a las anteriores, así que *banco* no vería *parque*. Un codificador tiene atención bidireccional y encaja con la intuición.</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Preferido: <span class="in">`dccuchile/bert-base-spanish-wwm-cased`</span> (BETO, ~110 M, solo español).</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Alternativas: <span class="in">`google-bert/bert-base-multilingual-cased`</span>, <span class="in">`FacebookAI/xlm-roberta-base`</span>.</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Datos:** extraídos con <span class="in">`output_attentions=True`</span> (<span class="in">`attn_implementation="eager"`</span>) en un script offline y precalculados; el navegador no necesita el modelo.</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Aclarar siempre que es un BERT, no un LLM autorregresivo.** Riesgo: que el alumno asuma que los LLM (ChatGPT, Qwen, Llama…) miran en ambos sentidos como esta demo.</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Etiqueta fija y visible en la demo: «Modelo: BERT (codificador). Mira antes **y** después. Los LLM generativos son decodificadores y solo miran hacia atrás».</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Interruptor «Ver como un LLM generativo» que aplica la máscara causal: al pulsar *banco* en «Me senté en el banco del parque», *parque* queda tachada porque aún no existe. Es un ejemplo directo de por qué un LLM no puede usar el contexto posterior al generar.</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Enlazar con el apartado de encoder vs decoder de <span class="in">`01a-transformer.qmd`</span>.</span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>La máscara se aplica sobre los pesos del propio BERT; se avisa de que es una ilustración (un decodificador real se entrena así, no se enmascara a posteriori). También puede hacerse en la parte 1.</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Resultado de la prueba de viabilidad** (BETO, 5 frases, <span class="in">`scripts/probe_attention.py`</span>):</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Se ven con claridad cabezas posicionales (token anterior: L00H10, L03H08; token siguiente: L05H07, L01H08; <span class="in">`[CLS]`</span>/<span class="in">`[SEP]`</span>: L10H05/H07/H08/H09).</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>**No** aparece una cabeza que desambigüe «banco» ni que resuelva pronombres (*era* → *maleta*): el efecto no es visible en los pesos crudos. Por eso la parte 1 es ilustrativa y la parte 2 promete solo «tipos de cabezas».</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Segunda prueba (frases sintácticas, pares no adyacentes): L6H10 (sujeto→verbo) y L1H3 (objeto→verbo) aparecen en las dos pruebas con criterios distintos, pero con 3–4 casos y frases con las que se eligieron (circular). En la demo se presentan como «tendencia», y ~50 % de su atención va a <span class="in">`[CLS]`</span>/<span class="in">`[SEP]`</span>.</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Ampliación pendiente (opcional): validar con ~30–40 frases por relación de un treebank (p. ej. UD Spanish-GSD).</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Cautelas:**</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>BERT concentra mucha atención en <span class="in">`[CLS]`</span>, <span class="in">`[SEP]`</span> y puntuación (Clark et al., 2019, *What Does BERT Look At?*): ocultarlos/atenuarlos o explicarlos.</span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>No está garantizado que una cabeza desambigüe «banco»; la correferencia y los patrones sintácticos son más probables. Decidir frases y cabezas finales tras la prueba de viabilidad (<span class="in">`scripts/probe_attention.py`</span>).</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a><span class="ss">  - </span>Considerar añadir Clark et al. (2019) a <span class="in">`references.bib`</span>.</span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="fu">### Creatividad / temperatura</span></span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque1/01b-llms.qmd`</span></span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** botón «continuar la frase» que escribe la siguiente palabra; un slider de «creatividad» de «predecible» a «caótico». El alumno genera 10 veces y compara.</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** el modelo no «decide», saca una palabra de un abanico de probabilidades. A 0 siempre sale lo mismo; a valores altos aparece lo absurdo.</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Extensión:** top-k y top-p como «recortar el abanico» (barras que se acortan).</span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Datos:** distribuciones de siguiente token precalculadas para 3–4 frases.</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a><span class="fu">### Ventana de contexto: la mochila</span></span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque1/01b-llms.qmd`</span></span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** el alumno arrastra documentos a una «mochila» con capacidad limitada y ve qué cabe y qué se queda fuera.</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** el contexto es finito y lo del medio se pierde con más facilidad («lost in the middle»).</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Extensión:** barra de coste y latencia según longitud (tokens → euros). Tamaño del KV-cache como dato plegado.</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a><span class="fu">### Búsqueda vectorial en un mapa</span></span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque1/01d-vectordb.qmd`</span> (amplía <span class="in">`demos/embeddings.qmd`</span>)</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** mapa 2D de puntos; el alumno escribe una consulta, aparece como un punto y se iluminan sus vecinos.</span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** buscar por significado es buscar «lo más cercano».</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Extensión:** exacta vs aproximada (HNSW/IVF) con un control «más rápido ↔ más exacto» que muestre qué vecinos se pierden. Recall frente a latencia como dato plegado.</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a><span class="fu">### Taller HPD 1 (apoyo)</span></span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque1/hpd1-embeddings.qmd`</span></span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** reutilizar la demo de mapa de búsqueda como paso previo al taller, para que el alumno llegue con la intuición antes de escribir el pipeline.</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bloque 2 — Orquestación</span></span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a><span class="fu">### Anatomía del tool calling</span></span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque2/02e-agentes.qmd`</span>, base de <span class="in">`hpd2-agente-tool-calling.qmd`</span> y <span class="in">`hpd4-servidor-mcp.qmd`</span> (evaluables)</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** mostrar paso a paso el esquema de la herramienta, la petición del modelo, la ejecución y la respuesta, con un LLM simulado. El alumno edita la **descripción** de la herramienta y ve cuándo falla la selección.</span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** el modelo decide qué herramienta usar leyendo su descripción; una descripción ambigua produce llamadas equivocadas.</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Por qué importa:** el error típico de los alumnos en HPD2/HPD4 está justo aquí.</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prompt lab</span></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque2/02a-prompt-engineering.qmd`</span></span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** el mismo problema resuelto con zero-shot, few-shot, CoT y salida estructurada. Respuestas reales pregrabadas; el alumno puntúa y compara.</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** pequeñas diferencias en el prompt cambian mucho el resultado, y cada técnica tiene su caso de uso.</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a><span class="fu">### Traza de un agente</span></span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque2/02e-agentes.qmd`</span>, <span class="in">`02f-patrones-agentes.qmd`</span></span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** reproducir una conversación paso a paso: pensando → usa herramienta → resultado → respuesta, con botón «siguiente».</span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Fallos incorporados:** bucle infinito, herramienta equivocada, error de parseo, alucinación de una herramienta inexistente.</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** un agente es un bucle, y los bucles pueden fallar de formas muy concretas.</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a><span class="fu">### Inspector de MCP</span></span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque2/02d-mcp.qmd`</span>, <span class="in">`hpd4-servidor-mcp.qmd`</span></span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** simulador del handshake y de <span class="in">`tools/list`</span> entre cliente y servidor (JSON-RPC), mostrando qué se dicen y en qué orden.</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** MCP es un protocolo estándar de descubrimiento y uso de herramientas, no magia.</span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a><span class="fu">### Grafo de LangGraph interactivo</span></span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque2/hpd3-workflows-langgraph.qmd`</span> (no evaluable), <span class="in">`02f-patrones-agentes.qmd`</span></span>
+<span id="cb1-128"><a href="#cb1-128" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** editar nodos y aristas condicionales y ver cómo evoluciona el estado al ejecutar.</span>
+<span id="cb1-129"><a href="#cb1-129" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** un workflow es un grafo con estado; las decisiones están en las aristas.</span>
+<span id="cb1-130"><a href="#cb1-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-131"><a href="#cb1-131" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-132"><a href="#cb1-132" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-133"><a href="#cb1-133" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bloque 3 — Aplicaciones</span></span>
+<span id="cb1-134"><a href="#cb1-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-135"><a href="#cb1-135" aria-hidden="true" tabindex="-1"></a><span class="fu">### Pipeline RAG con palancas</span></span>
+<span id="cb1-136"><a href="#cb1-136" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque3/03b-rag-avanzado.qmd`</span>, <span class="in">`evaluables/hpd5-rag-mixto.qmd`</span></span>
+<span id="cb1-137"><a href="#cb1-137" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** el alumno mueve tamaño de fragmento, top-k, reranker y umbral, y ve cómo cambian el contexto recuperado y la respuesta.</span>
+<span id="cb1-138"><a href="#cb1-138" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Fallo visible:** el fragmento correcto no entra en el top-k y la respuesta falla.</span>
+<span id="cb1-139"><a href="#cb1-139" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** la calidad de un RAG depende más de la recuperación que del modelo.</span>
+<span id="cb1-140"><a href="#cb1-140" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Conexión:** reutiliza el chunking de <span class="in">`demos/chunking.qmd`</span>.</span>
+<span id="cb1-141"><a href="#cb1-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-142"><a href="#cb1-142" aria-hidden="true" tabindex="-1"></a><span class="fu">### Comparador híbrido (BM25 + densa + RRF)</span></span>
+<span id="cb1-143"><a href="#cb1-143" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque3/03b-rag-avanzado.qmd`</span></span>
+<span id="cb1-144"><a href="#cb1-144" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** la misma consulta con búsqueda por palabras y por significado; rankings distintos; la fusión de rankings en directo.</span>
+<span id="cb1-145"><a href="#cb1-145" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** cada método acierta donde el otro falla (nombres propios y códigos frente a paráfrasis).</span>
+<span id="cb1-146"><a href="#cb1-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-147"><a href="#cb1-147" aria-hidden="true" tabindex="-1"></a><span class="fu">### Fine-tuning y LoRA</span></span>
+<span id="cb1-148"><a href="#cb1-148" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque3/03c-fine-tuning.qmd`</span></span>
+<span id="cb1-149"><a href="#cb1-149" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** un modelo gigante «congelado» con una pequeña pieza acoplada, que es lo único que se entrena. Slider del tamaño de esa pieza, con porcentaje de parámetros entrenados y memoria como barras.</span>
+<span id="cb1-150"><a href="#cb1-150" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Extensión:** comparación full fine-tuning vs LoRA vs QLoRA.</span>
+<span id="cb1-151"><a href="#cb1-151" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** se puede adaptar un modelo enorme entrenando una fracción mínima.</span>
+<span id="cb1-152"><a href="#cb1-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-153"><a href="#cb1-153" aria-hidden="true" tabindex="-1"></a><span class="fu">### Calidad de datos sintéticos</span></span>
+<span id="cb1-154"><a href="#cb1-154" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque3/03a-datos-sinteticos.qmd`</span></span>
+<span id="cb1-155"><a href="#cb1-155" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** inspeccionar un lote generado y detectar duplicados, colapso de diversidad y sesgos (diversidad léxica, distribución de etiquetas).</span>
+<span id="cb1-156"><a href="#cb1-156" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** generar muchos datos no es generar buenos datos.</span>
+<span id="cb1-157"><a href="#cb1-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-158"><a href="#cb1-158" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-159"><a href="#cb1-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-160"><a href="#cb1-160" aria-hidden="true" tabindex="-1"></a><span class="fu">## Bloque 4 — Gobernanza (CE-6)</span></span>
+<span id="cb1-161"><a href="#cb1-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-162"><a href="#cb1-162" aria-hidden="true" tabindex="-1"></a><span class="fu">### Juez LLM con sesgo de posición</span></span>
+<span id="cb1-163"><a href="#cb1-163" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque4/04a-evaluacion.qmd`</span>, <span class="in">`evaluables/proyecto-final.qmd`</span></span>
+<span id="cb1-164"><a href="#cb1-164" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** el alumno ve dos respuestas y elige la mejor; luego se intercambia el orden y el «juez» cambia de opinión.</span>
+<span id="cb1-165"><a href="#cb1-165" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Otros sesgos:** de longitud (la respuesta más larga gana) y de autopreferencia.</span>
+<span id="cb1-166"><a href="#cb1-166" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** un LLM-as-judge no es neutral; hay que controlarlo (intercambiar orden, rúbricas, calibrar con humanos).</span>
+<span id="cb1-167"><a href="#cb1-167" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Datos:** veredictos reales grabados.</span>
+<span id="cb1-168"><a href="#cb1-168" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-169"><a href="#cb1-169" aria-hidden="true" tabindex="-1"></a><span class="fu">### Detector de alucinaciones por grounding</span></span>
+<span id="cb1-170"><a href="#cb1-170" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque4/04b-alucinaciones.qmd`</span></span>
+<span id="cb1-171"><a href="#cb1-171" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** una respuesta con afirmaciones marcadas como soportadas o no por el contexto, con las citas resaltadas.</span>
+<span id="cb1-172"><a href="#cb1-172" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** una respuesta fluida no es una respuesta verdadera; el grounding permite comprobarla.</span>
+<span id="cb1-173"><a href="#cb1-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-174"><a href="#cb1-174" aria-hidden="true" tabindex="-1"></a><span class="fu">### Anonimización de PII</span></span>
+<span id="cb1-175"><a href="#cb1-175" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque4/04c-privacidad.qmd`</span></span>
+<span id="cb1-176"><a href="#cb1-176" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** pegar un texto y ver qué detectan reglas (regex) y NER, con falsos positivos y falsos negativos visibles.</span>
+<span id="cb1-177"><a href="#cb1-177" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Extensión:** compromiso privacidad-utilidad con ruido de privacidad diferencial (ε), como slider.</span>
+<span id="cb1-178"><a href="#cb1-178" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** anonimizar bien es difícil y siempre hay lo que se escapa.</span>
+<span id="cb1-179"><a href="#cb1-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-180"><a href="#cb1-180" aria-hidden="true" tabindex="-1"></a><span class="fu">### Auditoría de sesgo</span></span>
+<span id="cb1-181"><a href="#cb1-181" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque4/04d-sesgo.qmd`</span></span>
+<span id="cb1-182"><a href="#cb1-182" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** plantillas de prompt con atributos intercambiados (género, origen) y comparación lado a lado de las salidas, con una métrica sencilla de disparidad.</span>
+<span id="cb1-183"><a href="#cb1-183" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** el sesgo se detecta comparando, no leyendo una sola respuesta.</span>
+<span id="cb1-184"><a href="#cb1-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-185"><a href="#cb1-185" aria-hidden="true" tabindex="-1"></a><span class="fu">### Calculadora de despliegue</span></span>
+<span id="cb1-186"><a href="#cb1-186" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque4/04f-despliegue.qmd`</span></span>
+<span id="cb1-187"><a href="#cb1-187" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea:** coste por petición, tasa de aciertos de caché y comparación API vs on-premise (VRAM necesaria según cuantización).</span>
+<span id="cb1-188"><a href="#cb1-188" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Mensaje:** el coste y la viabilidad dependen de decisiones de despliegue concretas.</span>
+<span id="cb1-189"><a href="#cb1-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-190"><a href="#cb1-190" aria-hidden="true" tabindex="-1"></a><span class="fu">### Model Card (apoyo)</span></span>
+<span id="cb1-191"><a href="#cb1-191" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Capítulo:** <span class="in">`bloque4/04e-documentacion.qmd`</span></span>
+<span id="cb1-192"><a href="#cb1-192" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Idea (por explorar):** rellenar una Model Card guiada con un caso de uso y ver qué riesgos quedan sin documentar.</span>
+<span id="cb1-193"><a href="#cb1-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-194"><a href="#cb1-194" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb1-195"><a href="#cb1-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-196"><a href="#cb1-196" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resumen por capítulo</span></span>
+<span id="cb1-197"><a href="#cb1-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-198"><a href="#cb1-198" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Capítulo <span class="pp">|</span> Demo(s) <span class="pp">|</span></span>
+<span id="cb1-199"><a href="#cb1-199" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-200"><a href="#cb1-200" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`01a-transformer`</span> <span class="pp">|</span> Atención con palabras clicables <span class="pp">|</span></span>
+<span id="cb1-201"><a href="#cb1-201" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`01b-llms`</span> <span class="pp">|</span> Creatividad/temperatura; mochila de contexto <span class="pp">|</span></span>
+<span id="cb1-202"><a href="#cb1-202" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`01d-vectordb`</span> <span class="pp">|</span> Búsqueda vectorial en un mapa <span class="pp">|</span></span>
+<span id="cb1-203"><a href="#cb1-203" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`02a-prompt-engineering`</span> <span class="pp">|</span> Prompt lab <span class="pp">|</span></span>
+<span id="cb1-204"><a href="#cb1-204" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`02d-mcp`</span> / <span class="in">`hpd4`</span> <span class="pp">|</span> Inspector de MCP <span class="pp">|</span></span>
+<span id="cb1-205"><a href="#cb1-205" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`02e-agentes`</span> / <span class="in">`hpd2`</span> <span class="pp">|</span> Anatomía del tool calling; traza de un agente <span class="pp">|</span></span>
+<span id="cb1-206"><a href="#cb1-206" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`02f-patrones-agentes`</span> / <span class="in">`hpd3`</span> <span class="pp">|</span> Traza de un agente; grafo de LangGraph <span class="pp">|</span></span>
+<span id="cb1-207"><a href="#cb1-207" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`03a-datos-sinteticos`</span> <span class="pp">|</span> Calidad de datos sintéticos <span class="pp">|</span></span>
+<span id="cb1-208"><a href="#cb1-208" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`03b-rag-avanzado`</span> / <span class="in">`hpd5`</span> <span class="pp">|</span> RAG con palancas; comparador híbrido <span class="pp">|</span></span>
+<span id="cb1-209"><a href="#cb1-209" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`03c-fine-tuning`</span> <span class="pp">|</span> LoRA <span class="pp">|</span></span>
+<span id="cb1-210"><a href="#cb1-210" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`04a-evaluacion`</span> <span class="pp">|</span> Juez LLM con sesgo de posición <span class="pp">|</span></span>
+<span id="cb1-211"><a href="#cb1-211" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`04b-alucinaciones`</span> <span class="pp">|</span> Detector por grounding <span class="pp">|</span></span>
+<span id="cb1-212"><a href="#cb1-212" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`04c-privacidad`</span> <span class="pp">|</span> Anonimización de PII <span class="pp">|</span></span>
+<span id="cb1-213"><a href="#cb1-213" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`04d-sesgo`</span> <span class="pp">|</span> Auditoría de sesgo <span class="pp">|</span></span>
+<span id="cb1-214"><a href="#cb1-214" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`04e-documentacion`</span> <span class="pp">|</span> Model Card guiada (por explorar) <span class="pp">|</span></span>
+<span id="cb1-215"><a href="#cb1-215" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`04f-despliegue`</span> <span class="pp">|</span> Calculadora de despliegue <span class="pp">|</span></span>
+<span id="cb1-216"><a href="#cb1-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-217"><a href="#cb1-217" aria-hidden="true" tabindex="-1"></a><span class="fu">## Notas técnicas</span></span>
+<span id="cb1-218"><a href="#cb1-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-219"><a href="#cb1-219" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Las demos van en <span class="in">`demos/`</span> como <span class="in">`.qmd`</span> con Shinylive; los datos precalculados se generan con scripts en <span class="in">`scripts/`</span> (ver <span class="in">`build_demo_data.py`</span>) y se insertan entre marcadores <span class="in">`DATA-START`</span> / <span class="in">`DATA-END`</span>.</span>
+<span id="cb1-220"><a href="#cb1-220" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Hay que añadir cada demo al sidebar en <span class="in">`_quarto.yml`</span> y enlazarla desde el capítulo correspondiente.</span>
+<span id="cb1-221"><a href="#cb1-221" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Las demos que dependen de un LLM usan respuestas grabadas una sola vez, para que sean deterministas y no requieran <span class="in">`LLM_API_KEY`</span>.</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -58,7 +61,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -74,10 +97,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-f97a59afa23c78b76dca51217b896fc0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -182,6 +205,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Visión general</span></a>
   </div>
@@ -212,20 +241,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+  <a href="../bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HPD 1 — Embeddings</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd1-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 1</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd1-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 1</span></a>
+  <a href="../evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
   </div>
 </li>
       </ul>
@@ -277,38 +306,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd2-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 2</span></a>
+  <a href="../evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd2-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 2</span></a>
+  <a href="../bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../bloque2/hpd3-servidor-mcp.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HPD 3 — Servidor MCP</span></a>
+  <a href="../bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd3-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 3</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd3-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 3</span></a>
+  <a href="../evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
   </div>
 </li>
       </ul>
@@ -342,26 +371,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Fine-tuning eficiente</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd4-rag-mixto.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HPD 4 — RAG Mixto</span></a>
+  <a href="../evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd4-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios — Datos Sintéticos</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd4-datos-sinteticos-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión — Datos Sintéticos</span></a>
+  <a href="../evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
   </div>
 </li>
       </ul>
@@ -378,7 +407,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Teoría y Despliegue</span></a>
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
   </div>
 </li>
       </ul>
@@ -386,7 +451,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
- <span class="menu-text">Evaluación</span></a>
+ <span class="menu-text">Demos interactivas</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -394,8 +459,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Evaluación y Proyecto</span></a>
+  <a href="../demos/atencion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
       </ul>
@@ -403,12 +498,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
- <span class="menu-text">Recursos</span></a>
+ <span class="menu-text">Evaluación</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../06-herramientas.html" class="sidebar-item-text sidebar-link">
@@ -433,17 +551,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#llamaindex" id="toc-llamaindex" class="nav-link active" data-scroll-target="#llamaindex">LlamaIndex</a>
+  <li><a href="#sec-llamaindex" id="toc-sec-llamaindex" class="nav-link active" data-scroll-target="#sec-llamaindex">LlamaIndex</a>
   <ul class="collapse">
-  <li><a href="#qué-es-llamaindex" id="toc-qué-es-llamaindex" class="nav-link" data-scroll-target="#qué-es-llamaindex">¿Qué es LlamaIndex?</a></li>
-  <li><a href="#primer-contacto-indexar-y-preguntar" id="toc-primer-contacto-indexar-y-preguntar" class="nav-link" data-scroll-target="#primer-contacto-indexar-y-preguntar">Primer contacto: indexar y preguntar</a></li>
-  <li><a href="#el-pipeline-de-ingesta" id="toc-el-pipeline-de-ingesta" class="nav-link" data-scroll-target="#el-pipeline-de-ingesta">El pipeline de ingesta</a></li>
-  <li><a href="#tipos-de-índices" id="toc-tipos-de-índices" class="nav-link" data-scroll-target="#tipos-de-índices">Tipos de índices</a></li>
-  <li><a href="#query-engines" id="toc-query-engines" class="nav-link" data-scroll-target="#query-engines">Query Engines</a></li>
-  <li><a href="#consultas-sobre-datos-estructurados-sql" id="toc-consultas-sobre-datos-estructurados-sql" class="nav-link" data-scroll-target="#consultas-sobre-datos-estructurados-sql">Consultas sobre datos estructurados (SQL)</a></li>
-  <li><a href="#chunking-estratégico" id="toc-chunking-estratégico" class="nav-link" data-scroll-target="#chunking-estratégico">Chunking estratégico</a></li>
-  <li><a href="#resumen-del-flujo-rag-con-llamaindex" id="toc-resumen-del-flujo-rag-con-llamaindex" class="nav-link" data-scroll-target="#resumen-del-flujo-rag-con-llamaindex">Resumen del flujo RAG con LlamaIndex</a></li>
+  <li><a href="#sec-que-es-llamaindex" id="toc-sec-que-es-llamaindex" class="nav-link" data-scroll-target="#sec-que-es-llamaindex">¿Qué es LlamaIndex?</a></li>
+  <li><a href="#sec-primer-contacto-llamaindex" id="toc-sec-primer-contacto-llamaindex" class="nav-link" data-scroll-target="#sec-primer-contacto-llamaindex">Primer contacto: indexar y preguntar</a></li>
+  <li><a href="#sec-pipeline-ingesta" id="toc-sec-pipeline-ingesta" class="nav-link" data-scroll-target="#sec-pipeline-ingesta">El pipeline de ingesta</a></li>
+  <li><a href="#sec-tipos-indices" id="toc-sec-tipos-indices" class="nav-link" data-scroll-target="#sec-tipos-indices">Tipos de índices</a></li>
+  <li><a href="#sec-query-engines" id="toc-sec-query-engines" class="nav-link" data-scroll-target="#sec-query-engines">Query Engines</a></li>
+  <li><a href="#sec-nlsql" id="toc-sec-nlsql" class="nav-link" data-scroll-target="#sec-nlsql">Consultas sobre datos estructurados (SQL)</a></li>
+  <li><a href="#sec-chunking-estrategico" id="toc-sec-chunking-estrategico" class="nav-link" data-scroll-target="#sec-chunking-estrategico">Chunking estratégico</a></li>
+  <li><a href="#sec-resumen-flujo-llamaindex" id="toc-sec-resumen-flujo-llamaindex" class="nav-link" data-scroll-target="#sec-resumen-flujo-llamaindex">Resumen del flujo RAG con LlamaIndex</a></li>
   </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="02c-llamaindex.ipynb" download="02c-llamaindex.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
@@ -476,25 +595,69 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </figure>
 </div>
 <blockquote class="blockquote">
-<p>Este tema forma parte del <strong>Bloque 2 — Orquestación</strong>. Se recomienda haber visto <a href="../bloque2/02b-langchain.html">LangChain</a> primero.</p>
+<p>Este tema forma parte del Bloque 2 — Orquestación. Se recomienda haber visto <a href="../bloque2/02b-langchain.html">LangChain</a> primero.</p>
 </blockquote>
-<div id="7e1deb4c" class="cell" data-execution_count="1">
+<div id="2392e93b" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q llama<span class="op">-</span>index llama<span class="op">-</span>index<span class="op">-</span>llms<span class="op">-</span>openai<span class="op">-</span>like python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="9e42ccd5" class="cell" data-execution_count="2">
+<div id="7e4a919f" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">Setup compartido para la API key de Llamus en todos los notebooks.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">Orden de resolución:</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">  1. .env local (python-dotenv)</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">  2. os.environ ya configurado externamente</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _load_llm_api_key():</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        load_dotenv()</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ImportError</span>:</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> os.getenv(<span class="st">"LLM_API_KEY"</span>):</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>            <span class="im">from</span> google.colab <span class="im">import</span> userdata</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> name <span class="kw">in</span> (<span class="st">"LLAMUS_API_KEY"</span>, <span class="st">"LLM_API_KEY"</span>):</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>                <span class="cf">try</span>:</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>                    value <span class="op">=</span> userdata.get(name)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> value:</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>                        os.environ[<span class="st">"LLM_API_KEY"</span>] <span class="op">=</span> value</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">break</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>                <span class="cf">except</span> <span class="pp">Exception</span>:</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">continue</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">ImportError</span>:</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>            <span class="cf">pass</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>_load_llm_api_key()</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.getenv(<span class="st">"LLM_API_KEY"</span>):</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"✓ LLM_API_KEY cargada."</span>)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  LLM_API_KEY no encontrada."</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"    • Local: crea un archivo .env con LLM_API_KEY=tu_clave"</span>)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'"</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Librerías cargadas correctamente.</code></pre>
+<pre><code>✓ LLM_API_KEY cargada.
+Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="565ee86e" class="cell" data-execution_count="3">
+<div id="676c5673" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.llms.openai_like <span class="im">import</span> OpenAILike</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.base.embeddings.base <span class="im">import</span> BaseEmbedding</span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.base.llms.types <span class="im">import</span> LLMMetadata</span>
@@ -502,7 +665,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>LLM_URL <span class="op">=</span> <span class="st">"https://llamus.cs.us.es/api/v1"</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>LLM_URL <span class="op">=</span> os.getenv(<span class="st">"LLM_URL"</span>, <span class="st">"https://llamus.cs.us.es/api/v1"</span>)</span>
 <span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Llamus usa una API compatible con OpenAI, pero llama-index necesita adaptadores</span></span>
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># porque valida los modelos contra listas fijas de OpenAI.</span></span>
@@ -543,8 +706,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Crea un archivo .env en la raíz del proyecto con:</span><span class="ch">\n</span><span class="st">    LLM_API_KEY=tu_api_key</span><span class="ch">\n</span><span class="st">    Las celdas siguientes mostrarán este mensaje hasta que configures la clave."</span>)</span>
 <span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    Settings.llm <span class="op">=</span> LlamusChatLLM(model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>, api_base<span class="op">=</span>LLM_URL, api_key<span class="op">=</span>LLM_KEY, temperature<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    Settings.embed_model <span class="op">=</span> LlamusEmbedding(<span class="st">"qwen3-embedding:0.6b"</span>, api_key<span class="op">=</span>LLM_KEY, api_base<span class="op">=</span>LLM_URL)</span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>    Settings.llm <span class="op">=</span> LlamusChatLLM(model<span class="op">=</span>os.getenv(<span class="st">"LLM_MODEL"</span>, <span class="st">"gemma4:26b"</span>), api_base<span class="op">=</span>LLM_URL, api_key<span class="op">=</span>LLM_KEY, temperature<span class="op">=</span><span class="dv">0</span>, max_tokens<span class="op">=</span><span class="dv">2048</span>)</span>
+<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    Settings.embed_model <span class="op">=</span> LlamusEmbedding(os.getenv(<span class="st">"LLM_EMBED_MODEL"</span>, <span class="st">"qwen3-embedding:0.6b"</span>), api_key<span class="op">=</span>LLM_KEY, api_base<span class="op">=</span>LLM_URL)</span>
 <span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>    Settings.chunk_size <span class="op">=</span> <span class="dv">512</span></span>
 <span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>    Settings.chunk_overlap <span class="op">=</span> <span class="dv">50</span></span>
 <span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"✅ LlamaIndex configurado. Las celdas de ejemplo funcionarán correctamente."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -562,16 +725,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><code>qwen3-embedding:0.6b</code> es un modelo de embeddings <strong>multilingüe</strong> disponible en Llamus, a diferencia de los modelos ingleses (<code>all-MiniLM-L6-v2</code>, <code>e5-small-v2</code>) usados en el Bloque 1. Esto permite que los ejemplos de esta página usen texto en <strong>español</strong> sin pérdida de calidad: el tokenizador de Qwen maneja correctamente caracteres acentuados y la distribución del espacio semántico está calibrada para múltiples idiomas.</p>
-<p>Para usar embeddings en español en tu proyecto, <code>qwen3-embedding:0.6b</code> (o su versión mayor <code>qwen3-embedding:4b</code>) son la opción recomendada.</p>
+<p><code>qwen3-embedding:0.6b</code> es un modelo de embeddings multilingüe disponible en Llamus, a diferencia de los modelos ingleses (<code>all-MiniLM-L6-v2</code>, <code>e5-small-v2</code>) usados en el Bloque 1. Esto permite que los ejemplos de esta página usen texto en español sin pérdida de calidad: el tokenizador de Qwen maneja correctamente caracteres acentuados y la distribución del espacio semántico está calibrada para múltiples idiomas.</p>
+<p>Para usar embeddings en español en tu proyecto, <code>qwen3-embedding:0.6b</code> (o su versión mayor <code>qwen3-embedding:4b</code>) es la opción recomendada.</p>
 </div>
 </div>
-<section id="llamaindex" class="level2">
-<h2 class="anchored" data-anchor-id="llamaindex">LlamaIndex</h2>
-<section id="qué-es-llamaindex" class="level3">
-<h3 class="anchored" data-anchor-id="qué-es-llamaindex">¿Qué es LlamaIndex?</h3>
-<p>LlamaIndex (antes GPT Index) es un <strong>framework de indexación diseñado específicamente para RAG</strong> (Retrieval-Augmented Generation) y aplicaciones de pregunta-respuesta sobre tus propios datos.</p>
-<p>Mientras LangChain es un framework generalista (cadenas, agentes, herramientas…), LlamaIndex está especializado en una cosa y la hace muy bien: <strong>convertir tus documentos en un índice consultable por un LLM</strong>.</p>
+<section id="sec-llamaindex" class="level2">
+<h2 class="anchored" data-anchor-id="sec-llamaindex">LlamaIndex</h2>
+<section id="sec-que-es-llamaindex" class="level3">
+<h3 class="anchored" data-anchor-id="sec-que-es-llamaindex">¿Qué es LlamaIndex?</h3>
+<p>LlamaIndex (antes GPT Index) es un framework de indexación diseñado específicamente para RAG (Retrieval-Augmented Generation) y aplicaciones de pregunta-respuesta sobre tus propios datos.</p>
+<p>Mientras LangChain es un framework generalista (cadenas, agentes, herramientas…), LlamaIndex está especializado en una cosa y la hace muy bien: convertir tus documentos en un índice consultable por un LLM.</p>
+<div id="fig-llamaindex-pipeline" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-llamaindex-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -595,7 +761,19 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p><strong>¿Cuándo elegir LlamaIndex vs LangChain?</strong></p>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-llamaindex-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
+<p><strong>¿Cuándo elegir LlamaIndex frente a LangChain?</strong></p>
+<div id="tbl-llamaindex-vs-langchain" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-llamaindex-vs-langchain-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Comparativa entre LlamaIndex y LangChain por criterio de uso
+</figcaption>
+<div aria-describedby="tbl-llamaindex-vs-langchain-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -617,7 +795,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 <tr class="even">
 <td><strong>Curva de aprendizaje</strong></td>
-<td>Más suave (más opinado)</td>
+<td>Más suave (más dogmático)</td>
 <td>Más empinada (más flexible)</td>
 </tr>
 <tr class="odd">
@@ -637,13 +815,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+</div>
+</figure>
+</div>
 <blockquote class="blockquote">
-<p>En muchos proyectos se usan <strong>ambos</strong>: LlamaIndex para indexar y recuperar, LangChain para orquestar el agente.</p>
+<p>En muchos proyectos se usan ambos: LlamaIndex para indexar y recuperar, LangChain para orquestar el agente.</p>
 </blockquote>
 </section>
-<section id="primer-contacto-indexar-y-preguntar" class="level3">
-<h3 class="anchored" data-anchor-id="primer-contacto-indexar-y-preguntar">Primer contacto: indexar y preguntar</h3>
-<div id="7e71d8be" class="cell" data-execution_count="4">
+<section id="sec-primer-contacto-llamaindex" class="level3">
+<h3 class="anchored" data-anchor-id="sec-primer-contacto-llamaindex">Primer contacto: indexar y preguntar</h3>
+<div id="1349472b" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> VectorStoreIndex, Document</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos documentos de ejemplo en memoria (sin necesidad de archivos externos)</span></span>
@@ -669,13 +850,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Documentos cargados: 4
 
 Pregunta: ¿Cuáles fueron los ingresos totales en 2025?
-Respuesta: Las ventas de 2025 fueron de 5.6 millones de euros.</code></pre>
+Respuesta: Los ingresos totales en 2025 fueron de 5,6 millones de euros.</code></pre>
 </div>
 </div>
 </section>
-<section id="el-pipeline-de-ingesta" class="level3">
-<h3 class="anchored" data-anchor-id="el-pipeline-de-ingesta">El pipeline de ingesta</h3>
+<section id="sec-pipeline-ingesta" class="level3">
+<h3 class="anchored" data-anchor-id="sec-pipeline-ingesta">El pipeline de ingesta</h3>
 <p>La ingesta convierte documentos brutos en nodos indexables:</p>
+<div id="fig-pipeline-ingesta" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-pipeline-ingesta-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -699,7 +883,13 @@ Respuesta: Las ventas de 2025 fueron de 5.6 millones de euros.</code></pre>
 </div>
 </div>
 </div>
-<div id="6a3af5a5" class="cell" data-execution_count="5">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-pipeline-ingesta-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2
+</figcaption>
+</figure>
+</div>
+<div id="e2b43299" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.node_parser <span class="im">import</span> SentenceSplitter</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.ingestion <span class="im">import</span> IngestionPipeline</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -722,9 +912,15 @@ Ejemplo de nodo: Las ventas de 2025 fueron de 5.6 millones de euros. El producto
 </div>
 </div>
 </section>
-<section id="tipos-de-índices" class="level3">
-<h3 class="anchored" data-anchor-id="tipos-de-índices">Tipos de índices</h3>
+<section id="sec-tipos-indices" class="level3">
+<h3 class="anchored" data-anchor-id="sec-tipos-indices">Tipos de índices</h3>
 <p>No todos los datos se consultan igual. LlamaIndex ofrece varios tipos de índices:</p>
+<div id="tbl-tipos-indices" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-tipos-indices-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Tipos de índices en LlamaIndex y cuándo usar cada uno
+</figcaption>
+<div aria-describedby="tbl-tipos-indices-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -756,6 +952,12 @@ Ejemplo de nodo: Las ventas de 2025 fueron de 5.6 millones de euros. El producto
 </tr>
 </tbody>
 </table>
+</div>
+</figure>
+</div>
+<div id="fig-tipos-indices" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-tipos-indices-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -787,7 +989,13 @@ Ejemplo de nodo: Las ventas de 2025 fueron de 5.6 millones de euros. El producto
 </div>
 </div>
 </div>
-<div id="5e995cb6" class="cell" data-execution_count="6">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-tipos-indices-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3
+</figcaption>
+</figure>
+</div>
+<div id="d82ba1a9" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> VectorStoreIndex, SummaryIndex</span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
@@ -805,17 +1013,17 @@ Ejemplo de nodo: Las ventas de 2025 fueron de 5.6 millones de euros. El producto
 <span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(summary_index.as_query_engine(response_mode<span class="op">=</span><span class="st">"tree_summarize"</span>).query(pregunta))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== VectorStoreIndex ===
-La información proporcionada no permite determinar el crecimiento de la empresa entre esos años.
+La información disponible no permite determinar el crecimiento de la empresa entre 2024 y 2025, ya que no se proporcionan datos correspondientes al año 2024.
 
 === SummaryIndex (tree_summarize) ===
-Las ventas en 2025 fueron de 5.6 millones de euros, mientras que en 2024 fueron de 4.8 millones de euros.</code></pre>
+Las ventas aumentaron de 4.8 millones de euros en 2024 a 5.6 millones de euros en 2025.</code></pre>
 </div>
 </div>
 </section>
-<section id="query-engines" class="level3">
-<h3 class="anchored" data-anchor-id="query-engines">Query Engines</h3>
-<p>Un <strong>Query Engine</strong> es el punto final de la API: recibe una pregunta en lenguaje natural y devuelve una respuesta.</p>
-<div id="253853d7" class="cell" data-execution_count="7">
+<section id="sec-query-engines" class="level3">
+<h3 class="anchored" data-anchor-id="sec-query-engines">Query Engines</h3>
+<p>Un Query Engine es el punto final de la API: recibe una pregunta en lenguaje natural y devuelve una respuesta.</p>
+<div id="d4eba2d2" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
@@ -836,7 +1044,7 @@ Las ventas en 2025 fueron de 5.6 millones de euros, mientras que en 2024 fueron 
 <span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>nodo<span class="sc">.</span>text[:<span class="dv">120</span>]<span class="sc">}</span><span class="ss">..."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
-Respuesta: Ana lidera el equipo de Data Science, y el equipo está formado por 12 personas.
+Respuesta: Ana lidera el equipo de Data Science, el cual está compuesto por 12 personas.
 
 --- Fuentes utilizadas ---
 Fuente 1 (score: 0.819):
@@ -848,10 +1056,10 @@ Fuente 3 (score: 0.162):
 </div>
 </div>
 </section>
-<section id="consultas-sobre-datos-estructurados-sql" class="level3">
-<h3 class="anchored" data-anchor-id="consultas-sobre-datos-estructurados-sql">Consultas sobre datos estructurados (SQL)</h3>
+<section id="sec-nlsql" class="level3">
+<h3 class="anchored" data-anchor-id="sec-nlsql">Consultas sobre datos estructurados (SQL)</h3>
 <p>LlamaIndex también puede traducir lenguaje natural a SQL:</p>
-<div id="bae8837b" class="cell" data-execution_count="8">
+<div id="cf87752a" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
 <span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -915,9 +1123,12 @@ Fuente 3 (score: 0.162):
 
 Pregunta: ¿Cuánto ha facturado CloudSync en total?
 SQL generado: SELECT SUM(importe) FROM ventas WHERE producto = 'CloudSync'
-Respuesta: CloudSync ha facturado un total de 770,000.0.</code></pre>
+Respuesta: CloudSync ha facturado un total de 770.000.</code></pre>
 </div>
 </div>
+<div id="fig-nlsql-patron" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-nlsql-patron-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -939,11 +1150,17 @@ Respuesta: CloudSync ha facturado un total de 770,000.0.</code></pre>
 </div>
 </div>
 </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-nlsql-patron-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4
+</figcaption>
+</figure>
+</div>
 </section>
-<section id="chunking-estratégico" class="level3">
-<h3 class="anchored" data-anchor-id="chunking-estratégico">Chunking estratégico</h3>
-<p>El tamaño y solapamiento de los chunks afecta drásticamente a la calidad del RAG:</p>
-<div id="0682252e" class="cell" data-execution_count="9">
+<section id="sec-chunking-estrategico" class="level3">
+<h3 class="anchored" data-anchor-id="sec-chunking-estrategico">Chunking estratégico</h3>
+<p>El tamaño y solapamiento de los chunks afectan drásticamente a la calidad del RAG:</p>
+<div id="ba1a7288" class="cell" data-execution_count="9">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.node_parser <span class="im">import</span> SentenceSplitter, TokenTextSplitter</span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>texto_largo <span class="op">=</span> <span class="st">"La inteligencia artificial generativa está transformando el panorama del análisis de datos. "</span> <span class="op">*</span> <span class="dv">30</span></span>
@@ -984,8 +1201,11 @@ Chunks por tokens: 5</code></pre>
 </div>
 </div>
 </section>
-<section id="resumen-del-flujo-rag-con-llamaindex" class="level3">
-<h3 class="anchored" data-anchor-id="resumen-del-flujo-rag-con-llamaindex">Resumen del flujo RAG con LlamaIndex</h3>
+<section id="sec-resumen-flujo-llamaindex" class="level3">
+<h3 class="anchored" data-anchor-id="sec-resumen-flujo-llamaindex">Resumen del flujo RAG con LlamaIndex</h3>
+<div id="fig-rag-completo-llamaindex" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-rag-completo-llamaindex-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -1012,14 +1232,28 @@ Chunks por tokens: 5</code></pre>
 </div>
 </div>
 </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-rag-completo-llamaindex-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5
+</figcaption>
+</figure>
+</div>
 <blockquote class="blockquote">
-<p><strong>Lectura recomendada:</strong> <a href="https://docs.llamaindex.ai/en/stable/">LlamaIndex Documentation</a></p>
+<p><strong>Lectura recomendada:</strong> <a href="https://docs.llamaindex.ai/en/stable/">LlamaIndex Documentation</a> <span class="citation" data-cites="llamaindex">(<a href="#ref-llamaindex" role="doc-biblioref">LlamaIndex, 2025</a>)</span>.</p>
 </blockquote>
+</section>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-llamaindex" class="csl-entry" role="listitem">
+LlamaIndex. (2025). <em>LlamaIndex documentation</em>. Documentación oficial. <a href="https://docs.llamaindex.ai">https://docs.llamaindex.ai</a>
+</div>
+</div>
 
 
 <!-- -->
 
-</section>
 </section>
 
 </main> <!-- /main -->
@@ -1121,16 +1355,16 @@ Chunks por tokens: 5</code></pre>
     }
     function toggleCodeHandler(show) {
       return function(e) {
-        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
-        for (let i=0; i<detailsSrc.length; i++) {
-          const details = detailsSrc[i].parentElement;
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
           if (show) {
             details.open = true;
           } else {
             details.removeAttribute("open");
           }
         }
-        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
         const fromCls = show ? "hidden" : "unhidden";
         const toCls = show ? "unhidden" : "hidden";
         for (let i=0; i<cellCodeDivs.length; i++) {
@@ -1487,7 +1721,7 @@ Chunks por tokens: 5</code></pre>
 <span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="al">![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)</span><span class="co">](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque2/02c-llamaindex.ipynb)</span></span>
 <span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Este tema forma parte del **Bloque 2 — Orquestación**. Se recomienda haber visto </span><span class="co">[</span><span class="ot">LangChain</span><span class="co">](02b-langchain.qmd)</span><span class="at"> primero.</span></span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Este tema forma parte del Bloque 2 — Orquestación. Se recomienda haber visto </span><span class="co">[</span><span class="ot">LangChain</span><span class="co">](02b-langchain.qmd)</span><span class="at"> primero.</span></span>
 <span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
 <span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
@@ -1500,392 +1734,454 @@ Chunks por tokens: 5</code></pre>
 <span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
 <span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>load_dotenv()</span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a><span class="co">Setup compartido para la API key de Llamus en todos los notebooks.</span></span>
+<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a><span class="co">Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).</span></span>
+<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a><span class="co">Orden de resolución:</span></span>
+<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a><span class="co">  1. .env local (python-dotenv)</span></span>
+<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a><span class="co">  2. os.environ ya configurado externamente</span></span>
+<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a><span class="co">  3. Google Colab userdata: secret "LLAMUS_API_KEY" (preferente) o "LLM_API_KEY"</span></span>
 <span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a><span class="co">Las celdas posteriores pueden leer la clave con os.environ.get("LLM_API_KEY").</span></span>
+<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
+<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb18-38"><a href="#cb18-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.llms.openai_like <span class="im">import</span> OpenAILike</span>
-<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.base.embeddings.base <span class="im">import</span> BaseEmbedding</span>
-<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.base.llms.types <span class="im">import</span> LLMMetadata</span>
-<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> Settings</span>
-<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
-<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
-<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a>LLM_URL <span class="op">=</span> <span class="st">"https://llamus.cs.us.es/api/v1"</span></span>
-<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a><span class="co"># Llamus usa una API compatible con OpenAI, pero llama-index necesita adaptadores</span></span>
-<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a><span class="co"># porque valida los modelos contra listas fijas de OpenAI.</span></span>
-<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LlamusChatLLM(OpenAILike):</span>
-<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""OpenAILike con is_chat_model=True para usar /v1/chat/completions."""</span></span>
-<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
-<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> metadata(<span class="va">self</span>) <span class="op">-&gt;</span> LLMMetadata:</span>
-<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a>        meta <span class="op">=</span> <span class="bu">super</span>().metadata</span>
-<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>        meta.is_chat_model <span class="op">=</span> <span class="va">True</span></span>
-<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> meta</span>
-<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LlamusEmbedding(BaseEmbedding):</span>
-<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Embeddings vía API de Llamus (qwen3-embedding)."""</span></span>
-<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, model_name: <span class="bu">str</span>, api_key: <span class="bu">str</span>, api_base: <span class="bu">str</span>):</span>
-<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(model_name<span class="op">=</span>model_name)</span>
-<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._client <span class="op">=</span> OpenAI(api_key<span class="op">=</span>api_key, base_url<span class="op">=</span>api_base)</span>
-<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._model <span class="op">=</span> model_name</span>
-<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _get_text_embedding(<span class="va">self</span>, text: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">float</span>]:</span>
-<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._client.embeddings.create(<span class="bu">input</span><span class="op">=</span>text, model<span class="op">=</span><span class="va">self</span>._model).data[<span class="dv">0</span>].embedding</span>
-<span id="cb18-68"><a href="#cb18-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-69"><a href="#cb18-69" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _get_text_embeddings(<span class="va">self</span>, texts: <span class="bu">list</span>[<span class="bu">str</span>]) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">list</span>[<span class="bu">float</span>]]:</span>
-<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> [d.embedding <span class="cf">for</span> d <span class="kw">in</span> <span class="va">self</span>._client.embeddings.create(<span class="bu">input</span><span class="op">=</span>texts, model<span class="op">=</span><span class="va">self</span>._model).data]</span>
-<span id="cb18-71"><a href="#cb18-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-72"><a href="#cb18-72" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _get_query_embedding(<span class="va">self</span>, query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">float</span>]:</span>
-<span id="cb18-73"><a href="#cb18-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._get_text_embedding(query)</span>
-<span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> _aget_text_embedding(<span class="va">self</span>, text: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">float</span>]:</span>
-<span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._get_text_embedding(text)</span>
-<span id="cb18-77"><a href="#cb18-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-78"><a href="#cb18-78" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> _aget_text_embeddings(<span class="va">self</span>, texts: <span class="bu">list</span>[<span class="bu">str</span>]) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">list</span>[<span class="bu">float</span>]]:</span>
-<span id="cb18-79"><a href="#cb18-79" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._get_text_embeddings(texts)</span>
-<span id="cb18-80"><a href="#cb18-80" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-81"><a href="#cb18-81" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> _aget_query_embedding(<span class="va">self</span>, query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">float</span>]:</span>
-<span id="cb18-82"><a href="#cb18-82" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._get_query_embedding(query)</span>
-<span id="cb18-83"><a href="#cb18-83" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-84"><a href="#cb18-84" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
-<span id="cb18-85"><a href="#cb18-85" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Crea un archivo .env en la raíz del proyecto con:</span><span class="ch">\n</span><span class="st">    LLM_API_KEY=tu_api_key</span><span class="ch">\n</span><span class="st">    Las celdas siguientes mostrarán este mensaje hasta que configures la clave."</span>)</span>
-<span id="cb18-86"><a href="#cb18-86" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb18-87"><a href="#cb18-87" aria-hidden="true" tabindex="-1"></a>    Settings.llm <span class="op">=</span> LlamusChatLLM(model<span class="op">=</span><span class="st">"gemma4:e2b-mlx"</span>, api_base<span class="op">=</span>LLM_URL, api_key<span class="op">=</span>LLM_KEY, temperature<span class="op">=</span><span class="dv">0</span>)</span>
-<span id="cb18-88"><a href="#cb18-88" aria-hidden="true" tabindex="-1"></a>    Settings.embed_model <span class="op">=</span> LlamusEmbedding(<span class="st">"qwen3-embedding:0.6b"</span>, api_key<span class="op">=</span>LLM_KEY, api_base<span class="op">=</span>LLM_URL)</span>
-<span id="cb18-89"><a href="#cb18-89" aria-hidden="true" tabindex="-1"></a>    Settings.chunk_size <span class="op">=</span> <span class="dv">512</span></span>
-<span id="cb18-90"><a href="#cb18-90" aria-hidden="true" tabindex="-1"></a>    Settings.chunk_overlap <span class="op">=</span> <span class="dv">50</span></span>
-<span id="cb18-91"><a href="#cb18-91" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"✅ LlamaIndex configurado. Las celdas de ejemplo funcionarán correctamente."</span>)</span>
-<span id="cb18-92"><a href="#cb18-92" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-39"><a href="#cb18-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-40"><a href="#cb18-40" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _load_llm_api_key():</span>
+<span id="cb18-41"><a href="#cb18-41" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb18-42"><a href="#cb18-42" aria-hidden="true" tabindex="-1"></a>        <span class="im">from</span> dotenv <span class="im">import</span> load_dotenv</span>
+<span id="cb18-43"><a href="#cb18-43" aria-hidden="true" tabindex="-1"></a>        load_dotenv()</span>
+<span id="cb18-44"><a href="#cb18-44" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">ImportError</span>:</span>
+<span id="cb18-45"><a href="#cb18-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">pass</span></span>
+<span id="cb18-46"><a href="#cb18-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-47"><a href="#cb18-47" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> os.getenv(<span class="st">"LLM_API_KEY"</span>):</span>
+<span id="cb18-48"><a href="#cb18-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">try</span>:</span>
+<span id="cb18-49"><a href="#cb18-49" aria-hidden="true" tabindex="-1"></a>            <span class="im">from</span> google.colab <span class="im">import</span> userdata</span>
+<span id="cb18-50"><a href="#cb18-50" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> name <span class="kw">in</span> (<span class="st">"LLAMUS_API_KEY"</span>, <span class="st">"LLM_API_KEY"</span>):</span>
+<span id="cb18-51"><a href="#cb18-51" aria-hidden="true" tabindex="-1"></a>                <span class="cf">try</span>:</span>
+<span id="cb18-52"><a href="#cb18-52" aria-hidden="true" tabindex="-1"></a>                    value <span class="op">=</span> userdata.get(name)</span>
+<span id="cb18-53"><a href="#cb18-53" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">if</span> value:</span>
+<span id="cb18-54"><a href="#cb18-54" aria-hidden="true" tabindex="-1"></a>                        os.environ[<span class="st">"LLM_API_KEY"</span>] <span class="op">=</span> value</span>
+<span id="cb18-55"><a href="#cb18-55" aria-hidden="true" tabindex="-1"></a>                        <span class="cf">break</span></span>
+<span id="cb18-56"><a href="#cb18-56" aria-hidden="true" tabindex="-1"></a>                <span class="cf">except</span> <span class="pp">Exception</span>:</span>
+<span id="cb18-57"><a href="#cb18-57" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">continue</span></span>
+<span id="cb18-58"><a href="#cb18-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">except</span> <span class="pp">ImportError</span>:</span>
+<span id="cb18-59"><a href="#cb18-59" aria-hidden="true" tabindex="-1"></a>            <span class="cf">pass</span></span>
+<span id="cb18-60"><a href="#cb18-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-61"><a href="#cb18-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-62"><a href="#cb18-62" aria-hidden="true" tabindex="-1"></a>_load_llm_api_key()</span>
+<span id="cb18-63"><a href="#cb18-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-64"><a href="#cb18-64" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> os.getenv(<span class="st">"LLM_API_KEY"</span>):</span>
+<span id="cb18-65"><a href="#cb18-65" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"✓ LLM_API_KEY cargada."</span>)</span>
+<span id="cb18-66"><a href="#cb18-66" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb18-67"><a href="#cb18-67" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  LLM_API_KEY no encontrada."</span>)</span>
+<span id="cb18-68"><a href="#cb18-68" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"    • Local: crea un archivo .env con LLM_API_KEY=tu_clave"</span>)</span>
+<span id="cb18-69"><a href="#cb18-69" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"    • Colab: añade un Secret 🔑 con nombre 'LLAMUS_API_KEY'"</span>)</span>
+<span id="cb18-70"><a href="#cb18-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-71"><a href="#cb18-71" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
+<span id="cb18-72"><a href="#cb18-72" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb18-73"><a href="#cb18-73" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb18-74"><a href="#cb18-74" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span>
+<span id="cb18-75"><a href="#cb18-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-76"><a href="#cb18-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-79"><a href="#cb18-79" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb18-80"><a href="#cb18-80" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb18-81"><a href="#cb18-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-82"><a href="#cb18-82" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.llms.openai_like <span class="im">import</span> OpenAILike</span>
+<span id="cb18-83"><a href="#cb18-83" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.base.embeddings.base <span class="im">import</span> BaseEmbedding</span>
+<span id="cb18-84"><a href="#cb18-84" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.base.llms.types <span class="im">import</span> LLMMetadata</span>
+<span id="cb18-85"><a href="#cb18-85" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> Settings</span>
+<span id="cb18-86"><a href="#cb18-86" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> openai <span class="im">import</span> OpenAI</span>
+<span id="cb18-87"><a href="#cb18-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-88"><a href="#cb18-88" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
+<span id="cb18-89"><a href="#cb18-89" aria-hidden="true" tabindex="-1"></a>LLM_URL <span class="op">=</span> os.getenv(<span class="st">"LLM_URL"</span>, <span class="st">"https://llamus.cs.us.es/api/v1"</span>)</span>
+<span id="cb18-90"><a href="#cb18-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-91"><a href="#cb18-91" aria-hidden="true" tabindex="-1"></a><span class="co"># Llamus usa una API compatible con OpenAI, pero llama-index necesita adaptadores</span></span>
+<span id="cb18-92"><a href="#cb18-92" aria-hidden="true" tabindex="-1"></a><span class="co"># porque valida los modelos contra listas fijas de OpenAI.</span></span>
 <span id="cb18-93"><a href="#cb18-93" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-94"><a href="#cb18-94" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
-<span id="cb18-95"><a href="#cb18-95" aria-hidden="true" tabindex="-1"></a><span class="fu">## Modelo de embeddings multilingüe</span></span>
-<span id="cb18-96"><a href="#cb18-96" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-97"><a href="#cb18-97" aria-hidden="true" tabindex="-1"></a><span class="in">`qwen3-embedding:0.6b`</span> es un modelo de embeddings **multilingüe** disponible en Llamus, a diferencia de los modelos ingleses (`all-MiniLM-L6-v2`, `e5-small-v2`) usados en el Bloque 1. Esto permite que los ejemplos de esta página usen texto en **español** sin pérdida de calidad: el tokenizador de Qwen maneja correctamente caracteres acentuados y la distribución del espacio semántico está calibrada para múltiples idiomas.</span>
-<span id="cb18-98"><a href="#cb18-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-99"><a href="#cb18-99" aria-hidden="true" tabindex="-1"></a>Para usar embeddings en español en tu proyecto, <span class="in">`qwen3-embedding:0.6b`</span> (o su versión mayor <span class="in">`qwen3-embedding:4b`</span>) son la opción recomendada.</span>
-<span id="cb18-100"><a href="#cb18-100" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-94"><a href="#cb18-94" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LlamusChatLLM(OpenAILike):</span>
+<span id="cb18-95"><a href="#cb18-95" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""OpenAILike con is_chat_model=True para usar /v1/chat/completions."""</span></span>
+<span id="cb18-96"><a href="#cb18-96" aria-hidden="true" tabindex="-1"></a>    <span class="at">@property</span></span>
+<span id="cb18-97"><a href="#cb18-97" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> metadata(<span class="va">self</span>) <span class="op">-&gt;</span> LLMMetadata:</span>
+<span id="cb18-98"><a href="#cb18-98" aria-hidden="true" tabindex="-1"></a>        meta <span class="op">=</span> <span class="bu">super</span>().metadata</span>
+<span id="cb18-99"><a href="#cb18-99" aria-hidden="true" tabindex="-1"></a>        meta.is_chat_model <span class="op">=</span> <span class="va">True</span></span>
+<span id="cb18-100"><a href="#cb18-100" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> meta</span>
 <span id="cb18-101"><a href="#cb18-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-102"><a href="#cb18-102" aria-hidden="true" tabindex="-1"></a><span class="fu">## LlamaIndex</span></span>
-<span id="cb18-103"><a href="#cb18-103" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-104"><a href="#cb18-104" aria-hidden="true" tabindex="-1"></a><span class="fu">### ¿Qué es LlamaIndex?</span></span>
-<span id="cb18-105"><a href="#cb18-105" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-106"><a href="#cb18-106" aria-hidden="true" tabindex="-1"></a>LlamaIndex (antes GPT Index) es un **framework de indexación diseñado específicamente para RAG** (Retrieval-Augmented Generation) y aplicaciones de pregunta-respuesta sobre tus propios datos.</span>
-<span id="cb18-107"><a href="#cb18-107" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-108"><a href="#cb18-108" aria-hidden="true" tabindex="-1"></a>Mientras LangChain es un framework generalista (cadenas, agentes, herramientas...), LlamaIndex está especializado en una cosa y la hace muy bien: **convertir tus documentos en un índice consultable por un LLM**.</span>
-<span id="cb18-109"><a href="#cb18-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-112"><a href="#cb18-112" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb18-113"><a href="#cb18-113" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb18-114"><a href="#cb18-114" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">LlamaIndex Pipeline</span><span class="ot">"</span></span>
-<span id="cb18-115"><a href="#cb18-115" aria-hidden="true" tabindex="-1"></a>        A[Documentos&lt;br/&gt;PDF, CSV, TXT, DB] --&gt; B[Ingesta&lt;br/&gt;load + parse]</span>
-<span id="cb18-116"><a href="#cb18-116" aria-hidden="true" tabindex="-1"></a>        B --&gt; C[Nodos&lt;br/&gt;chunks semánticos]</span>
-<span id="cb18-117"><a href="#cb18-117" aria-hidden="true" tabindex="-1"></a>        C --&gt; D[Índice&lt;br/&gt;vector, keyword, tree...]</span>
-<span id="cb18-118"><a href="#cb18-118" aria-hidden="true" tabindex="-1"></a>        D --&gt; E[Query Engine&lt;br/&gt;lenguaje natural]</span>
-<span id="cb18-119"><a href="#cb18-119" aria-hidden="true" tabindex="-1"></a>        E --&gt; F[Respuesta&lt;br/&gt;con fuentes]</span>
-<span id="cb18-120"><a href="#cb18-120" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb18-121"><a href="#cb18-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-122"><a href="#cb18-122" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb18-123"><a href="#cb18-123" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#e65100,color:#fff</span></span>
-<span id="cb18-124"><a href="#cb18-124" aria-hidden="true" tabindex="-1"></a>    style F fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb18-125"><a href="#cb18-125" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-102"><a href="#cb18-102" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LlamusEmbedding(BaseEmbedding):</span>
+<span id="cb18-103"><a href="#cb18-103" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Embeddings vía API de Llamus (qwen3-embedding)."""</span></span>
+<span id="cb18-104"><a href="#cb18-104" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, model_name: <span class="bu">str</span>, api_key: <span class="bu">str</span>, api_base: <span class="bu">str</span>):</span>
+<span id="cb18-105"><a href="#cb18-105" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(model_name<span class="op">=</span>model_name)</span>
+<span id="cb18-106"><a href="#cb18-106" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._client <span class="op">=</span> OpenAI(api_key<span class="op">=</span>api_key, base_url<span class="op">=</span>api_base)</span>
+<span id="cb18-107"><a href="#cb18-107" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._model <span class="op">=</span> model_name</span>
+<span id="cb18-108"><a href="#cb18-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-109"><a href="#cb18-109" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _get_text_embedding(<span class="va">self</span>, text: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">float</span>]:</span>
+<span id="cb18-110"><a href="#cb18-110" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._client.embeddings.create(<span class="bu">input</span><span class="op">=</span>text, model<span class="op">=</span><span class="va">self</span>._model).data[<span class="dv">0</span>].embedding</span>
+<span id="cb18-111"><a href="#cb18-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-112"><a href="#cb18-112" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _get_text_embeddings(<span class="va">self</span>, texts: <span class="bu">list</span>[<span class="bu">str</span>]) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">list</span>[<span class="bu">float</span>]]:</span>
+<span id="cb18-113"><a href="#cb18-113" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> [d.embedding <span class="cf">for</span> d <span class="kw">in</span> <span class="va">self</span>._client.embeddings.create(<span class="bu">input</span><span class="op">=</span>texts, model<span class="op">=</span><span class="va">self</span>._model).data]</span>
+<span id="cb18-114"><a href="#cb18-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-115"><a href="#cb18-115" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _get_query_embedding(<span class="va">self</span>, query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">float</span>]:</span>
+<span id="cb18-116"><a href="#cb18-116" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._get_text_embedding(query)</span>
+<span id="cb18-117"><a href="#cb18-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-118"><a href="#cb18-118" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> _aget_text_embedding(<span class="va">self</span>, text: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">float</span>]:</span>
+<span id="cb18-119"><a href="#cb18-119" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._get_text_embedding(text)</span>
+<span id="cb18-120"><a href="#cb18-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-121"><a href="#cb18-121" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> _aget_text_embeddings(<span class="va">self</span>, texts: <span class="bu">list</span>[<span class="bu">str</span>]) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">list</span>[<span class="bu">float</span>]]:</span>
+<span id="cb18-122"><a href="#cb18-122" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._get_text_embeddings(texts)</span>
+<span id="cb18-123"><a href="#cb18-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-124"><a href="#cb18-124" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="kw">def</span> _aget_query_embedding(<span class="va">self</span>, query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">list</span>[<span class="bu">float</span>]:</span>
+<span id="cb18-125"><a href="#cb18-125" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._get_query_embedding(query)</span>
 <span id="cb18-126"><a href="#cb18-126" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-127"><a href="#cb18-127" aria-hidden="true" tabindex="-1"></a>**¿Cuándo elegir LlamaIndex vs LangChain?**</span>
-<span id="cb18-128"><a href="#cb18-128" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-129"><a href="#cb18-129" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Criterio <span class="pp">|</span> LlamaIndex <span class="pp">|</span> LangChain <span class="pp">|</span></span>
-<span id="cb18-130"><a href="#cb18-130" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb18-131"><a href="#cb18-131" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Foco principal** <span class="pp">|</span> Indexación y RAG <span class="pp">|</span> Orquestación general <span class="pp">|</span></span>
-<span id="cb18-132"><a href="#cb18-132" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Curva de aprendizaje** <span class="pp">|</span> Más suave (más opinado) <span class="pp">|</span> Más empinada (más flexible) <span class="pp">|</span></span>
-<span id="cb18-133"><a href="#cb18-133" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Carga de documentos** <span class="pp">|</span> <span class="in">`SimpleDirectoryReader`</span> carga 20+ formatos <span class="pp">|</span> Necesitas cargadores específicos <span class="pp">|</span></span>
-<span id="cb18-134"><a href="#cb18-134" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Índices avanzados** <span class="pp">|</span> Árboles, grafos, keywords <span class="pp">|</span> Depende de VectorStore <span class="pp">|</span></span>
-<span id="cb18-135"><a href="#cb18-135" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Agentes** <span class="pp">|</span> Básico (con herramientas) <span class="pp">|</span> Muy potente (ReAct, multi-agente) <span class="pp">|</span></span>
+<span id="cb18-127"><a href="#cb18-127" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb18-128"><a href="#cb18-128" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Crea un archivo .env en la raíz del proyecto con:</span><span class="ch">\n</span><span class="st">    LLM_API_KEY=tu_api_key</span><span class="ch">\n</span><span class="st">    Las celdas siguientes mostrarán este mensaje hasta que configures la clave."</span>)</span>
+<span id="cb18-129"><a href="#cb18-129" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb18-130"><a href="#cb18-130" aria-hidden="true" tabindex="-1"></a>    Settings.llm <span class="op">=</span> LlamusChatLLM(model<span class="op">=</span>os.getenv(<span class="st">"LLM_MODEL"</span>, <span class="st">"gemma4:26b"</span>), api_base<span class="op">=</span>LLM_URL, api_key<span class="op">=</span>LLM_KEY, temperature<span class="op">=</span><span class="dv">0</span>, max_tokens<span class="op">=</span><span class="dv">2048</span>)</span>
+<span id="cb18-131"><a href="#cb18-131" aria-hidden="true" tabindex="-1"></a>    Settings.embed_model <span class="op">=</span> LlamusEmbedding(os.getenv(<span class="st">"LLM_EMBED_MODEL"</span>, <span class="st">"qwen3-embedding:0.6b"</span>), api_key<span class="op">=</span>LLM_KEY, api_base<span class="op">=</span>LLM_URL)</span>
+<span id="cb18-132"><a href="#cb18-132" aria-hidden="true" tabindex="-1"></a>    Settings.chunk_size <span class="op">=</span> <span class="dv">512</span></span>
+<span id="cb18-133"><a href="#cb18-133" aria-hidden="true" tabindex="-1"></a>    Settings.chunk_overlap <span class="op">=</span> <span class="dv">50</span></span>
+<span id="cb18-134"><a href="#cb18-134" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"✅ LlamaIndex configurado. Las celdas de ejemplo funcionarán correctamente."</span>)</span>
+<span id="cb18-135"><a href="#cb18-135" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb18-136"><a href="#cb18-136" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-137"><a href="#cb18-137" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; En muchos proyectos se usan **ambos**: LlamaIndex para indexar y recuperar, LangChain para orquestar el agente.</span></span>
-<span id="cb18-138"><a href="#cb18-138" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-139"><a href="#cb18-139" aria-hidden="true" tabindex="-1"></a><span class="fu">### Primer contacto: indexar y preguntar</span></span>
-<span id="cb18-140"><a href="#cb18-140" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-143"><a href="#cb18-143" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb18-144"><a href="#cb18-144" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb18-145"><a href="#cb18-145" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-146"><a href="#cb18-146" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> VectorStoreIndex, Document</span>
-<span id="cb18-147"><a href="#cb18-147" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-148"><a href="#cb18-148" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos documentos de ejemplo en memoria (sin necesidad de archivos externos)</span></span>
-<span id="cb18-149"><a href="#cb18-149" aria-hidden="true" tabindex="-1"></a>textos <span class="op">=</span> [</span>
-<span id="cb18-150"><a href="#cb18-150" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Las ventas de 2025 fueron de 5.6 millones de euros. El producto CloudSync Pro facturó 450k€ en Q1. La región de Madrid aportó el 40</span><span class="sc">% d</span><span class="st">el total."</span>,</span>
-<span id="cb18-151"><a href="#cb18-151" aria-hidden="true" tabindex="-1"></a>    <span class="st">"En 2024 las ventas fueron de 4.8 millones de euros, un crecimiento del 16.7</span><span class="sc">% r</span><span class="st">especto a 2023. El mejor trimestre fue Q4 con 1.4 millones."</span>,</span>
-<span id="cb18-152"><a href="#cb18-152" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El equipo de Data Science está formado por 12 personas: 4 ingenieros ML, 5 analistas y 3 data engineers. Ana lidera el equipo desde 2023."</span>,</span>
-<span id="cb18-153"><a href="#cb18-153" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La empresa abrió oficina en Barcelona en marzo de 2025 con 8 empleados. La previsión para 2026 es duplicar la plantilla en esta sede."</span>,</span>
-<span id="cb18-154"><a href="#cb18-154" aria-hidden="true" tabindex="-1"></a>]</span>
-<span id="cb18-155"><a href="#cb18-155" aria-hidden="true" tabindex="-1"></a>documentos <span class="op">=</span> [Document(text<span class="op">=</span>t) <span class="cf">for</span> t <span class="kw">in</span> textos]</span>
-<span id="cb18-156"><a href="#cb18-156" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Documentos cargados: </span><span class="sc">{</span><span class="bu">len</span>(documentos)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-157"><a href="#cb18-157" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-158"><a href="#cb18-158" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
-<span id="cb18-159"><a href="#cb18-159" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
-<span id="cb18-160"><a href="#cb18-160" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb18-161"><a href="#cb18-161" aria-hidden="true" tabindex="-1"></a>    indice <span class="op">=</span> VectorStoreIndex.from_documents(documentos)</span>
-<span id="cb18-162"><a href="#cb18-162" aria-hidden="true" tabindex="-1"></a>    query_engine <span class="op">=</span> indice.as_query_engine(similarity_top_k<span class="op">=</span><span class="dv">2</span>)</span>
-<span id="cb18-163"><a href="#cb18-163" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-164"><a href="#cb18-164" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> query_engine.query(<span class="st">"¿Cuáles fueron los ingresos totales en 2025?"</span>)</span>
-<span id="cb18-165"><a href="#cb18-165" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Pregunta: ¿Cuáles fueron los ingresos totales en 2025?"</span>)</span>
-<span id="cb18-166"><a href="#cb18-166" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Respuesta: </span><span class="sc">{</span>respuesta<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-167"><a href="#cb18-167" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-168"><a href="#cb18-168" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-169"><a href="#cb18-169" aria-hidden="true" tabindex="-1"></a><span class="fu">### El pipeline de ingesta</span></span>
-<span id="cb18-170"><a href="#cb18-170" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-171"><a href="#cb18-171" aria-hidden="true" tabindex="-1"></a>La ingesta convierte documentos brutos en nodos indexables:</span>
-<span id="cb18-172"><a href="#cb18-172" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-175"><a href="#cb18-175" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb18-176"><a href="#cb18-176" aria-hidden="true" tabindex="-1"></a>graph LR</span>
-<span id="cb18-177"><a href="#cb18-177" aria-hidden="true" tabindex="-1"></a>    A[PDF] --&gt; B[Reader&lt;br/&gt;extrae texto]</span>
-<span id="cb18-178"><a href="#cb18-178" aria-hidden="true" tabindex="-1"></a>    C[CSV] --&gt; B</span>
-<span id="cb18-179"><a href="#cb18-179" aria-hidden="true" tabindex="-1"></a>    D[Web] --&gt; B</span>
-<span id="cb18-180"><a href="#cb18-180" aria-hidden="true" tabindex="-1"></a>    B --&gt; E[Transformations&lt;br/&gt;chunking, metadatos]</span>
-<span id="cb18-181"><a href="#cb18-181" aria-hidden="true" tabindex="-1"></a>    E --&gt; F[Nodes&lt;br/&gt;unidades indexables]</span>
-<span id="cb18-182"><a href="#cb18-182" aria-hidden="true" tabindex="-1"></a>    F --&gt; G[Embeddings&lt;br/&gt;vectoriza]</span>
-<span id="cb18-183"><a href="#cb18-183" aria-hidden="true" tabindex="-1"></a>    G --&gt; H[(Vector Store&lt;br/&gt;ChromaDB/FAISS)]</span>
-<span id="cb18-184"><a href="#cb18-184" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-185"><a href="#cb18-185" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb18-186"><a href="#cb18-186" aria-hidden="true" tabindex="-1"></a>    style F fill:<span class="co">#e65100,color:#fff</span></span>
-<span id="cb18-187"><a href="#cb18-187" aria-hidden="true" tabindex="-1"></a>    style H fill:<span class="co">#FFD43B,color:#000</span></span>
-<span id="cb18-188"><a href="#cb18-188" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-189"><a href="#cb18-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-192"><a href="#cb18-192" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb18-193"><a href="#cb18-193" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb18-137"><a href="#cb18-137" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb18-138"><a href="#cb18-138" aria-hidden="true" tabindex="-1"></a><span class="fu">## Modelo de embeddings multilingüe</span></span>
+<span id="cb18-139"><a href="#cb18-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-140"><a href="#cb18-140" aria-hidden="true" tabindex="-1"></a><span class="in">`qwen3-embedding:0.6b`</span> es un modelo de embeddings multilingüe disponible en Llamus, a diferencia de los modelos ingleses (<span class="in">`all-MiniLM-L6-v2`</span>, <span class="in">`e5-small-v2`</span>) usados en el Bloque 1. Esto permite que los ejemplos de esta página usen texto en español sin pérdida de calidad: el tokenizador de Qwen maneja correctamente caracteres acentuados y la distribución del espacio semántico está calibrada para múltiples idiomas.</span>
+<span id="cb18-141"><a href="#cb18-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-142"><a href="#cb18-142" aria-hidden="true" tabindex="-1"></a>Para usar embeddings en español en tu proyecto, <span class="in">`qwen3-embedding:0.6b`</span> (o su versión mayor <span class="in">`qwen3-embedding:4b`</span>) es la opción recomendada.</span>
+<span id="cb18-143"><a href="#cb18-143" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-144"><a href="#cb18-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-145"><a href="#cb18-145" aria-hidden="true" tabindex="-1"></a><span class="fu">## LlamaIndex {#sec-llamaindex}</span></span>
+<span id="cb18-146"><a href="#cb18-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-147"><a href="#cb18-147" aria-hidden="true" tabindex="-1"></a><span class="fu">### ¿Qué es LlamaIndex? {#sec-que-es-llamaindex}</span></span>
+<span id="cb18-148"><a href="#cb18-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-149"><a href="#cb18-149" aria-hidden="true" tabindex="-1"></a>LlamaIndex (antes GPT Index) es un framework de indexación diseñado específicamente para RAG (Retrieval-Augmented Generation) y aplicaciones de pregunta-respuesta sobre tus propios datos.</span>
+<span id="cb18-150"><a href="#cb18-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-151"><a href="#cb18-151" aria-hidden="true" tabindex="-1"></a>Mientras LangChain es un framework generalista (cadenas, agentes, herramientas...), LlamaIndex está especializado en una cosa y la hace muy bien: convertir tus documentos en un índice consultable por un LLM.</span>
+<span id="cb18-152"><a href="#cb18-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-153"><a href="#cb18-153" aria-hidden="true" tabindex="-1"></a>::: {#fig-llamaindex-pipeline}</span>
+<span id="cb18-156"><a href="#cb18-156" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb18-157"><a href="#cb18-157" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb18-158"><a href="#cb18-158" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">LlamaIndex Pipeline</span><span class="ot">"</span></span>
+<span id="cb18-159"><a href="#cb18-159" aria-hidden="true" tabindex="-1"></a>        A[Documentos&lt;br/&gt;PDF, CSV, TXT, DB] --&gt; B[Ingesta&lt;br/&gt;load + parse]</span>
+<span id="cb18-160"><a href="#cb18-160" aria-hidden="true" tabindex="-1"></a>        B --&gt; C[Nodos&lt;br/&gt;chunks semánticos]</span>
+<span id="cb18-161"><a href="#cb18-161" aria-hidden="true" tabindex="-1"></a>        C --&gt; D[Índice&lt;br/&gt;vector, keyword, tree...]</span>
+<span id="cb18-162"><a href="#cb18-162" aria-hidden="true" tabindex="-1"></a>        D --&gt; E[Query Engine&lt;br/&gt;lenguaje natural]</span>
+<span id="cb18-163"><a href="#cb18-163" aria-hidden="true" tabindex="-1"></a>        E --&gt; F[Respuesta&lt;br/&gt;con fuentes]</span>
+<span id="cb18-164"><a href="#cb18-164" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb18-165"><a href="#cb18-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-166"><a href="#cb18-166" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb18-167"><a href="#cb18-167" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb18-168"><a href="#cb18-168" aria-hidden="true" tabindex="-1"></a>    style F fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb18-169"><a href="#cb18-169" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-170"><a href="#cb18-170" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-171"><a href="#cb18-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-172"><a href="#cb18-172" aria-hidden="true" tabindex="-1"></a>**¿Cuándo elegir LlamaIndex frente a LangChain?**</span>
+<span id="cb18-173"><a href="#cb18-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-174"><a href="#cb18-174" aria-hidden="true" tabindex="-1"></a>: Comparativa entre LlamaIndex y LangChain por criterio de uso {#tbl-llamaindex-vs-langchain}</span>
+<span id="cb18-175"><a href="#cb18-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-176"><a href="#cb18-176" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Criterio <span class="pp">|</span> LlamaIndex <span class="pp">|</span> LangChain <span class="pp">|</span></span>
+<span id="cb18-177"><a href="#cb18-177" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb18-178"><a href="#cb18-178" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Foco principal** <span class="pp">|</span> Indexación y RAG <span class="pp">|</span> Orquestación general <span class="pp">|</span></span>
+<span id="cb18-179"><a href="#cb18-179" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Curva de aprendizaje** <span class="pp">|</span> Más suave (más dogmático) <span class="pp">|</span> Más empinada (más flexible) <span class="pp">|</span></span>
+<span id="cb18-180"><a href="#cb18-180" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Carga de documentos** <span class="pp">|</span> <span class="in">`SimpleDirectoryReader`</span> carga 20+ formatos <span class="pp">|</span> Necesitas cargadores específicos <span class="pp">|</span></span>
+<span id="cb18-181"><a href="#cb18-181" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Índices avanzados** <span class="pp">|</span> Árboles, grafos, keywords <span class="pp">|</span> Depende de VectorStore <span class="pp">|</span></span>
+<span id="cb18-182"><a href="#cb18-182" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Agentes** <span class="pp">|</span> Básico (con herramientas) <span class="pp">|</span> Muy potente (ReAct, multi-agente) <span class="pp">|</span></span>
+<span id="cb18-183"><a href="#cb18-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-184"><a href="#cb18-184" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; En muchos proyectos se usan ambos: LlamaIndex para indexar y recuperar, LangChain para orquestar el agente.</span></span>
+<span id="cb18-185"><a href="#cb18-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-186"><a href="#cb18-186" aria-hidden="true" tabindex="-1"></a><span class="fu">### Primer contacto: indexar y preguntar {#sec-primer-contacto-llamaindex}</span></span>
+<span id="cb18-187"><a href="#cb18-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-190"><a href="#cb18-190" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb18-191"><a href="#cb18-191" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb18-192"><a href="#cb18-192" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-193"><a href="#cb18-193" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> VectorStoreIndex, Document</span>
 <span id="cb18-194"><a href="#cb18-194" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-195"><a href="#cb18-195" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.node_parser <span class="im">import</span> SentenceSplitter</span>
-<span id="cb18-196"><a href="#cb18-196" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.ingestion <span class="im">import</span> IngestionPipeline</span>
-<span id="cb18-197"><a href="#cb18-197" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-198"><a href="#cb18-198" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> IngestionPipeline(</span>
-<span id="cb18-199"><a href="#cb18-199" aria-hidden="true" tabindex="-1"></a>    transformations<span class="op">=</span>[</span>
-<span id="cb18-200"><a href="#cb18-200" aria-hidden="true" tabindex="-1"></a>        SentenceSplitter(chunk_size<span class="op">=</span><span class="dv">256</span>, chunk_overlap<span class="op">=</span><span class="dv">30</span>),</span>
-<span id="cb18-201"><a href="#cb18-201" aria-hidden="true" tabindex="-1"></a>    ]</span>
-<span id="cb18-202"><a href="#cb18-202" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb18-203"><a href="#cb18-203" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-204"><a href="#cb18-204" aria-hidden="true" tabindex="-1"></a>nodos <span class="op">=</span> pipeline.run(documents<span class="op">=</span>documentos)</span>
-<span id="cb18-205"><a href="#cb18-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-206"><a href="#cb18-206" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Documentos: </span><span class="sc">{</span><span class="bu">len</span>(documentos)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-207"><a href="#cb18-207" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Nodos generados: </span><span class="sc">{</span><span class="bu">len</span>(nodos)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-208"><a href="#cb18-208" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> nodos:</span>
-<span id="cb18-209"><a href="#cb18-209" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Ejemplo de nodo: </span><span class="sc">{</span>nodos[<span class="dv">0</span>]<span class="sc">.</span>text[:<span class="dv">150</span>]<span class="sc">}</span><span class="ss">..."</span>)</span>
-<span id="cb18-210"><a href="#cb18-210" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-211"><a href="#cb18-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-212"><a href="#cb18-212" aria-hidden="true" tabindex="-1"></a><span class="fu">### Tipos de índices</span></span>
-<span id="cb18-213"><a href="#cb18-213" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-214"><a href="#cb18-214" aria-hidden="true" tabindex="-1"></a>No todos los datos se consultan igual. LlamaIndex ofrece varios tipos de índices:</span>
+<span id="cb18-195"><a href="#cb18-195" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos documentos de ejemplo en memoria (sin necesidad de archivos externos)</span></span>
+<span id="cb18-196"><a href="#cb18-196" aria-hidden="true" tabindex="-1"></a>textos <span class="op">=</span> [</span>
+<span id="cb18-197"><a href="#cb18-197" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Las ventas de 2025 fueron de 5.6 millones de euros. El producto CloudSync Pro facturó 450k€ en Q1. La región de Madrid aportó el 40</span><span class="sc">% d</span><span class="st">el total."</span>,</span>
+<span id="cb18-198"><a href="#cb18-198" aria-hidden="true" tabindex="-1"></a>    <span class="st">"En 2024 las ventas fueron de 4.8 millones de euros, un crecimiento del 16.7</span><span class="sc">% r</span><span class="st">especto a 2023. El mejor trimestre fue Q4 con 1.4 millones."</span>,</span>
+<span id="cb18-199"><a href="#cb18-199" aria-hidden="true" tabindex="-1"></a>    <span class="st">"El equipo de Data Science está formado por 12 personas: 4 ingenieros ML, 5 analistas y 3 data engineers. Ana lidera el equipo desde 2023."</span>,</span>
+<span id="cb18-200"><a href="#cb18-200" aria-hidden="true" tabindex="-1"></a>    <span class="st">"La empresa abrió oficina en Barcelona en marzo de 2025 con 8 empleados. La previsión para 2026 es duplicar la plantilla en esta sede."</span>,</span>
+<span id="cb18-201"><a href="#cb18-201" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb18-202"><a href="#cb18-202" aria-hidden="true" tabindex="-1"></a>documentos <span class="op">=</span> [Document(text<span class="op">=</span>t) <span class="cf">for</span> t <span class="kw">in</span> textos]</span>
+<span id="cb18-203"><a href="#cb18-203" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Documentos cargados: </span><span class="sc">{</span><span class="bu">len</span>(documentos)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-204"><a href="#cb18-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-205"><a href="#cb18-205" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb18-206"><a href="#cb18-206" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb18-207"><a href="#cb18-207" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb18-208"><a href="#cb18-208" aria-hidden="true" tabindex="-1"></a>    indice <span class="op">=</span> VectorStoreIndex.from_documents(documentos)</span>
+<span id="cb18-209"><a href="#cb18-209" aria-hidden="true" tabindex="-1"></a>    query_engine <span class="op">=</span> indice.as_query_engine(similarity_top_k<span class="op">=</span><span class="dv">2</span>)</span>
+<span id="cb18-210"><a href="#cb18-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-211"><a href="#cb18-211" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> query_engine.query(<span class="st">"¿Cuáles fueron los ingresos totales en 2025?"</span>)</span>
+<span id="cb18-212"><a href="#cb18-212" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Pregunta: ¿Cuáles fueron los ingresos totales en 2025?"</span>)</span>
+<span id="cb18-213"><a href="#cb18-213" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Respuesta: </span><span class="sc">{</span>respuesta<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-214"><a href="#cb18-214" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb18-215"><a href="#cb18-215" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-216"><a href="#cb18-216" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Índice <span class="pp">|</span> ¿Cómo funciona? <span class="pp">|</span> Mejor para <span class="pp">|</span></span>
-<span id="cb18-217"><a href="#cb18-217" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb18-218"><a href="#cb18-218" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **VectorStoreIndex** <span class="pp">|</span> Embeddings + búsqueda por similitud <span class="pp">|</span> Preguntas semánticas <span class="pp">|</span></span>
-<span id="cb18-219"><a href="#cb18-219" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **SummaryIndex** <span class="pp">|</span> Resume cada chunk y lo encadena <span class="pp">|</span> Preguntas generales sobre TODO el documento <span class="pp">|</span></span>
-<span id="cb18-220"><a href="#cb18-220" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **KeywordTableIndex** <span class="pp">|</span> Extrae keywords de cada chunk <span class="pp">|</span> Preguntas muy específicas <span class="pp">|</span></span>
-<span id="cb18-221"><a href="#cb18-221" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-224"><a href="#cb18-224" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb18-225"><a href="#cb18-225" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb18-226"><a href="#cb18-226" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">VectorStoreIndex</span><span class="ot">"</span></span>
-<span id="cb18-227"><a href="#cb18-227" aria-hidden="true" tabindex="-1"></a>        V[Pregunta] --&gt; VQ[Búsqueda&lt;br/&gt;similitud coseno]</span>
-<span id="cb18-228"><a href="#cb18-228" aria-hidden="true" tabindex="-1"></a>        VQ --&gt; VD[(Vectores&lt;br/&gt;top-K chunks)]</span>
-<span id="cb18-229"><a href="#cb18-229" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb18-230"><a href="#cb18-230" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-231"><a href="#cb18-231" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">SummaryIndex</span><span class="ot">"</span></span>
-<span id="cb18-232"><a href="#cb18-232" aria-hidden="true" tabindex="-1"></a>        S[Pregunta] --&gt; SQ[Recorre&lt;br/&gt;todos los chunks]</span>
-<span id="cb18-233"><a href="#cb18-233" aria-hidden="true" tabindex="-1"></a>        SQ --&gt; SR[Resumen&lt;br/&gt;completo]</span>
-<span id="cb18-234"><a href="#cb18-234" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb18-235"><a href="#cb18-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-236"><a href="#cb18-236" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">KeywordTableIndex</span><span class="ot">"</span></span>
-<span id="cb18-237"><a href="#cb18-237" aria-hidden="true" tabindex="-1"></a>        K[Pregunta] --&gt; KQ[Extrae&lt;br/&gt;keyword]</span>
-<span id="cb18-238"><a href="#cb18-238" aria-hidden="true" tabindex="-1"></a>        KQ --&gt; KT[(Tabla&lt;br/&gt;keyword→chunk)]</span>
-<span id="cb18-239"><a href="#cb18-239" aria-hidden="true" tabindex="-1"></a>        KT --&gt; KR[Chunks&lt;br/&gt;específicos]</span>
-<span id="cb18-240"><a href="#cb18-240" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb18-241"><a href="#cb18-241" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-242"><a href="#cb18-242" aria-hidden="true" tabindex="-1"></a>    style V fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb18-243"><a href="#cb18-243" aria-hidden="true" tabindex="-1"></a>    style S fill:<span class="co">#306998,color:#fff</span></span>
-<span id="cb18-244"><a href="#cb18-244" aria-hidden="true" tabindex="-1"></a>    style K fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb18-245"><a href="#cb18-245" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-216"><a href="#cb18-216" aria-hidden="true" tabindex="-1"></a><span class="fu">### El pipeline de ingesta {#sec-pipeline-ingesta}</span></span>
+<span id="cb18-217"><a href="#cb18-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-218"><a href="#cb18-218" aria-hidden="true" tabindex="-1"></a>La ingesta convierte documentos brutos en nodos indexables:</span>
+<span id="cb18-219"><a href="#cb18-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-220"><a href="#cb18-220" aria-hidden="true" tabindex="-1"></a>::: {#fig-pipeline-ingesta}</span>
+<span id="cb18-223"><a href="#cb18-223" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb18-224"><a href="#cb18-224" aria-hidden="true" tabindex="-1"></a>graph LR</span>
+<span id="cb18-225"><a href="#cb18-225" aria-hidden="true" tabindex="-1"></a>    A[PDF] --&gt; B[Reader&lt;br/&gt;extrae texto]</span>
+<span id="cb18-226"><a href="#cb18-226" aria-hidden="true" tabindex="-1"></a>    C[CSV] --&gt; B</span>
+<span id="cb18-227"><a href="#cb18-227" aria-hidden="true" tabindex="-1"></a>    D[Web] --&gt; B</span>
+<span id="cb18-228"><a href="#cb18-228" aria-hidden="true" tabindex="-1"></a>    B --&gt; E[Transformations&lt;br/&gt;chunking, metadatos]</span>
+<span id="cb18-229"><a href="#cb18-229" aria-hidden="true" tabindex="-1"></a>    E --&gt; F[Nodes&lt;br/&gt;unidades indexables]</span>
+<span id="cb18-230"><a href="#cb18-230" aria-hidden="true" tabindex="-1"></a>    F --&gt; G[Embeddings&lt;br/&gt;vectoriza]</span>
+<span id="cb18-231"><a href="#cb18-231" aria-hidden="true" tabindex="-1"></a>    G --&gt; H[(Vector Store&lt;br/&gt;ChromaDB/FAISS)]</span>
+<span id="cb18-232"><a href="#cb18-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-233"><a href="#cb18-233" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb18-234"><a href="#cb18-234" aria-hidden="true" tabindex="-1"></a>    style F fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb18-235"><a href="#cb18-235" aria-hidden="true" tabindex="-1"></a>    style H fill:<span class="co">#FFD43B,color:#000</span></span>
+<span id="cb18-236"><a href="#cb18-236" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-237"><a href="#cb18-237" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-238"><a href="#cb18-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-241"><a href="#cb18-241" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb18-242"><a href="#cb18-242" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb18-243"><a href="#cb18-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-244"><a href="#cb18-244" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.node_parser <span class="im">import</span> SentenceSplitter</span>
+<span id="cb18-245"><a href="#cb18-245" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.ingestion <span class="im">import</span> IngestionPipeline</span>
 <span id="cb18-246"><a href="#cb18-246" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-249"><a href="#cb18-249" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb18-250"><a href="#cb18-250" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb18-251"><a href="#cb18-251" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-252"><a href="#cb18-252" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> VectorStoreIndex, SummaryIndex</span>
-<span id="cb18-253"><a href="#cb18-253" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-254"><a href="#cb18-254" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
-<span id="cb18-255"><a href="#cb18-255" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
-<span id="cb18-256"><a href="#cb18-256" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb18-257"><a href="#cb18-257" aria-hidden="true" tabindex="-1"></a>    vector_index <span class="op">=</span> VectorStoreIndex.from_documents(documentos)</span>
-<span id="cb18-258"><a href="#cb18-258" aria-hidden="true" tabindex="-1"></a>    summary_index <span class="op">=</span> SummaryIndex.from_documents(documentos)</span>
-<span id="cb18-259"><a href="#cb18-259" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-260"><a href="#cb18-260" aria-hidden="true" tabindex="-1"></a>    pregunta <span class="op">=</span> <span class="st">"¿Cuánto ha crecido la empresa entre 2024 y 2025?"</span></span>
-<span id="cb18-261"><a href="#cb18-261" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-262"><a href="#cb18-262" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"=== VectorStoreIndex ==="</span>)</span>
-<span id="cb18-263"><a href="#cb18-263" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(vector_index.as_query_engine().query(pregunta))</span>
+<span id="cb18-247"><a href="#cb18-247" aria-hidden="true" tabindex="-1"></a>pipeline <span class="op">=</span> IngestionPipeline(</span>
+<span id="cb18-248"><a href="#cb18-248" aria-hidden="true" tabindex="-1"></a>    transformations<span class="op">=</span>[</span>
+<span id="cb18-249"><a href="#cb18-249" aria-hidden="true" tabindex="-1"></a>        SentenceSplitter(chunk_size<span class="op">=</span><span class="dv">256</span>, chunk_overlap<span class="op">=</span><span class="dv">30</span>),</span>
+<span id="cb18-250"><a href="#cb18-250" aria-hidden="true" tabindex="-1"></a>    ]</span>
+<span id="cb18-251"><a href="#cb18-251" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb18-252"><a href="#cb18-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-253"><a href="#cb18-253" aria-hidden="true" tabindex="-1"></a>nodos <span class="op">=</span> pipeline.run(documents<span class="op">=</span>documentos)</span>
+<span id="cb18-254"><a href="#cb18-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-255"><a href="#cb18-255" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Documentos: </span><span class="sc">{</span><span class="bu">len</span>(documentos)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-256"><a href="#cb18-256" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Nodos generados: </span><span class="sc">{</span><span class="bu">len</span>(nodos)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-257"><a href="#cb18-257" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> nodos:</span>
+<span id="cb18-258"><a href="#cb18-258" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Ejemplo de nodo: </span><span class="sc">{</span>nodos[<span class="dv">0</span>]<span class="sc">.</span>text[:<span class="dv">150</span>]<span class="sc">}</span><span class="ss">..."</span>)</span>
+<span id="cb18-259"><a href="#cb18-259" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-260"><a href="#cb18-260" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-261"><a href="#cb18-261" aria-hidden="true" tabindex="-1"></a><span class="fu">### Tipos de índices {#sec-tipos-indices}</span></span>
+<span id="cb18-262"><a href="#cb18-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-263"><a href="#cb18-263" aria-hidden="true" tabindex="-1"></a>No todos los datos se consultan igual. LlamaIndex ofrece varios tipos de índices:</span>
 <span id="cb18-264"><a href="#cb18-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-265"><a href="#cb18-265" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== SummaryIndex (tree_summarize) ==="</span>)</span>
-<span id="cb18-266"><a href="#cb18-266" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(summary_index.as_query_engine(response_mode<span class="op">=</span><span class="st">"tree_summarize"</span>).query(pregunta))</span>
-<span id="cb18-267"><a href="#cb18-267" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-268"><a href="#cb18-268" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-269"><a href="#cb18-269" aria-hidden="true" tabindex="-1"></a><span class="fu">### Query Engines</span></span>
-<span id="cb18-270"><a href="#cb18-270" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-271"><a href="#cb18-271" aria-hidden="true" tabindex="-1"></a>Un **Query Engine** es el punto final de la API: recibe una pregunta en lenguaje natural y devuelve una respuesta.</span>
+<span id="cb18-265"><a href="#cb18-265" aria-hidden="true" tabindex="-1"></a>: Tipos de índices en LlamaIndex y cuándo usar cada uno {#tbl-tipos-indices}</span>
+<span id="cb18-266"><a href="#cb18-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-267"><a href="#cb18-267" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Índice <span class="pp">|</span> ¿Cómo funciona? <span class="pp">|</span> Mejor para <span class="pp">|</span></span>
+<span id="cb18-268"><a href="#cb18-268" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb18-269"><a href="#cb18-269" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **VectorStoreIndex** <span class="pp">|</span> Embeddings + búsqueda por similitud <span class="pp">|</span> Preguntas semánticas <span class="pp">|</span></span>
+<span id="cb18-270"><a href="#cb18-270" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **SummaryIndex** <span class="pp">|</span> Resume cada chunk y lo encadena <span class="pp">|</span> Preguntas generales sobre TODO el documento <span class="pp">|</span></span>
+<span id="cb18-271"><a href="#cb18-271" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **KeywordTableIndex** <span class="pp">|</span> Extrae keywords de cada chunk <span class="pp">|</span> Preguntas muy específicas <span class="pp">|</span></span>
 <span id="cb18-272"><a href="#cb18-272" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-275"><a href="#cb18-275" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb18-276"><a href="#cb18-276" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb18-277"><a href="#cb18-277" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-278"><a href="#cb18-278" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
-<span id="cb18-279"><a href="#cb18-279" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
-<span id="cb18-280"><a href="#cb18-280" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb18-281"><a href="#cb18-281" aria-hidden="true" tabindex="-1"></a>    indice <span class="op">=</span> VectorStoreIndex.from_documents(documentos)</span>
-<span id="cb18-282"><a href="#cb18-282" aria-hidden="true" tabindex="-1"></a>    query_engine <span class="op">=</span> indice.as_query_engine(</span>
-<span id="cb18-283"><a href="#cb18-283" aria-hidden="true" tabindex="-1"></a>        similarity_top_k<span class="op">=</span><span class="dv">3</span>,</span>
-<span id="cb18-284"><a href="#cb18-284" aria-hidden="true" tabindex="-1"></a>        response_mode<span class="op">=</span><span class="st">"compact"</span>,</span>
-<span id="cb18-285"><a href="#cb18-285" aria-hidden="true" tabindex="-1"></a>        verbose<span class="op">=</span><span class="va">True</span>,</span>
-<span id="cb18-286"><a href="#cb18-286" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-273"><a href="#cb18-273" aria-hidden="true" tabindex="-1"></a>::: {#fig-tipos-indices}</span>
+<span id="cb18-276"><a href="#cb18-276" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb18-277"><a href="#cb18-277" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb18-278"><a href="#cb18-278" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">VectorStoreIndex</span><span class="ot">"</span></span>
+<span id="cb18-279"><a href="#cb18-279" aria-hidden="true" tabindex="-1"></a>        V[Pregunta] --&gt; VQ[Búsqueda&lt;br/&gt;similitud coseno]</span>
+<span id="cb18-280"><a href="#cb18-280" aria-hidden="true" tabindex="-1"></a>        VQ --&gt; VD[(Vectores&lt;br/&gt;top-K chunks)]</span>
+<span id="cb18-281"><a href="#cb18-281" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb18-282"><a href="#cb18-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-283"><a href="#cb18-283" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">SummaryIndex</span><span class="ot">"</span></span>
+<span id="cb18-284"><a href="#cb18-284" aria-hidden="true" tabindex="-1"></a>        S[Pregunta] --&gt; SQ[Recorre&lt;br/&gt;todos los chunks]</span>
+<span id="cb18-285"><a href="#cb18-285" aria-hidden="true" tabindex="-1"></a>        SQ --&gt; SR[Resumen&lt;br/&gt;completo]</span>
+<span id="cb18-286"><a href="#cb18-286" aria-hidden="true" tabindex="-1"></a>    end</span>
 <span id="cb18-287"><a href="#cb18-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-288"><a href="#cb18-288" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> query_engine.query(<span class="st">"¿Quién lidera el equipo de Data Science y cuántas personas tiene?"</span>)</span>
-<span id="cb18-289"><a href="#cb18-289" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Respuesta: </span><span class="sc">{</span>respuesta<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-290"><a href="#cb18-290" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-291"><a href="#cb18-291" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Inspeccionar fuentes</span></span>
-<span id="cb18-292"><a href="#cb18-292" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- Fuentes utilizadas ---"</span>)</span>
-<span id="cb18-293"><a href="#cb18-293" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, nodo <span class="kw">in</span> <span class="bu">enumerate</span>(respuesta.source_nodes):</span>
-<span id="cb18-294"><a href="#cb18-294" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Fuente </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> (score: </span><span class="sc">{</span>nodo<span class="sc">.</span>score<span class="sc">:.3f}</span><span class="ss">):"</span>)</span>
-<span id="cb18-295"><a href="#cb18-295" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>nodo<span class="sc">.</span>text[:<span class="dv">120</span>]<span class="sc">}</span><span class="ss">..."</span>)</span>
-<span id="cb18-296"><a href="#cb18-296" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-297"><a href="#cb18-297" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-298"><a href="#cb18-298" aria-hidden="true" tabindex="-1"></a><span class="fu">### Consultas sobre datos estructurados (SQL)</span></span>
+<span id="cb18-288"><a href="#cb18-288" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">KeywordTableIndex</span><span class="ot">"</span></span>
+<span id="cb18-289"><a href="#cb18-289" aria-hidden="true" tabindex="-1"></a>        K[Pregunta] --&gt; KQ[Extrae&lt;br/&gt;keyword]</span>
+<span id="cb18-290"><a href="#cb18-290" aria-hidden="true" tabindex="-1"></a>        KQ --&gt; KT[(Tabla&lt;br/&gt;keyword→chunk)]</span>
+<span id="cb18-291"><a href="#cb18-291" aria-hidden="true" tabindex="-1"></a>        KT --&gt; KR[Chunks&lt;br/&gt;específicos]</span>
+<span id="cb18-292"><a href="#cb18-292" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb18-293"><a href="#cb18-293" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-294"><a href="#cb18-294" aria-hidden="true" tabindex="-1"></a>    style V fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb18-295"><a href="#cb18-295" aria-hidden="true" tabindex="-1"></a>    style S fill:<span class="co">#306998,color:#fff</span></span>
+<span id="cb18-296"><a href="#cb18-296" aria-hidden="true" tabindex="-1"></a>    style K fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb18-297"><a href="#cb18-297" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-298"><a href="#cb18-298" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb18-299"><a href="#cb18-299" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-300"><a href="#cb18-300" aria-hidden="true" tabindex="-1"></a>LlamaIndex también puede traducir lenguaje natural a SQL:</span>
-<span id="cb18-301"><a href="#cb18-301" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-304"><a href="#cb18-304" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb18-305"><a href="#cb18-305" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb18-302"><a href="#cb18-302" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb18-303"><a href="#cb18-303" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb18-304"><a href="#cb18-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-305"><a href="#cb18-305" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core <span class="im">import</span> VectorStoreIndex, SummaryIndex</span>
 <span id="cb18-306"><a href="#cb18-306" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-307"><a href="#cb18-307" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
-<span id="cb18-308"><a href="#cb18-308" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
-<span id="cb18-309"><a href="#cb18-309" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-310"><a href="#cb18-310" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos una BD SQLite de ejemplo en memoria</span></span>
-<span id="cb18-311"><a href="#cb18-311" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> sqlite3.<span class="ex">connect</span>(<span class="st">":memory:"</span>)</span>
-<span id="cb18-312"><a href="#cb18-312" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"CREATE TABLE ventas (id INTEGER, producto TEXT, importe REAL, region TEXT)"</span>)</span>
-<span id="cb18-313"><a href="#cb18-313" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (1, 'CloudSync', 450000, 'Madrid')"</span>)</span>
-<span id="cb18-314"><a href="#cb18-314" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (2, 'DataViz', 200000, 'Barcelona')"</span>)</span>
-<span id="cb18-315"><a href="#cb18-315" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (3, 'CloudSync', 320000, 'Madrid')"</span>)</span>
-<span id="cb18-316"><a href="#cb18-316" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (4, 'AI Toolkit', 180000, 'Norte')"</span>)</span>
-<span id="cb18-317"><a href="#cb18-317" aria-hidden="true" tabindex="-1"></a>db.commit()</span>
-<span id="cb18-318"><a href="#cb18-318" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-319"><a href="#cb18-319" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Base de datos creada:"</span>)</span>
-<span id="cb18-320"><a href="#cb18-320" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> db.execute(<span class="st">"SELECT * FROM ventas"</span>):</span>
-<span id="cb18-321"><a href="#cb18-321" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>row<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-322"><a href="#cb18-322" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-323"><a href="#cb18-323" aria-hidden="true" tabindex="-1"></a><span class="co"># Guardar a disco para usar con SQLAlchemy</span></span>
-<span id="cb18-324"><a href="#cb18-324" aria-hidden="true" tabindex="-1"></a>tmp <span class="op">=</span> tempfile.NamedTemporaryFile(suffix<span class="op">=</span><span class="st">".db"</span>, delete<span class="op">=</span><span class="va">False</span>)</span>
-<span id="cb18-325"><a href="#cb18-325" aria-hidden="true" tabindex="-1"></a>tmp.close()</span>
-<span id="cb18-326"><a href="#cb18-326" aria-hidden="true" tabindex="-1"></a>bkp <span class="op">=</span> sqlite3.<span class="ex">connect</span>(tmp.name)</span>
-<span id="cb18-327"><a href="#cb18-327" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> line <span class="kw">in</span> db.iterdump():</span>
-<span id="cb18-328"><a href="#cb18-328" aria-hidden="true" tabindex="-1"></a>    bkp.execute(line)</span>
-<span id="cb18-329"><a href="#cb18-329" aria-hidden="true" tabindex="-1"></a>bkp.commit()</span>
-<span id="cb18-330"><a href="#cb18-330" aria-hidden="true" tabindex="-1"></a>bkp.close()<span class="op">;</span> db.close()</span>
-<span id="cb18-331"><a href="#cb18-331" aria-hidden="true" tabindex="-1"></a>db_path <span class="op">=</span> tmp.name</span>
-<span id="cb18-332"><a href="#cb18-332" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-333"><a href="#cb18-333" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
-<span id="cb18-334"><a href="#cb18-334" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">⚠️  Configura LLM_API_KEY en .env para la demo NLSQL."</span>)</span>
-<span id="cb18-335"><a href="#cb18-335" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb18-336"><a href="#cb18-336" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> llama_index.core <span class="im">import</span> SQLDatabase</span>
-<span id="cb18-337"><a href="#cb18-337" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> llama_index.core.query_engine <span class="im">import</span> NLSQLTableQueryEngine</span>
-<span id="cb18-338"><a href="#cb18-338" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> sqlalchemy <span class="im">import</span> create_engine</span>
-<span id="cb18-339"><a href="#cb18-339" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-340"><a href="#cb18-340" aria-hidden="true" tabindex="-1"></a>    engine <span class="op">=</span> create_engine(<span class="ss">f"sqlite:///</span><span class="sc">{</span>db_path<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-341"><a href="#cb18-341" aria-hidden="true" tabindex="-1"></a>    sql_database <span class="op">=</span> SQLDatabase(engine, include_tables<span class="op">=</span>[<span class="st">"ventas"</span>])</span>
-<span id="cb18-342"><a href="#cb18-342" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-343"><a href="#cb18-343" aria-hidden="true" tabindex="-1"></a>    query_engine <span class="op">=</span> NLSQLTableQueryEngine(</span>
-<span id="cb18-344"><a href="#cb18-344" aria-hidden="true" tabindex="-1"></a>        sql_database<span class="op">=</span>sql_database,</span>
-<span id="cb18-345"><a href="#cb18-345" aria-hidden="true" tabindex="-1"></a>        llm<span class="op">=</span>Settings.llm,</span>
-<span id="cb18-346"><a href="#cb18-346" aria-hidden="true" tabindex="-1"></a>        tables<span class="op">=</span>[<span class="st">"ventas"</span>]</span>
-<span id="cb18-347"><a href="#cb18-347" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb18-348"><a href="#cb18-348" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-349"><a href="#cb18-349" aria-hidden="true" tabindex="-1"></a>    pregunta <span class="op">=</span> <span class="st">"¿Cuánto ha facturado CloudSync en total?"</span></span>
-<span id="cb18-350"><a href="#cb18-350" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> query_engine.query(pregunta)</span>
-<span id="cb18-351"><a href="#cb18-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-352"><a href="#cb18-352" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Pregunta: </span><span class="sc">{</span>pregunta<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-353"><a href="#cb18-353" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"SQL generado: </span><span class="sc">{</span>respuesta<span class="sc">.</span>metadata<span class="sc">.</span>get(<span class="st">'sql_query'</span>, <span class="st">'no disponible'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-354"><a href="#cb18-354" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Respuesta: </span><span class="sc">{</span>respuesta<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-355"><a href="#cb18-355" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-356"><a href="#cb18-356" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os <span class="im">as</span> _os</span>
-<span id="cb18-357"><a href="#cb18-357" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
-<span id="cb18-358"><a href="#cb18-358" aria-hidden="true" tabindex="-1"></a>    _os.unlink(db_path)</span>
-<span id="cb18-359"><a href="#cb18-359" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">FileNotFoundError</span>:</span>
-<span id="cb18-360"><a href="#cb18-360" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span>
-<span id="cb18-361"><a href="#cb18-361" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-307"><a href="#cb18-307" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb18-308"><a href="#cb18-308" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb18-309"><a href="#cb18-309" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb18-310"><a href="#cb18-310" aria-hidden="true" tabindex="-1"></a>    vector_index <span class="op">=</span> VectorStoreIndex.from_documents(documentos)</span>
+<span id="cb18-311"><a href="#cb18-311" aria-hidden="true" tabindex="-1"></a>    summary_index <span class="op">=</span> SummaryIndex.from_documents(documentos)</span>
+<span id="cb18-312"><a href="#cb18-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-313"><a href="#cb18-313" aria-hidden="true" tabindex="-1"></a>    pregunta <span class="op">=</span> <span class="st">"¿Cuánto ha crecido la empresa entre 2024 y 2025?"</span></span>
+<span id="cb18-314"><a href="#cb18-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-315"><a href="#cb18-315" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"=== VectorStoreIndex ==="</span>)</span>
+<span id="cb18-316"><a href="#cb18-316" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(vector_index.as_query_engine().query(pregunta))</span>
+<span id="cb18-317"><a href="#cb18-317" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-318"><a href="#cb18-318" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== SummaryIndex (tree_summarize) ==="</span>)</span>
+<span id="cb18-319"><a href="#cb18-319" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(summary_index.as_query_engine(response_mode<span class="op">=</span><span class="st">"tree_summarize"</span>).query(pregunta))</span>
+<span id="cb18-320"><a href="#cb18-320" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-321"><a href="#cb18-321" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-322"><a href="#cb18-322" aria-hidden="true" tabindex="-1"></a><span class="fu">### Query Engines {#sec-query-engines}</span></span>
+<span id="cb18-323"><a href="#cb18-323" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-324"><a href="#cb18-324" aria-hidden="true" tabindex="-1"></a>Un Query Engine es el punto final de la API: recibe una pregunta en lenguaje natural y devuelve una respuesta.</span>
+<span id="cb18-325"><a href="#cb18-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-328"><a href="#cb18-328" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb18-329"><a href="#cb18-329" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb18-330"><a href="#cb18-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-331"><a href="#cb18-331" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb18-332"><a href="#cb18-332" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ver el output de esta celda."</span>)</span>
+<span id="cb18-333"><a href="#cb18-333" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb18-334"><a href="#cb18-334" aria-hidden="true" tabindex="-1"></a>    indice <span class="op">=</span> VectorStoreIndex.from_documents(documentos)</span>
+<span id="cb18-335"><a href="#cb18-335" aria-hidden="true" tabindex="-1"></a>    query_engine <span class="op">=</span> indice.as_query_engine(</span>
+<span id="cb18-336"><a href="#cb18-336" aria-hidden="true" tabindex="-1"></a>        similarity_top_k<span class="op">=</span><span class="dv">3</span>,</span>
+<span id="cb18-337"><a href="#cb18-337" aria-hidden="true" tabindex="-1"></a>        response_mode<span class="op">=</span><span class="st">"compact"</span>,</span>
+<span id="cb18-338"><a href="#cb18-338" aria-hidden="true" tabindex="-1"></a>        verbose<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb18-339"><a href="#cb18-339" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-340"><a href="#cb18-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-341"><a href="#cb18-341" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> query_engine.query(<span class="st">"¿Quién lidera el equipo de Data Science y cuántas personas tiene?"</span>)</span>
+<span id="cb18-342"><a href="#cb18-342" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Respuesta: </span><span class="sc">{</span>respuesta<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-343"><a href="#cb18-343" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-344"><a href="#cb18-344" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Inspeccionar fuentes</span></span>
+<span id="cb18-345"><a href="#cb18-345" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">--- Fuentes utilizadas ---"</span>)</span>
+<span id="cb18-346"><a href="#cb18-346" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i, nodo <span class="kw">in</span> <span class="bu">enumerate</span>(respuesta.source_nodes):</span>
+<span id="cb18-347"><a href="#cb18-347" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"Fuente </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> (score: </span><span class="sc">{</span>nodo<span class="sc">.</span>score<span class="sc">:.3f}</span><span class="ss">):"</span>)</span>
+<span id="cb18-348"><a href="#cb18-348" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>nodo<span class="sc">.</span>text[:<span class="dv">120</span>]<span class="sc">}</span><span class="ss">..."</span>)</span>
+<span id="cb18-349"><a href="#cb18-349" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-350"><a href="#cb18-350" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-351"><a href="#cb18-351" aria-hidden="true" tabindex="-1"></a><span class="fu">### Consultas sobre datos estructurados (SQL) {#sec-nlsql}</span></span>
+<span id="cb18-352"><a href="#cb18-352" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-353"><a href="#cb18-353" aria-hidden="true" tabindex="-1"></a>LlamaIndex también puede traducir lenguaje natural a SQL:</span>
+<span id="cb18-354"><a href="#cb18-354" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-357"><a href="#cb18-357" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb18-358"><a href="#cb18-358" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb18-359"><a href="#cb18-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-360"><a href="#cb18-360" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
+<span id="cb18-361"><a href="#cb18-361" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> tempfile</span>
 <span id="cb18-362"><a href="#cb18-362" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-365"><a href="#cb18-365" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb18-366"><a href="#cb18-366" aria-hidden="true" tabindex="-1"></a>graph LR</span>
-<span id="cb18-367"><a href="#cb18-367" aria-hidden="true" tabindex="-1"></a>    A[Pregunta NL] --&gt; B[LLM&lt;br/&gt;genera SQL]</span>
-<span id="cb18-368"><a href="#cb18-368" aria-hidden="true" tabindex="-1"></a>    B --&gt; C{SQL válido?}</span>
-<span id="cb18-369"><a href="#cb18-369" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Sí| D[Ejecuta en BD]</span>
-<span id="cb18-370"><a href="#cb18-370" aria-hidden="true" tabindex="-1"></a>    D --&gt; E[Resultados]</span>
-<span id="cb18-371"><a href="#cb18-371" aria-hidden="true" tabindex="-1"></a>    E --&gt; F[LLM&lt;br/&gt;resume respuesta]</span>
-<span id="cb18-372"><a href="#cb18-372" aria-hidden="true" tabindex="-1"></a>    F --&gt; G[Respuesta NL&lt;br/&gt;+ datos]</span>
-<span id="cb18-373"><a href="#cb18-373" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-374"><a href="#cb18-374" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb18-375"><a href="#cb18-375" aria-hidden="true" tabindex="-1"></a>    style G fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb18-376"><a href="#cb18-376" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-377"><a href="#cb18-377" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-378"><a href="#cb18-378" aria-hidden="true" tabindex="-1"></a><span class="fu">### Chunking estratégico</span></span>
-<span id="cb18-379"><a href="#cb18-379" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-380"><a href="#cb18-380" aria-hidden="true" tabindex="-1"></a>El tamaño y solapamiento de los chunks afecta drásticamente a la calidad del RAG:</span>
-<span id="cb18-381"><a href="#cb18-381" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-384"><a href="#cb18-384" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb18-385"><a href="#cb18-385" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb18-386"><a href="#cb18-386" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-387"><a href="#cb18-387" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.node_parser <span class="im">import</span> SentenceSplitter, TokenTextSplitter</span>
-<span id="cb18-388"><a href="#cb18-388" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-389"><a href="#cb18-389" aria-hidden="true" tabindex="-1"></a>texto_largo <span class="op">=</span> <span class="st">"La inteligencia artificial generativa está transformando el panorama del análisis de datos. "</span> <span class="op">*</span> <span class="dv">30</span></span>
-<span id="cb18-390"><a href="#cb18-390" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-391"><a href="#cb18-391" aria-hidden="true" tabindex="-1"></a><span class="co"># Chunking por frases</span></span>
-<span id="cb18-392"><a href="#cb18-392" aria-hidden="true" tabindex="-1"></a>parser_frases <span class="op">=</span> SentenceSplitter(chunk_size<span class="op">=</span><span class="dv">256</span>, chunk_overlap<span class="op">=</span><span class="dv">30</span>)</span>
-<span id="cb18-393"><a href="#cb18-393" aria-hidden="true" tabindex="-1"></a>nodos_frases <span class="op">=</span> parser_frases.get_nodes_from_documents([Document(text<span class="op">=</span>texto_largo)])</span>
-<span id="cb18-394"><a href="#cb18-394" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-395"><a href="#cb18-395" aria-hidden="true" tabindex="-1"></a><span class="co"># Chunking por tokens</span></span>
-<span id="cb18-396"><a href="#cb18-396" aria-hidden="true" tabindex="-1"></a>parser_tokens <span class="op">=</span> TokenTextSplitter(chunk_size<span class="op">=</span><span class="dv">128</span>, chunk_overlap<span class="op">=</span><span class="dv">20</span>)</span>
-<span id="cb18-397"><a href="#cb18-397" aria-hidden="true" tabindex="-1"></a>nodos_tokens <span class="op">=</span> parser_tokens.get_nodes_from_documents([Document(text<span class="op">=</span>texto_largo)])</span>
-<span id="cb18-398"><a href="#cb18-398" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-399"><a href="#cb18-399" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Texto original: </span><span class="sc">{</span><span class="bu">len</span>(texto_largo)<span class="sc">}</span><span class="ss"> caracteres"</span>)</span>
-<span id="cb18-400"><a href="#cb18-400" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Chunks por frases: </span><span class="sc">{</span><span class="bu">len</span>(nodos_frases)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-401"><a href="#cb18-401" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Chunks por tokens: </span><span class="sc">{</span><span class="bu">len</span>(nodos_tokens)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb18-402"><a href="#cb18-402" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-403"><a href="#cb18-403" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-404"><a href="#cb18-404" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
-<span id="cb18-405"><a href="#cb18-405" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reglas prácticas de chunking</span></span>
-<span id="cb18-406"><a href="#cb18-406" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Chunk pequeño** (128-256 tokens): más preciso, pero puede perder contexto. Bueno para FAQs.</span>
-<span id="cb18-407"><a href="#cb18-407" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Chunk medio** (512 tokens): buen equilibrio. Funciona para la mayoría de casos.</span>
-<span id="cb18-408"><a href="#cb18-408" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Chunk grande** (1024+ tokens): mantiene contexto pero es más caro.</span>
-<span id="cb18-409"><a href="#cb18-409" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Overlap** (10-20% del chunk): evita que una frase quede cortada entre dos chunks.</span>
-<span id="cb18-410"><a href="#cb18-410" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb18-411"><a href="#cb18-411" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-412"><a href="#cb18-412" aria-hidden="true" tabindex="-1"></a><span class="fu">### Resumen del flujo RAG con LlamaIndex</span></span>
-<span id="cb18-413"><a href="#cb18-413" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-416"><a href="#cb18-416" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb18-417"><a href="#cb18-417" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb18-418"><a href="#cb18-418" aria-hidden="true" tabindex="-1"></a>    A[Documentos&lt;br/&gt;PDF, CSV, SQL] --&gt; B[SimpleDirectoryReader&lt;br/&gt;carga multi-formato]</span>
-<span id="cb18-419"><a href="#cb18-419" aria-hidden="true" tabindex="-1"></a>    B --&gt; C[Node Parser&lt;br/&gt;chunking + metadatos]</span>
-<span id="cb18-420"><a href="#cb18-420" aria-hidden="true" tabindex="-1"></a>    C --&gt; D[Embedding Model&lt;br/&gt;vectorización]</span>
-<span id="cb18-421"><a href="#cb18-421" aria-hidden="true" tabindex="-1"></a>    D --&gt; E[Vector Store&lt;br/&gt;ChromaDB / FAISS]</span>
-<span id="cb18-422"><a href="#cb18-422" aria-hidden="true" tabindex="-1"></a>    E --&gt; F[Índice&lt;br/&gt;VectorStoreIndex]</span>
-<span id="cb18-423"><a href="#cb18-423" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-424"><a href="#cb18-424" aria-hidden="true" tabindex="-1"></a>    P[Usuario pregunta] --&gt; F</span>
-<span id="cb18-425"><a href="#cb18-425" aria-hidden="true" tabindex="-1"></a>    F --&gt; G[Retriever&lt;br/&gt;top-K chunks]</span>
-<span id="cb18-426"><a href="#cb18-426" aria-hidden="true" tabindex="-1"></a>    G --&gt; H[Response Synthesizer&lt;br/&gt;combina + LLM]</span>
-<span id="cb18-427"><a href="#cb18-427" aria-hidden="true" tabindex="-1"></a>    H --&gt; I[Respuesta&lt;br/&gt;con fuentes]</span>
-<span id="cb18-428"><a href="#cb18-428" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-429"><a href="#cb18-429" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb18-430"><a href="#cb18-430" aria-hidden="true" tabindex="-1"></a>    style F fill:<span class="co">#e65100,color:#fff</span></span>
-<span id="cb18-431"><a href="#cb18-431" aria-hidden="true" tabindex="-1"></a>    style I fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb18-432"><a href="#cb18-432" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb18-433"><a href="#cb18-433" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-434"><a href="#cb18-434" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Lectura recomendada:** </span><span class="co">[</span><span class="ot">LlamaIndex Documentation</span><span class="co">](https://docs.llamaindex.ai/en/stable/)</span></span>
+<span id="cb18-363"><a href="#cb18-363" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos una BD SQLite de ejemplo en memoria</span></span>
+<span id="cb18-364"><a href="#cb18-364" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> sqlite3.<span class="ex">connect</span>(<span class="st">":memory:"</span>)</span>
+<span id="cb18-365"><a href="#cb18-365" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"CREATE TABLE ventas (id INTEGER, producto TEXT, importe REAL, region TEXT)"</span>)</span>
+<span id="cb18-366"><a href="#cb18-366" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (1, 'CloudSync', 450000, 'Madrid')"</span>)</span>
+<span id="cb18-367"><a href="#cb18-367" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (2, 'DataViz', 200000, 'Barcelona')"</span>)</span>
+<span id="cb18-368"><a href="#cb18-368" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (3, 'CloudSync', 320000, 'Madrid')"</span>)</span>
+<span id="cb18-369"><a href="#cb18-369" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (4, 'AI Toolkit', 180000, 'Norte')"</span>)</span>
+<span id="cb18-370"><a href="#cb18-370" aria-hidden="true" tabindex="-1"></a>db.commit()</span>
+<span id="cb18-371"><a href="#cb18-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-372"><a href="#cb18-372" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Base de datos creada:"</span>)</span>
+<span id="cb18-373"><a href="#cb18-373" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> db.execute(<span class="st">"SELECT * FROM ventas"</span>):</span>
+<span id="cb18-374"><a href="#cb18-374" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  </span><span class="sc">{</span>row<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-375"><a href="#cb18-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-376"><a href="#cb18-376" aria-hidden="true" tabindex="-1"></a><span class="co"># Guardar a disco para usar con SQLAlchemy</span></span>
+<span id="cb18-377"><a href="#cb18-377" aria-hidden="true" tabindex="-1"></a>tmp <span class="op">=</span> tempfile.NamedTemporaryFile(suffix<span class="op">=</span><span class="st">".db"</span>, delete<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb18-378"><a href="#cb18-378" aria-hidden="true" tabindex="-1"></a>tmp.close()</span>
+<span id="cb18-379"><a href="#cb18-379" aria-hidden="true" tabindex="-1"></a>bkp <span class="op">=</span> sqlite3.<span class="ex">connect</span>(tmp.name)</span>
+<span id="cb18-380"><a href="#cb18-380" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> line <span class="kw">in</span> db.iterdump():</span>
+<span id="cb18-381"><a href="#cb18-381" aria-hidden="true" tabindex="-1"></a>    bkp.execute(line)</span>
+<span id="cb18-382"><a href="#cb18-382" aria-hidden="true" tabindex="-1"></a>bkp.commit()</span>
+<span id="cb18-383"><a href="#cb18-383" aria-hidden="true" tabindex="-1"></a>bkp.close()<span class="op">;</span> db.close()</span>
+<span id="cb18-384"><a href="#cb18-384" aria-hidden="true" tabindex="-1"></a>db_path <span class="op">=</span> tmp.name</span>
+<span id="cb18-385"><a href="#cb18-385" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-386"><a href="#cb18-386" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb18-387"><a href="#cb18-387" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">⚠️  Configura LLM_API_KEY en .env para la demo NLSQL."</span>)</span>
+<span id="cb18-388"><a href="#cb18-388" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb18-389"><a href="#cb18-389" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> llama_index.core <span class="im">import</span> SQLDatabase</span>
+<span id="cb18-390"><a href="#cb18-390" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> llama_index.core.query_engine <span class="im">import</span> NLSQLTableQueryEngine</span>
+<span id="cb18-391"><a href="#cb18-391" aria-hidden="true" tabindex="-1"></a>    <span class="im">from</span> sqlalchemy <span class="im">import</span> create_engine</span>
+<span id="cb18-392"><a href="#cb18-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-393"><a href="#cb18-393" aria-hidden="true" tabindex="-1"></a>    engine <span class="op">=</span> create_engine(<span class="ss">f"sqlite:///</span><span class="sc">{</span>db_path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-394"><a href="#cb18-394" aria-hidden="true" tabindex="-1"></a>    sql_database <span class="op">=</span> SQLDatabase(engine, include_tables<span class="op">=</span>[<span class="st">"ventas"</span>])</span>
+<span id="cb18-395"><a href="#cb18-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-396"><a href="#cb18-396" aria-hidden="true" tabindex="-1"></a>    query_engine <span class="op">=</span> NLSQLTableQueryEngine(</span>
+<span id="cb18-397"><a href="#cb18-397" aria-hidden="true" tabindex="-1"></a>        sql_database<span class="op">=</span>sql_database,</span>
+<span id="cb18-398"><a href="#cb18-398" aria-hidden="true" tabindex="-1"></a>        llm<span class="op">=</span>Settings.llm,</span>
+<span id="cb18-399"><a href="#cb18-399" aria-hidden="true" tabindex="-1"></a>        tables<span class="op">=</span>[<span class="st">"ventas"</span>]</span>
+<span id="cb18-400"><a href="#cb18-400" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb18-401"><a href="#cb18-401" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-402"><a href="#cb18-402" aria-hidden="true" tabindex="-1"></a>    pregunta <span class="op">=</span> <span class="st">"¿Cuánto ha facturado CloudSync en total?"</span></span>
+<span id="cb18-403"><a href="#cb18-403" aria-hidden="true" tabindex="-1"></a>    respuesta <span class="op">=</span> query_engine.query(pregunta)</span>
+<span id="cb18-404"><a href="#cb18-404" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-405"><a href="#cb18-405" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Pregunta: </span><span class="sc">{</span>pregunta<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-406"><a href="#cb18-406" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"SQL generado: </span><span class="sc">{</span>respuesta<span class="sc">.</span>metadata<span class="sc">.</span>get(<span class="st">'sql_query'</span>, <span class="st">'no disponible'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-407"><a href="#cb18-407" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"Respuesta: </span><span class="sc">{</span>respuesta<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-408"><a href="#cb18-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-409"><a href="#cb18-409" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os <span class="im">as</span> _os</span>
+<span id="cb18-410"><a href="#cb18-410" aria-hidden="true" tabindex="-1"></a><span class="cf">try</span>:</span>
+<span id="cb18-411"><a href="#cb18-411" aria-hidden="true" tabindex="-1"></a>    _os.unlink(db_path)</span>
+<span id="cb18-412"><a href="#cb18-412" aria-hidden="true" tabindex="-1"></a><span class="cf">except</span> <span class="pp">FileNotFoundError</span>:</span>
+<span id="cb18-413"><a href="#cb18-413" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span>
+<span id="cb18-414"><a href="#cb18-414" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-415"><a href="#cb18-415" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-416"><a href="#cb18-416" aria-hidden="true" tabindex="-1"></a>::: {#fig-nlsql-patron}</span>
+<span id="cb18-419"><a href="#cb18-419" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb18-420"><a href="#cb18-420" aria-hidden="true" tabindex="-1"></a>graph LR</span>
+<span id="cb18-421"><a href="#cb18-421" aria-hidden="true" tabindex="-1"></a>    A[Pregunta NL] --&gt; B[LLM&lt;br/&gt;genera SQL]</span>
+<span id="cb18-422"><a href="#cb18-422" aria-hidden="true" tabindex="-1"></a>    B --&gt; C{SQL válido?}</span>
+<span id="cb18-423"><a href="#cb18-423" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Sí| D[Ejecuta en BD]</span>
+<span id="cb18-424"><a href="#cb18-424" aria-hidden="true" tabindex="-1"></a>    D --&gt; E[Resultados]</span>
+<span id="cb18-425"><a href="#cb18-425" aria-hidden="true" tabindex="-1"></a>    E --&gt; F[LLM&lt;br/&gt;resume respuesta]</span>
+<span id="cb18-426"><a href="#cb18-426" aria-hidden="true" tabindex="-1"></a>    F --&gt; G[Respuesta NL&lt;br/&gt;+ datos]</span>
+<span id="cb18-427"><a href="#cb18-427" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-428"><a href="#cb18-428" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb18-429"><a href="#cb18-429" aria-hidden="true" tabindex="-1"></a>    style G fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb18-430"><a href="#cb18-430" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-431"><a href="#cb18-431" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-432"><a href="#cb18-432" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-433"><a href="#cb18-433" aria-hidden="true" tabindex="-1"></a><span class="fu">### Chunking estratégico {#sec-chunking-estrategico}</span></span>
+<span id="cb18-434"><a href="#cb18-434" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-435"><a href="#cb18-435" aria-hidden="true" tabindex="-1"></a>El tamaño y solapamiento de los chunks afectan drásticamente a la calidad del RAG:</span>
+<span id="cb18-436"><a href="#cb18-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-439"><a href="#cb18-439" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb18-440"><a href="#cb18-440" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb18-441"><a href="#cb18-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-442"><a href="#cb18-442" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> llama_index.core.node_parser <span class="im">import</span> SentenceSplitter, TokenTextSplitter</span>
+<span id="cb18-443"><a href="#cb18-443" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-444"><a href="#cb18-444" aria-hidden="true" tabindex="-1"></a>texto_largo <span class="op">=</span> <span class="st">"La inteligencia artificial generativa está transformando el panorama del análisis de datos. "</span> <span class="op">*</span> <span class="dv">30</span></span>
+<span id="cb18-445"><a href="#cb18-445" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-446"><a href="#cb18-446" aria-hidden="true" tabindex="-1"></a><span class="co"># Chunking por frases</span></span>
+<span id="cb18-447"><a href="#cb18-447" aria-hidden="true" tabindex="-1"></a>parser_frases <span class="op">=</span> SentenceSplitter(chunk_size<span class="op">=</span><span class="dv">256</span>, chunk_overlap<span class="op">=</span><span class="dv">30</span>)</span>
+<span id="cb18-448"><a href="#cb18-448" aria-hidden="true" tabindex="-1"></a>nodos_frases <span class="op">=</span> parser_frases.get_nodes_from_documents([Document(text<span class="op">=</span>texto_largo)])</span>
+<span id="cb18-449"><a href="#cb18-449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-450"><a href="#cb18-450" aria-hidden="true" tabindex="-1"></a><span class="co"># Chunking por tokens</span></span>
+<span id="cb18-451"><a href="#cb18-451" aria-hidden="true" tabindex="-1"></a>parser_tokens <span class="op">=</span> TokenTextSplitter(chunk_size<span class="op">=</span><span class="dv">128</span>, chunk_overlap<span class="op">=</span><span class="dv">20</span>)</span>
+<span id="cb18-452"><a href="#cb18-452" aria-hidden="true" tabindex="-1"></a>nodos_tokens <span class="op">=</span> parser_tokens.get_nodes_from_documents([Document(text<span class="op">=</span>texto_largo)])</span>
+<span id="cb18-453"><a href="#cb18-453" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-454"><a href="#cb18-454" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Texto original: </span><span class="sc">{</span><span class="bu">len</span>(texto_largo)<span class="sc">}</span><span class="ss"> caracteres"</span>)</span>
+<span id="cb18-455"><a href="#cb18-455" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Chunks por frases: </span><span class="sc">{</span><span class="bu">len</span>(nodos_frases)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-456"><a href="#cb18-456" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Chunks por tokens: </span><span class="sc">{</span><span class="bu">len</span>(nodos_tokens)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb18-457"><a href="#cb18-457" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-458"><a href="#cb18-458" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-459"><a href="#cb18-459" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb18-460"><a href="#cb18-460" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reglas prácticas de chunking</span></span>
+<span id="cb18-461"><a href="#cb18-461" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Chunk pequeño** (128-256 tokens): más preciso, pero puede perder contexto. Bueno para FAQs.</span>
+<span id="cb18-462"><a href="#cb18-462" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Chunk medio** (512 tokens): buen equilibrio. Funciona para la mayoría de casos.</span>
+<span id="cb18-463"><a href="#cb18-463" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Chunk grande** (1024+ tokens): mantiene contexto pero es más caro.</span>
+<span id="cb18-464"><a href="#cb18-464" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Overlap** (10-20% del chunk): evita que una frase quede cortada entre dos chunks.</span>
+<span id="cb18-465"><a href="#cb18-465" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-466"><a href="#cb18-466" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-467"><a href="#cb18-467" aria-hidden="true" tabindex="-1"></a><span class="fu">### Resumen del flujo RAG con LlamaIndex {#sec-resumen-flujo-llamaindex}</span></span>
+<span id="cb18-468"><a href="#cb18-468" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-469"><a href="#cb18-469" aria-hidden="true" tabindex="-1"></a>::: {#fig-rag-completo-llamaindex}</span>
+<span id="cb18-472"><a href="#cb18-472" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb18-473"><a href="#cb18-473" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb18-474"><a href="#cb18-474" aria-hidden="true" tabindex="-1"></a>    A[Documentos&lt;br/&gt;PDF, CSV, SQL] --&gt; B[SimpleDirectoryReader&lt;br/&gt;carga multi-formato]</span>
+<span id="cb18-475"><a href="#cb18-475" aria-hidden="true" tabindex="-1"></a>    B --&gt; C[Node Parser&lt;br/&gt;chunking + metadatos]</span>
+<span id="cb18-476"><a href="#cb18-476" aria-hidden="true" tabindex="-1"></a>    C --&gt; D[Embedding Model&lt;br/&gt;vectorización]</span>
+<span id="cb18-477"><a href="#cb18-477" aria-hidden="true" tabindex="-1"></a>    D --&gt; E[Vector Store&lt;br/&gt;ChromaDB / FAISS]</span>
+<span id="cb18-478"><a href="#cb18-478" aria-hidden="true" tabindex="-1"></a>    E --&gt; F[Índice&lt;br/&gt;VectorStoreIndex]</span>
+<span id="cb18-479"><a href="#cb18-479" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-480"><a href="#cb18-480" aria-hidden="true" tabindex="-1"></a>    P[Usuario pregunta] --&gt; F</span>
+<span id="cb18-481"><a href="#cb18-481" aria-hidden="true" tabindex="-1"></a>    F --&gt; G[Retriever&lt;br/&gt;top-K chunks]</span>
+<span id="cb18-482"><a href="#cb18-482" aria-hidden="true" tabindex="-1"></a>    G --&gt; H[Response Synthesizer&lt;br/&gt;combina + LLM]</span>
+<span id="cb18-483"><a href="#cb18-483" aria-hidden="true" tabindex="-1"></a>    H --&gt; I[Respuesta&lt;br/&gt;con fuentes]</span>
+<span id="cb18-484"><a href="#cb18-484" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-485"><a href="#cb18-485" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb18-486"><a href="#cb18-486" aria-hidden="true" tabindex="-1"></a>    style F fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb18-487"><a href="#cb18-487" aria-hidden="true" tabindex="-1"></a>    style I fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb18-488"><a href="#cb18-488" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb18-489"><a href="#cb18-489" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb18-490"><a href="#cb18-490" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-491"><a href="#cb18-491" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Lectura recomendada:** </span><span class="co">[</span><span class="ot">LlamaIndex Documentation</span><span class="co">](https://docs.llamaindex.ai/en/stable/)</span><span class="at"> </span><span class="co">[</span><span class="ot">@llamaindex</span><span class="co">]</span><span class="at">.</span></span>
+<span id="cb18-492"><a href="#cb18-492" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-493"><a href="#cb18-493" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb18-494"><a href="#cb18-494" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-495"><a href="#cb18-495" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb18-496"><a href="#cb18-496" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

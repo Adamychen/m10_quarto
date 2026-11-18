@@ -2,20 +2,23 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>Bloque 1 — Fundamentos: Transformers, LLMs y Representación Vectorial – Módulo 10 — IA Generativa para Data Science</title>
+<title>Bloque 1 — Fundamentos: Transformers, LLM y Representación Vectorial – Módulo 10 — IA Generativa para Data Science</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -58,7 +61,27 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
 
 
 <script src="../site_libs/quarto-nav/quarto-nav.js"></script>
@@ -74,10 +97,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="../site_libs/quarto-html/anchor.min.js"></script>
 <link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="../site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="../site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="../site_libs/bootstrap/bootstrap-f97a59afa23c78b76dca51217b896fc0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -123,7 +146,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque1/01-fundamentos.html">Bloque 1 — Fundamentos</a></li><li class="breadcrumb-item"><a href="../bloque1/01-fundamentos.html">Visión general</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque1/00-panorama.html">Bloque 1 — Fundamentos</a></li><li class="breadcrumb-item"><a href="../bloque1/01-fundamentos.html">Visión general</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -182,6 +205,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Visión general</span></a>
   </div>
@@ -212,20 +241,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+  <a href="../bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HPD 1 — Embeddings</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd1-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 1</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd1-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 1</span></a>
+  <a href="../evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
   </div>
 </li>
       </ul>
@@ -277,38 +306,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd2-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 2</span></a>
+  <a href="../evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd2-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 2</span></a>
+  <a href="../bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../bloque2/hpd3-servidor-mcp.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HPD 3 — Servidor MCP</span></a>
+  <a href="../bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd3-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 3</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd3-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 3</span></a>
+  <a href="../evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
   </div>
 </li>
       </ul>
@@ -342,26 +371,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Fine-tuning eficiente</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd4-rag-mixto.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HPD 4 — RAG Mixto</span></a>
+  <a href="../evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd4-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios — Datos Sintéticos</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="../evaluables/hpd4-datos-sinteticos-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión — Datos Sintéticos</span></a>
+  <a href="../evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
   </div>
 </li>
       </ul>
@@ -378,7 +407,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Teoría y Despliegue</span></a>
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
   </div>
 </li>
       </ul>
@@ -386,7 +451,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
- <span class="menu-text">Evaluación</span></a>
+ <span class="menu-text">Demos interactivas</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -394,8 +459,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Evaluación y Proyecto</span></a>
+  <a href="../demos/atencion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
       </ul>
@@ -403,12 +498,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
- <span class="menu-text">Recursos</span></a>
+ <span class="menu-text">Evaluación</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="../06-herramientas.html" class="sidebar-item-text sidebar-link">
@@ -433,20 +551,21 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#objetivos-del-bloque" id="toc-objetivos-del-bloque" class="nav-link active" data-scroll-target="#objetivos-del-bloque">Objetivos del bloque</a></li>
-  <li><a href="#mapa-conceptual-del-bloque" id="toc-mapa-conceptual-del-bloque" class="nav-link" data-scroll-target="#mapa-conceptual-del-bloque">Mapa conceptual del bloque</a></li>
-  <li><a href="#contenido-del-bloque" id="toc-contenido-del-bloque" class="nav-link" data-scroll-target="#contenido-del-bloque">Contenido del bloque</a></li>
-  <li><a href="#referencias-del-bloque" id="toc-referencias-del-bloque" class="nav-link" data-scroll-target="#referencias-del-bloque">Referencias del bloque</a></li>
-  <li><a href="#resumen-del-bloque" id="toc-resumen-del-bloque" class="nav-link" data-scroll-target="#resumen-del-bloque">Resumen del bloque</a></li>
+  <li><a href="#sec-objetivos" id="toc-sec-objetivos" class="nav-link active" data-scroll-target="#sec-objetivos">Objetivos del bloque</a></li>
+  <li><a href="#sec-mapa-conceptual" id="toc-sec-mapa-conceptual" class="nav-link" data-scroll-target="#sec-mapa-conceptual">Mapa conceptual del bloque</a></li>
+  <li><a href="#sec-contenido-bloque" id="toc-sec-contenido-bloque" class="nav-link" data-scroll-target="#sec-contenido-bloque">Contenido del bloque</a></li>
+  <li><a href="#sec-referencias" id="toc-sec-referencias" class="nav-link" data-scroll-target="#sec-referencias">Referencias del bloque</a></li>
+  <li><a href="#sec-resumen-bloque" id="toc-sec-resumen-bloque" class="nav-link" data-scroll-target="#sec-resumen-bloque">Resumen del bloque</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="01-fundamentos.ipynb" download="01-fundamentos.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque1/01-fundamentos.html">Bloque 1 — Fundamentos</a></li><li class="breadcrumb-item"><a href="../bloque1/01-fundamentos.html">Visión general</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../bloque1/00-panorama.html">Bloque 1 — Fundamentos</a></li><li class="breadcrumb-item"><a href="../bloque1/01-fundamentos.html">Visión general</a></li></ol></nav>
 <div class="quarto-title">
-<div class="quarto-title-block"><div><h1 class="title">Bloque 1 — Fundamentos: Transformers, LLMs y Representación Vectorial</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+<div class="quarto-title-block"><div><h1 class="title">Bloque 1 — Fundamentos: Transformers, LLM y Representación Vectorial</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
 </div>
 
 
@@ -465,9 +584,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <p><a href="https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01-fundamentos.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid"></a></p>
 <blockquote class="blockquote">
-<p><strong>Carga:</strong> HT: 6h | HPD: 4h</p>
-<p><strong>Competencias asociadas:</strong> <a href="../index.html#competencias-específicas">CE-1</a></p>
-<p><strong>Dependencias:</strong> <code>torch</code>, <code>transformers</code>, <code>sentence-transformers</code>, <code>chromadb</code>, <code>faiss-cpu</code>, <code>matplotlib</code>, <code>scikit-learn</code>, <code>numpy</code></p>
+<p><strong>Competencias asociadas:</strong> <a href="../index.html#sec-competencias-especificas">CE-1</a></p>
+<p><strong>Dependencias:</strong> <code>torch</code>, <code>transformers</code>, <code>sentence-transformers</code>, <code>chromadb</code>, <code>faiss-cpu</code>, <code>langchain-text-splitters</code>, <code>matplotlib</code>, <code>scikit-learn</code>, <code>numpy</code></p>
+</blockquote>
+<blockquote class="blockquote">
+<p><strong>Orientación previa:</strong> comienza por el <a href="../bloque1/00-panorama.html">panorama histórico: del texto a los embeddings</a>. Es una introducción conceptual que no sustituye los temas técnicos de este bloque.</p>
 </blockquote>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -479,7 +600,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Todas las celdas de código están diseñadas para ejecutarse en <strong>Google Colab</strong> con GPU T4 gratuita (12 GB RAM).</p>
+<p>Todas las celdas de código están diseñadas para ejecutarse en Google Colab con GPU T4 gratuita (16 GB de VRAM y 12 GB de RAM).</p>
 <ol type="1">
 <li>Haz clic en el badge “Open in Colab” de arriba</li>
 <li>Si es la primera vez, autoriza Colab en GitHub: <strong>Settings → GitHub → Connect to GitHub</strong></li>
@@ -488,76 +609,154 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Si el badge no funciona, abre <a href="https://colab.research.google.com">colab.research.google.com</a>, ve a <strong>File → Open Notebook → GitHub</strong>, busca <code>Adamychen/m10_quarto</code> y selecciona el notebook correspondiente.</p>
 </div>
 </div>
-<section id="objetivos-del-bloque" class="level2">
-<h2 class="anchored" data-anchor-id="objetivos-del-bloque">Objetivos del bloque</h2>
-<p>Comprender la arquitectura que subyace a los LLMs modernos y dominar la representación vectorial de texto y datos tabulares, así como las bases de datos vectoriales para búsqueda semántica y recuperación de información.</p>
+<section id="sec-objetivos" class="level2">
+<h2 class="anchored" data-anchor-id="sec-objetivos">Objetivos del bloque</h2>
+<p>Comprender la arquitectura que subyace a los LLM modernos y dominar la representación vectorial de texto y datos tabulares, así como las bases de datos vectoriales para búsqueda semántica y recuperación de información.</p>
 </section>
-<section id="mapa-conceptual-del-bloque" class="level2">
-<h2 class="anchored" data-anchor-id="mapa-conceptual-del-bloque">Mapa conceptual del bloque</h2>
+<section id="sec-mapa-conceptual" class="level2">
+<h2 class="anchored" data-anchor-id="sec-mapa-conceptual">Mapa conceptual del bloque</h2>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Leyenda de colores
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A lo largo del módulo, los diagramas usan una paleta consistente para que identifiques rápidamente el rol de cada elemento. Los azules y el amarillo coinciden con la paleta oficial de Python.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th></th>
+<th>Significado</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><span style="display:inline-block;width:1em;height:1em;background:#4B8BBE;border:1px solid #1e3a5f;vertical-align:middle"></span></td>
+<td><strong>Azul claro</strong> — Input / fuente de datos</td>
+</tr>
+<tr class="even">
+<td><span style="display:inline-block;width:1em;height:1em;background:#306998;border:1px solid #1e3a5f;vertical-align:middle"></span></td>
+<td><strong>Azul oscuro</strong> — Proceso / orquestación</td>
+</tr>
+<tr class="odd">
+<td><span style="display:inline-block;width:1em;height:1em;background:#FFD43B;border:1px solid #b8860b;vertical-align:middle"></span></td>
+<td><strong>Amarillo</strong> — Resultado intermedio</td>
+</tr>
+<tr class="even">
+<td><span style="display:inline-block;width:1em;height:1em;background:#e65100;border:1px solid #bf360c;vertical-align:middle"></span></td>
+<td><strong>Naranja</strong> — Aviso / herramienta</td>
+</tr>
+<tr class="odd">
+<td><span style="display:inline-block;width:1em;height:1em;background:#2e7d32;border:1px solid #0d3010;vertical-align:middle"></span></td>
+<td><strong>Verde</strong> — Éxito / meta final</td>
+</tr>
+<tr class="even">
+<td><span style="display:inline-block;width:1em;height:1em;background:#c62828;border:1px solid #7f0000;vertical-align:middle"></span></td>
+<td><strong>Rojo</strong> — Riesgo / error</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="fig-mapa-fundamentos" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-mapa-fundamentos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
 <p></p><figure class="figure"><p></p>
 <div>
-<pre class="mermaid mermaid-js">graph TD
-    subgraph "Fundamentos"
-        A[Transformer] --&gt; B[LLM]
-        A --&gt; C[Embeddings]
-        B --&gt; D["RAG avanzado (Bloque 3)"]
-        C --&gt; E[Vector DB]
-        E --&gt; D
+<pre class="mermaid mermaid-js">flowchart TD
+    subgraph "Bloque 1 — Fundamentos"
+        P0[00&lt;br/&gt;Panorama historico&lt;br/&gt;representacion y generacion]:::input --&gt; A
+        P0 --&gt; C
+        A[01a&lt;br/&gt;Transformer&lt;br/&gt;+ atención + posicional]:::input --&gt; B[01b&lt;br/&gt;LLM e inferencia&lt;br/&gt;+ tokenización BPE]:::proc
+        A --&gt; C[01c&lt;br/&gt;Embeddings&lt;br/&gt;+ espacio geométrico]:::doc
+        C --&gt; D[01d&lt;br/&gt;Bases de datos&lt;br/&gt;vectoriales]:::doc
+        D --&gt; E2[01e&lt;br/&gt;De documentos a&lt;br/&gt;recuperación]:::obs
+        E2 --&gt; F["HPD 1&lt;br/&gt;Pipeline de embeddings&lt;br/&gt;y búsqueda semántica"]:::out
     end
-    style A fill:#4B8BBE,color:#fff
-    style B fill:#306998,color:#fff
-    style C fill:#FFD43B,color:#000
-    style E fill:#FFD43B,color:#000
+    D --&gt; G["RAG avanzado&lt;br/&gt;(Bloque 3)"]:::out
+    F --&gt; H["Proyecto&lt;br/&gt;integrador"]:::out
+
+    classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef proc  fill:#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px
+    classDef doc   fill:#FFD43B,stroke:#b8860b,color:#000,stroke-width:1.5px
+    classDef obs   fill:#e65100,stroke:#bf360c,color:#fff,stroke-width:1.5px
+    classDef out   fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
 </pre>
 </div>
 <p></p></figure><p></p>
 </div>
 </div>
 </div>
-<p>Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos los fundamentos de la arquitectura Transformer, pasamos a exponer cómo esta arquitectura escala para construir los LLMs (en su forma más general), continuaremos con la representación de la información haciendo uso de vectores numéricos por medio de los embeddings y, finalmente, explicaremos algunos métodos para almacenar y recuperar esos vectores de representación de forma eficiente.</p>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-mapa-fundamentos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
+<p>Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos con la arquitectura Transformer (atención, codificación posicional, variantes), pasamos a los LLM y la inferencia (incluyendo una profundización en tokenización BPE), continuamos con la representación vectorial del lenguaje (embeddings y su geometría) y continuamos con las bases de datos vectoriales que permiten búsqueda semántica eficiente y terminamos con el paso que convierte todo lo anterior en un sistema que funciona: trocear documentos, combinar búsqueda léxica y semántica y medir la calidad de la recuperación (01e). Las páginas 01c, 01d y 01e comparten un mismo caso conductor, el buscador de preguntas frecuentes de un banco, para que puedas comparar técnicas sobre los mismos datos.</p>
+<p>El <a href="../bloque1/00-panorama.html">panorama histórico</a> añade una perspectiva distinta a esta secuencia técnica. Allí se sigue la línea one-hot → TF-IDF → word2vec/GloVe → representaciones contextuales → SBERT/E5 → RAG, mientras que las páginas técnicas explican en detalle la línea RNN/LSTM → Transformer → LLM → herramientas y agentes. Mantener ambas líneas evita presentar los embeddings como una consecuencia exclusiva de los LLM: los embeddings de palabras son anteriores al Transformer, pero los embeddings contextuales y de frases modernos aprovechan esta arquitectura.</p>
 </section>
-<section id="contenido-del-bloque" class="level2">
-<h2 class="anchored" data-anchor-id="contenido-del-bloque">Contenido del bloque</h2>
-<p>La siguiente tabla muestra el itinerario que sigue este bloque en su exposición de objetivos, así como los ficheros interactivos asociados y el tiempo estimado necesario para la exposición de los mismos:</p>
+<section id="sec-contenido-bloque" class="level2">
+<h2 class="anchored" data-anchor-id="sec-contenido-bloque">Contenido del bloque</h2>
+<p>La siguiente tabla muestra el itinerario que sigue este bloque en su exposición de objetivos, así como los ficheros interactivos asociados:</p>
+<div id="tbl-itinerario" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-itinerario-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Itinerario del Bloque 1
+</figcaption>
+<div aria-describedby="tbl-itinerario-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <thead>
 <tr class="header">
 <th>Tema</th>
 <th>Archivo</th>
-<th>Duración estimada</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td><strong>Transformers</strong> — Atención, codificación posicional, variantes</td>
-<td><a href="../bloque1/01a-transformer.html">01a-transformer.qmd</a></td>
-<td>2h</td>
+<td><strong>Panorama histórico</strong> — De one-hot y TF-IDF a embeddings contextuales, búsqueda semántica y RAG</td>
+<td><a href="../bloque1/00-panorama.html">00-panorama.qmd</a></td>
 </tr>
 <tr class="even">
-<td><strong>LLMs e inferencia</strong> — Preentrenamiento, tokenización, parámetros, HF Hub, API Llamus</td>
-<td><a href="../bloque1/01b-llms.html">01b-llms.qmd</a></td>
-<td>2h</td>
+<td><strong>Transformers</strong> — Pipeline intuitiva, atención, codificación posicional, variantes</td>
+<td><a href="../bloque1/01a-transformer.html">01a-transformer.qmd</a></td>
 </tr>
 <tr class="odd">
-<td><strong>Embeddings</strong> — word2vec, SBERT, modelos, comparativa</td>
-<td><a href="../bloque1/01c-embeddings.html">01c-embeddings.qmd</a></td>
-<td>1h</td>
+<td><strong>LLM e inferencia</strong> — Preentrenamiento, BPE paso a paso, parámetros, HF Hub, API Llamus</td>
+<td><a href="../bloque1/01b-llms.html">01b-llms.qmd</a></td>
 </tr>
 <tr class="even">
+<td><strong>Embeddings</strong> — word2vec, representaciones contextuales, SBERT y espacio geométrico</td>
+<td><a href="../bloque1/01c-embeddings.html">01c-embeddings.qmd</a></td>
+</tr>
+<tr class="odd">
 <td><strong>Bases de datos vectoriales</strong> — Chroma, FAISS, HNSW, búsqueda semántica</td>
 <td><a href="../bloque1/01d-vectordb.html">01d-vectordb.qmd</a></td>
-<td>1h</td>
+</tr>
+<tr class="even">
+<td><strong>De documentos a recuperación</strong> — Chunking, BM25, búsqueda híbrida (RRF), hit@k, recall@k y MRR</td>
+<td><a href="../bloque1/01e-recuperacion.html">01e-recuperacion.qmd</a></td>
 </tr>
 <tr class="odd">
 <td><strong>HPD 1 — Pipeline de embeddings</strong></td>
-<td><a href="../evaluables/hpd1-embeddings.html">hpd1-embeddings.qmd</a></td>
-<td>4h</td>
+<td><a href="../bloque1/hpd1-embeddings.html">hpd1-embeddings.qmd</a></td>
 </tr>
 </tbody>
 </table>
+</div>
+</figure>
+</div>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -568,13 +767,13 @@ Note
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p><strong>Teoría obligatoria.</strong> Los temas listados arriba son obligatorios. Puedes profundizar en cada uno según tu interés.</p>
+<p><strong>Teoría obligatoria.</strong> Los temas 01a-01e son obligatorios. Cada página termina con una sección <em>Comprueba lo aprendido</em>: preguntas con la respuesta plegada para que te autoevalúes. Las secciones marcadas como <em>Nivel avanzado</em> son opcionales en una primera lectura. La lectura recomendada sobre cabezas de salida, SFT, PPO y DPO se ha movido al <a href="../bloque3/03c-previo-cabezas.html">Bloque 3, como previo a fine-tuning</a>.</p>
 </div>
 </div>
-<div id="3a9d51c4" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q chromadb faiss<span class="op">-</span>cpu sentence<span class="op">-</span>transformers</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div id="26487fef" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q chromadb faiss<span class="op">-</span>cpu sentence<span class="op">-</span>transformers langchain<span class="op">-</span>text<span class="op">-</span>splitters</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="5bc0a487" class="cell" data-execution_count="2">
+<div id="f312ba70" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
@@ -587,32 +786,33 @@ Note
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
 <span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span>
 <span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NumPy: </span><span class="sc">{</span>np<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Librerías cargadas correctamente.
-NumPy: 2.5.0</code></pre>
-</div>
 </div>
 <hr>
 </section>
-<section id="referencias-del-bloque" class="level2">
-<h2 class="anchored" data-anchor-id="referencias-del-bloque">Referencias del bloque</h2>
+<section id="sec-referencias" class="level2">
+<h2 class="anchored" data-anchor-id="sec-referencias">Referencias del bloque</h2>
 <ul>
-<li>Devlin, J., Chang, M., Lee, K. &amp; Toutanova, K. (2018). <strong>BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding</strong>. arXiv:1810.04805</li>
-<li>Vaswani, A. et al.&nbsp;(2017). <strong>Attention is All You Need</strong>. NeurIPS. <a href="https://arxiv.org/abs/1706.03762">arXiv:1706.03762</a></li>
-<li>Kaplan, J. et al.&nbsp;(2020). <strong>Scaling Laws for Neural Language Models</strong>. arXiv:2001.08361</li>
-<li>Hoffmann, J. et al.&nbsp;(2022). <strong>Training Compute-Optimal Large Language Models</strong> (Chinchilla). arXiv:2203.15556</li>
-<li>Su, J. et al.&nbsp;(2021). <strong>RoFormer: Enhanced Transformer with Rotary Position Embedding</strong> (RoPE). arXiv:2104.09864</li>
-<li>Dao, T. et al.&nbsp;(2022). <strong>FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness</strong>. arXiv:2205.14135</li>
-<li>Reimers, N. &amp; Gurevych, I. (2019). <strong>Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks</strong>. <a href="https://arxiv.org/abs/1908.10084">arXiv:1908.10084</a></li>
-<li>Wang, L. et al.&nbsp;(2022). <strong>Text Embeddings by Weakly-Supervised Contrastive Pre-training</strong> (E5). arXiv:2212.03533</li>
-<li>Radford, A. et al.&nbsp;(2021). <strong>Learning Transferable Visual Models From Natural Language Supervision</strong> (CLIP). arXiv:2103.00020</li>
-<li>Malkov, Y. &amp; Yashunin, D. (2018). <strong>Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs</strong> (HNSW). IEEE TPAMI. <a href="https://arxiv.org/abs/1603.09320">arXiv:1603.09320</a></li>
-<li>Johnson, J., Douze, M. &amp; Jégou, H. (2019). <strong>Billion-scale similarity search with GPUs</strong> (FAISS). IEEE TBD. <a href="https://arxiv.org/abs/1702.08734">arXiv:1702.08734</a></li>
+<li><span class="citation" data-cites="vaswani2017attention">Vaswani et al. (<a href="#ref-vaswani2017attention" role="doc-biblioref">2017</a>)</span></li>
+<li><span class="citation" data-cites="devlin2019bert">Devlin et al. (<a href="#ref-devlin2019bert" role="doc-biblioref">2019</a>)</span></li>
+<li><span class="citation" data-cites="kaplan2020scaling">Kaplan et al. (<a href="#ref-kaplan2020scaling" role="doc-biblioref">2020</a>)</span></li>
+<li><span class="citation" data-cites="hoffmann2022chinchilla"><span class="nocase">Hoffmann et al.</span> (<a href="#ref-hoffmann2022chinchilla" role="doc-biblioref">2022</a>)</span></li>
+<li><span class="citation" data-cites="su2021roformer">Su et al. (<a href="#ref-su2021roformer" role="doc-biblioref">2021</a>)</span></li>
+<li><span class="citation" data-cites="dao2022flashattention">Dao et al. (<a href="#ref-dao2022flashattention" role="doc-biblioref">2022</a>)</span></li>
+<li><span class="citation" data-cites="reimers2019sbert">Reimers &amp; Gurevych (<a href="#ref-reimers2019sbert" role="doc-biblioref">2019</a>)</span></li>
+<li><span class="citation" data-cites="wang2022e5">Wang et al. (<a href="#ref-wang2022e5" role="doc-biblioref">2022</a>)</span></li>
+<li><span class="citation" data-cites="radford2021clip">Radford et al. (<a href="#ref-radford2021clip" role="doc-biblioref">2021</a>)</span></li>
+<li><span class="citation" data-cites="malkov2018hnsw">Malkov &amp; Yashunin (<a href="#ref-malkov2018hnsw" role="doc-biblioref">2020</a>)</span></li>
+<li><span class="citation" data-cites="johnson2019faiss">Johnson et al. (<a href="#ref-johnson2019faiss" role="doc-biblioref">2021</a>)</span></li>
+<li><span class="citation" data-cites="sennrich2016bpe">Sennrich et al. (<a href="#ref-sennrich2016bpe" role="doc-biblioref">2016</a>)</span></li>
+<li><span class="citation" data-cites="roitman2026hitchhiker">Roitman (<a href="#ref-roitman2026hitchhiker" role="doc-biblioref">2026</a>)</span></li>
 </ul>
 <hr>
 </section>
-<section id="resumen-del-bloque" class="level2">
-<h2 class="anchored" data-anchor-id="resumen-del-bloque">Resumen del bloque</h2>
+<section id="sec-resumen-bloque" class="level2">
+<h2 class="anchored" data-anchor-id="sec-resumen-bloque">Resumen del bloque</h2>
+<div id="fig-resumen-bloque-1" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-resumen-bloque-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell" data-layout-align="default">
 <div class="cell-output-display">
 <div>
@@ -620,7 +820,9 @@ NumPy: 2.5.0</code></pre>
 <div>
 <pre class="mermaid mermaid-js">graph TD
     subgraph "Bloque 1"
-        A[Transformer] --&gt;|Arquitectura base| B[LLMs]
+        P0[Panorama historico] --&gt; A[Transformer]
+        P0 --&gt; C[Embeddings]
+        A[Transformer] --&gt;|Arquitectura base| B[LLM]
         A --&gt;|Representación| C[Embeddings]
         B --&gt;|Tokens + parámetros| D[Inferencia]
         C --&gt;|Indexación| E[Vector DB]
@@ -635,13 +837,19 @@ NumPy: 2.5.0</code></pre>
 </div>
 </div>
 </div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-resumen-bloque-1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2
+</figcaption>
+</figure>
+</div>
 <p>Este primer bloque sienta las bases para el resto de bloques que componen el curso. Concretamente:</p>
 <ul>
-<li><strong>Bloque 2:</strong> uso de LLMs para construir agentes y prompts estructurados</li>
+<li><strong>Bloque 2:</strong> uso de LLM para construir agentes y prompts estructurados</li>
 <li><strong>Bloque 3:</strong> uso de embeddings + vector DB para construir sistemas RAG (recuperación de información)</li>
 <li><strong>Bloque 4:</strong> evaluación y despliegue de sistemas en producción</li>
 </ul>
-<p>Tras haber asimilado los conceptos de las secciones anteriores, puedes pasar al <a href="../evaluables/hpd1-embeddings.html">taller práctico: HPD 1 — Pipeline de embeddings y búsqueda semántica</a>.</p>
+<p>Tras haber asimilado los conceptos de las secciones anteriores, puedes pasar al <a href="../bloque1/hpd1-embeddings.html">taller práctico: HPD 1 — Pipeline de embeddings y búsqueda semántica</a>.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -653,10 +861,55 @@ NumPy: 2.5.0</code></pre>
 </div>
 <div class="callout-body-container callout-body">
 <ol type="1">
-<li>Asegúrate de haber ejecutado <code>source .venv/bin/activate</code> (o <code>setup.bat</code> en Windows)</li>
+<li>Asegúrate de tener un entorno Python 3.11+ con las dependencias de <code>requirements.txt</code> instaladas</li>
 <li>Confirma que ejecutaste todas las celdas de código de los sub-temas sin errores</li>
-<li>Lee Vaswani et al.&nbsp;(2017) secciones 3-5 (lectura obligatoria)</li>
+<li>Lee Vaswani et al. <span class="citation" data-cites="vaswani2017attention">(<a href="#ref-vaswani2017attention" role="doc-biblioref">2017</a>)</span> secciones 3-5 (lectura obligatoria)</li>
 </ol>
+</div>
+</div>
+<hr>
+</section>
+<section id="references" class="level1">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" data-line-spacing="2" role="list">
+<div id="ref-dao2022flashattention" class="csl-entry" role="listitem">
+Dao, T., Fu, D. Y., Ermon, S., Rudra, A., &amp; Ré, C. (2022). <span>FlashAttention</span>: Fast and memory-efficient exact attention with <span>IO</span>-awareness. <em>Advances in Neural Information Processing Systems</em>. <a href="https://arxiv.org/abs/2205.14135">https://arxiv.org/abs/2205.14135</a>
+</div>
+<div id="ref-devlin2019bert" class="csl-entry" role="listitem">
+Devlin, J., Chang, M.-W., Lee, K., &amp; Toutanova, K. (2019). <span>BERT</span>: Pre-training of deep bidirectional transformers for language understanding. <em>Proceedings of the 2019 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 1 (Long and Short Papers)</em>, 4171–4186. <a href="https://doi.org/10.18653/v1/N19-1423">https://doi.org/10.18653/v1/N19-1423</a>
+</div>
+<div id="ref-hoffmann2022chinchilla" class="csl-entry" role="listitem">
+<span class="nocase">Hoffmann, J., Borgeaud, S., Mensch, A., Buchatskaya, E., Cai, T., Rutherford, E., de las Casas, D., Hendricks, L. A., Welbl, J., Clark, A., Lehman, E., Sifre, L., Graves, M., Simonyan, K., Penedo, G., Lin, Z., Gokay, D., Mellor, J., Helly, J., … Brown, T. B.</span> (2022). Training compute-optimal large language models. <em>arXiv Preprint arXiv:2203.15556</em>. <a href="https://arxiv.org/abs/2203.15556">https://arxiv.org/abs/2203.15556</a>
+</div>
+<div id="ref-johnson2019faiss" class="csl-entry" role="listitem">
+Johnson, J., Douze, M., &amp; Jégou, H. (2021). Billion-scale similarity search with <span>GPUs</span>. <em>IEEE Transactions on Big Data</em>, <em>7</em>(3), 535–547. <a href="https://doi.org/10.1109/TBDATA.2019.2921572">https://doi.org/10.1109/TBDATA.2019.2921572</a>
+</div>
+<div id="ref-kaplan2020scaling" class="csl-entry" role="listitem">
+Kaplan, J., McCandlish, S., Henighan, T., Brown, T. B., Chess, B., Child, R., Gray, S., Radford, A., Wu, J., &amp; Amodei, D. (2020). Scaling laws for neural language models. <em>arXiv Preprint arXiv:2001.08361</em>. <a href="https://arxiv.org/abs/2001.08361">https://arxiv.org/abs/2001.08361</a>
+</div>
+<div id="ref-malkov2018hnsw" class="csl-entry" role="listitem">
+Malkov, Y. A., &amp; Yashunin, D. A. (2020). Efficient and robust approximate nearest neighbor search using hierarchical navigable small world graphs. <em>IEEE Transactions on Pattern Analysis and Machine Intelligence</em>, <em>42</em>(4), 824–836. <a href="https://doi.org/10.1109/TPAMI.2018.2889473">https://doi.org/10.1109/TPAMI.2018.2889473</a>
+</div>
+<div id="ref-radford2021clip" class="csl-entry" role="listitem">
+Radford, A., Kim, J. W., Hallacy, C., Ramesh, A., Goh, G., Agarwal, S., Sastry, G., Askell, A., Mishkin, P., Clark, J., Krueger, G., &amp; Sutskever, I. (2021). Learning transferable visual models from natural language supervision (<span>CLIP</span>). <em>arXiv Preprint arXiv:2103.00020</em>. <a href="https://arxiv.org/abs/2103.00020">https://arxiv.org/abs/2103.00020</a>
+</div>
+<div id="ref-reimers2019sbert" class="csl-entry" role="listitem">
+Reimers, N., &amp; Gurevych, I. (2019). Sentence-<span>BERT</span>: Sentence embeddings using siamese <span>BERT</span>-networks. <em>Proceedings of the 2019 Conference on Empirical Methods in Natural Language Processing and the 9th International Joint Conference on Natural Language Processing (EMNLP-IJCNLP)</em>, 3982–3992. <a href="https://doi.org/10.18653/v1/D19-1410">https://doi.org/10.18653/v1/D19-1410</a>
+</div>
+<div id="ref-roitman2026hitchhiker" class="csl-entry" role="listitem">
+Roitman, H. (2026). <em>The hitchhiker’s guide to agentic AI: From foundations to systems</em>. Versión 1.2.2. Licencia CC BY-SA 4.0. <a href="https://creativecommons.org/licenses/by-sa/4.0/">https://creativecommons.org/licenses/by-sa/4.0/</a>
+</div>
+<div id="ref-sennrich2016bpe" class="csl-entry" role="listitem">
+Sennrich, R., Haddow, B., &amp; Birch, A. (2016). <em>Neural machine translation of rare words with subword units</em>. 1715–1725. <a href="https://doi.org/10.18653/v1/P16-1162">https://doi.org/10.18653/v1/P16-1162</a>
+</div>
+<div id="ref-su2021roformer" class="csl-entry" role="listitem">
+Su, J., Lu, Y., Pan, S., Wen, B., &amp; Liu, Y. (2021). <span>RoFormer</span>: Enhanced transformer with rotary position embedding. <em>arXiv Preprint arXiv:2104.09864</em>. <a href="https://arxiv.org/abs/2104.09864">https://arxiv.org/abs/2104.09864</a>
+</div>
+<div id="ref-vaswani2017attention" class="csl-entry" role="listitem">
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, L., &amp; Polosukhin, I. (2017). <em>Attention is all you need</em>. <em>30</em>. <a href="https://arxiv.org/abs/1706.03762">https://arxiv.org/abs/1706.03762</a>
+</div>
+<div id="ref-wang2022e5" class="csl-entry" role="listitem">
+Wang, L., Yang, N., Huang, X., Jiao, B., Yang, L., Jiang, D., Majumder, R., &amp; Wei, F. (2022). Text embeddings by weakly-supervised contrastive pre-training (<span>E5</span>). <em>arXiv Preprint arXiv:2212.03533</em>. <a href="https://arxiv.org/abs/2212.03533">https://arxiv.org/abs/2212.03533</a>
 </div>
 </div>
 
@@ -764,16 +1017,16 @@ NumPy: 2.5.0</code></pre>
     }
     function toggleCodeHandler(show) {
       return function(e) {
-        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
-        for (let i=0; i<detailsSrc.length; i++) {
-          const details = detailsSrc[i].parentElement;
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
           if (show) {
             details.open = true;
           } else {
             details.removeAttribute("open");
           }
         }
-        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
         const fromCls = show ? "hidden" : "unhidden";
         const toCls = show ? "unhidden" : "hidden";
         for (let i=0; i<cellCodeDivs.length; i++) {
@@ -1123,146 +1376,191 @@ NumPy: 2.5.0</code></pre>
     }
   });
   </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Bloque 1 — Fundamentos: Transformers, LLMs y Representación Vectorial"</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> jupyter</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="al">![](https://colab.research.google.com/assets/colab-badge.svg)</span><span class="co">](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01-fundamentos.ipynb)</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Carga:** HT: 6h </span><span class="pp">|</span><span class="at"> HPD: 4h</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Competencias asociadas:** </span><span class="co">[</span><span class="ot">CE-1</span><span class="co">](../index.qmd#competencias-específicas)</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Dependencias:** </span><span class="in">`torch`</span><span class="at">, </span><span class="in">`transformers`</span><span class="at">, </span><span class="in">`sentence-transformers`</span><span class="at">, </span><span class="in">`chromadb`</span><span class="at">, </span><span class="in">`faiss-cpu`</span><span class="at">, </span><span class="in">`matplotlib`</span><span class="at">, </span><span class="in">`scikit-learn`</span><span class="at">, </span><span class="in">`numpy`</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ejecución en Colab</span></span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>Todas las celdas de código están diseñadas para ejecutarse en **Google Colab** con GPU T4 gratuita (12 GB RAM).</span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Haz clic en el badge "Open in Colab" de arriba</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Si es la primera vez, autoriza Colab en GitHub: **Settings → GitHub → Connect to GitHub**</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>En Colab: <span class="in">`Runtime → Run all`</span></span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>Si el badge no funciona, abre <span class="co">[</span><span class="ot">colab.research.google.com</span><span class="co">](https://colab.research.google.com)</span>, ve a **File → Open Notebook → GitHub**, busca <span class="in">`Adamychen/m10_quarto`</span> y selecciona el notebook correspondiente.</span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## Objetivos del bloque</span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>Comprender la arquitectura que subyace a los LLMs modernos y dominar la representación vectorial de texto y datos tabulares, así como las bases de datos vectoriales para búsqueda semántica y recuperación de información.</span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mapa conceptual del bloque</span></span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Fundamentos</span><span class="ot">"</span></span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>        A[Transformer] --&gt; B[LLM]</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>        A --&gt; C[Embeddings]</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>        B --&gt; D[<span class="ot">"</span><span class="st">RAG avanzado (Bloque 3)</span><span class="ot">"</span>]</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>        C --&gt; E[Vector DB]</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>        E --&gt; D</span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    style B fill:<span class="co">#306998,color:#fff</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>    style C fill:<span class="co">#FFD43B,color:#000</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>    style E fill:<span class="co">#FFD43B,color:#000</span></span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos los fundamentos de la arquitectura Transformer, pasamos a exponer cómo esta arquitectura escala para construir los LLMs (en su forma más general), continuaremos con la representación de la información haciendo uso de vectores numéricos por medio de los embeddings y, finalmente, explicaremos algunos métodos para almacenar y recuperar esos vectores de representación de forma eficiente.</span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="fu">## Contenido del bloque</span></span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>La siguiente tabla muestra el itinerario que sigue este bloque en su exposición de objetivos, así como los ficheros interactivos asociados y el tiempo estimado necesario para la exposición de los mismos:</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Tema <span class="pp">|</span> Archivo <span class="pp">|</span> Duración estimada <span class="pp">|</span></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Transformers** — Atención, codificación posicional, variantes <span class="pp">|</span> <span class="co">[</span><span class="ot">01a-transformer.qmd</span><span class="co">](01a-transformer.qmd)</span> <span class="pp">|</span> 2h <span class="pp">|</span></span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **LLMs e inferencia** — Preentrenamiento, tokenización, parámetros, HF Hub, API Llamus <span class="pp">|</span> <span class="co">[</span><span class="ot">01b-llms.qmd</span><span class="co">](01b-llms.qmd)</span> <span class="pp">|</span> 2h <span class="pp">|</span></span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Embeddings** — word2vec, SBERT, modelos, comparativa <span class="pp">|</span> <span class="co">[</span><span class="ot">01c-embeddings.qmd</span><span class="co">](01c-embeddings.qmd)</span> <span class="pp">|</span> 1h <span class="pp">|</span></span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica <span class="pp">|</span> <span class="co">[</span><span class="ot">01d-vectordb.qmd</span><span class="co">](01d-vectordb.qmd)</span> <span class="pp">|</span> 1h <span class="pp">|</span></span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **HPD 1 — Pipeline de embeddings** <span class="pp">|</span> <span class="co">[</span><span class="ot">hpd1-embeddings.qmd</span><span class="co">](../evaluables/hpd1-embeddings.qmd)</span> <span class="pp">|</span> 4h <span class="pp">|</span></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>**Teoría obligatoria.** Los temas listados arriba son obligatorios. Puedes profundizar en cada uno según tu interés.</span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-68"><a href="#cb4-68" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb4-69"><a href="#cb4-69" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb4-70"><a href="#cb4-70" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb4-71"><a href="#cb4-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-72"><a href="#cb4-72" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q chromadb faiss<span class="op">-</span>cpu sentence<span class="op">-</span>transformers</span>
-<span id="cb4-73"><a href="#cb4-73" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-74"><a href="#cb4-74" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-75"><a href="#cb4-75" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-76"><a href="#cb4-76" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-79"><a href="#cb4-79" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb4-80"><a href="#cb4-80" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb4-81"><a href="#cb4-81" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-82"><a href="#cb4-82" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
-<span id="cb4-83"><a href="#cb4-83" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
-<span id="cb4-84"><a href="#cb4-84" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
-<span id="cb4-85"><a href="#cb4-85" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
-<span id="cb4-86"><a href="#cb4-86" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>, category<span class="op">=</span><span class="pp">DeprecationWarning</span>)</span>
-<span id="cb4-87"><a href="#cb4-87" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>, category<span class="op">=</span><span class="pp">FutureWarning</span>)</span>
-<span id="cb4-88"><a href="#cb4-88" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
-<span id="cb4-89"><a href="#cb4-89" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
-<span id="cb4-90"><a href="#cb4-90" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
-<span id="cb4-91"><a href="#cb4-91" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
-<span id="cb4-92"><a href="#cb4-92" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span>
-<span id="cb4-93"><a href="#cb4-93" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NumPy: </span><span class="sc">{</span>np<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb4-94"><a href="#cb4-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-95"><a href="#cb4-95" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-96"><a href="#cb4-96" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-97"><a href="#cb4-97" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-98"><a href="#cb4-98" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb4-99"><a href="#cb4-99" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-100"><a href="#cb4-100" aria-hidden="true" tabindex="-1"></a><span class="fu">## Referencias del bloque</span></span>
-<span id="cb4-101"><a href="#cb4-101" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-102"><a href="#cb4-102" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Devlin, J., Chang, M., Lee, K. &amp; Toutanova, K. (2018). **BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding**. arXiv:1810.04805</span>
-<span id="cb4-103"><a href="#cb4-103" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Vaswani, A. et al. (2017). **Attention is All You Need**. NeurIPS. <span class="co">[</span><span class="ot">arXiv:1706.03762</span><span class="co">](https://arxiv.org/abs/1706.03762)</span></span>
-<span id="cb4-104"><a href="#cb4-104" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Kaplan, J. et al. (2020). **Scaling Laws for Neural Language Models**. arXiv:2001.08361</span>
-<span id="cb4-105"><a href="#cb4-105" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Hoffmann, J. et al. (2022). **Training Compute-Optimal Large Language Models** (Chinchilla). arXiv:2203.15556</span>
-<span id="cb4-106"><a href="#cb4-106" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Su, J. et al. (2021). **RoFormer: Enhanced Transformer with Rotary Position Embedding** (RoPE). arXiv:2104.09864</span>
-<span id="cb4-107"><a href="#cb4-107" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Dao, T. et al. (2022). **FlashAttention: Fast and Memory-Efficient Exact Attention with IO-Awareness**. arXiv:2205.14135</span>
-<span id="cb4-108"><a href="#cb4-108" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Reimers, N. &amp; Gurevych, I. (2019). **Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks**. <span class="co">[</span><span class="ot">arXiv:1908.10084</span><span class="co">](https://arxiv.org/abs/1908.10084)</span></span>
-<span id="cb4-109"><a href="#cb4-109" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Wang, L. et al. (2022). **Text Embeddings by Weakly-Supervised Contrastive Pre-training** (E5). arXiv:2212.03533</span>
-<span id="cb4-110"><a href="#cb4-110" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Radford, A. et al. (2021). **Learning Transferable Visual Models From Natural Language Supervision** (CLIP). arXiv:2103.00020</span>
-<span id="cb4-111"><a href="#cb4-111" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Malkov, Y. &amp; Yashunin, D. (2018). **Efficient and robust approximate nearest neighbor search using Hierarchical Navigable Small World graphs** (HNSW). IEEE TPAMI. <span class="co">[</span><span class="ot">arXiv:1603.09320</span><span class="co">](https://arxiv.org/abs/1603.09320)</span></span>
-<span id="cb4-112"><a href="#cb4-112" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Johnson, J., Douze, M. &amp; Jégou, H. (2019). **Billion-scale similarity search with GPUs** (FAISS). IEEE TBD. <span class="co">[</span><span class="ot">arXiv:1702.08734</span><span class="co">](https://arxiv.org/abs/1702.08734)</span></span>
-<span id="cb4-113"><a href="#cb4-113" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-114"><a href="#cb4-114" aria-hidden="true" tabindex="-1"></a>---</span>
-<span id="cb4-115"><a href="#cb4-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-116"><a href="#cb4-116" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resumen del bloque</span></span>
-<span id="cb4-117"><a href="#cb4-117" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-120"><a href="#cb4-120" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb4-121"><a href="#cb4-121" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb4-122"><a href="#cb4-122" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Bloque 1</span><span class="ot">"</span></span>
-<span id="cb4-123"><a href="#cb4-123" aria-hidden="true" tabindex="-1"></a>        A[Transformer] --&gt;|Arquitectura base| B[LLMs]</span>
-<span id="cb4-124"><a href="#cb4-124" aria-hidden="true" tabindex="-1"></a>        A --&gt;|Representación| C[Embeddings]</span>
-<span id="cb4-125"><a href="#cb4-125" aria-hidden="true" tabindex="-1"></a>        B --&gt;|Tokens + parámetros| D[Inferencia]</span>
-<span id="cb4-126"><a href="#cb4-126" aria-hidden="true" tabindex="-1"></a>        C --&gt;|Indexación| E[Vector DB]</span>
-<span id="cb4-127"><a href="#cb4-127" aria-hidden="true" tabindex="-1"></a>        E --&gt;|Búsqueda| F[Búsqueda semántica]</span>
-<span id="cb4-128"><a href="#cb4-128" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb4-129"><a href="#cb4-129" aria-hidden="true" tabindex="-1"></a>    D --&gt; F</span>
-<span id="cb4-130"><a href="#cb4-130" aria-hidden="true" tabindex="-1"></a>    F --&gt; G[HPD <span class="dv">1</span>: Pipeline de embeddings]</span>
-<span id="cb4-131"><a href="#cb4-131" aria-hidden="true" tabindex="-1"></a>    G --&gt; H[Proyecto integrador]</span>
-<span id="cb4-132"><a href="#cb4-132" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb4-133"><a href="#cb4-133" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-134"><a href="#cb4-134" aria-hidden="true" tabindex="-1"></a>Este primer bloque sienta las bases para el resto de bloques que componen el curso. Concretamente:</span>
-<span id="cb4-135"><a href="#cb4-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-136"><a href="#cb4-136" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Bloque 2:** uso de LLMs para construir agentes y prompts estructurados</span>
-<span id="cb4-137"><a href="#cb4-137" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Bloque 3:** uso de embeddings + vector DB para construir sistemas RAG (recuperación de información)</span>
-<span id="cb4-138"><a href="#cb4-138" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Bloque 4:** evaluación y despliegue de sistemas en producción</span>
-<span id="cb4-139"><a href="#cb4-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-140"><a href="#cb4-140" aria-hidden="true" tabindex="-1"></a>Tras haber asimilado los conceptos de las secciones anteriores, puedes pasar al <span class="co">[</span><span class="ot">taller práctico: HPD 1 — Pipeline de embeddings y búsqueda semántica</span><span class="co">](../evaluables/hpd1-embeddings.qmd)</span>.</span>
-<span id="cb4-141"><a href="#cb4-141" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-142"><a href="#cb4-142" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
-<span id="cb4-143"><a href="#cb4-143" aria-hidden="true" tabindex="-1"></a><span class="fu">## Antes de continuar</span></span>
-<span id="cb4-144"><a href="#cb4-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-145"><a href="#cb4-145" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Asegúrate de haber ejecutado <span class="in">`source .venv/bin/activate`</span> (o <span class="in">`setup.bat`</span> en Windows)</span>
-<span id="cb4-146"><a href="#cb4-146" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Confirma que ejecutaste todas las celdas de código de los sub-temas sin errores</span>
-<span id="cb4-147"><a href="#cb4-147" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Lee Vaswani et al. (2017) secciones 3-5 (lectura obligatoria)</span>
-<span id="cb4-148"><a href="#cb4-148" aria-hidden="true" tabindex="-1"></a>:::</span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Bloque 1 — Fundamentos: Transformers, LLM y Representación Vectorial"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> jupyter</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="al">![](https://colab.research.google.com/assets/colab-badge.svg)</span><span class="co">](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/bloque1/01-fundamentos.ipynb)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Competencias asociadas:** </span><span class="co">[</span><span class="ot">CE-1</span><span class="co">](../index.qmd#sec-competencias-especificas)</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Dependencias:** </span><span class="in">`torch`</span><span class="at">, </span><span class="in">`transformers`</span><span class="at">, </span><span class="in">`sentence-transformers`</span><span class="at">, </span><span class="in">`chromadb`</span><span class="at">, </span><span class="in">`faiss-cpu`</span><span class="at">, </span><span class="in">`langchain-text-splitters`</span><span class="at">, </span><span class="in">`matplotlib`</span><span class="at">, </span><span class="in">`scikit-learn`</span><span class="at">, </span><span class="in">`numpy`</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Orientación previa:** comienza por el </span><span class="co">[</span><span class="ot">panorama histórico: del texto a los embeddings</span><span class="co">](00-panorama.qmd)</span><span class="at">. Es una introducción conceptual que no sustituye los temas técnicos de este bloque.</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ejecución en Colab</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>Todas las celdas de código están diseñadas para ejecutarse en Google Colab con GPU T4 gratuita (16 GB de VRAM y 12 GB de RAM).</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Haz clic en el badge "Open in Colab" de arriba</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Si es la primera vez, autoriza Colab en GitHub: **Settings → GitHub → Connect to GitHub**</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>En Colab: <span class="in">`Runtime → Run all`</span></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>Si el badge no funciona, abre <span class="co">[</span><span class="ot">colab.research.google.com</span><span class="co">](https://colab.research.google.com)</span>, ve a **File → Open Notebook → GitHub**, busca <span class="in">`Adamychen/m10_quarto`</span> y selecciona el notebook correspondiente.</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="fu">## Objetivos del bloque {#sec-objetivos}</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>Comprender la arquitectura que subyace a los LLM modernos y dominar la representación vectorial de texto y datos tabulares, así como las bases de datos vectoriales para búsqueda semántica y recuperación de información.</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a><span class="fu">## Mapa conceptual del bloque {#sec-mapa-conceptual}</span></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="fu">## Leyenda de colores</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a>A lo largo del módulo, los diagramas usan una paleta consistente para que</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>identifiques rápidamente el rol de cada elemento. Los azules y el amarillo</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>coinciden con la paleta oficial de Python.</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="pp">|</span> Significado <span class="pp">|</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> style</span><span class="op">=</span><span class="st">"display:inline-block;width:1em;height:1em;background:#4B8BBE;border:1px solid #1e3a5f;vertical-align:middle"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span> <span class="pp">|</span> **Azul claro** — Input / fuente de datos <span class="pp">|</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> style</span><span class="op">=</span><span class="st">"display:inline-block;width:1em;height:1em;background:#306998;border:1px solid #1e3a5f;vertical-align:middle"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span> <span class="pp">|</span> **Azul oscuro** — Proceso / orquestación <span class="pp">|</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> style</span><span class="op">=</span><span class="st">"display:inline-block;width:1em;height:1em;background:#FFD43B;border:1px solid #b8860b;vertical-align:middle"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span> <span class="pp">|</span> **Amarillo** — Resultado intermedio <span class="pp">|</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> style</span><span class="op">=</span><span class="st">"display:inline-block;width:1em;height:1em;background:#e65100;border:1px solid #bf360c;vertical-align:middle"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span> <span class="pp">|</span> **Naranja** — Aviso / herramienta <span class="pp">|</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> style</span><span class="op">=</span><span class="st">"display:inline-block;width:1em;height:1em;background:#2e7d32;border:1px solid #0d3010;vertical-align:middle"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span> <span class="pp">|</span> **Verde** — Éxito / meta final <span class="pp">|</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="dt">&lt;</span><span class="kw">span</span><span class="ot"> style</span><span class="op">=</span><span class="st">"display:inline-block;width:1em;height:1em;background:#c62828;border:1px solid #7f0000;vertical-align:middle"</span><span class="dt">&gt;&lt;/</span><span class="kw">span</span><span class="dt">&gt;</span> <span class="pp">|</span> **Rojo** — Riesgo / error <span class="pp">|</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>::: {#fig-mapa-fundamentos}</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Bloque 1 — Fundamentos</span><span class="ot">"</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>        P0[<span class="dv">00</span>&lt;br/&gt;Panorama historico&lt;br/&gt;representacion y generacion]:::input --&gt; A</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>        P0 --&gt; C</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>        A[<span class="bn">01</span>a&lt;br/&gt;Transformer&lt;br/&gt;+ atención + posicional]:::input --&gt; B[<span class="bn">01</span>b&lt;br/&gt;LLM e inferencia&lt;br/&gt;+ tokenización BPE]:::proc</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a>        A --&gt; C[<span class="bn">01</span>c&lt;br/&gt;Embeddings&lt;br/&gt;+ espacio geométrico]:::doc</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>        C --&gt; D[<span class="bn">01</span>d&lt;br/&gt;Bases de datos&lt;br/&gt;vectoriales]:::doc</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>        D --&gt; E2[<span class="bn">01</span>e&lt;br/&gt;De documentos a&lt;br/&gt;recuperación]:::obs</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>        E2 --&gt; F[<span class="ot">"</span><span class="st">HPD 1&lt;br/&gt;Pipeline de embeddings&lt;br/&gt;y búsqueda semántica</span><span class="ot">"</span>]:::out</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>    D --&gt; G[<span class="ot">"</span><span class="st">RAG avanzado&lt;br/&gt;(Bloque 3)</span><span class="ot">"</span>]:::out</span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    F --&gt; H[<span class="ot">"</span><span class="st">Proyecto&lt;br/&gt;integrador</span><span class="ot">"</span>]:::out</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>    classDef proc  fill:<span class="co">#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    classDef doc   fill:<span class="co">#FFD43B,stroke:#b8860b,color:#000,stroke-width:1.5px</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    classDef obs   fill:<span class="co">#e65100,stroke:#bf360c,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    classDef out   fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>Los cuatro pilares de este bloque (Transformer → LLM → Embeddings → Vector DB) actúan como soporte sobre el que se construye todo el módulo. El orden sigue una progresión natural basada en dependencias: comenzamos con la arquitectura Transformer (atención, codificación posicional, variantes), pasamos a los LLM y la inferencia (incluyendo una profundización en tokenización BPE), continuamos con la representación vectorial del lenguaje (embeddings y su geometría) y continuamos con las bases de datos vectoriales que permiten búsqueda semántica eficiente y terminamos con el paso que convierte todo lo anterior en un sistema que funciona: trocear documentos, combinar búsqueda léxica y semántica y medir la calidad de la recuperación (01e). Las páginas 01c, 01d y 01e comparten un mismo caso conductor, el buscador de preguntas frecuentes de un banco, para que puedas comparar técnicas sobre los mismos datos.</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>El <span class="co">[</span><span class="ot">panorama histórico</span><span class="co">](00-panorama.qmd)</span> añade una perspectiva distinta a esta secuencia técnica. Allí se sigue la línea one-hot → TF-IDF → word2vec/GloVe → representaciones contextuales → SBERT/E5 → RAG, mientras que las páginas técnicas explican en detalle la línea RNN/LSTM → Transformer → LLM → herramientas y agentes. Mantener ambas líneas evita presentar los embeddings como una consecuencia exclusiva de los LLM: los embeddings de palabras son anteriores al Transformer, pero los embeddings contextuales y de frases modernos aprovechan esta arquitectura.</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a><span class="fu">## Contenido del bloque {#sec-contenido-bloque}</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>La siguiente tabla muestra el itinerario que sigue este bloque en su exposición de objetivos, así como los ficheros interactivos asociados:</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>: Itinerario del Bloque 1 {#tbl-itinerario}</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Tema <span class="pp">|</span> Archivo <span class="pp">|</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Panorama histórico** — De one-hot y TF-IDF a embeddings contextuales, búsqueda semántica y RAG <span class="pp">|</span> <span class="co">[</span><span class="ot">00-panorama.qmd</span><span class="co">](00-panorama.qmd)</span> <span class="pp">|</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Transformers** — Pipeline intuitiva, atención, codificación posicional, variantes <span class="pp">|</span> <span class="co">[</span><span class="ot">01a-transformer.qmd</span><span class="co">](01a-transformer.qmd)</span> <span class="pp">|</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **LLM e inferencia** — Preentrenamiento, BPE paso a paso, parámetros, HF Hub, API Llamus <span class="pp">|</span> <span class="co">[</span><span class="ot">01b-llms.qmd</span><span class="co">](01b-llms.qmd)</span> <span class="pp">|</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Embeddings** — word2vec, representaciones contextuales, SBERT y espacio geométrico <span class="pp">|</span> <span class="co">[</span><span class="ot">01c-embeddings.qmd</span><span class="co">](01c-embeddings.qmd)</span> <span class="pp">|</span></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Bases de datos vectoriales** — Chroma, FAISS, HNSW, búsqueda semántica <span class="pp">|</span> <span class="co">[</span><span class="ot">01d-vectordb.qmd</span><span class="co">](01d-vectordb.qmd)</span> <span class="pp">|</span></span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **De documentos a recuperación** — Chunking, BM25, búsqueda híbrida (RRF), hit@k, recall@k y MRR <span class="pp">|</span> <span class="co">[</span><span class="ot">01e-recuperacion.qmd</span><span class="co">](01e-recuperacion.qmd)</span> <span class="pp">|</span></span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **HPD 1 — Pipeline de embeddings** <span class="pp">|</span> <span class="co">[</span><span class="ot">hpd1-embeddings.qmd</span><span class="co">](hpd1-embeddings.qmd)</span> <span class="pp">|</span></span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>**Teoría obligatoria.** Los temas 01a-01e son obligatorios. Cada página termina con una sección *Comprueba lo aprendido*: preguntas con la respuesta plegada para que te autoevalúes. Las secciones marcadas como *Nivel avanzado* son opcionales en una primera lectura. La lectura recomendada sobre cabezas de salida, SFT, PPO y DPO se ha movido al <span class="co">[</span><span class="ot">Bloque 3, como previo a fine-tuning</span><span class="co">](../bloque3/03c-previo-cabezas.qmd)</span>.</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q chromadb faiss<span class="op">-</span>cpu sentence<span class="op">-</span>transformers langchain<span class="op">-</span>text<span class="op">-</span>splitters</span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>, category<span class="op">=</span><span class="pp">DeprecationWarning</span>)</span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>warnings.filterwarnings(<span class="st">"ignore"</span>, category<span class="op">=</span><span class="pp">FutureWarning</span>)</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>plt.rcParams[<span class="st">"figure.dpi"</span>] <span class="op">=</span> <span class="dv">100</span></span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Librerías cargadas correctamente."</span>)</span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"NumPy: </span><span class="sc">{</span>np<span class="sc">.</span>__version__<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a><span class="fu">## Referencias del bloque {#sec-referencias}</span></span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@vaswani2017attention</span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@devlin2019bert</span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@kaplan2020scaling</span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@hoffmann2022chinchilla</span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@su2021roformer</span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@dao2022flashattention</span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@reimers2019sbert</span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@wang2022e5</span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@radford2021clip</span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@malkov2018hnsw</span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@johnson2019faiss</span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@sennrich2016bpe</span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@roitman2026hitchhiker</span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a><span class="fu">## Resumen del bloque {#sec-resumen-bloque}</span></span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a>::: {#fig-resumen-bloque-1}</span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Bloque 1</span><span class="ot">"</span></span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a>        P0[Panorama historico] --&gt; A[Transformer]</span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a>        P0 --&gt; C[Embeddings]</span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>        A[Transformer] --&gt;|Arquitectura base| B[LLM]</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a>        A --&gt;|Representación| C[Embeddings]</span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a>        B --&gt;|Tokens + parámetros| D[Inferencia]</span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a>        C --&gt;|Indexación| E[Vector DB]</span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a>        E --&gt;|Búsqueda| F[Búsqueda semántica]</span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a>    D --&gt; F</span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a>    F --&gt; G[HPD <span class="dv">1</span>: Pipeline de embeddings]</span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a>    G --&gt; H[Proyecto integrador]</span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a>Este primer bloque sienta las bases para el resto de bloques que componen el curso. Concretamente:</span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Bloque 2:** uso de LLM para construir agentes y prompts estructurados</span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Bloque 3:** uso de embeddings + vector DB para construir sistemas RAG (recuperación de información)</span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Bloque 4:** evaluación y despliegue de sistemas en producción</span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>Tras haber asimilado los conceptos de las secciones anteriores, puedes pasar al <span class="co">[</span><span class="ot">taller práctico: HPD 1 — Pipeline de embeddings y búsqueda semántica</span><span class="co">](hpd1-embeddings.qmd)</span>.</span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a><span class="fu">## Antes de continuar</span></span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>Asegúrate de tener un entorno Python 3.11+ con las dependencias de <span class="in">`requirements.txt`</span> instaladas</span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>Confirma que ejecutaste todas las celdas de código de los sub-temas sin errores</span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>Lee Vaswani et al. <span class="co">[</span><span class="ot">-@vaswani2017attention</span><span class="co">]</span> secciones 3-5 (lectura obligatoria)</span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a>---</span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

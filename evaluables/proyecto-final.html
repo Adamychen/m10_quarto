@@ -1,0 +1,1880 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Proyecto integrador final – Módulo 10 — IA Generativa para Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<meta name="mermaid-theme" content="neutral">
+<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../05-evaluacion.html">Evaluación</a></li><li class="breadcrumb-item"><a href="../evaluables/proyecto-final.html">Proyecto integrador final</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Módulo 10 — IA Generativa para Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inicio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acerca de</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 1 — Fundamentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01a-transformer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01b-llms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs e inferencia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01c-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01d-vectordb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bases de datos vectoriales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 2 — Orquestación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02-orquestacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02a-prompt-engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prompt Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02b-langchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LangChain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02c-llamaindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LlamaIndex</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02d-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02e-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentes Inteligentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 3 — Aplicaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03-aplicaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03b-rag-avanzado.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAG Avanzado</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03a-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tuning eficiente</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 4 — Gobernanza</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Demos interactivas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Evaluación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../06-herramientas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Herramientas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../07-bibliografia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliografía</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#sec-proyecto-descripcion" id="toc-sec-proyecto-descripcion" class="nav-link active" data-scroll-target="#sec-proyecto-descripcion">Descripción general</a>
+  <ul class="collapse">
+  <li><a href="#sec-idea-central" id="toc-sec-idea-central" class="nav-link" data-scroll-target="#sec-idea-central">La idea central</a></li>
+  <li><a href="#sec-cadena-workflow-agente" id="toc-sec-cadena-workflow-agente" class="nav-link" data-scroll-target="#sec-cadena-workflow-agente">¿Cadena, workflow o agente?</a></li>
+  <li><a href="#sec-componentes" id="toc-sec-componentes" class="nav-link" data-scroll-target="#sec-componentes">Componentes del sistema</a></li>
+  <li><a href="#sec-flujo-recomendado" id="toc-sec-flujo-recomendado" class="nav-link" data-scroll-target="#sec-flujo-recomendado">Flujo de trabajo recomendado</a></li>
+  </ul></li>
+  <li><a href="#sec-propuesta" id="toc-sec-propuesta" class="nav-link" data-scroll-target="#sec-propuesta">Fase 0 — Propuesta (<code>propuesta.md</code>)</a></li>
+  <li><a href="#sec-datos" id="toc-sec-datos" class="nav-link" data-scroll-target="#sec-datos">Dónde conseguir datos</a>
+  <ul class="collapse">
+  <li><a href="#ruta-1-dataset-real-abierto" id="toc-ruta-1-dataset-real-abierto" class="nav-link" data-scroll-target="#ruta-1-dataset-real-abierto">Ruta 1 — Dataset real abierto</a></li>
+  <li><a href="#ruta-2-datos-sintéticos-generados-por-ti" id="toc-ruta-2-datos-sintéticos-generados-por-ti" class="nav-link" data-scroll-target="#ruta-2-datos-sintéticos-generados-por-ti">Ruta 2 — Datos sintéticos generados por ti</a></li>
+  <li><a href="#ruta-3-tu-propio-corpus" id="toc-ruta-3-tu-propio-corpus" class="nav-link" data-scroll-target="#ruta-3-tu-propio-corpus">Ruta 3 — Tu propio corpus</a></li>
+  </ul></li>
+  <li><a href="#sec-problemas-ejemplo" id="toc-sec-problemas-ejemplo" class="nav-link" data-scroll-target="#sec-problemas-ejemplo">Problemas de ejemplo</a></li>
+  <li><a href="#sec-evaluacion" id="toc-sec-evaluacion" class="nav-link" data-scroll-target="#sec-evaluacion">Evaluación</a></li>
+  <li><a href="#sec-rubrica" id="toc-sec-rubrica" class="nav-link" data-scroll-target="#sec-rubrica">Rúbrica</a></li>
+  <li><a href="#sec-entregables" id="toc-sec-entregables" class="nav-link" data-scroll-target="#sec-entregables">Entregables</a></li>
+  <li><a href="#sec-criterios-exito" id="toc-sec-criterios-exito" class="nav-link" data-scroll-target="#sec-criterios-exito">Criterios de éxito</a></li>
+  <li><a href="#sec-formato-entrega" id="toc-sec-formato-entrega" class="nav-link" data-scroll-target="#sec-formato-entrega">Formato de entrega</a></li>
+  <li><a href="#sec-consejos" id="toc-sec-consejos" class="nav-link" data-scroll-target="#sec-consejos">Consejos finales</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="proyecto-final.ipynb" download="proyecto-final.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../05-evaluacion.html">Evaluación</a></li><li class="breadcrumb-item"><a href="../evaluables/proyecto-final.html">Proyecto integrador final</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Proyecto integrador final</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><a href="https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/evaluables/proyecto-final.ipynb"><img src="https://colab.research.google.com/assets/colab-badge.svg" class="img-fluid figure-img"></a></p>
+<figcaption>Open In Colab</figcaption>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p><strong>Peso:</strong> 60 % de la nota final.</p>
+<p><strong>Nota mínima:</strong> 5,0 / 10.</p>
+<p><strong>Prerrequisitos:</strong> tener completados y entregados todos los HPD 1-5.</p>
+<p><strong>Competencias:</strong> <a href="../index.html#sec-competencias-especificas">CE-1 a CE-6</a>.</p>
+<p><strong>Base teórica:</strong> <a href="../bloque2/02f-patrones-agentes.html">02f — Patrones de Diseño de Agentes</a>.</p>
+</blockquote>
+<div class="callout callout-style-default callout-warning no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Variables de corrección
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>El script de corrección leerá las siguientes variables del notebook:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Variable</th>
+<th>Valor</th>
+<th>Descripción</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>proy_problema</code></td>
+<td>Texto corto</td>
+<td>Problema que resuelve el proyecto</td>
+</tr>
+<tr class="even">
+<td><code>proy_patron</code></td>
+<td>Texto</td>
+<td>Patrón de orquestación elegido — cadena, workflow o agente (de la taxonomía de 02f o propuesta propia)</td>
+</tr>
+<tr class="odd">
+<td><code>proy_reporte</code></td>
+<td>Ruta al archivo de informe</td>
+<td>Informe de evaluación en Markdown/PDF</td>
+</tr>
+</tbody>
+</table>
+<p>Defínelas en la primera celda del notebook.</p>
+</div>
+</div>
+<div id="b7a2af3b" class="cell" data-execution_count="1">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>proy_problema <span class="op">=</span> <span class="st">"Describe tu problema en una frase"</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>proy_patron <span class="op">=</span> <span class="st">"planning"</span>  <span class="co"># ej. cadena, react, routing, prompt-chaining, parallelization, orchestrator-workers, evaluator-optimizer, planning, reflection, multi-agente, propio...</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>proy_reporte <span class="op">=</span> <span class="st">"informe_evaluacion.md"</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Problema: </span><span class="sc">{</span>proy_problema<span class="sc">}</span><span class="ss"> — Patrón: </span><span class="sc">{</span>proy_patron<span class="sc">}</span><span class="ss"> — Informe: </span><span class="sc">{</span>proy_reporte<span class="sc">}</span><span class="ss">"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Problema: Describe tu problema en una frase — Patrón: planning — Informe: informe_evaluacion.md</code></pre>
+</div>
+</div>
+<section id="sec-proyecto-descripcion" class="level2">
+<h2 class="anchored" data-anchor-id="sec-proyecto-descripcion">Descripción general</h2>
+<p>El proyecto integrador final es 100 % libre. Tú eliges el problema y el patrón de orquestación con el que resolverlo — una cadena, un workflow o un agente, o una variante propia —. El objetivo ya no es “construir un RAG con agente”, sino diseñar, implementar y evaluar un sistema de orquestación con LLM que resuelva un problema real de forma demostrablemente eficaz.</p>
+<p>Los HPD 1-5 ya garantizan que dominas las piezas técnicas (embeddings, agentes con tool calling, workflows con LangGraph, MCP, RAG evaluado con RAGAS). El proyecto es la prueba de que sabes integrarlas con criterio: elegir la arquitectura adecuada para un problema, justificarla y demostrar con evidencia que funciona mejor que una alternativa más simple.</p>
+<section id="sec-idea-central" class="level3">
+<h3 class="anchored" data-anchor-id="sec-idea-central">La idea central</h3>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Tu proyecto en tres preguntas
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li><strong>¿Qué problema resuelvo?</strong> (y cómo se mide que está resuelto)</li>
+<li><strong>¿Qué patrón de orquestación elijo?</strong> (cadena, workflow o agente — y por qué, con la guía de selección de 02f)</li>
+<li><strong>¿Cómo demuestro que mi patrón aporta valor?</strong> (comparándolo con un baseline más simple)</li>
+</ol>
+</div>
+</div>
+<p>Elige un patrón de la taxonomía de <a href="../bloque2/02f-patrones-agentes.html#sec-guia-seleccion">02f — Patrones de Diseño de Agentes</a> — prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer, ReAct, planning, reflection, multi-agente, human-in-the-loop… — o propón una idea propia: una variante de un patrón conocido o un patrón nuevo que se te ocurra. Las propuestas originales tienen recompensa explícita en la rúbrica. Si tu problema no justifica más, una cadena simple también es un proyecto válido — ver <a href="#sec-cadena-workflow-agente">¿Cadena, workflow o agente?</a>.</p>
+</section>
+<section id="sec-cadena-workflow-agente" class="level3">
+<h3 class="anchored" data-anchor-id="sec-cadena-workflow-agente">¿Cadena, workflow o agente?</h3>
+<p>Tu sistema puede estar en cualquiera de los tres niveles de orquestación que presenta <a href="../bloque2/02f-patrones-agentes.html#sec-workflows-vs-agentes">02f — Workflows frente a Agentes</a>:</p>
+<ul>
+<li><strong>Cadena simple</strong>: 1-2 llamadas al LLM encadenadas en código, sin ramas ni herramientas.</li>
+<li><strong>Workflow</strong>: pasos y ramas fijas definidas por el sistema (prompt chaining, routing, parallelization, evaluator-optimizer…).</li>
+<li><strong>Agente</strong>: el LLM decide en tiempo real qué hacer y con qué herramienta (ReAct, planning, reflection…).</li>
+</ul>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Una cadena simple bien justificada es un proyecto válido
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>El objetivo no es “usar un agente”, sino elegir el nivel de complejidad que tu problema necesita y demostrar que funciona. Un prompt chaining o un routing bien ejecutados, con métricas y comparativa contra baseline, puntúa igual que un agente. El error típico es sobrediseñar: un agente donde bastaba una cadena es más caro, menos fiable y más difícil de evaluar.</p>
+</div>
+</div>
+<div id="tbl-cadena-workflow-agente" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-cadena-workflow-agente-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Cómo elegir entre los tres niveles
+</figcaption>
+<div aria-describedby="tbl-cadena-workflow-agente-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Criterio</th>
+<th>Cadena simple</th>
+<th>Workflow</th>
+<th>Agente</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Quién controla el flujo</strong></td>
+<td>El código, orden fijo</td>
+<td>El código, pasos y ramas fijas</td>
+<td>El LLM, bucle dinámico</td>
+</tr>
+<tr class="even">
+<td><strong>Coste (llamadas LLM)</strong></td>
+<td>1-2</td>
+<td>2-10, predecible</td>
+<td>3-25+, variable</td>
+</tr>
+<tr class="odd">
+<td><strong>Predictibilidad y depuración</strong></td>
+<td>Muy altas</td>
+<td>Altas (pasos inspeccionables)</td>
+<td>Bajas (trayectorias no reproducibles)</td>
+</tr>
+<tr class="even">
+<td><strong>Facilidad de evaluación</strong></td>
+<td>Muy alta</td>
+<td>Alta</td>
+<td>Baja</td>
+</tr>
+<tr class="odd">
+<td><strong>Riesgo de fallo</strong></td>
+<td>Muy bajo</td>
+<td>Bajo</td>
+<td>Medio-alto (bucles, tools que fallan)</td>
+</tr>
+<tr class="even">
+<td><strong>Cuándo elegirlo</strong></td>
+<td>Tarea de 1-2 pasos</td>
+<td>Estructura de la tarea conocida</td>
+<td>Estructura desconocida, decisión en tiempo real</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p><strong>Guía rápida:</strong></p>
+<ul>
+<li>¿Tu problema es de 1-2 pasos con flujo fijo? → <strong>cadena simple</strong>.</li>
+<li>¿Conoces la estructura pero hay varios pasos, ramas o validaciones? → <strong>workflow</strong> (prompt chaining, routing, parallelization, evaluator-optimizer).</li>
+<li>¿El LLM debe decidir qué herramienta usar y cuándo parar? → <strong>agente</strong> (ReAct, planning, reflection).</li>
+</ul>
+<p>La rúbrica premia la justificación: un workflow bien argumentado y comparado con su baseline puntúa igual que un agente; la diferencia está en la evidencia, no en la complejidad.</p>
+</section>
+<section id="sec-componentes" class="level3">
+<h3 class="anchored" data-anchor-id="sec-componentes">Componentes del sistema</h3>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Componente</th>
+<th>Requisito</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Propuesta</strong></td>
+<td><code>propuesta.md</code>: problema, usuarios, criterios de éxito medibles, patrón candidato, ruta de datos</td>
+</tr>
+<tr class="even">
+<td><strong>Patrón de orquestación</strong></td>
+<td>1 patrón de la taxonomía de 02f (cadena, workflow o agente — o propuesta propia) + justificación con la guía de selección + diagrama de arquitectura</td>
+</tr>
+<tr class="odd">
+<td><strong>Sistema funcional</strong></td>
+<td>≥2 herramientas, workers o recursos que el problema requiera (búsqueda semántica, consultas SQL, ejecución Python, APIs, código…)</td>
+</tr>
+<tr class="even">
+<td><strong>RAG</strong></td>
+<td>Solo si tu problema lo requiere (respuestas fundamentadas en un corpus de conocimiento). Si lo usas: pipeline de embeddings + al menos una mejora avanzada</td>
+</tr>
+<tr class="odd">
+<td><strong>Evaluación</strong></td>
+<td>Métricas específicas de tu tarea + comparativa contra baseline (cadena simple o ReAct genérico) + RAGAS si usas RAG</td>
+</tr>
+<tr class="even">
+<td><strong>Gobernanza</strong></td>
+<td>Análisis de riesgos: alucinación, sesgo, privacidad, human-in-the-loop si aplica</td>
+</tr>
+<tr class="odd">
+<td><strong>Informe final</strong></td>
+<td>Documentación técnica, arquitectura, decisiones de diseño, métricas, riesgos e iteraciones</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="sec-flujo-recomendado" class="level3">
+<h3 class="anchored" data-anchor-id="sec-flujo-recomendado">Flujo de trabajo recomendado</h3>
+<div id="fig-flujo-proyecto" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-flujo-proyecto-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">graph LR
+    classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef proc fill:#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
+    classDef doc fill:#FFD43B,stroke:#b8960f,color:#000,stroke-width:1.5px
+    classDef tool fill:#e65100,stroke:#7a2b00,color:#fff,stroke-width:1.5px
+    classDef out fill:#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px
+
+    PROB[Problema real&lt;br/&gt;tuyo]:::input
+    PROP[Propuesta&lt;br/&gt;propuesta.md]:::doc
+    DATOS[Datos&lt;br/&gt;o recursos]:::input
+    PATRON[Patrón elegido&lt;br/&gt;de la taxonomía]:::proc
+    SIST[Sistema funcional&lt;br/&gt;cadena / workflow / agente]:::proc
+    BASELINE[Baseline&lt;br/&gt;cadena simple]:::tool
+    EVAL[Evaluación&lt;br/&gt;métricas + comparativa]:::tool
+    RISK[Análisis de riesgos]:::tool
+    REPORT[Informe final]:::out
+
+    PROB --&gt; PROP --&gt; DATOS
+    PROP --&gt; PATRON
+    DATOS --&gt; SIST
+    PATRON --&gt; SIST
+    SIST --&gt; EVAL
+    BASELINE --&gt; EVAL
+    EVAL --&gt; RISK
+    RISK --&gt; REPORT
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig quarto-uncaptioned" id="fig-flujo-proyecto-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1
+</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<section id="sec-propuesta" class="level2">
+<h2 class="anchored" data-anchor-id="sec-propuesta">Fase 0 — Propuesta (<code>propuesta.md</code>)</h2>
+<p>Antes de escribir código, entrega una propuesta de una página que responda:</p>
+<ol type="1">
+<li><strong>El problema</strong>: ¿qué problema real quieres resolver y para quién? Una frase clara + contexto.</li>
+<li><strong>Criterios de éxito medibles</strong>: ¿cómo sabrás que el sistema lo resuelve? (p.&nbsp;ej. “responde correctamente ≥ 80 % de 50 preguntas de test”, “reduce a 3 llamadas de media el análisis de un informe”).</li>
+<li><strong>Patrón candidato</strong>: ¿qué patrón de la taxonomía piensas usar y por qué? (puede cambiar luego, pero conviene decidirlo pronto).</li>
+<li><strong>Ruta de datos</strong>: ¿de dónde salen los datos o recursos? (ver <a href="#sec-datos">Dónde conseguir datos</a>).</li>
+</ol>
+<p>Esta propuesta se corrige junto al proyecto final y vale dentro de la dimensión “Propuesta y datos” de la rúbrica.</p>
+</section>
+<section id="sec-datos" class="level2">
+<h2 class="anchored" data-anchor-id="sec-datos">Dónde conseguir datos</h2>
+<p>Los datos son un medio, no el objetivo: solo los necesitas si tu problema requiere conocimiento externo (grounding). Si tu problema no es de conocimiento —un planificador de tareas, un evaluador-optimizer de redacción, un orquestador de workers sobre un repositorio de código, un agente de análisis con pandas— los “datos” son simplemente los recursos que tu problema necesite: código, tablas, APIs, documentos propios.</p>
+<p>Para problemas de conocimiento, tienes tres rutas oficiales:</p>
+<section id="ruta-1-dataset-real-abierto" class="level3">
+<h3 class="anchored" data-anchor-id="ruta-1-dataset-real-abierto">Ruta 1 — Dataset real abierto</h3>
+<p>Catálogo de fuentes con licencia segura:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Fuente</th>
+<th>Qué encontrarás</th>
+<th>Nota</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><a href="https://www.kaggle.com/datasets">Kaggle Datasets</a></td>
+<td>Datasets de casi cualquier dominio</td>
+<td>Comprueba la licencia de cada dataset</td>
+</tr>
+<tr class="even">
+<td><a href="https://huggingface.co/datasets">Hugging Face Datasets</a></td>
+<td>Corpus de texto, pares Q&amp;A, datasets de instrucción</td>
+<td>Ideal para RAG y evaluación</td>
+</tr>
+<tr class="odd">
+<td><a href="https://archive.ics.uci.edu">UCI ML Repository</a></td>
+<td>Datasets clásicos de ML tabular</td>
+<td>Bien documentados</td>
+</tr>
+<tr class="even">
+<td><a href="https://datasetsearch.research.google.com">Google Dataset Search</a></td>
+<td>Buscador transversal de datasets abiertos</td>
+<td>Filtra por licencia</td>
+</tr>
+<tr class="odd">
+<td><a href="https://datos.gob.es">datos.gob.es</a> / <a href="https://data.europa.eu">data.europa.eu</a></td>
+<td>Datos abiertos de administraciones españolas y europeas</td>
+<td>Mucho material tabular y documental</td>
+</tr>
+<tr class="even">
+<td><a href="https://pubmed.ncbi.nlm.nih.gov">PubMed</a> (API con <code>biopython</code>/<code>pymed</code>)</td>
+<td>Abstracts biomédicos</td>
+<td>Fuente alternativa de texto científico</td>
+</tr>
+<tr class="odd">
+<td><a href="https://www.sec.gov/edgar">SEC EDGAR</a></td>
+<td>Informes financieros de empresas públicas</td>
+<td>Formato HTML/TXT</td>
+</tr>
+<tr class="even">
+<td>Yahoo Finance (<code>yfinance</code>) / Alpha Vantage</td>
+<td>Cotizaciones y datos de mercado</td>
+<td>API con límites gratuitos</td>
+</tr>
+<tr class="odd">
+<td><a href="https://github.com/awesomedata/awesome-public-datasets">Awesome Public Datasets</a></td>
+<td>Índice curado de datasets abiertos</td>
+<td>Muy amplio</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p>⚠️ <strong>Licencias</strong>: documenta en tu informe la licencia del dataset que uses. Los datasets personales o empresariales con PII están fuera de alcance — ver <a href="../bloque4/04c-privacidad.html">Bloque 4 — Privacidad</a>.</p>
+</blockquote>
+</section>
+<section id="ruta-2-datos-sintéticos-generados-por-ti" class="level3">
+<h3 class="anchored" data-anchor-id="ruta-2-datos-sintéticos-generados-por-ti">Ruta 2 — Datos sintéticos generados por ti</h3>
+<p>Es la ruta recomendada para problemas de conocimiento sin datos disponibles. El módulo ya te da las herramientas:</p>
+<ul>
+<li><strong>Texto y tablas realistas</strong>: prompting del LLM con JSON Schema (<a href="../bloque2/02a-prompt-engineering.html#sec-json-schema-datos-sint">02a</a>) o <code>faker</code> + <code>numpy</code> + <code>pandas</code>.</li>
+<li><strong>Tabular con fidelidad estadística</strong>: SDV (CTGAN/TVAE), con presupuesto de privacidad diferencial ε (<a href="../bloque3/03a-datos-sinteticos.html">03a</a>).</li>
+<li><strong>Historiales clínicos</strong>: <a href="https://synthetichealth.github.io/synthea/">Synthea</a>.</li>
+</ul>
+<p>El pipeline de generación sintética es parte del proyecto: documenta cómo lo construiste, cómo validaste su calidad y por qué lo elegiste frente a datos reales.</p>
+</section>
+<section id="ruta-3-tu-propio-corpus" class="level3">
+<h3 class="anchored" data-anchor-id="ruta-3-tu-propio-corpus">Ruta 3 — Tu propio corpus</h3>
+<p>Si tu problema gira en torno a documentos reales que ya tienes o puedes producir (manuales, normativas, informes de tu organización, artículos de tu dominio), úsalos. Un corpus propio con ≥50 documentos o ≥10 000 filas tabulares es perfectamente válido.</p>
+</section>
+</section>
+<section id="sec-problemas-ejemplo" class="level2">
+<h2 class="anchored" data-anchor-id="sec-problemas-ejemplo">Problemas de ejemplo</h2>
+<p>Si no tienes un problema propio, inspírate en uno de estos (el patrón es solo una sugerencia — la elección final es tuya):</p>
+<div id="tbl-problemas-ejemplo" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-problemas-ejemplo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Problemas de ejemplo con patrón y datos sugeridos
+</figcaption>
+<div aria-describedby="tbl-problemas-ejemplo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+<col style="width: 25%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>#</th>
+<th>Problema</th>
+<th>Patrón que encaja</th>
+<th>Fuentes sugeridas</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>1</td>
+<td>Asistente para el análisis de cuentas anuales de una PYME</td>
+<td>Routing (factual vs.&nbsp;analítico)</td>
+<td>Ruta 2 (sintético) o SEC EDGAR</td>
+</tr>
+<tr class="even">
+<td>2</td>
+<td>Triaje automático de tickets de soporte con respuesta sugerida</td>
+<td>Routing + prompt chaining</td>
+<td>Ruta 2 (faker) o Kaggle support tickets</td>
+</tr>
+<tr class="odd">
+<td>3</td>
+<td>Comparador de artículos científicos de un tema</td>
+<td>Orchestrator-workers</td>
+<td>PubMed / arXiv abstracts</td>
+</tr>
+<tr class="even">
+<td>4</td>
+<td>Mentor personal de hábitos que aprende de tus errores</td>
+<td>Reflection / Reflexion</td>
+<td>Ruta 3 (tu propio diario)</td>
+</tr>
+<tr class="odd">
+<td>5</td>
+<td>Analizador de reviews para detectar insights de producto</td>
+<td>ReAct + herramientas</td>
+<td>Amazon Reviews / Kaggle</td>
+</tr>
+<tr class="even">
+<td>6</td>
+<td>Planificador de viajes multi-ciudad con restricciones</td>
+<td>Planning (plan-and-execute)</td>
+<td>Ruta 2 (sintético)</td>
+</tr>
+<tr class="odd">
+<td>7</td>
+<td>Generador de informes de ventas con control de calidad editorial</td>
+<td>Evaluator-optimizer</td>
+<td>Ruta 2 (pandas + SDV)</td>
+</tr>
+<tr class="even">
+<td>8</td>
+<td>Auditor de código con revisiones paralelas por aspecto</td>
+<td>Parallelization (fan-out)</td>
+<td>Ruta 3 (repositorio propio)</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+</section>
+<section id="sec-evaluacion" class="level2">
+<h2 class="anchored" data-anchor-id="sec-evaluacion">Evaluación</h2>
+<p>Tu informe debe demostrar, en este orden:</p>
+<ol type="1">
+<li><strong>Métricas de la tarea</strong>: las que definiste en la propuesta como criterios de éxito (precisión sobre un test, tasa de éxito de la tarea, nº de pasos, coste en llamadas…).</li>
+<li><strong>Comparativa contra baseline</strong>: ejecuta el mismo problema con una cadena simple (LLM directo) y, si procede, con ReAct genérico (<code>create_agent</code> de 02e). Compara y explica <em>por qué</em> tu patrón gana o pierde: ¿menos llamadas? ¿más aciertos? ¿mejor manejo de errores?</li>
+<li><strong>RAGAS (solo si usas RAG)</strong>: faithfulness, answer relevancy, context precision — objetivo compuesto &gt; 0,65, con desglose por tipo de pregunta. Ya lo dominas de <a href="../evaluables/hpd5-entregable.html">HPD 5</a>.</li>
+<li><strong>Iteración documentada</strong>: al menos una iteración mostrando cómo un cambio (chunk size, prompt, top-k, temperatura, criterio del evaluador…) mejoró una métrica.</li>
+</ol>
+</section>
+<section id="sec-rubrica" class="level2">
+<h2 class="anchored" data-anchor-id="sec-rubrica">Rúbrica</h2>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+<col style="width: 16%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Dimensión</th>
+<th>Peso</th>
+<th>Insuficiente (&lt; 5)</th>
+<th>Suficiente (5-6,9)</th>
+<th>Notable (7-8,9)</th>
+<th>Sobresaliente (9-10)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>Propuesta y datos</strong></td>
+<td>15 %</td>
+<td>Sin propuesta o sin criterios de éxito</td>
+<td>Propuesta con problema y criterios básicos; datos o recursos mínimos</td>
+<td>Propuesta clara con criterios medibles; ruta de datos justificada</td>
+<td>Propuesta con criterios medibles, riesgos anticipados y generación de datos (si aplica), todo ello documentado y validado</td>
+</tr>
+<tr class="even">
+<td><strong>Patrón</strong></td>
+<td>20 %</td>
+<td>Patrón inexistente o aplicado sin criterio</td>
+<td>Patrón de la taxonomía aplicado correctamente</td>
+<td>Patrón justificado con la guía de selección de 02f y comparado con alternativas</td>
+<td>Justificación rigurosa + variante propia del patrón o propuesta de patrón nuevo con defensa de su valor</td>
+</tr>
+<tr class="odd">
+<td><strong>Solución del problema</strong></td>
+<td>25 %</td>
+<td>El sistema no resuelve el problema o falla en el flujo principal</td>
+<td>Sistema funcional que resuelve el caso principal</td>
+<td>Sistema robusto con manejo de errores, ≥2 herramientas y pipeline reproducible</td>
+<td>Sistema modular, eficiente (coste/latencia considerados) y con decisiones de diseño documentadas</td>
+</tr>
+<tr class="even">
+<td><strong>Evaluación</strong></td>
+<td>15 %</td>
+<td>Sin evaluación cuantitativa</td>
+<td>Métricas de tarea reportadas</td>
+<td>Métricas + comparativa contra baseline con análisis</td>
+<td>Comparativa rigurosa contra baseline y alternativa (p.&nbsp;ej. ReAct vs.&nbsp;patrón elegido), con iteración documentada</td>
+</tr>
+<tr class="odd">
+<td><strong>Gobernanza y ética</strong></td>
+<td>10 %</td>
+<td>No se abordan riesgos</td>
+<td>Se identifica un riesgo</td>
+<td>Riesgo identificado y mitigación propuesta</td>
+<td>Análisis de múltiples riesgos (alucinación, sesgo, privacidad, HITL) con ejemplos concretos</td>
+</tr>
+<tr class="even">
+<td><strong>Documentación</strong></td>
+<td>15 %</td>
+<td>Código sin comentarios, sin README</td>
+<td>README básico y código legible</td>
+<td>Docstrings, diagrama de arquitectura, decisiones de diseño</td>
+<td>Documentación completa: arquitectura, decisiones, informe de evaluación autocontenido y guía de reproducción</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p><strong>Bonus — Idea novedosa</strong> (hasta 1 punto adicional sobre la nota final): proponer una variante propia de un patrón, un patrón nuevo, o una combinación original de patrones, defendida con experimentos que demuestren su valor frente a las alternativas canónicas.</p>
+</blockquote>
+</section>
+<section id="sec-entregables" class="level2">
+<h2 class="anchored" data-anchor-id="sec-entregables">Entregables</h2>
+<ol type="1">
+<li><strong><code>propuesta.md</code></strong> — propuesta de una página (Fase 0).</li>
+<li><strong><code>proyecto_final.ipynb</code></strong> — notebook con el sistema completo, celdas numeradas y las variables de corrección en la primera celda.</li>
+<li><strong>Datos o recursos</strong> — datasets, corpus o scripts de generación (reales o sintéticos, con licencia documentada).</li>
+<li><strong><code>informe_evaluacion.md</code></strong> — métricas, comparativa contra baseline, análisis de riesgos e iteración documentada.</li>
+<li><strong><code>README.md</code></strong> — instrucciones de reproducción, requisitos, arquitectura y ejemplos de uso.</li>
+</ol>
+</section>
+<section id="sec-criterios-exito" class="level2">
+<h2 class="anchored" data-anchor-id="sec-criterios-exito">Criterios de éxito</h2>
+<ul>
+<li>El problema está definido con criterios de éxito medibles y el sistema los alcanza.</li>
+<li>El patrón elegido está justificado con la guía de selección de 02f y su valor se demuestra contra un baseline.</li>
+<li>Si usa RAG: métricas RAGAS &gt; 0,5, faithfulness &gt; 0,7 y mejora sobre baseline.</li>
+<li>El análisis de riesgos identifica al menos un caso real de alucinación o sesgo con su mitigación.</li>
+<li>El README permite reproducir el pipeline en menos de 15 minutos.</li>
+</ul>
+</section>
+<section id="sec-formato-entrega" class="level2">
+<h2 class="anchored" data-anchor-id="sec-formato-entrega">Formato de entrega</h2>
+<ol type="1">
+<li><strong>Repositorio GitHub público</strong> (recomendado) o archivo ZIP con todos los ficheros.</li>
+<li>El repositorio debe incluir: <code>propuesta.md</code>, <code>proyecto_final.ipynb</code>, <code>informe_evaluacion.md</code>, <code>README.md</code>, <code>datos/</code> (o script de generación) y <code>requirements.txt</code>.</li>
+<li>El notebook debe definir <code>proy_problema</code>, <code>proy_patron</code> y <code>proy_reporte</code> en la primera celda.</li>
+</ol>
+<p><strong>Fecha límite:</strong> consultar el calendario del módulo en la plataforma.</p>
+</section>
+<section id="sec-consejos" class="level2">
+<h2 class="anchored" data-anchor-id="sec-consejos">Consejos finales</h2>
+<ul>
+<li><strong>Empieza por la propuesta</strong>: define problema y criterios de éxito antes de escribir código. Si no puedes medir “resolverlo”, no puedes evaluarlo.</li>
+<li><strong>Elige el nivel más simple que funcione</strong>: el principio nº 1 de diseño de 02f es mantenerlo simple. Una cadena o un routing bien justificados puntúan más que un multi-agente injustificado.</li>
+<li><strong>Itera</strong>: construye primero el baseline, luego tu patrón, y compara. Cada mejora debe estar documentada con su impacto en métricas.</li>
+<li><strong>Sé crítico con tu sistema</strong>: el análisis de riesgos es tan importante como las métricas.</li>
+<li><strong>Cita tus fuentes</strong>: datasets, modelos, papers y patrones usados — en tu informe y en las referencias del proyecto.</li>
+</ul>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<footer class="footer-custom">
+  <div class="footer-logos">
+    <img src="../images/logo_cfp.png" alt="Formación Permanente · Universidad de Sevilla">
+  </div>
+  <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
+</footer>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Proyecto integrador final"</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> jupyter</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">[</span><span class="al">![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)</span><span class="co">](https://colab.research.google.com/github/Adamychen/m10_quarto/blob/main/notebooks/evaluables/proyecto-final.ipynb)</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Peso:** 60 % de la nota final.</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Nota mínima:** 5,0 / 10.</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Prerrequisitos:** tener completados y entregados todos los HPD 1-5.</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Competencias:** </span><span class="co">[</span><span class="ot">CE-1 a CE-6</span><span class="co">](../index.qmd#sec-competencias-especificas)</span><span class="at">.</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="at">&gt;</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Base teórica:** </span><span class="co">[</span><span class="ot">02f — Patrones de Diseño de Agentes</span><span class="co">](../bloque2/02f-patrones-agentes.qmd)</span><span class="at">.</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning icon=false}</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="fu">## Variables de corrección</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>El script de corrección leerá las siguientes variables del notebook:</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Variable <span class="pp">|</span> Valor <span class="pp">|</span> Descripción <span class="pp">|</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`proy_problema`</span> <span class="pp">|</span> Texto corto <span class="pp">|</span> Problema que resuelve el proyecto <span class="pp">|</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`proy_patron`</span> <span class="pp">|</span> Texto <span class="pp">|</span> Patrón de orquestación elegido — cadena, workflow o agente (de la taxonomía de 02f o propuesta propia) <span class="pp">|</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="in">`proy_reporte`</span> <span class="pp">|</span> Ruta al archivo de informe <span class="pp">|</span> Informe de evaluación en Markdown/PDF <span class="pp">|</span></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>Defínelas en la primera celda del notebook.</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: true</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>proy_problema <span class="op">=</span> <span class="st">"Describe tu problema en una frase"</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>proy_patron <span class="op">=</span> <span class="st">"planning"</span>  <span class="co"># ej. cadena, react, routing, prompt-chaining, parallelization, orchestrator-workers, evaluator-optimizer, planning, reflection, multi-agente, propio...</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>proy_reporte <span class="op">=</span> <span class="st">"informe_evaluacion.md"</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Problema: </span><span class="sc">{</span>proy_problema<span class="sc">}</span><span class="ss"> — Patrón: </span><span class="sc">{</span>proy_patron<span class="sc">}</span><span class="ss"> — Informe: </span><span class="sc">{</span>proy_reporte<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="fu">## Descripción general {#sec-proyecto-descripcion}</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>El proyecto integrador final es 100 % libre. Tú eliges el problema y el patrón de orquestación con el que resolverlo — una cadena, un workflow o un agente, o una variante propia —. El objetivo ya no es "construir un RAG con agente", sino diseñar, implementar y evaluar un sistema de orquestación con LLM que resuelva un problema real de forma demostrablemente eficaz.</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>Los HPD 1-5 ya garantizan que dominas las piezas técnicas (embeddings, agentes con tool calling, workflows con LangGraph, MCP, RAG evaluado con RAGAS). El proyecto es la prueba de que sabes integrarlas con criterio: elegir la arquitectura adecuada para un problema, justificarla y demostrar con evidencia que funciona mejor que una alternativa más simple.</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a><span class="fu">### La idea central {#sec-idea-central}</span></span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a><span class="fu">## Tu proyecto en tres preguntas</span></span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**¿Qué problema resuelvo?** (y cómo se mide que está resuelto)</span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**¿Qué patrón de orquestación elijo?** (cadena, workflow o agente — y por qué, con la guía de selección de 02f)</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**¿Cómo demuestro que mi patrón aporta valor?** (comparándolo con un baseline más simple)</span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>Elige un patrón de la taxonomía de <span class="co">[</span><span class="ot">02f — Patrones de Diseño de Agentes</span><span class="co">](../bloque2/02f-patrones-agentes.qmd#sec-guia-seleccion)</span> — prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer, ReAct, planning, reflection, multi-agente, human-in-the-loop... — o propón una idea propia: una variante de un patrón conocido o un patrón nuevo que se te ocurra. Las propuestas originales tienen recompensa explícita en la rúbrica. Si tu problema no justifica más, una cadena simple también es un proyecto válido — ver <span class="co">[</span><span class="ot">¿Cadena, workflow o agente?</span><span class="co">](#sec-cadena-workflow-agente)</span>.</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a><span class="fu">### ¿Cadena, workflow o agente? {#sec-cadena-workflow-agente}</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>Tu sistema puede estar en cualquiera de los tres niveles de orquestación que presenta <span class="co">[</span><span class="ot">02f — Workflows frente a Agentes</span><span class="co">](../bloque2/02f-patrones-agentes.qmd#sec-workflows-vs-agentes)</span>:</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Cadena simple**: 1-2 llamadas al LLM encadenadas en código, sin ramas ni herramientas.</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Workflow**: pasos y ramas fijas definidas por el sistema (prompt chaining, routing, parallelization, evaluator-optimizer...).</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Agente**: el LLM decide en tiempo real qué hacer y con qué herramienta (ReAct, planning, reflection...).</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>::: {.callout-important}</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a><span class="fu">## Una cadena simple bien justificada es un proyecto válido</span></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>El objetivo no es "usar un agente", sino elegir el nivel de complejidad que tu problema necesita y demostrar que funciona. Un prompt chaining o un routing bien ejecutados, con métricas y comparativa contra baseline, puntúa igual que un agente. El error típico es sobrediseñar: un agente donde bastaba una cadena es más caro, menos fiable y más difícil de evaluar.</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>: Cómo elegir entre los tres niveles {#tbl-cadena-workflow-agente}</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Criterio <span class="pp">|</span> Cadena simple <span class="pp">|</span> Workflow <span class="pp">|</span> Agente <span class="pp">|</span></span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Quién controla el flujo** <span class="pp">|</span> El código, orden fijo <span class="pp">|</span> El código, pasos y ramas fijas <span class="pp">|</span> El LLM, bucle dinámico <span class="pp">|</span></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Coste (llamadas LLM)** <span class="pp">|</span> 1-2 <span class="pp">|</span> 2-10, predecible <span class="pp">|</span> 3-25+, variable <span class="pp">|</span></span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Predictibilidad y depuración** <span class="pp">|</span> Muy altas <span class="pp">|</span> Altas (pasos inspeccionables) <span class="pp">|</span> Bajas (trayectorias no reproducibles) <span class="pp">|</span></span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Facilidad de evaluación** <span class="pp">|</span> Muy alta <span class="pp">|</span> Alta <span class="pp">|</span> Baja <span class="pp">|</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Riesgo de fallo** <span class="pp">|</span> Muy bajo <span class="pp">|</span> Bajo <span class="pp">|</span> Medio-alto (bucles, tools que fallan) <span class="pp">|</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Cuándo elegirlo** <span class="pp">|</span> Tarea de 1-2 pasos <span class="pp">|</span> Estructura de la tarea conocida <span class="pp">|</span> Estructura desconocida, decisión en tiempo real <span class="pp">|</span></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>**Guía rápida:**</span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>¿Tu problema es de 1-2 pasos con flujo fijo? → **cadena simple**.</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>¿Conoces la estructura pero hay varios pasos, ramas o validaciones? → **workflow** (prompt chaining, routing, parallelization, evaluator-optimizer).</span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>¿El LLM debe decidir qué herramienta usar y cuándo parar? → **agente** (ReAct, planning, reflection).</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a>La rúbrica premia la justificación: un workflow bien argumentado y comparado con su baseline puntúa igual que un agente; la diferencia está en la evidencia, no en la complejidad.</span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a><span class="fu">### Componentes del sistema {#sec-componentes}</span></span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Componente <span class="pp">|</span> Requisito <span class="pp">|</span></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Propuesta** <span class="pp">|</span> <span class="in">`propuesta.md`</span>: problema, usuarios, criterios de éxito medibles, patrón candidato, ruta de datos <span class="pp">|</span></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Patrón de orquestación** <span class="pp">|</span> 1 patrón de la taxonomía de 02f (cadena, workflow o agente — o propuesta propia) + justificación con la guía de selección + diagrama de arquitectura <span class="pp">|</span></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Sistema funcional** <span class="pp">|</span> ≥2 herramientas, workers o recursos que el problema requiera (búsqueda semántica, consultas SQL, ejecución Python, APIs, código...) <span class="pp">|</span></span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **RAG** <span class="pp">|</span> Solo si tu problema lo requiere (respuestas fundamentadas en un corpus de conocimiento). Si lo usas: pipeline de embeddings + al menos una mejora avanzada <span class="pp">|</span></span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Evaluación** <span class="pp">|</span> Métricas específicas de tu tarea + comparativa contra baseline (cadena simple o ReAct genérico) + RAGAS si usas RAG <span class="pp">|</span></span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Gobernanza** <span class="pp">|</span> Análisis de riesgos: alucinación, sesgo, privacidad, human-in-the-loop si aplica <span class="pp">|</span></span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Informe final** <span class="pp">|</span> Documentación técnica, arquitectura, decisiones de diseño, métricas, riesgos e iteraciones <span class="pp">|</span></span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a><span class="fu">### Flujo de trabajo recomendado {#sec-flujo-recomendado}</span></span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>::: {#fig-flujo-proyecto}</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a>graph LR</span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a>    classDef doc fill:<span class="co">#FFD43B,stroke:#b8960f,color:#000,stroke-width:1.5px</span></span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>    classDef tool fill:<span class="co">#e65100,stroke:#7a2b00,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>    PROB[Problema real&lt;br/&gt;tuyo]:::input</span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>    PROP[Propuesta&lt;br/&gt;propuesta.md]:::doc</span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>    DATOS[Datos&lt;br/&gt;o recursos]:::input</span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a>    PATRON[Patrón elegido&lt;br/&gt;de la taxonomía]:::proc</span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a>    SIST[Sistema funcional&lt;br/&gt;cadena / workflow / agente]:::proc</span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>    BASELINE[Baseline&lt;br/&gt;cadena simple]:::tool</span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a>    EVAL[Evaluación&lt;br/&gt;métricas + comparativa]:::tool</span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>    RISK[Análisis de riesgos]:::tool</span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a>    REPORT[Informe final]:::out</span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a>    PROB --&gt; PROP --&gt; DATOS</span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>    PROP --&gt; PATRON</span>
+<span id="cb3-132"><a href="#cb3-132" aria-hidden="true" tabindex="-1"></a>    DATOS --&gt; SIST</span>
+<span id="cb3-133"><a href="#cb3-133" aria-hidden="true" tabindex="-1"></a>    PATRON --&gt; SIST</span>
+<span id="cb3-134"><a href="#cb3-134" aria-hidden="true" tabindex="-1"></a>    SIST --&gt; EVAL</span>
+<span id="cb3-135"><a href="#cb3-135" aria-hidden="true" tabindex="-1"></a>    BASELINE --&gt; EVAL</span>
+<span id="cb3-136"><a href="#cb3-136" aria-hidden="true" tabindex="-1"></a>    EVAL --&gt; RISK</span>
+<span id="cb3-137"><a href="#cb3-137" aria-hidden="true" tabindex="-1"></a>    RISK --&gt; REPORT</span>
+<span id="cb3-138"><a href="#cb3-138" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb3-139"><a href="#cb3-139" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb3-140"><a href="#cb3-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-141"><a href="#cb3-141" aria-hidden="true" tabindex="-1"></a><span class="fu">## Fase 0 — Propuesta (`propuesta.md`) {#sec-propuesta}</span></span>
+<span id="cb3-142"><a href="#cb3-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-143"><a href="#cb3-143" aria-hidden="true" tabindex="-1"></a>Antes de escribir código, entrega una propuesta de una página que responda:</span>
+<span id="cb3-144"><a href="#cb3-144" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-145"><a href="#cb3-145" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**El problema**: ¿qué problema real quieres resolver y para quién? Una frase clara + contexto.</span>
+<span id="cb3-146"><a href="#cb3-146" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Criterios de éxito medibles**: ¿cómo sabrás que el sistema lo resuelve? (p. ej. "responde correctamente ≥ 80 % de 50 preguntas de test", "reduce a 3 llamadas de media el análisis de un informe").</span>
+<span id="cb3-147"><a href="#cb3-147" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Patrón candidato**: ¿qué patrón de la taxonomía piensas usar y por qué? (puede cambiar luego, pero conviene decidirlo pronto).</span>
+<span id="cb3-148"><a href="#cb3-148" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Ruta de datos**: ¿de dónde salen los datos o recursos? (ver <span class="co">[</span><span class="ot">Dónde conseguir datos</span><span class="co">](#sec-datos)</span>).</span>
+<span id="cb3-149"><a href="#cb3-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-150"><a href="#cb3-150" aria-hidden="true" tabindex="-1"></a>Esta propuesta se corrige junto al proyecto final y vale dentro de la dimensión "Propuesta y datos" de la rúbrica.</span>
+<span id="cb3-151"><a href="#cb3-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-152"><a href="#cb3-152" aria-hidden="true" tabindex="-1"></a><span class="fu">## Dónde conseguir datos {#sec-datos}</span></span>
+<span id="cb3-153"><a href="#cb3-153" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-154"><a href="#cb3-154" aria-hidden="true" tabindex="-1"></a>Los datos son un medio, no el objetivo: solo los necesitas si tu problema requiere conocimiento externo (grounding). Si tu problema no es de conocimiento —un planificador de tareas, un evaluador-optimizer de redacción, un orquestador de workers sobre un repositorio de código, un agente de análisis con pandas— los "datos" son simplemente los recursos que tu problema necesite: código, tablas, APIs, documentos propios.</span>
+<span id="cb3-155"><a href="#cb3-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-156"><a href="#cb3-156" aria-hidden="true" tabindex="-1"></a>Para problemas de conocimiento, tienes tres rutas oficiales:</span>
+<span id="cb3-157"><a href="#cb3-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-158"><a href="#cb3-158" aria-hidden="true" tabindex="-1"></a><span class="fu">### Ruta 1 — Dataset real abierto</span></span>
+<span id="cb3-159"><a href="#cb3-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-160"><a href="#cb3-160" aria-hidden="true" tabindex="-1"></a>Catálogo de fuentes con licencia segura:</span>
+<span id="cb3-161"><a href="#cb3-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-162"><a href="#cb3-162" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fuente <span class="pp">|</span> Qué encontrarás <span class="pp">|</span> Nota <span class="pp">|</span></span>
+<span id="cb3-163"><a href="#cb3-163" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb3-164"><a href="#cb3-164" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">Kaggle Datasets</span><span class="co">](https://www.kaggle.com/datasets)</span> <span class="pp">|</span> Datasets de casi cualquier dominio <span class="pp">|</span> Comprueba la licencia de cada dataset <span class="pp">|</span></span>
+<span id="cb3-165"><a href="#cb3-165" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">Hugging Face Datasets</span><span class="co">](https://huggingface.co/datasets)</span> <span class="pp">|</span> Corpus de texto, pares Q&amp;A, datasets de instrucción <span class="pp">|</span> Ideal para RAG y evaluación <span class="pp">|</span></span>
+<span id="cb3-166"><a href="#cb3-166" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">UCI ML Repository</span><span class="co">](https://archive.ics.uci.edu)</span> <span class="pp">|</span> Datasets clásicos de ML tabular <span class="pp">|</span> Bien documentados <span class="pp">|</span></span>
+<span id="cb3-167"><a href="#cb3-167" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">Google Dataset Search</span><span class="co">](https://datasetsearch.research.google.com)</span> <span class="pp">|</span> Buscador transversal de datasets abiertos <span class="pp">|</span> Filtra por licencia <span class="pp">|</span></span>
+<span id="cb3-168"><a href="#cb3-168" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">datos.gob.es</span><span class="co">](https://datos.gob.es)</span> / <span class="co">[</span><span class="ot">data.europa.eu</span><span class="co">](https://data.europa.eu)</span> <span class="pp">|</span> Datos abiertos de administraciones españolas y europeas <span class="pp">|</span> Mucho material tabular y documental <span class="pp">|</span></span>
+<span id="cb3-169"><a href="#cb3-169" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">PubMed</span><span class="co">](https://pubmed.ncbi.nlm.nih.gov)</span> (API con <span class="in">`biopython`</span>/<span class="in">`pymed`</span>) <span class="pp">|</span> Abstracts biomédicos <span class="pp">|</span> Fuente alternativa de texto científico <span class="pp">|</span></span>
+<span id="cb3-170"><a href="#cb3-170" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">SEC EDGAR</span><span class="co">](https://www.sec.gov/edgar)</span> <span class="pp">|</span> Informes financieros de empresas públicas <span class="pp">|</span> Formato HTML/TXT <span class="pp">|</span></span>
+<span id="cb3-171"><a href="#cb3-171" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Yahoo Finance (<span class="in">`yfinance`</span>) / Alpha Vantage <span class="pp">|</span> Cotizaciones y datos de mercado <span class="pp">|</span> API con límites gratuitos <span class="pp">|</span></span>
+<span id="cb3-172"><a href="#cb3-172" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> <span class="co">[</span><span class="ot">Awesome Public Datasets</span><span class="co">](https://github.com/awesomedata/awesome-public-datasets)</span> <span class="pp">|</span> Índice curado de datasets abiertos <span class="pp">|</span> Muy amplio <span class="pp">|</span></span>
+<span id="cb3-173"><a href="#cb3-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-174"><a href="#cb3-174" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; ⚠️ **Licencias**: documenta en tu informe la licencia del dataset que uses. Los datasets personales o empresariales con PII están fuera de alcance — ver </span><span class="co">[</span><span class="ot">Bloque 4 — Privacidad</span><span class="co">](../bloque4/04c-privacidad.qmd)</span><span class="at">.</span></span>
+<span id="cb3-175"><a href="#cb3-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-176"><a href="#cb3-176" aria-hidden="true" tabindex="-1"></a><span class="fu">### Ruta 2 — Datos sintéticos generados por ti</span></span>
+<span id="cb3-177"><a href="#cb3-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-178"><a href="#cb3-178" aria-hidden="true" tabindex="-1"></a>Es la ruta recomendada para problemas de conocimiento sin datos disponibles. El módulo ya te da las herramientas:</span>
+<span id="cb3-179"><a href="#cb3-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-180"><a href="#cb3-180" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Texto y tablas realistas**: prompting del LLM con JSON Schema (<span class="co">[</span><span class="ot">02a</span><span class="co">](../bloque2/02a-prompt-engineering.qmd#sec-json-schema-datos-sint)</span>) o <span class="in">`faker`</span> + <span class="in">`numpy`</span> + <span class="in">`pandas`</span>.</span>
+<span id="cb3-181"><a href="#cb3-181" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Tabular con fidelidad estadística**: SDV (CTGAN/TVAE), con presupuesto de privacidad diferencial ε (<span class="co">[</span><span class="ot">03a</span><span class="co">](../bloque3/03a-datos-sinteticos.qmd)</span>).</span>
+<span id="cb3-182"><a href="#cb3-182" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Historiales clínicos**: <span class="co">[</span><span class="ot">Synthea</span><span class="co">](https://synthetichealth.github.io/synthea/)</span>.</span>
+<span id="cb3-183"><a href="#cb3-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-184"><a href="#cb3-184" aria-hidden="true" tabindex="-1"></a>El pipeline de generación sintética es parte del proyecto: documenta cómo lo construiste, cómo validaste su calidad y por qué lo elegiste frente a datos reales.</span>
+<span id="cb3-185"><a href="#cb3-185" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-186"><a href="#cb3-186" aria-hidden="true" tabindex="-1"></a><span class="fu">### Ruta 3 — Tu propio corpus</span></span>
+<span id="cb3-187"><a href="#cb3-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-188"><a href="#cb3-188" aria-hidden="true" tabindex="-1"></a>Si tu problema gira en torno a documentos reales que ya tienes o puedes producir (manuales, normativas, informes de tu organización, artículos de tu dominio), úsalos. Un corpus propio con ≥50 documentos o ≥10 000 filas tabulares es perfectamente válido.</span>
+<span id="cb3-189"><a href="#cb3-189" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-190"><a href="#cb3-190" aria-hidden="true" tabindex="-1"></a><span class="fu">## Problemas de ejemplo {#sec-problemas-ejemplo}</span></span>
+<span id="cb3-191"><a href="#cb3-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-192"><a href="#cb3-192" aria-hidden="true" tabindex="-1"></a>Si no tienes un problema propio, inspírate en uno de estos (el patrón es solo una sugerencia — la elección final es tuya):</span>
+<span id="cb3-193"><a href="#cb3-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-194"><a href="#cb3-194" aria-hidden="true" tabindex="-1"></a>: Problemas de ejemplo con patrón y datos sugeridos {#tbl-problemas-ejemplo}</span>
+<span id="cb3-195"><a href="#cb3-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-196"><a href="#cb3-196" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> # <span class="pp">|</span> Problema <span class="pp">|</span> Patrón que encaja <span class="pp">|</span> Fuentes sugeridas <span class="pp">|</span></span>
+<span id="cb3-197"><a href="#cb3-197" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb3-198"><a href="#cb3-198" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 1 <span class="pp">|</span> Asistente para el análisis de cuentas anuales de una PYME <span class="pp">|</span> Routing (factual vs. analítico) <span class="pp">|</span> Ruta 2 (sintético) o SEC EDGAR <span class="pp">|</span></span>
+<span id="cb3-199"><a href="#cb3-199" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 2 <span class="pp">|</span> Triaje automático de tickets de soporte con respuesta sugerida <span class="pp">|</span> Routing + prompt chaining <span class="pp">|</span> Ruta 2 (faker) o Kaggle support tickets <span class="pp">|</span></span>
+<span id="cb3-200"><a href="#cb3-200" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 3 <span class="pp">|</span> Comparador de artículos científicos de un tema <span class="pp">|</span> Orchestrator-workers <span class="pp">|</span> PubMed / arXiv abstracts <span class="pp">|</span></span>
+<span id="cb3-201"><a href="#cb3-201" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 4 <span class="pp">|</span> Mentor personal de hábitos que aprende de tus errores <span class="pp">|</span> Reflection / Reflexion <span class="pp">|</span> Ruta 3 (tu propio diario) <span class="pp">|</span></span>
+<span id="cb3-202"><a href="#cb3-202" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 5 <span class="pp">|</span> Analizador de reviews para detectar insights de producto <span class="pp">|</span> ReAct + herramientas <span class="pp">|</span> Amazon Reviews / Kaggle <span class="pp">|</span></span>
+<span id="cb3-203"><a href="#cb3-203" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 6 <span class="pp">|</span> Planificador de viajes multi-ciudad con restricciones <span class="pp">|</span> Planning (plan-and-execute) <span class="pp">|</span> Ruta 2 (sintético) <span class="pp">|</span></span>
+<span id="cb3-204"><a href="#cb3-204" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 7 <span class="pp">|</span> Generador de informes de ventas con control de calidad editorial <span class="pp">|</span> Evaluator-optimizer <span class="pp">|</span> Ruta 2 (pandas + SDV) <span class="pp">|</span></span>
+<span id="cb3-205"><a href="#cb3-205" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 8 <span class="pp">|</span> Auditor de código con revisiones paralelas por aspecto <span class="pp">|</span> Parallelization (fan-out) <span class="pp">|</span> Ruta 3 (repositorio propio) <span class="pp">|</span></span>
+<span id="cb3-206"><a href="#cb3-206" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-207"><a href="#cb3-207" aria-hidden="true" tabindex="-1"></a><span class="fu">## Evaluación {#sec-evaluacion}</span></span>
+<span id="cb3-208"><a href="#cb3-208" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-209"><a href="#cb3-209" aria-hidden="true" tabindex="-1"></a>Tu informe debe demostrar, en este orden:</span>
+<span id="cb3-210"><a href="#cb3-210" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-211"><a href="#cb3-211" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Métricas de la tarea**: las que definiste en la propuesta como criterios de éxito (precisión sobre un test, tasa de éxito de la tarea, nº de pasos, coste en llamadas...).</span>
+<span id="cb3-212"><a href="#cb3-212" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Comparativa contra baseline**: ejecuta el mismo problema con una cadena simple (LLM directo) y, si procede, con ReAct genérico (<span class="in">`create_agent`</span> de 02e). Compara y explica *por qué* tu patrón gana o pierde: ¿menos llamadas? ¿más aciertos? ¿mejor manejo de errores?</span>
+<span id="cb3-213"><a href="#cb3-213" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**RAGAS (solo si usas RAG)**: faithfulness, answer relevancy, context precision — objetivo compuesto &gt; 0,65, con desglose por tipo de pregunta. Ya lo dominas de <span class="co">[</span><span class="ot">HPD 5</span><span class="co">](hpd5-entregable.qmd)</span>.</span>
+<span id="cb3-214"><a href="#cb3-214" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Iteración documentada**: al menos una iteración mostrando cómo un cambio (chunk size, prompt, top-k, temperatura, criterio del evaluador...) mejoró una métrica.</span>
+<span id="cb3-215"><a href="#cb3-215" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-216"><a href="#cb3-216" aria-hidden="true" tabindex="-1"></a><span class="fu">## Rúbrica {#sec-rubrica}</span></span>
+<span id="cb3-217"><a href="#cb3-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-218"><a href="#cb3-218" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Dimensión <span class="pp">|</span> Peso <span class="pp">|</span> Insuficiente (&lt; 5) <span class="pp">|</span> Suficiente (5-6,9) <span class="pp">|</span> Notable (7-8,9) <span class="pp">|</span> Sobresaliente (9-10) <span class="pp">|</span></span>
+<span id="cb3-219"><a href="#cb3-219" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|---|---|</span></span>
+<span id="cb3-220"><a href="#cb3-220" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Propuesta y datos** <span class="pp">|</span> 15 % <span class="pp">|</span> Sin propuesta o sin criterios de éxito <span class="pp">|</span> Propuesta con problema y criterios básicos; datos o recursos mínimos <span class="pp">|</span> Propuesta clara con criterios medibles; ruta de datos justificada <span class="pp">|</span> Propuesta con criterios medibles, riesgos anticipados y generación de datos (si aplica), todo ello documentado y validado <span class="pp">|</span></span>
+<span id="cb3-221"><a href="#cb3-221" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Patrón** <span class="pp">|</span> 20 % <span class="pp">|</span> Patrón inexistente o aplicado sin criterio <span class="pp">|</span> Patrón de la taxonomía aplicado correctamente <span class="pp">|</span> Patrón justificado con la guía de selección de 02f y comparado con alternativas <span class="pp">|</span> Justificación rigurosa + variante propia del patrón o propuesta de patrón nuevo con defensa de su valor <span class="pp">|</span></span>
+<span id="cb3-222"><a href="#cb3-222" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Solución del problema** <span class="pp">|</span> 25 % <span class="pp">|</span> El sistema no resuelve el problema o falla en el flujo principal <span class="pp">|</span> Sistema funcional que resuelve el caso principal <span class="pp">|</span> Sistema robusto con manejo de errores, ≥2 herramientas y pipeline reproducible <span class="pp">|</span> Sistema modular, eficiente (coste/latencia considerados) y con decisiones de diseño documentadas <span class="pp">|</span></span>
+<span id="cb3-223"><a href="#cb3-223" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Evaluación** <span class="pp">|</span> 15 % <span class="pp">|</span> Sin evaluación cuantitativa <span class="pp">|</span> Métricas de tarea reportadas <span class="pp">|</span> Métricas + comparativa contra baseline con análisis <span class="pp">|</span> Comparativa rigurosa contra baseline y alternativa (p. ej. ReAct vs. patrón elegido), con iteración documentada <span class="pp">|</span></span>
+<span id="cb3-224"><a href="#cb3-224" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Gobernanza y ética** <span class="pp">|</span> 10 % <span class="pp">|</span> No se abordan riesgos <span class="pp">|</span> Se identifica un riesgo <span class="pp">|</span> Riesgo identificado y mitigación propuesta <span class="pp">|</span> Análisis de múltiples riesgos (alucinación, sesgo, privacidad, HITL) con ejemplos concretos <span class="pp">|</span></span>
+<span id="cb3-225"><a href="#cb3-225" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Documentación** <span class="pp">|</span> 15 % <span class="pp">|</span> Código sin comentarios, sin README <span class="pp">|</span> README básico y código legible <span class="pp">|</span> Docstrings, diagrama de arquitectura, decisiones de diseño <span class="pp">|</span> Documentación completa: arquitectura, decisiones, informe de evaluación autocontenido y guía de reproducción <span class="pp">|</span></span>
+<span id="cb3-226"><a href="#cb3-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-227"><a href="#cb3-227" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Bonus — Idea novedosa** (hasta 1 punto adicional sobre la nota final): proponer una variante propia de un patrón, un patrón nuevo, o una combinación original de patrones, defendida con experimentos que demuestren su valor frente a las alternativas canónicas.</span></span>
+<span id="cb3-228"><a href="#cb3-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-229"><a href="#cb3-229" aria-hidden="true" tabindex="-1"></a><span class="fu">## Entregables {#sec-entregables}</span></span>
+<span id="cb3-230"><a href="#cb3-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-231"><a href="#cb3-231" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**`propuesta.md`** — propuesta de una página (Fase 0).</span>
+<span id="cb3-232"><a href="#cb3-232" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**`proyecto_final.ipynb`** — notebook con el sistema completo, celdas numeradas y las variables de corrección en la primera celda.</span>
+<span id="cb3-233"><a href="#cb3-233" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Datos o recursos** — datasets, corpus o scripts de generación (reales o sintéticos, con licencia documentada).</span>
+<span id="cb3-234"><a href="#cb3-234" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**`informe_evaluacion.md`** — métricas, comparativa contra baseline, análisis de riesgos e iteración documentada.</span>
+<span id="cb3-235"><a href="#cb3-235" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**`README.md`** — instrucciones de reproducción, requisitos, arquitectura y ejemplos de uso.</span>
+<span id="cb3-236"><a href="#cb3-236" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-237"><a href="#cb3-237" aria-hidden="true" tabindex="-1"></a><span class="fu">## Criterios de éxito {#sec-criterios-exito}</span></span>
+<span id="cb3-238"><a href="#cb3-238" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-239"><a href="#cb3-239" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El problema está definido con criterios de éxito medibles y el sistema los alcanza.</span>
+<span id="cb3-240"><a href="#cb3-240" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El patrón elegido está justificado con la guía de selección de 02f y su valor se demuestra contra un baseline.</span>
+<span id="cb3-241"><a href="#cb3-241" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>Si usa RAG: métricas RAGAS &gt; 0,5, faithfulness &gt; 0,7 y mejora sobre baseline.</span>
+<span id="cb3-242"><a href="#cb3-242" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El análisis de riesgos identifica al menos un caso real de alucinación o sesgo con su mitigación.</span>
+<span id="cb3-243"><a href="#cb3-243" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>El README permite reproducir el pipeline en menos de 15 minutos.</span>
+<span id="cb3-244"><a href="#cb3-244" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-245"><a href="#cb3-245" aria-hidden="true" tabindex="-1"></a><span class="fu">## Formato de entrega {#sec-formato-entrega}</span></span>
+<span id="cb3-246"><a href="#cb3-246" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-247"><a href="#cb3-247" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Repositorio GitHub público** (recomendado) o archivo ZIP con todos los ficheros.</span>
+<span id="cb3-248"><a href="#cb3-248" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>El repositorio debe incluir: <span class="in">`propuesta.md`</span>, <span class="in">`proyecto_final.ipynb`</span>, <span class="in">`informe_evaluacion.md`</span>, <span class="in">`README.md`</span>, <span class="in">`datos/`</span> (o script de generación) y <span class="in">`requirements.txt`</span>.</span>
+<span id="cb3-249"><a href="#cb3-249" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>El notebook debe definir <span class="in">`proy_problema`</span>, <span class="in">`proy_patron`</span> y <span class="in">`proy_reporte`</span> en la primera celda.</span>
+<span id="cb3-250"><a href="#cb3-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-251"><a href="#cb3-251" aria-hidden="true" tabindex="-1"></a>**Fecha límite:** consultar el calendario del módulo en la plataforma.</span>
+<span id="cb3-252"><a href="#cb3-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-253"><a href="#cb3-253" aria-hidden="true" tabindex="-1"></a><span class="fu">## Consejos finales {#sec-consejos}</span></span>
+<span id="cb3-254"><a href="#cb3-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-255"><a href="#cb3-255" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Empieza por la propuesta**: define problema y criterios de éxito antes de escribir código. Si no puedes medir "resolverlo", no puedes evaluarlo.</span>
+<span id="cb3-256"><a href="#cb3-256" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Elige el nivel más simple que funcione**: el principio nº 1 de diseño de 02f es mantenerlo simple. Una cadena o un routing bien justificados puntúan más que un multi-agente injustificado.</span>
+<span id="cb3-257"><a href="#cb3-257" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Itera**: construye primero el baseline, luego tu patrón, y compara. Cada mejora debe estar documentada con su impacto en métricas.</span>
+<span id="cb3-258"><a href="#cb3-258" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sé crítico con tu sistema**: el análisis de riesgos es tan importante como las métricas.</span>
+<span id="cb3-259"><a href="#cb3-259" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Cita tus fuentes**: datasets, modelos, papers y patrones usados — en tu informe y en las referencias del proyecto.</span>
+</code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

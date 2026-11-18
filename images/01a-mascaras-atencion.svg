@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 430" role="img" aria-labelledby="title desc">
+  <title id="title">Máscara bidireccional y máscara causal</title>
+  <desc id="desc">Comparación entre una máscara de atención completa, usada en un encoder, y una máscara triangular causal, usada en un decoder-only.</desc>
+  <style>
+    .title { font: 700 23px Arial, sans-serif; fill: #1e3a5f; }
+    .panel { font: 700 18px Arial, sans-serif; fill: #1e293b; text-anchor: middle; }
+    .small { font: 14px Arial, sans-serif; fill: #475569; text-anchor: middle; }
+    .legend { font: 14px Arial, sans-serif; fill: #475569; text-anchor: start; }
+    .axis { font: 13px Arial, sans-serif; fill: #334155; text-anchor: middle; dominant-baseline: middle; }
+    .one { font: 700 15px Arial, sans-serif; fill: #fff; text-anchor: middle; dominant-baseline: middle; }
+    .zero { font: 700 15px Arial, sans-serif; fill: #64748b; text-anchor: middle; dominant-baseline: middle; }
+  </style>
+
+  <rect width="900" height="430" rx="14" fill="#ffffff"/>
+  <text x="450" y="35" class="title" text-anchor="middle">La máscara decide qué información puede utilizar cada posición</text>
+
+  <text x="270" y="76" class="panel">Encoder: atención bidireccional</text>
+  <text x="675" y="76" class="panel">Decoder-only: atención causal</text>
+  <text x="270" y="99" class="small">Cada token puede consultar toda la secuencia</text>
+  <text x="675" y="99" class="small">El futuro queda bloqueado durante el entrenamiento</text>
+
+  <g transform="translate(105,125)">
+    <text x="100" y="-14" class="small">Keys</text>
+    <text x="-42" y="100" class="small" transform="rotate(-90 -42 100)">Queries</text>
+    <text x="20" y="-2" class="axis">t1</text><text x="60" y="-2" class="axis">t2</text><text x="100" y="-2" class="axis">t3</text><text x="140" y="-2" class="axis">t4</text><text x="180" y="-2" class="axis">t5</text>
+    <text x="-17" y="20" class="axis">t1</text><text x="-17" y="60" class="axis">t2</text><text x="-17" y="100" class="axis">t3</text><text x="-17" y="140" class="axis">t4</text><text x="-17" y="180" class="axis">t5</text>
+    <g fill="#306998" stroke="#fff" stroke-width="2">
+      <rect x="0" y="0" width="40" height="40"/><rect x="40" y="0" width="40" height="40"/><rect x="80" y="0" width="40" height="40"/><rect x="120" y="0" width="40" height="40"/><rect x="160" y="0" width="40" height="40"/>
+      <rect x="0" y="40" width="40" height="40"/><rect x="40" y="40" width="40" height="40"/><rect x="80" y="40" width="40" height="40"/><rect x="120" y="40" width="40" height="40"/><rect x="160" y="40" width="40" height="40"/>
+      <rect x="0" y="80" width="40" height="40"/><rect x="40" y="80" width="40" height="40"/><rect x="80" y="80" width="40" height="40"/><rect x="120" y="80" width="40" height="40"/><rect x="160" y="80" width="40" height="40"/>
+      <rect x="0" y="120" width="40" height="40"/><rect x="40" y="120" width="40" height="40"/><rect x="80" y="120" width="40" height="40"/><rect x="120" y="120" width="40" height="40"/><rect x="160" y="120" width="40" height="40"/>
+      <rect x="0" y="160" width="40" height="40"/><rect x="40" y="160" width="40" height="40"/><rect x="80" y="160" width="40" height="40"/><rect x="120" y="160" width="40" height="40"/><rect x="160" y="160" width="40" height="40"/>
+    </g>
+    <g class="one"><text x="20" y="20">1</text><text x="60" y="20">1</text><text x="100" y="20">1</text><text x="140" y="20">1</text><text x="180" y="20">1</text><text x="20" y="60">1</text><text x="60" y="60">1</text><text x="100" y="60">1</text><text x="140" y="60">1</text><text x="180" y="60">1</text><text x="20" y="100">1</text><text x="60" y="100">1</text><text x="100" y="100">1</text><text x="140" y="100">1</text><text x="180" y="100">1</text><text x="20" y="140">1</text><text x="60" y="140">1</text><text x="100" y="140">1</text><text x="140" y="140">1</text><text x="180" y="140">1</text><text x="20" y="180">1</text><text x="60" y="180">1</text><text x="100" y="180">1</text><text x="140" y="180">1</text><text x="180" y="180">1</text></g>
+  </g>
+
+  <g transform="translate(510,125)">
+    <text x="100" y="-14" class="small">Keys</text>
+    <text x="-42" y="100" class="small" transform="rotate(-90 -42 100)">Queries</text>
+    <text x="20" y="-2" class="axis">t1</text><text x="60" y="-2" class="axis">t2</text><text x="100" y="-2" class="axis">t3</text><text x="140" y="-2" class="axis">t4</text><text x="180" y="-2" class="axis">t5</text>
+    <text x="-17" y="20" class="axis">t1</text><text x="-17" y="60" class="axis">t2</text><text x="-17" y="100" class="axis">t3</text><text x="-17" y="140" class="axis">t4</text><text x="-17" y="180" class="axis">t5</text>
+    <g fill="#306998" stroke="#fff" stroke-width="2">
+      <rect x="0" y="0" width="40" height="40"/><rect x="0" y="40" width="40" height="40"/><rect x="40" y="40" width="40" height="40"/><rect x="0" y="80" width="40" height="40"/><rect x="40" y="80" width="40" height="40"/><rect x="80" y="80" width="40" height="40"/><rect x="0" y="120" width="40" height="40"/><rect x="40" y="120" width="40" height="40"/><rect x="80" y="120" width="40" height="40"/><rect x="120" y="120" width="40" height="40"/><rect x="0" y="160" width="40" height="40"/><rect x="40" y="160" width="40" height="40"/><rect x="80" y="160" width="40" height="40"/><rect x="120" y="160" width="40" height="40"/><rect x="160" y="160" width="40" height="40"/>
+    </g>
+    <g fill="#e2e8f0" stroke="#fff" stroke-width="2">
+      <rect x="40" y="0" width="40" height="40"/><rect x="80" y="0" width="40" height="40"/><rect x="120" y="0" width="40" height="40"/><rect x="160" y="0" width="40" height="40"/><rect x="80" y="40" width="40" height="40"/><rect x="120" y="40" width="40" height="40"/><rect x="160" y="40" width="40" height="40"/><rect x="120" y="80" width="40" height="40"/><rect x="160" y="80" width="40" height="40"/><rect x="160" y="120" width="40" height="40"/>
+    </g>
+  </g>
+
+  <rect x="120" y="350" width="18" height="18" rx="3" fill="#306998"/>
+  <text x="148" y="364" class="legend">1: se permite consultar</text>
+  <rect x="390" y="350" width="18" height="18" rx="3" fill="#e2e8f0" stroke="#94a3b8"/>
+  <text x="418" y="364" class="legend">0: se bloquea con -infinito</text>
+  <text x="450" y="402" class="small">Durante la inferencia, los tokens futuros todavía no existen; la máscara reproduce esa restricción durante el entrenamiento.</text>
+</svg>

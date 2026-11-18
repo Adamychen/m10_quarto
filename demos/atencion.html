@@ -1,0 +1,1771 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Pulsa una palabra y mira en cuáles del resto de la frase se apoya para interpretarse. Después comprueba qué pasa cuando solo puede mirar hacia atrás, como en un LLM generativo.">
+
+<title>Demo — La atención: ¿en qué se fija cada palabra? – Módulo 10 — IA Generativa para Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<meta name="shinylive:serviceworker_dir" content="..">
+<script src="../site_libs/quarto-contrib/shinylive-0.10.15/shinylive/load-shinylive-sw.js" type="module"></script>
+<script src="../site_libs/quarto-contrib/shinylive-0.10.15/shinylive/run-python-blocks.js" type="module"></script>
+<link href="../site_libs/quarto-contrib/shinylive-0.10.15/shinylive/shinylive.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/shinylive-quarto-css/shinylive-quarto.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../demos/atencion.html">Demos interactivas</a></li><li class="breadcrumb-item"><a href="../demos/atencion.html">Atención (1): la idea</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Módulo 10 — IA Generativa para Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inicio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acerca de</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 1 — Fundamentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01a-transformer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01b-llms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs e inferencia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01c-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01d-vectordb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bases de datos vectoriales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 2 — Orquestación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02-orquestacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02a-prompt-engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prompt Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02b-langchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LangChain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02c-llamaindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LlamaIndex</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02d-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02e-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentes Inteligentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 3 — Aplicaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03-aplicaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03b-rag-avanzado.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAG Avanzado</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03a-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tuning eficiente</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 4 — Gobernanza</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Demos interactivas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Evaluación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../06-herramientas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Herramientas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../07-bibliografia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliografía</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#qué-observar" id="toc-qué-observar" class="nav-link active" data-scroll-target="#qué-observar">Qué observar</a></li>
+  <li><a href="#qué-has-visto" id="toc-qué-has-visto" class="nav-link" data-scroll-target="#qué-has-visto">Qué has visto</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="atencion.ipynb" download="atencion.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../demos/atencion.html">Demos interactivas</a></li><li class="breadcrumb-item"><a href="../demos/atencion.html">Atención (1): la idea</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Demo — La atención: ¿en qué se fija cada palabra?</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+<div>
+  <div class="description">
+    Pulsa una palabra y mira en cuáles del resto de la frase se apoya para interpretarse. Después comprueba qué pasa cuando solo puede mirar hacia atrás, como en un LLM generativo.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>Demo que acompaña a <a href="../bloque1/01a-transformer.html#sec-atencion-multi-cabeza">Arquitectura Transformer</a>. Se ejecuta en el navegador con Shinylive y no necesita clave de API.</p>
+</blockquote>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Esto es una ilustración, no un modelo real
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Los pesos de esta demo están <strong>diseñados a mano</strong> para que se vea la idea de la atención con claridad. Un modelo real tiene muchas cabezas de atención y ninguna se comporta de forma tan limpia ni tan fácil de leer.</p>
+</div>
+</div>
+<p>Una misma palabra puede significar cosas muy distintas según las que la rodean: no es lo mismo el <em>banco</em> donde te sientas que el <em>banco</em> que quiebra. La <strong>atención</strong> es el mecanismo con el que un Transformer le permite a cada palabra consultar al resto de la frase para decidir cómo interpretarse.</p>
+<p>Pulsa cualquier palabra y verás en cuáles se apoya: cuanto más grueso el arco, más atención le presta. Si es tu primera vez, pulsa <strong>Empezar ▶</strong> y sigue el recorrido guiado de seis pasos.</p>
+<pre class="shinylive-python" data-engine="python"><code>#| '!! shinylive warning !!': |
+#|   shinylive does not work in self-contained HTML documents.
+#|   Please set `embed-resources: false` in your metadata.
+#| standalone: true
+#| viewerHeight: 1100
+
+from shiny import reactive
+from shiny.express import input, ui, render
+
+# Pesos de atención ilustrativos: SENTENCES[i]["att"][palabra] = {otra_palabra: peso}.
+# Los pesos se normalizan al 100 %. Las palabras sin entrada usan un patrón de vecindad.
+SENTENCES = [
+    {
+        "label": "Me senté en el banco del parque",
+        "words": ["Me", "senté", "en", "el", "banco", "del", "parque"],
+        "default": 4,
+        "att": {
+            4: {6: 5, 1: 3, 2: 1, 3: 1.5, 5: 1.5, 0: 0.5},
+            6: {4: 4, 5: 3, 1: 1},
+            1: {0: 3, 4: 3, 2: 2},
+        },
+        "why": {
+            4: "«banco» busca pistas: «senté» y «parque» apuntan a un asiento, no a una entidad financiera.",
+        },
+    },
+    {
+        "label": "El banco cerró porque estaba en quiebra",
+        "words": ["El", "banco", "cerró", "porque", "estaba", "en", "quiebra"],
+        "default": 1,
+        "att": {
+            1: {6: 4, 2: 4, 4: 2, 0: 1.5, 3: 1},
+            2: {1: 5, 3: 2, 6: 1},
+            6: {5: 3, 4: 3, 1: 3},
+        },
+        "why": {
+            1: "Aquí «banco» se apoya en «cerró» y «quiebra»: es una empresa, no un asiento.",
+        },
+    },
+    {
+        "label": "El trofeo no cabía en la maleta porque era demasiado grande",
+        "words": ["El", "trofeo", "no", "cabía", "en", "la", "maleta", "porque", "era", "demasiado", "grande"],
+        "default": 8,
+        "att": {
+            8: {1: 6, 10: 3, 6: 1.5, 7: 1.5, 9: 1},
+            10: {9: 4, 8: 3, 1: 3},
+            3: {1: 4, 2: 3, 6: 2},
+        },
+        "why": {
+            8: "«era» es un pronombre sin significado propio: para saber a qué se refiere busca en la frase. Si algo es «demasiado grande» y no cabe, es el trofeo.",
+        },
+    },
+    {
+        "label": "El trofeo no cabía en la maleta porque era demasiado pequeña",
+        "words": ["El", "trofeo", "no", "cabía", "en", "la", "maleta", "porque", "era", "demasiado", "pequeña"],
+        "default": 8,
+        "att": {
+            8: {6: 6, 10: 3, 1: 1.5, 7: 1.5, 9: 1},
+            10: {9: 4, 8: 3, 6: 3},
+            3: {1: 4, 2: 3, 6: 2},
+        },
+        "why": {
+            8: "Cambia una sola palabra («pequeña») y «era» pasa a referirse a la maleta: la atención sigue el sentido de toda la frase, no la posición.",
+        },
+    },
+]
+
+# Recorrido guiado: (frase, palabra, modo LLM generativo, texto)
+TOUR = [
+    (0, 4, False, "«banco» en el parque: mira en qué palabras se apoya para saber qué tipo de banco es."),
+    (1, 1, False, "La misma palabra en otra frase. Ahora las pistas son otras: «cerró» y «quiebra»."),
+    (2, 8, False, "«era» es un pronombre: no significa nada solo y busca a quién se refiere. Aquí, al trofeo."),
+    (3, 8, False, "Cambia «grande» por «pequeña» y «era» pasa a mirar a la maleta."),
+    (0, 4, True, "Modo LLM generativo: solo puede mirar hacia atrás. «parque» aún no existe y se pierde la pista clave."),
+    (2, 8, True, "Con el pronombre casi no cambia nada: las pistas ya estaban antes."),
+]
+
+BLUE, DARK, YELLOW, ORANGE, GRAY = "#4B8BBE", "#306998", "#FFD43B", "#e65100", "#9ca3af"
+
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.muted{color:#6b7280;font-size:.85em}
+.tour{display:flex;align-items:center;gap:10px;background:#eef4fa;border-radius:10px;padding:8px 12px;margin:0 0 10px}
+.tour .txt{flex:1}
+.tour .step{font-size:.8em;color:#306998;font-weight:600;white-space:nowrap}
+.bars{display:grid;grid-template-columns:90px 1fr 44px;gap:4px 8px;align-items:center;max-width:520px}
+.track{height:14px;background:#f3f4f6;border-radius:4px;overflow:hidden}
+.fill{height:100%;background:#4B8BBE;border-radius:4px}
+.word:hover rect{stroke:#306998;stroke-width:2.5}
+.mat{width:auto;border-collapse:collapse;margin:0 auto}
+.mat td{width:30px;height:26px;text-align:center;font-size:.72em;border:1px solid #fff;cursor:pointer}
+.mat th{font-weight:500;font-size:.8em;padding:0 4px}
+.mat th.col{writing-mode:vertical-rl;transform:rotate(180deg);height:70px;vertical-align:bottom}
+""")
+
+
+def attention(s, sel, causal):
+    """Pesos normalizados {palabra: porcentaje} de la palabra seleccionada."""
+    n = len(s["words"])
+    raw = dict(s["att"].get(sel) or {})
+    if not raw:
+        for j in range(n):
+            if j != sel:
+                raw[j] = {1: 3.0, 2: 1.5}.get(abs(j - sel), 0.5)
+    if causal:
+        raw = {j: w for j, w in raw.items() if j &lt; sel}
+    total = sum(raw.values())
+    return {j: w / total for j, w in raw.items()} if total else {}
+
+
+def layout(words):
+    xs, x = [], 10
+    for w in words:
+        width = 11 * len(w) + 24
+        xs.append((x, width))
+        x += width + 8
+    return xs, x + 2
+
+
+current = reactive.value(None)
+pending = reactive.value(None)  # palabra que debe seleccionarse tras un cambio de frase del recorrido
+step = reactive.value(-1)
+
+
+def go(k):
+    sent, word, causal, _ = TOUR[k]
+    step.set(k)
+    if int(input.sent()) != sent:
+        pending.set(word)
+        ui.update_radio_buttons("sent", selected=str(sent))
+    else:
+        current.set(word)
+    ui.update_switch("causal", value=causal)
+
+
+@reactive.effect
+def _reset():
+    s = SENTENCES[int(input.sent())]
+    with reactive.isolate():
+        p = pending()
+    current.set(p if p is not None else s["default"])
+    pending.set(None)
+
+
+@reactive.effect
+@reactive.event(input.w)
+def _click():
+    current.set(int(input.w()))
+
+
+@reactive.effect
+@reactive.event(input.next)
+def _next():
+    go(min(step() + 1, len(TOUR) - 1))
+
+
+@reactive.effect
+@reactive.event(input.prev)
+def _prev():
+    go(max(step() - 1, 0))
+
+
+@render.ui
+def tour():
+    k = step()
+    if k &lt; 0:
+        txt = "¿Primera vez? Sigue el &lt;b&gt;recorrido guiado&lt;/b&gt; en seis pasos, o pulsa tú cualquier palabra."
+        label = ""
+    else:
+        txt, label = TOUR[k][3], f"Paso {k + 1} de {len(TOUR)}"
+    prev_dis = "disabled" if k &lt;= 0 else ""
+    next_lbl = "Empezar ▶" if k &lt; 0 else "Siguiente ▶"
+    next_dis = "disabled" if k &gt;= len(TOUR) - 1 else ""
+    return ui.HTML(
+        f"&lt;div class='tour'&gt;&lt;span class='step'&gt;{label}&lt;/span&gt;&lt;span class='txt'&gt;{txt}&lt;/span&gt;"
+        f"&lt;button class='btn btn-sm btn-outline-primary' {prev_dis} "
+        f"onclick=\"Shiny.setInputValue('prev', Date.now(), {{priority: 'event'}})\"&gt;◀&lt;/button&gt;"
+        f"&lt;button class='btn btn-sm btn-primary' {next_dis} "
+        f"onclick=\"Shiny.setInputValue('next', Date.now(), {{priority: 'event'}})\"&gt;{next_lbl}&lt;/button&gt;&lt;/div&gt;"
+    )
+
+
+ui.input_radio_buttons(
+    "sent", "Frase",
+    {str(i): s["label"] for i, s in enumerate(SENTENCES)}, selected="0", width="100%",
+)
+ui.input_switch("causal", "Ver como un LLM generativo (solo puede mirar hacia atrás)", value=False)
+
+
+@render.ui
+def figure():
+    s = SENTENCES[int(input.sent())]
+    words, causal = s["words"], input.causal()
+    sel = current()
+    if sel is None or sel &gt;= len(words):
+        return ui.HTML("")
+    att = attention(s, sel, causal)
+    xs, total_w = layout(words)
+    base_y, h = 120, 44
+
+    def cx(i):
+        return xs[i][0] + xs[i][1] / 2
+
+    parts, labels, placed, cands = [], [], [], []
+    for j, w in sorted(att.items(), key=lambda kv: kv[1]):
+        dist = abs(cx(j) - cx(sel))
+        top = base_y - min(125, 25 + dist * 0.22) - 40
+        mx = (cx(sel) + cx(j)) / 2
+        parts.append(
+            f"&lt;path d='M{cx(sel)},{base_y} Q{mx},{top} {cx(j)},{base_y}' "
+            f"fill='none' stroke='{DARK}' stroke-width='{1 + 11 * w:.1f}' "
+            f"stroke-opacity='{0.25 + 0.75 * w:.2f}' stroke-linecap='round'/&gt;"
+        )
+        cands.append((w, mx, (base_y + top) / 2))
+    for w, mx, apex in sorted(cands, reverse=True):
+        if w &gt;= 0.12 and all(abs(mx - px) &gt; 40 or abs(apex - py) &gt; 14 for px, py in placed):
+            placed.append((mx, apex))
+            labels.append(
+                f"&lt;text x='{mx}' y='{apex - 4}' text-anchor='middle' font-size='12' font-weight='600' "
+                f"fill='{DARK}' stroke='#fff' stroke-width='4' paint-order='stroke'&gt;{w:.0%}&lt;/text&gt;"
+            )
+    for i, word in enumerate(words):
+        x, wd = xs[i]
+        future = causal and i &gt; sel
+        if i == sel:
+            fill, fop, tcol, deco = DARK, 1, "#fff", "none"
+        elif i in att:
+            fill, fop, tcol, deco = YELLOW, 0.3 + 0.7 * att[i], "#000", "none"
+        else:
+            fill, fop, tcol, deco = "none", 1, "currentColor", "line-through" if future else "none"
+        opacity = 0.4 if future else 1
+        parts.append(
+            f"&lt;g class='word' style='cursor:pointer' opacity='{opacity}' "
+            f"onclick=\"Shiny.setInputValue('w', {i}, {{priority: 'event'}})\"&gt;"
+            f"&lt;rect x='{x}' y='{base_y}' width='{wd}' height='{h}' rx='8' fill='{fill}' "
+            f"fill-opacity='{fop}' stroke='{DARK if i == sel else GRAY}' stroke-width='1.5'/&gt;"
+            f"&lt;text x='{x + wd / 2}' y='{base_y + 28}' text-anchor='middle' font-size='17' "
+            f"fill='{tcol}' text-decoration='{deco}'&gt;{word}&lt;/text&gt;&lt;/g&gt;"
+        )
+    svg = (
+        f"&lt;svg viewBox='0 0 {total_w} {base_y + h + 8}' width='100%' "
+        f"style='max-width:{max(total_w, 480)}px;display:block;margin:8px 0' "
+        f"font-family='system-ui,sans-serif'&gt;{''.join(parts)}{''.join(labels)}&lt;/svg&gt;"
+    )
+
+    word = words[sel]
+    if att:
+        ranked = sorted(att.items(), key=lambda kv: -kv[1])
+        bars = "".join(
+            f"&lt;span&gt;{words[j]}&lt;/span&gt;&lt;span class='track'&gt;&lt;span class='fill' style='display:block;"
+            f"width:{100 * w / ranked[0][1]:.0f}%'&gt;&lt;/span&gt;&lt;/span&gt;&lt;span&gt;{w:.0%}&lt;/span&gt;"
+            for j, w in ranked[:3]
+        )
+        summary = f"&lt;p style='margin:0 0 4px'&gt;Al interpretar &lt;b&gt;«{word}»&lt;/b&gt;, presta más atención a:&lt;/p&gt;&lt;div class='bars'&gt;{bars}&lt;/div&gt;"
+    else:
+        summary = (
+            f"&lt;p&gt;&lt;b&gt;«{word}»&lt;/b&gt; es la primera palabra: un LLM generativo todavía no tiene "
+            f"ninguna palabra anterior en la que apoyarse.&lt;/p&gt;"
+        )
+
+    why = s["why"].get(sel)
+    lost = [words[j] for j in sorted(s["att"].get(sel, {})) if j &gt; sel]
+    note = ""
+    if causal and lost and why:
+        note = (
+            f"&lt;p style='border-left:4px solid {ORANGE};padding-left:10px;margin-top:10px'&gt;"
+            f"Un LLM generativo no puede ver lo que viene después: se pierde "
+            f"&lt;b&gt;{', '.join('«' + w + '»' for w in lost)}&lt;/b&gt;, justo las pistas que aclaraban el sentido. "
+            f"Con lo que sí ve, la interpretación queda mucho menos clara.&lt;/p&gt;"
+        )
+    elif why:
+        note = f"&lt;p style='border-left:4px solid {ORANGE};padding-left:10px;margin-top:10px'&gt;{why}&lt;/p&gt;"
+    mode = (
+        "&lt;b&gt;Modo LLM generativo:&lt;/b&gt; las palabras tachadas aún no existen."
+        if causal
+        else "&lt;b&gt;Modo codificador (tipo BERT):&lt;/b&gt; cada palabra mira antes y después."
+    )
+    return ui.HTML(
+        f"&lt;div class='card'&gt;&lt;div class='muted'&gt;{mode} Pulsa otra palabra para cambiar.&lt;/div&gt;"
+        f"{svg}{summary}{note}&lt;/div&gt;"
+    )
+
+
+ui.input_checkbox("nums", "Ver los números: la tabla completa de atención", value=False, width="100%")
+
+
+@render.ui
+def matrix():
+    if not input.nums():
+        return ui.HTML("")
+    s = SENTENCES[int(input.sent())]
+    words, causal, sel = s["words"], input.causal(), current()
+    head = "".join(f"&lt;th class='col'&gt;{w}&lt;/th&gt;" for w in words)
+    rows = []
+    for i, w in enumerate(words):
+        att = attention(s, i, causal)
+        cells = []
+        for j in range(len(words)):
+            if causal and j &gt; i:
+                cells.append(
+                    "&lt;td style='background:repeating-linear-gradient(45deg,#f3f4f6,#f3f4f6 4px,#e5e7eb 4px,#e5e7eb 8px)'&gt;&lt;/td&gt;"
+                )
+                continue
+            v = att.get(j, 0.0)
+            txt = f"{v * 100:.0f}" if v &gt;= 0.005 else ""
+            col = "#fff" if v &gt; 0.35 else "#111"
+            cells.append(f"&lt;td style='background:rgba(48,105,152,{min(1, v * 1.6):.2f});color:{col}'&gt;{txt}&lt;/td&gt;")
+        style = f"outline:2px solid {ORANGE};outline-offset:-1px" if i == sel else ""
+        rows.append(
+            f"&lt;tr style='{style}' onclick=\"Shiny.setInputValue('w', {i}, {{priority: 'event'}})\"&gt;"
+            f"&lt;th style='text-align:right'&gt;{w}&lt;/th&gt;{''.join(cells)}&lt;/tr&gt;"
+        )
+    note = (
+        "Cada fila es una palabra y reparte su atención (100 %) entre las columnas. "
+        + ("La zona rayada es lo que un LLM generativo no puede ver: el triángulo de la &lt;b&gt;máscara causal&lt;/b&gt;. " if causal else "")
+        + "Los pesos son ilustrativos. Pulsa una fila para seleccionar esa palabra."
+    )
+    return ui.HTML(
+        f"&lt;div class='card' style='overflow-x:auto'&gt;&lt;table class='mat'&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;{head}&lt;/tr&gt;&lt;/thead&gt;"
+        f"&lt;tbody&gt;{''.join(rows)}&lt;/tbody&gt;&lt;/table&gt;&lt;p class='muted' style='margin:6px 0 0'&gt;{note}&lt;/p&gt;&lt;/div&gt;"
+    )</code></pre>
+<section id="qué-observar" class="level2">
+<h2 class="anchored" data-anchor-id="qué-observar">Qué observar</h2>
+<ol type="1">
+<li>Con la primera frase, <strong>pulsa «banco»</strong>: se apoya sobre todo en «parque» y «senté». Pasa a la segunda frase y vuelve a pulsar «banco»: ahora son «cerró» y «quiebra». Es la misma palabra, pero se interpreta de forma distinta porque el contexto es distinto.</li>
+<li>En las dos frases del trofeo, <strong>pulsa «era»</strong>. Es un pronombre: no significa nada por sí mismo y necesita buscar a quién se refiere. Con «grande» mira al trofeo; con «pequeña», a la maleta. Cambia una palabra y cambia a quién mira.</li>
+<li><strong>Activa el interruptor «Ver como un LLM generativo»</strong> y vuelve a pulsar «banco» en la frase del parque. «parque» queda tachada: un LLM que genera texto palabra a palabra todavía no la ha visto, así que no puede usarla para interpretar «banco».</li>
+<li>Con el interruptor activo, pulsa «era» en la frase del trofeo. Aquí no cambia casi nada, porque las pistas ya están antes.</li>
+<li>Marca <strong>«Ver los números»</strong> con el interruptor activo: la tabla completa muestra un triángulo rayado. Es la <strong>máscara causal</strong>: cada palabra (fila) solo puede atender a las columnas anteriores.</li>
+</ol>
+</section>
+<section id="qué-has-visto" class="level2">
+<h2 class="anchored" data-anchor-id="qué-has-visto">Qué has visto</h2>
+<ul>
+<li>La atención permite que <strong>cada palabra se interprete según las demás</strong>, no de forma aislada.</li>
+<li>Los modelos tipo BERT (codificadores) miran a ambos lados. Los <strong>LLM generativos</strong> (ChatGPT, Qwen, Llama…) son decodificadores y solo miran hacia atrás, porque generan palabra a palabra. Por eso funcionan bien con pronombres, cuyas pistas suelen estar antes, pero no pueden usar lo que todavía no han escrito.</li>
+<li>Esto es una simplificación: en un modelo real hay muchas cabezas de atención a la vez, y cada una se fija en cosas distintas.</li>
+</ul>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Una precaución sobre el interruptor
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Aquí el modo «LLM generativo» simplemente tapa las palabras posteriores para que se vea la restricción. Un decodificador real no funciona tapando a posteriori: se entrena con esa restricción desde el principio y aprende a trabajar con ella.</p>
+</div>
+</div>
+<p><strong>¿Y en un modelo real?</strong> Continúa con la <a href="../demos/atencion-modelo-real.html">segunda parte</a>: pesos reales de un BERT, con seis cabezas de atención que se fijan en cosas distintas.</p>
+<p>Para ver cómo se define esta restricción en el modelo (máscara causal) y qué cambia entre las variantes de la arquitectura, consulta <a href="../bloque1/01a-transformer.html#sec-original-vs-moderno">Del Transformer original al decoder-only moderno</a>.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<footer class="footer-custom">
+  <div class="footer-logos">
+    <img src="../images/logo_cfp.png" alt="Formación Permanente · Universidad de Sevilla">
+  </div>
+  <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
+</footer>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Demo — La atención: ¿en qué se fija cada palabra?"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Pulsa una palabra y mira en cuáles del resto de la frase se apoya para interpretarse. Después comprueba qué pasa cuando solo puede mirar hacia atrás, como en un LLM generativo."</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> markdown</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Demo que acompaña a </span><span class="co">[</span><span class="ot">Arquitectura Transformer</span><span class="co">](../bloque1/01a-transformer.qmd#sec-atencion-multi-cabeza)</span><span class="at">. Se ejecuta en el navegador con Shinylive y no necesita clave de API.</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Esto es una ilustración, no un modelo real</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>Los pesos de esta demo están **diseñados a mano** para que se vea la idea de la atención con claridad. Un modelo real tiene muchas cabezas de atención y ninguna se comporta de forma tan limpia ni tan fácil de leer.</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>Una misma palabra puede significar cosas muy distintas según las que la rodean: no es lo mismo el *banco* donde te sientas que el *banco* que quiebra. La **atención** es el mecanismo con el que un Transformer le permite a cada palabra consultar al resto de la frase para decidir cómo interpretarse.</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>Pulsa cualquier palabra y verás en cuáles se apoya: cuanto más grueso el arco, más atención le presta. Si es tu primera vez, pulsa **Empezar ▶** y sigue el recorrido guiado de seis pasos.</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="in">```{shinylive-python}</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#| standalone: true</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#| viewerHeight: 1100</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">from</span> shiny import reactive</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="ex">from</span> shiny.express import input, ui, render</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co"># Pesos de atención ilustrativos: SENTENCES[i]["att"][palabra] = {otra_palabra: peso}.</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="co"># Los pesos se normalizan al 100 %. Las palabras sin entrada usan un patrón de vecindad.</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="ex">SENTENCES</span> = [</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">"label"</span><span class="ex">:</span> <span class="st">"Me senté en el banco del parque"</span>,</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        <span class="st">"words"</span><span class="ex">:</span> [<span class="st">"Me"</span>, <span class="st">"senté"</span>, <span class="st">"en"</span>, <span class="st">"el"</span>, <span class="st">"banco"</span>, <span class="st">"del"</span>, <span class="st">"parque"</span>],</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        <span class="st">"default"</span><span class="ex">:</span> 4,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        <span class="st">"att"</span><span class="ex">:</span> {</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>            <span class="ex">4:</span> {6: 5, 1: 3, 2: 1, 3: 1.5, 5: 1.5, 0: 0.5},</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            <span class="ex">6:</span> {4: 4, 5: 3, 1: 1},</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>            <span class="ex">1:</span> {0: 3, 4: 3, 2: 2},</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="ex">},</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        <span class="st">"why"</span><span class="ex">:</span> {</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>            <span class="ex">4:</span> <span class="st">"«banco» busca pistas: «senté» y «parque» apuntan a un asiento, no a una entidad financiera."</span>,</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        <span class="ex">},</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    <span class="ex">},</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        <span class="st">"label"</span><span class="ex">:</span> <span class="st">"El banco cerró porque estaba en quiebra"</span>,</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        <span class="st">"words"</span><span class="ex">:</span> [<span class="st">"El"</span>, <span class="st">"banco"</span>, <span class="st">"cerró"</span>, <span class="st">"porque"</span>, <span class="st">"estaba"</span>, <span class="st">"en"</span>, <span class="st">"quiebra"</span>],</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="st">"default"</span><span class="ex">:</span> 1,</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        <span class="st">"att"</span><span class="ex">:</span> {</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>            <span class="ex">1:</span> {6: 4, 2: 4, 4: 2, 0: 1.5, 3: 1},</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>            <span class="ex">2:</span> {1: 5, 3: 2, 6: 1},</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>            <span class="ex">6:</span> {5: 3, 4: 3, 1: 3},</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>        <span class="ex">},</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        <span class="st">"why"</span><span class="ex">:</span> {</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>            <span class="ex">1:</span> <span class="st">"Aquí «banco» se apoya en «cerró» y «quiebra»: es una empresa, no un asiento."</span>,</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>        <span class="ex">},</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="ex">},</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>        <span class="st">"label"</span><span class="ex">:</span> <span class="st">"El trofeo no cabía en la maleta porque era demasiado grande"</span>,</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>        <span class="st">"words"</span><span class="ex">:</span> [<span class="st">"El"</span>, <span class="st">"trofeo"</span>, <span class="st">"no"</span>, <span class="st">"cabía"</span>, <span class="st">"en"</span>, <span class="st">"la"</span>, <span class="st">"maleta"</span>, <span class="st">"porque"</span>, <span class="st">"era"</span>, <span class="st">"demasiado"</span>, <span class="st">"grande"</span>],</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>        <span class="st">"default"</span><span class="ex">:</span> 8,</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        <span class="st">"att"</span><span class="ex">:</span> {</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>            <span class="ex">8:</span> {1: 6, 10: 3, 6: 1.5, 7: 1.5, 9: 1},</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>            <span class="ex">10:</span> {9: 4, 8: 3, 1: 3},</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>            <span class="ex">3:</span> {1: 4, 2: 3, 6: 2},</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>        <span class="ex">},</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>        <span class="st">"why"</span><span class="ex">:</span> {</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>            <span class="ex">8:</span> <span class="st">"«era» es un pronombre sin significado propio: para saber a qué se refiere busca en la frase. Si algo es «demasiado grande» y no cabe, es el trofeo."</span>,</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>        <span class="ex">},</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    <span class="ex">},</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    <span class="kw">{</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        <span class="st">"label"</span><span class="ex">:</span> <span class="st">"El trofeo no cabía en la maleta porque era demasiado pequeña"</span>,</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>        <span class="st">"words"</span><span class="ex">:</span> [<span class="st">"El"</span>, <span class="st">"trofeo"</span>, <span class="st">"no"</span>, <span class="st">"cabía"</span>, <span class="st">"en"</span>, <span class="st">"la"</span>, <span class="st">"maleta"</span>, <span class="st">"porque"</span>, <span class="st">"era"</span>, <span class="st">"demasiado"</span>, <span class="st">"pequeña"</span>],</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        <span class="st">"default"</span><span class="ex">:</span> 8,</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        <span class="st">"att"</span><span class="ex">:</span> {</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>            <span class="ex">8:</span> {6: 6, 10: 3, 1: 1.5, 7: 1.5, 9: 1},</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>            <span class="ex">10:</span> {9: 4, 8: 3, 6: 3},</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>            <span class="ex">3:</span> {1: 4, 2: 3, 6: 2},</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        <span class="ex">},</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>        <span class="st">"why"</span><span class="ex">:</span> {</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>            <span class="ex">8:</span> <span class="st">"Cambia una sola palabra («pequeña») y «era» pasa a referirse a la maleta: la atención sigue el sentido de toda la frase, no la posición."</span>,</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>        <span class="ex">},</span></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>    <span class="ex">},</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a><span class="ex">]</span></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a><span class="co"># Recorrido guiado: (frase, palabra, modo LLM generativo, texto)</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a><span class="ex">TOUR</span> = [</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">0,</span> 4, False, <span class="st">"«banco» en el parque: mira en qué palabras se apoya para saber qué tipo de banco es."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">1,</span> 1, False, <span class="st">"La misma palabra en otra frase. Ahora las pistas son otras: «cerró» y «quiebra»."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">2,</span> 8, False, <span class="st">"«era» es un pronombre: no significa nada solo y busca a quién se refiere. Aquí, al trofeo."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">3,</span> 8, False, <span class="st">"Cambia «grande» por «pequeña» y «era» pasa a mirar a la maleta."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">0,</span> 4, True, <span class="st">"Modo LLM generativo: solo puede mirar hacia atrás. «parque» aún no existe y se pierde la pista clave."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="ex">2,</span> 8, True, <span class="st">"Con el pronombre casi no cambia nada: las pistas ya estaban antes."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="ex">]</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a><span class="ex">BLUE,</span> DARK, YELLOW, ORANGE, GRAY = <span class="st">"#4B8BBE"</span>, <span class="st">"#306998"</span>, <span class="st">"#FFD43B"</span>, <span class="st">"#e65100"</span>, <span class="st">"#9ca3af"</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a><span class="ex">ui.tags.style</span><span class="er">(</span><span class="st">"""</span></span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a><span class="st">body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a><span class="st">.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a><span class="st">.muted{color:#6b7280;font-size:.85em}</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a><span class="st">.tour{display:flex;align-items:center;gap:10px;background:#eef4fa;border-radius:10px;padding:8px 12px;margin:0 0 10px}</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a><span class="st">.tour .txt{flex:1}</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a><span class="st">.tour .step{font-size:.8em;color:#306998;font-weight:600;white-space:nowrap}</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a><span class="st">.bars{display:grid;grid-template-columns:90px 1fr 44px;gap:4px 8px;align-items:center;max-width:520px}</span></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a><span class="st">.track{height:14px;background:#f3f4f6;border-radius:4px;overflow:hidden}</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a><span class="st">.fill{height:100%;background:#4B8BBE;border-radius:4px}</span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a><span class="st">.word:hover rect{stroke:#306998;stroke-width:2.5}</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a><span class="st">.mat{width:auto;border-collapse:collapse;margin:0 auto}</span></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a><span class="st">.mat td{width:30px;height:26px;text-align:center;font-size:.72em;border:1px solid #fff;cursor:pointer}</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a><span class="st">.mat th{font-weight:500;font-size:.8em;padding:0 4px}</span></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a><span class="st">.mat th.col{writing-mode:vertical-rl;transform:rotate(180deg);height:70px;vertical-align:bottom}</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span><span class="kw">)</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> attention<span class="er">(</span><span class="ex">s,</span> sel, causal<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""Pesos normalizados {palabra: porcentaje} de la palabra seleccionada."""</span></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>    <span class="ex">n</span> = len<span class="er">(</span><span class="va">s</span><span class="op">[</span><span class="st">"words"</span><span class="op">]</span><span class="kw">)</span></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>    <span class="ex">raw</span> = dict<span class="er">(</span><span class="va">s</span><span class="op">[</span><span class="st">"att"</span><span class="op">]</span><span class="ex">.get</span><span class="er">(</span><span class="ex">sel</span><span class="kw">)</span> <span class="ex">or</span> {}<span class="kw">)</span></span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">not</span> raw:</span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> range<span class="er">(</span><span class="ex">n</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="ex">j</span> != sel:</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>                <span class="va">raw</span><span class="op">[</span>j<span class="op">]</span> <span class="ex">=</span> {1: 3.0, 2: 1.5}.get<span class="er">(</span><span class="ex">abs</span><span class="er">(</span><span class="ex">j</span> <span class="at">-</span> sel<span class="kw">)</span><span class="ex">,</span> 0.5<span class="kw">)</span></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">causal:</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>        <span class="ex">raw</span> = {j: w for j, w in raw.items<span class="er">(</span><span class="kw">)</span> <span class="cf">if</span> <span class="ex">j</span> <span class="op">&lt;</span> sel}</span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>    <span class="ex">total</span> = sum<span class="er">(</span><span class="fu">raw.values()</span><span class="kw">)</span></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">{j:</span> w / total for j, w in raw.items<span class="er">(</span><span class="kw">)}</span> <span class="cf">if</span> <span class="ex">total</span> else {}</span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> layout<span class="er">(</span><span class="ex">words</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>    <span class="ex">xs,</span> x = [], 10</span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> w <span class="kw">in</span> words:</span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>        <span class="ex">width</span> = 11 <span class="pp">*</span> len<span class="er">(</span><span class="fu">w</span><span class="kw">)</span> <span class="ex">+</span> 24</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>        <span class="ex">xs.append</span><span class="er">((</span><span class="va">x</span><span class="kw">,</span> <span class="va">width</span><span class="kw">))</span></span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>        <span class="ex">x</span> += width + 8</span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">xs,</span> x + 2</span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a><span class="ex">current</span> = reactive.value<span class="er">(</span><span class="ex">None</span><span class="kw">)</span></span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a><span class="ex">pending</span> = reactive.value<span class="er">(</span><span class="ex">None</span><span class="kw">)</span>  <span class="co"># palabra que debe seleccionarse tras un cambio de frase del recorrido</span></span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a><span class="ex">step</span> = reactive.value<span class="er">(</span><span class="ex">-1</span><span class="kw">)</span></span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> go<span class="er">(</span><span class="ex">k</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>    <span class="ex">sent,</span> word, causal, _ = TOUR<span class="pp">[</span><span class="ss">k</span><span class="pp">]</span></span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>    <span class="ex">step.set</span><span class="er">(</span><span class="ex">k</span><span class="kw">)</span></span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">int</span><span class="er">(</span><span class="fu">input.sent()</span><span class="kw">)</span> <span class="ex">!=</span> sent:</span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>        <span class="ex">pending.set</span><span class="er">(</span><span class="ex">word</span><span class="kw">)</span></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>        <span class="ex">ui.update_radio_buttons</span><span class="er">(</span><span class="st">"sent"</span><span class="ex">,</span> selected=str<span class="er">(</span><span class="ex">sent</span><span class="kw">))</span></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>    <span class="ex">else:</span></span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>        <span class="ex">current.set</span><span class="er">(</span><span class="ex">word</span><span class="kw">)</span></span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ui.update_switch</span><span class="er">(</span><span class="st">"causal"</span><span class="ex">,</span> value=causal<span class="kw">)</span></span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _reset<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>    <span class="ex">s</span> = SENTENCES[int<span class="er">(</span><span class="fu">input.sent()</span><span class="kw">)</span><span class="ex">]</span></span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>    <span class="ex">with</span> reactive.isolate<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>        <span class="ex">p</span> = pending<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>    <span class="ex">current.set</span><span class="er">(</span><span class="ex">p</span> if p is not None else s<span class="pp">[</span><span class="st">"default"</span><span class="pp">]</span><span class="kw">)</span></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>    <span class="ex">pending.set</span><span class="er">(</span><span class="ex">None</span><span class="kw">)</span></span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.w</span><span class="kw">)</span></span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _click<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>    <span class="ex">current.set</span><span class="er">(</span><span class="ex">int</span><span class="er">(</span><span class="fu">input.w()</span><span class="kw">))</span></span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.next</span><span class="kw">)</span></span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _next<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>    <span class="ex">go</span><span class="er">(</span><span class="ex">min</span><span class="er">(</span><span class="fu">step()</span> <span class="ex">+</span> 1, len<span class="er">(</span><span class="ex">TOUR</span><span class="kw">)</span> <span class="ex">-</span> 1<span class="kw">))</span></span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.prev</span><span class="kw">)</span></span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _prev<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>    <span class="ex">go</span><span class="er">(</span><span class="ex">max</span><span class="er">(</span><span class="fu">step()</span> <span class="ex">-</span> 1, 0<span class="kw">))</span></span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a><span class="ex">@render.ui</span></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> tour<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>    <span class="ex">k</span> = step<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">k</span> <span class="op">&lt;</span> 0:</span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>        <span class="ex">txt</span> = <span class="st">"¿Primera vez? Sigue el &lt;b&gt;recorrido guiado&lt;/b&gt; en seis pasos, o pulsa tú cualquier palabra."</span></span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>        <span class="ex">label</span> = <span class="st">""</span></span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>    <span class="ex">else:</span></span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>        <span class="ex">txt,</span> label = TOUR<span class="pp">[</span><span class="ss">k</span><span class="pp">][</span><span class="ss">3</span><span class="pp">]</span>, f<span class="st">"Paso {k + 1} de {len(TOUR)}"</span></span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>    <span class="ex">prev_dis</span> = <span class="st">"disabled"</span> if k <span class="op">&lt;</span>= 0 else <span class="st">""</span></span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>    <span class="ex">next_lbl</span> = <span class="st">"Empezar ▶"</span> if k <span class="op">&lt;</span> 0 else <span class="st">"Siguiente ▶"</span></span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>    <span class="ex">next_dis</span> = <span class="st">"disabled"</span> if k <span class="op">&gt;</span>= len<span class="er">(</span><span class="ex">TOUR</span><span class="kw">)</span> <span class="ex">-</span> 1 else <span class="st">""</span></span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span></span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='tour'&gt;&lt;span class='step'&gt;{label}&lt;/span&gt;&lt;span class='txt'&gt;{txt}&lt;/span&gt;"</span></span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;button class='btn btn-sm btn-outline-primary' {prev_dis} "</span></span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"onclick=</span><span class="dt">\"</span><span class="st">Shiny.setInputValue('prev', Date.now(), {{priority: 'event'}})</span><span class="dt">\"</span><span class="st">&gt;◀&lt;/button&gt;"</span></span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;button class='btn btn-sm btn-primary' {next_dis} "</span></span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"onclick=</span><span class="dt">\"</span><span class="st">Shiny.setInputValue('next', Date.now(), {{priority: 'event'}})</span><span class="dt">\"</span><span class="st">&gt;{next_lbl}&lt;/button&gt;&lt;/div&gt;"</span></span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a><span class="ex">ui.input_radio_buttons</span><span class="er">(</span></span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>    <span class="st">"sent"</span><span class="ex">,</span> <span class="st">"Frase"</span>,</span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>    <span class="ex">{str</span><span class="er">(</span><span class="ex">i</span><span class="kw">)</span><span class="bu">:</span> s<span class="pp">[</span><span class="st">"label"</span><span class="pp">]</span> for i, s in enumerate<span class="er">(</span><span class="ex">SENTENCES</span><span class="kw">)</span><span class="er">}</span><span class="ex">,</span> selected=<span class="st">"0"</span>, width=<span class="st">"100%"</span>,</span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a><span class="kw">)</span></span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a><span class="ex">ui.input_switch</span><span class="er">(</span><span class="st">"causal"</span><span class="ex">,</span> <span class="st">"Ver como un LLM generativo (solo puede mirar hacia atrás)"</span>, value=False<span class="kw">)</span></span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a><span class="ex">@render.ui</span></span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> figure<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>    <span class="ex">s</span> = SENTENCES[int<span class="er">(</span><span class="fu">input.sent()</span><span class="kw">)</span><span class="ex">]</span></span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>    <span class="ex">words,</span> causal = s<span class="pp">[</span><span class="st">"words"</span><span class="pp">]</span>, input.causal<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>    <span class="ex">sel</span> = current<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">sel</span> is None or sel <span class="op">&gt;</span>= len<span class="er">(</span><span class="ex">words</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span><span class="st">""</span><span class="kw">)</span></span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a>    <span class="ex">att</span> = attention<span class="er">(</span><span class="ex">s,</span> sel, causal<span class="kw">)</span></span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a>    <span class="ex">xs,</span> total_w = layout<span class="er">(</span><span class="ex">words</span><span class="kw">)</span></span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>    <span class="ex">base_y,</span> h = 120, 44</span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>    <span class="ex">def</span> cx<span class="er">(</span><span class="ex">i</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">xs</span><span class="op">[</span>i<span class="op">][</span><span class="dv">0</span><span class="op">]</span> <span class="ex">+</span> xs<span class="pp">[</span><span class="ss">i</span><span class="pp">][</span><span class="ss">1</span><span class="pp">]</span> / 2</span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>    <span class="ex">parts,</span> labels, placed, cands = [], [], [], []</span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> j<span class="ex">,</span> w in sorted<span class="er">(</span><span class="fu">att.items()</span><span class="ex">,</span> key=lambda kv: kv<span class="pp">[</span><span class="ss">1</span><span class="pp">]</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dist</span> = abs<span class="er">(</span><span class="ex">cx</span><span class="er">(</span><span class="ex">j</span><span class="kw">)</span> <span class="ex">-</span> cx<span class="er">(</span><span class="ex">sel</span><span class="kw">))</span></span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>        <span class="ex">top</span> = base_y <span class="at">-</span> min<span class="er">(</span><span class="ex">125,</span> 25 + dist <span class="pp">*</span> 0.22<span class="kw">)</span> <span class="ex">-</span> 40</span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>        <span class="ex">mx</span> = <span class="er">(</span><span class="ex">cx</span><span class="er">(</span><span class="ex">sel</span><span class="kw">)</span> <span class="ex">+</span> cx<span class="er">(</span><span class="ex">j</span><span class="kw">))</span> <span class="ex">/</span> 2</span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>        <span class="ex">parts.append</span><span class="er">(</span></span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;path d='M{cx(sel)},{base_y} Q{mx},{top} {cx(j)},{base_y}' "</span></span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"fill='none' stroke='{DARK}' stroke-width='{1 + 11 * w:.1f}' "</span></span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"stroke-opacity='{0.25 + 0.75 * w:.2f}' stroke-linecap='round'/&gt;"</span></span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>        <span class="ex">cands.append</span><span class="er">((</span><span class="va">w</span><span class="kw">,</span> <span class="va">mx</span><span class="kw">,</span> (<span class="va">base_y</span> <span class="op">+</span> <span class="va">top</span>) <span class="op">/</span> <span class="dv">2</span><span class="kw">))</span></span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> w<span class="ex">,</span> mx, apex in sorted<span class="er">(</span><span class="ex">cands,</span> reverse=True<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="fu">w</span> <span class="op">&gt;</span>= 0.12 and all<span class="er">(</span><span class="ex">abs</span><span class="er">(</span><span class="ex">mx</span> <span class="at">-</span> px<span class="kw">)</span> <span class="op">&gt;</span> 40 <span class="ex">or</span> abs<span class="er">(</span><span class="ex">apex</span> <span class="at">-</span> py<span class="kw">)</span> <span class="op">&gt;</span> 14 <span class="cf">for</span> px<span class="ex">,</span> py in placed<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a>            <span class="ex">placed.append</span><span class="er">((</span><span class="va">mx</span><span class="kw">,</span> <span class="va">apex</span><span class="kw">))</span></span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>            <span class="ex">labels.append</span><span class="er">(</span></span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>                <span class="ex">f</span><span class="st">"&lt;text x='{mx}' y='{apex - 4}' text-anchor='middle' font-size='12' font-weight='600' "</span></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>                <span class="ex">f</span><span class="st">"fill='{DARK}' stroke='#fff' stroke-width='4' paint-order='stroke'&gt;{w:.0%}&lt;/text&gt;"</span></span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>            <span class="kw">)</span></span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i<span class="ex">,</span> word in enumerate<span class="er">(</span><span class="ex">words</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>        <span class="ex">x,</span> wd = xs<span class="pp">[</span><span class="ss">i</span><span class="pp">]</span></span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>        <span class="ex">future</span> = causal and i <span class="op">&gt;</span> sel</span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="ex">i</span> == sel:</span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a>            <span class="ex">fill,</span> fop, tcol, deco = DARK, 1, <span class="st">"#fff"</span>, <span class="st">"none"</span></span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="ex">i</span> in att:</span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>            <span class="ex">fill,</span> fop, tcol, deco = YELLOW, 0.3 + 0.7 <span class="pp">*</span> att<span class="pp">[</span><span class="ss">i</span><span class="pp">]</span>, <span class="st">"#000"</span>, <span class="st">"none"</span></span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a>        <span class="ex">else:</span></span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>            <span class="ex">fill,</span> fop, tcol, deco = <span class="st">"none"</span>, 1, <span class="st">"currentColor"</span>, <span class="st">"line-through"</span> if future else <span class="st">"none"</span></span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a>        <span class="ex">opacity</span> = 0.4 if future else 1</span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a>        <span class="ex">parts.append</span><span class="er">(</span></span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;g class='word' style='cursor:pointer' opacity='{opacity}' "</span></span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"onclick=</span><span class="dt">\"</span><span class="st">Shiny.setInputValue('w', {i}, {{priority: 'event'}})</span><span class="dt">\"</span><span class="st">&gt;"</span></span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;rect x='{x}' y='{base_y}' width='{wd}' height='{h}' rx='8' fill='{fill}' "</span></span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"fill-opacity='{fop}' stroke='{DARK if i == sel else GRAY}' stroke-width='1.5'/&gt;"</span></span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;text x='{x + wd / 2}' y='{base_y + 28}' text-anchor='middle' font-size='17' "</span></span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"fill='{tcol}' text-decoration='{deco}'&gt;{word}&lt;/text&gt;&lt;/g&gt;"</span></span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>    <span class="ex">svg</span> = <span class="er">(</span></span>
+<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;svg viewBox='0 0 {total_w} {base_y + h + 8}' width='100%' "</span></span>
+<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"style='max-width:{max(total_w, 480)}px;display:block;margin:8px 0' "</span></span>
+<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"font-family='system-ui,sans-serif'&gt;{''.join(parts)}{''.join(labels)}&lt;/svg&gt;"</span></span>
+<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a>    <span class="ex">word</span> = words<span class="pp">[</span><span class="ss">sel</span><span class="pp">]</span></span>
+<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">att:</span></span>
+<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>        <span class="ex">ranked</span> = sorted<span class="er">(</span><span class="fu">att.items()</span><span class="ex">,</span> key=lambda kv: <span class="at">-kv</span><span class="pp">[</span><span class="ss">1</span><span class="pp">]</span><span class="kw">)</span></span>
+<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a>        <span class="ex">bars</span> = <span class="st">""</span>.join<span class="er">(</span></span>
+<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;span&gt;{words[j]}&lt;/span&gt;&lt;span class='track'&gt;&lt;span class='fill' style='display:block;"</span></span>
+<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"width:{100 * w / ranked[0][1]:.0f}%'&gt;&lt;/span&gt;&lt;/span&gt;&lt;span&gt;{w:.0%}&lt;/span&gt;"</span></span>
+<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> j<span class="ex">,</span> w in ranked<span class="pp">[</span><span class="ss">:3</span><span class="pp">]</span></span>
+<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a>        <span class="ex">summary</span> = f<span class="st">"&lt;p style='margin:0 0 4px'&gt;Al interpretar &lt;b&gt;«{word}»&lt;/b&gt;, presta más atención a:&lt;/p&gt;&lt;div class='bars'&gt;{bars}&lt;/div&gt;"</span></span>
+<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a>    <span class="ex">else:</span></span>
+<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a>        <span class="ex">summary</span> = <span class="er">(</span></span>
+<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;p&gt;&lt;b&gt;«{word}»&lt;/b&gt; es la primera palabra: un LLM generativo todavía no tiene "</span></span>
+<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"ninguna palabra anterior en la que apoyarse.&lt;/p&gt;"</span></span>
+<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a>    <span class="ex">why</span> = s<span class="pp">[</span><span class="st">"why"</span><span class="pp">]</span>.get<span class="er">(</span><span class="ex">sel</span><span class="kw">)</span></span>
+<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a>    <span class="ex">lost</span> = [words<span class="pp">[</span><span class="ss">j</span><span class="pp">]</span> for j in sorted<span class="er">(</span><span class="va">s</span><span class="op">[</span><span class="st">"att"</span><span class="op">]</span><span class="ex">.get</span><span class="er">(</span><span class="ex">sel,</span> {}<span class="kw">))</span> <span class="cf">if</span> <span class="ex">j</span> <span class="op">&gt;</span> sel]</span>
+<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a>    <span class="ex">note</span> = <span class="st">""</span></span>
+<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">causal</span> and lost and why:</span>
+<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a>        <span class="ex">note</span> = <span class="er">(</span></span>
+<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;p style='border-left:4px solid {ORANGE};padding-left:10px;margin-top:10px'&gt;"</span></span>
+<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"Un LLM generativo no puede ver lo que viene después: se pierde "</span></span>
+<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;b&gt;{', '.join('«' + w + '»' for w in lost)}&lt;/b&gt;, justo las pistas que aclaraban el sentido. "</span></span>
+<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"Con lo que sí ve, la interpretación queda mucho menos clara.&lt;/p&gt;"</span></span>
+<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> <span class="ex">why:</span></span>
+<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a>        <span class="ex">note</span> = f<span class="st">"&lt;p style='border-left:4px solid {ORANGE};padding-left:10px;margin-top:10px'&gt;{why}&lt;/p&gt;"</span></span>
+<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a>    <span class="ex">mode</span> = <span class="er">(</span></span>
+<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a>        <span class="st">"&lt;b&gt;Modo LLM generativo:&lt;/b&gt; las palabras tachadas aún no existen."</span></span>
+<span id="cb2-291"><a href="#cb2-291" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="ex">causal</span></span>
+<span id="cb2-292"><a href="#cb2-292" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span> <span class="st">"&lt;b&gt;Modo codificador (tipo BERT):&lt;/b&gt; cada palabra mira antes y después."</span></span>
+<span id="cb2-293"><a href="#cb2-293" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-294"><a href="#cb2-294" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span></span>
+<span id="cb2-295"><a href="#cb2-295" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='card'&gt;&lt;div class='muted'&gt;{mode} Pulsa otra palabra para cambiar.&lt;/div&gt;"</span></span>
+<span id="cb2-296"><a href="#cb2-296" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"{svg}{summary}{note}&lt;/div&gt;"</span></span>
+<span id="cb2-297"><a href="#cb2-297" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-298"><a href="#cb2-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-299"><a href="#cb2-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-300"><a href="#cb2-300" aria-hidden="true" tabindex="-1"></a><span class="ex">ui.input_checkbox</span><span class="er">(</span><span class="st">"nums"</span><span class="ex">,</span> <span class="st">"Ver los números: la tabla completa de atención"</span>, value=False, width=<span class="st">"100%"</span><span class="kw">)</span></span>
+<span id="cb2-301"><a href="#cb2-301" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-302"><a href="#cb2-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-303"><a href="#cb2-303" aria-hidden="true" tabindex="-1"></a><span class="ex">@render.ui</span></span>
+<span id="cb2-304"><a href="#cb2-304" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> matrix<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-305"><a href="#cb2-305" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">not</span> input.nums<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-306"><a href="#cb2-306" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span><span class="st">""</span><span class="kw">)</span></span>
+<span id="cb2-307"><a href="#cb2-307" aria-hidden="true" tabindex="-1"></a>    <span class="ex">s</span> = SENTENCES[int<span class="er">(</span><span class="fu">input.sent()</span><span class="kw">)</span><span class="ex">]</span></span>
+<span id="cb2-308"><a href="#cb2-308" aria-hidden="true" tabindex="-1"></a>    <span class="ex">words,</span> causal, sel = s<span class="pp">[</span><span class="st">"words"</span><span class="pp">]</span>, input.causal<span class="er">(</span><span class="kw">)</span><span class="ex">,</span> current<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-309"><a href="#cb2-309" aria-hidden="true" tabindex="-1"></a>    <span class="fu">head</span> = <span class="st">""</span>.join<span class="er">(</span><span class="ex">f</span><span class="st">"&lt;th class='col'&gt;{w}&lt;/th&gt;"</span> for w in words<span class="kw">)</span></span>
+<span id="cb2-310"><a href="#cb2-310" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rows</span> = []</span>
+<span id="cb2-311"><a href="#cb2-311" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i<span class="ex">,</span> w in enumerate<span class="er">(</span><span class="ex">words</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-312"><a href="#cb2-312" aria-hidden="true" tabindex="-1"></a>        <span class="ex">att</span> = attention<span class="er">(</span><span class="ex">s,</span> i, causal<span class="kw">)</span></span>
+<span id="cb2-313"><a href="#cb2-313" aria-hidden="true" tabindex="-1"></a>        <span class="ex">cells</span> = []</span>
+<span id="cb2-314"><a href="#cb2-314" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> j <span class="kw">in</span> range<span class="er">(</span><span class="ex">len</span><span class="er">(</span><span class="ex">words</span><span class="kw">))</span><span class="bu">:</span></span>
+<span id="cb2-315"><a href="#cb2-315" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="ex">causal</span> and j <span class="op">&gt;</span> i:</span>
+<span id="cb2-316"><a href="#cb2-316" aria-hidden="true" tabindex="-1"></a>                <span class="ex">cells.append</span><span class="er">(</span></span>
+<span id="cb2-317"><a href="#cb2-317" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"&lt;td style='background:repeating-linear-gradient(45deg,#f3f4f6,#f3f4f6 4px,#e5e7eb 4px,#e5e7eb 8px)'&gt;&lt;/td&gt;"</span></span>
+<span id="cb2-318"><a href="#cb2-318" aria-hidden="true" tabindex="-1"></a>                <span class="kw">)</span></span>
+<span id="cb2-319"><a href="#cb2-319" aria-hidden="true" tabindex="-1"></a>                <span class="cf">continue</span></span>
+<span id="cb2-320"><a href="#cb2-320" aria-hidden="true" tabindex="-1"></a>            <span class="ex">v</span> = att.get<span class="er">(</span><span class="ex">j,</span> 0.0<span class="kw">)</span></span>
+<span id="cb2-321"><a href="#cb2-321" aria-hidden="true" tabindex="-1"></a>            <span class="ex">txt</span> = f<span class="st">"{v * 100:.0f}"</span> if v <span class="op">&gt;</span>= 0.005 else <span class="st">""</span></span>
+<span id="cb2-322"><a href="#cb2-322" aria-hidden="true" tabindex="-1"></a>            <span class="fu">col</span> = <span class="st">"#fff"</span> if v <span class="op">&gt;</span> 0.35 else <span class="st">"#111"</span></span>
+<span id="cb2-323"><a href="#cb2-323" aria-hidden="true" tabindex="-1"></a>            <span class="ex">cells.append</span><span class="er">(</span><span class="ex">f</span><span class="st">"&lt;td style='background:rgba(48,105,152,{min(1, v * 1.6):.2f});color:{col}'&gt;{txt}&lt;/td&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-324"><a href="#cb2-324" aria-hidden="true" tabindex="-1"></a>        <span class="ex">style</span> = f<span class="st">"outline:2px solid {ORANGE};outline-offset:-1px"</span> if i == sel else <span class="st">""</span></span>
+<span id="cb2-325"><a href="#cb2-325" aria-hidden="true" tabindex="-1"></a>        <span class="ex">rows.append</span><span class="er">(</span></span>
+<span id="cb2-326"><a href="#cb2-326" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;tr style='{style}' onclick=</span><span class="dt">\"</span><span class="st">Shiny.setInputValue('w', {i}, {{priority: 'event'}})</span><span class="dt">\"</span><span class="st">&gt;"</span></span>
+<span id="cb2-327"><a href="#cb2-327" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;th style='text-align:right'&gt;{w}&lt;/th&gt;{''.join(cells)}&lt;/tr&gt;"</span></span>
+<span id="cb2-328"><a href="#cb2-328" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-329"><a href="#cb2-329" aria-hidden="true" tabindex="-1"></a>    <span class="ex">note</span> = <span class="er">(</span></span>
+<span id="cb2-330"><a href="#cb2-330" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Cada fila es una palabra y reparte su atención (100 %) entre las columnas. "</span></span>
+<span id="cb2-331"><a href="#cb2-331" aria-hidden="true" tabindex="-1"></a>        <span class="ex">+</span> <span class="er">(</span><span class="st">"La zona rayada es lo que un LLM generativo no puede ver: el triángulo de la &lt;b&gt;máscara causal&lt;/b&gt;. "</span> if causal else <span class="st">""</span><span class="kw">)</span></span>
+<span id="cb2-332"><a href="#cb2-332" aria-hidden="true" tabindex="-1"></a>        <span class="ex">+</span> <span class="st">"Los pesos son ilustrativos. Pulsa una fila para seleccionar esa palabra."</span></span>
+<span id="cb2-333"><a href="#cb2-333" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-334"><a href="#cb2-334" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span></span>
+<span id="cb2-335"><a href="#cb2-335" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='card' style='overflow-x:auto'&gt;&lt;table class='mat'&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;&lt;/th&gt;{head}&lt;/tr&gt;&lt;/thead&gt;"</span></span>
+<span id="cb2-336"><a href="#cb2-336" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;tbody&gt;{''.join(rows)}&lt;/tbody&gt;&lt;/table&gt;&lt;p class='muted' style='margin:6px 0 0'&gt;{note}&lt;/p&gt;&lt;/div&gt;"</span></span>
+<span id="cb2-337"><a href="#cb2-337" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-338"><a href="#cb2-338" aria-hidden="true" tabindex="-1"></a><span class="kw">```</span></span>
+<span id="cb2-339"><a href="#cb2-339" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-340"><a href="#cb2-340" aria-hidden="true" tabindex="-1"></a><span class="co">## Qué observar</span></span>
+<span id="cb2-341"><a href="#cb2-341" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-342"><a href="#cb2-342" aria-hidden="true" tabindex="-1"></a><span class="ex">1.</span> Con la primera frase, <span class="pp">**</span>pulsa «banco»<span class="pp">**</span>: se apoya sobre todo en «parque» y «senté». Pasa a la segunda frase y vuelve a pulsar «banco»: ahora son «cerró» y «quiebra». Es la misma palabra, pero se interpreta de forma distinta porque el contexto es distinto.</span>
+<span id="cb2-343"><a href="#cb2-343" aria-hidden="true" tabindex="-1"></a><span class="ex">2.</span> En las dos frases del trofeo, <span class="pp">**</span>pulsa «era»<span class="pp">**</span>. Es un pronombre: no significa nada por sí mismo y necesita buscar a quién se refiere. Con «grande» mira al trofeo<span class="kw">;</span> <span class="ex">con</span> «pequeña», a la maleta. Cambia una palabra y cambia a quién mira.</span>
+<span id="cb2-344"><a href="#cb2-344" aria-hidden="true" tabindex="-1"></a><span class="ex">3.</span> <span class="pp">**</span>Activa el interruptor «Ver como un LLM generativo»<span class="pp">**</span> y vuelve a pulsar «banco» en la frase del parque. «parque» queda tachada: un LLM que genera texto palabra a palabra todavía no la ha visto, así que no puede usarla para interpretar «banco».</span>
+<span id="cb2-345"><a href="#cb2-345" aria-hidden="true" tabindex="-1"></a><span class="ex">4.</span> Con el interruptor activo, pulsa «era» en la frase del trofeo. Aquí no cambia casi nada, porque las pistas ya están antes.</span>
+<span id="cb2-346"><a href="#cb2-346" aria-hidden="true" tabindex="-1"></a><span class="ex">5.</span> Marca <span class="pp">**</span>«Ver los números»<span class="pp">**</span> con el interruptor activo: la tabla completa muestra un triángulo rayado. Es la <span class="pp">**</span>máscara causal<span class="pp">**</span>: cada palabra <span class="er">(</span><span class="ex">fila</span><span class="kw">)</span> <span class="ex">solo</span> puede atender a las columnas anteriores.</span>
+<span id="cb2-347"><a href="#cb2-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-348"><a href="#cb2-348" aria-hidden="true" tabindex="-1"></a><span class="co">## Qué has visto</span></span>
+<span id="cb2-349"><a href="#cb2-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-350"><a href="#cb2-350" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> La atención permite que <span class="pp">**</span>cada palabra se interprete según las demás<span class="pp">**</span>, no de forma aislada.</span>
+<span id="cb2-351"><a href="#cb2-351" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> Los modelos tipo BERT <span class="er">(</span><span class="ex">codificadores</span><span class="kw">)</span> <span class="ex">miran</span> a ambos lados. Los <span class="pp">**</span>LLM generativos<span class="pp">**</span> <span class="er">(</span><span class="ex">ChatGPT,</span> Qwen, Llama…<span class="kw">)</span> <span class="ex">son</span> decodificadores y solo miran hacia atrás, porque generan palabra a palabra. Por eso funcionan bien con pronombres, cuyas pistas suelen estar antes, pero no pueden usar lo que todavía no han escrito.</span>
+<span id="cb2-352"><a href="#cb2-352" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> Esto es una simplificación: en un modelo real hay muchas cabezas de atención a la vez, y cada una se fija en cosas distintas.</span>
+<span id="cb2-353"><a href="#cb2-353" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-354"><a href="#cb2-354" aria-hidden="true" tabindex="-1"></a><span class="ex">:::</span> {.callout-warning}</span>
+<span id="cb2-355"><a href="#cb2-355" aria-hidden="true" tabindex="-1"></a><span class="co">## Una precaución sobre el interruptor</span></span>
+<span id="cb2-356"><a href="#cb2-356" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-357"><a href="#cb2-357" aria-hidden="true" tabindex="-1"></a><span class="ex">Aquí</span> el modo «LLM generativo» simplemente tapa las palabras posteriores para que se vea la restricción. Un decodificador real no funciona tapando a posteriori: se entrena con esa restricción desde el principio y aprende a trabajar con ella.</span>
+<span id="cb2-358"><a href="#cb2-358" aria-hidden="true" tabindex="-1"></a><span class="ex">:::</span></span>
+<span id="cb2-359"><a href="#cb2-359" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-360"><a href="#cb2-360" aria-hidden="true" tabindex="-1"></a><span class="ex">**¿Y</span> en un modelo real<span class="pp">?**</span> Continúa con la [segunda parte]<span class="er">(</span><span class="ex">atencion-modelo-real.qmd</span><span class="kw">)</span><span class="bu">:</span> pesos reales de un BERT, con seis cabezas de atención que se fijan en cosas distintas.</span>
+<span id="cb2-361"><a href="#cb2-361" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-362"><a href="#cb2-362" aria-hidden="true" tabindex="-1"></a><span class="ex">Para</span> ver cómo se define esta restricción en el modelo <span class="er">(</span><span class="ex">máscara</span> causal<span class="kw">)</span> <span class="ex">y</span> qué cambia entre las variantes de la arquitectura, consulta [Del Transformer original al decoder-only moderno]<span class="er">(</span><span class="ex">../bloque1/01a-transformer.qmd#sec-original-vs-moderno</span><span class="kw">)</span><span class="bu">.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

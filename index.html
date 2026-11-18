@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.9.37">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -12,10 +12,13 @@
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
 */
-code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -74,10 +77,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="site_libs/quarto-html/tippy.umd.min.js"></script>
 <script src="site_libs/quarto-html/anchor.min.js"></script>
 <link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="site_libs/quarto-html/quarto-syntax-highlighting-7f8f88aac4f3542376d5c11b86a4c14d.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="site_libs/bootstrap/bootstrap.min.js"></script>
 <link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="site_libs/bootstrap/bootstrap-f97a59afa23c78b76dca51217b896fc0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 <script id="quarto-search-options" type="application/json">{
   "location": "sidebar",
   "copy-button": false,
@@ -178,6 +181,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Visión general</span></a>
   </div>
@@ -208,20 +217,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+  <a href="./bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HPD 1 — Embeddings</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd1-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 1</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd1-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 1</span></a>
+  <a href="./evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
   </div>
 </li>
       </ul>
@@ -273,38 +282,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd2-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 2</span></a>
+  <a href="./evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd2-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 2</span></a>
+  <a href="./bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./bloque2/hpd3-servidor-mcp.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HPD 3 — Servidor MCP</span></a>
+  <a href="./bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd3-evaluables.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios evaluables HPD 3</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd3-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión HPD 3</span></a>
+  <a href="./evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
   </div>
 </li>
       </ul>
@@ -338,26 +347,26 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="./bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="./bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Fine-tuning eficiente</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd4-rag-mixto.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">HPD 4 — RAG Mixto</span></a>
+  <a href="./evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
   </div>
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd4-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Ejercicios — Datos Sintéticos</span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./evaluables/hpd4-datos-sinteticos-extension.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Extensión — Datos Sintéticos</span></a>
+  <a href="./evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
   </div>
 </li>
       </ul>
@@ -374,7 +383,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Teoría y Despliegue</span></a>
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
   </div>
 </li>
       </ul>
@@ -382,7 +427,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
- <span class="menu-text">Evaluación</span></a>
+ <span class="menu-text">Demos interactivas</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
@@ -390,8 +435,38 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./05-evaluacion.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text">Evaluación y Proyecto</span></a>
+  <a href="./demos/atencion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
   </div>
 </li>
       </ul>
@@ -399,12 +474,35 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
- <span class="menu-text">Recursos</span></a>
+ <span class="menu-text">Evaluación</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./06-herramientas.html" class="sidebar-item-text sidebar-link">
@@ -429,10 +527,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#distribución-de-la-carga-docente" id="toc-distribución-de-la-carga-docente" class="nav-link active" data-scroll-target="#distribución-de-la-carga-docente">Distribución de la carga docente</a></li>
-  <li><a href="#descripción-del-módulo" id="toc-descripción-del-módulo" class="nav-link" data-scroll-target="#descripción-del-módulo">1. Descripción del módulo</a></li>
-  <li><a href="#contenidos" id="toc-contenidos" class="nav-link" data-scroll-target="#contenidos">Contenidos</a></li>
-  <li><a href="#competencias-específicas" id="toc-competencias-específicas" class="nav-link" data-scroll-target="#competencias-específicas">Competencias específicas</a></li>
+  <li><a href="#sec-descripcion-modulo" id="toc-sec-descripcion-modulo" class="nav-link active" data-scroll-target="#sec-descripcion-modulo">1. Descripción del módulo</a></li>
+  <li><a href="#sec-contenidos" id="toc-sec-contenidos" class="nav-link" data-scroll-target="#sec-contenidos">Contenidos</a></li>
+  <li><a href="#sec-competencias-especificas" id="toc-sec-competencias-especificas" class="nav-link" data-scroll-target="#sec-competencias-especificas">Competencias específicas</a></li>
   </ul>
 <div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="index.ipynb" download="index.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
     </div>
@@ -482,106 +579,79 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Si prefieres descargar el <code>.ipynb</code> y subirlo manualmente: <a href="https://github.com/Adamychen/m10_quarto/tree/main/notebooks/">Ver archivos en GitHub</a>.</p>
 </div>
 </div>
-<section id="distribución-de-la-carga-docente" class="level2">
-<h2 class="anchored" data-anchor-id="distribución-de-la-carga-docente">Distribución de la carga docente</h2>
-<table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
-<thead>
-<tr class="header">
-<th>Tipo de actividad</th>
-<th>Horas</th>
-<th>% del total</th>
-<th>Formato</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>Horas Teóricas (HT)</td>
-<td>18</td>
-<td>24 %</td>
-<td>Magistral + lectura técnica</td>
-</tr>
-<tr class="even">
-<td>Horas Prácticas Docentes (HPD)</td>
-<td>12</td>
-<td>16 %</td>
-<td>Talleres guiados / notebooks</td>
-</tr>
-<tr class="odd">
-<td>Horas del Alumno (HA)</td>
-<td>45</td>
-<td>60 %</td>
-<td>Proyecto + estudio autónomo</td>
-</tr>
-<tr class="even">
-<td><strong>TOTAL</strong></td>
-<td><strong>75</strong></td>
-<td><strong>100 %</strong></td>
-<td></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="descripción-del-módulo" class="level2">
-<h2 class="anchored" data-anchor-id="descripción-del-módulo">1. Descripción del módulo</h2>
+<div class="callout callout-style-default callout-warning callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Warning</span>Configura tu API key de Llamus antes de ejecutar las celdas
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Los notebooks que usan LLM necesitan una API key de la Universidad de Sevilla. <strong>Si la celda de setup te muestra <code>⚠️ LLM_API_KEY no encontrada</code>, configúrala antes de seguir:</strong></p>
+<ul>
+<li><strong>En Colab</strong> (recomendado): abre el icono 🔑 (Secrets) en la barra lateral izquierda → “Add new secret” → nombre <code>LLAMUS_API_KEY</code> → pega tu clave → activa “Notebook access” → vuelve a ejecutar la celda de setup.</li>
+<li><strong>En local</strong>: crea un archivo <code>.env</code> en la raíz del proyecto con <code>LLM_API_KEY=tu_clave</code>.</li>
+</ul>
+<p>La clave te la proporcionará el profesorado al inicio del módulo. Más detalles en <a href="./06-herramientas.html#sec-config-api-key">Herramientas → Configuración de la API key</a>.</p>
+</div>
+</div>
+<section id="sec-descripcion-modulo" class="level2">
+<h2 class="anchored" data-anchor-id="sec-descripcion-modulo">1. Descripción del módulo</h2>
 <p>Este módulo introduce al alumno en el ecosistema de la IA Generativa desde una perspectiva de ingeniería aplicada a Data Science. El objetivo es que el alumno adquiera criterio técnico para seleccionar, integrar y desplegar modelos generativos en contextos reales: desde la consulta semántica sobre datos corporativos hasta la automatización de flujos de análisis mediante agentes.</p>
 <p>El módulo está diseñado con un enfoque <em>hands-on</em>: cada bloque teórico tiene un correlato práctico directo, y todas las actividades se articulan en torno a un proyecto integrador que el alumno construye de forma incremental a lo largo del módulo.</p>
+<p>El recorrido comienza con una pregunta transversal: ¿cómo pasamos del texto y los datos a representaciones que una máquina pueda comparar, transformar y utilizar? La respuesta histórica va desde las representaciones dispersas de palabras hasta los embeddings contextuales, los LLM, la recuperación semántica y los agentes. Puedes consultar este mapa antes de empezar el Bloque 1 en el <a href="./bloque1/00-panorama.html">panorama histórico: del texto a los embeddings</a>.</p>
 <blockquote class="blockquote">
 <p><strong>Prerrequisitos:</strong> haber superado los módulos anteriores del máster, con especial dominio de Python, manipulación de datos con pandas/NumPy y fundamentos de Machine Learning supervisado y no supervisado.</p>
 </blockquote>
 </section>
-<section id="contenidos" class="level2">
-<h2 class="anchored" data-anchor-id="contenidos">Contenidos</h2>
+<section id="sec-contenidos" class="level2">
+<h2 class="anchored" data-anchor-id="sec-contenidos">Contenidos</h2>
+<div id="tbl-contenidos" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-contenidos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;1: Bloques del módulo
+</figcaption>
+<div aria-describedby="tbl-contenidos-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
-<colgroup>
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-<col style="width: 25%">
-</colgroup>
 <thead>
 <tr class="header">
 <th>Bloque</th>
 <th>Título</th>
-<th>HT</th>
-<th>HPD</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td>1</td>
-<td>Fundamentos: Transformers, LLMs y Representación Vectorial</td>
-<td>6h</td>
-<td>4h</td>
+<td>Fundamentos: Transformers, LLM y Representación Vectorial</td>
 </tr>
 <tr class="even">
 <td>2</td>
 <td>Orquestación: Prompt Engineering, Frameworks y Agentes</td>
-<td>6h</td>
-<td>4h</td>
 </tr>
 <tr class="odd">
 <td>3</td>
 <td>Aplicaciones: RAG, Datos Sintéticos y Fine-tuning</td>
-<td>6h</td>
-<td>4h</td>
 </tr>
 <tr class="even">
 <td>4</td>
 <td>Despliegue y Gobernanza</td>
-<td>—</td>
-<td>—</td>
 </tr>
 </tbody>
 </table>
+</div>
+</figure>
+</div>
 </section>
-<section id="competencias-específicas" class="level2">
-<h2 class="anchored" data-anchor-id="competencias-específicas">Competencias específicas</h2>
+<section id="sec-competencias-especificas" class="level2">
+<h2 class="anchored" data-anchor-id="sec-competencias-especificas">Competencias específicas</h2>
+<div id="tbl-competencias" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-competencias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;2: Competencias específicas (CE) del módulo y su descriptor de logro
+</figcaption>
+<div aria-describedby="tbl-competencias-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <table class="caption-top table">
 <colgroup>
 <col style="width: 33%">
@@ -609,12 +679,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <tr class="odd">
 <td><strong>CE-3</strong></td>
 <td>Integración segura con entornos locales</td>
-<td>Implementar servidores MCP que expongan fuentes de datos corporativas a LLMs, aplicando controles de acceso y evaluando superficies de ataque (prompt injection, data leakage).</td>
+<td>Implementar servidores MCP que expongan fuentes de datos corporativas a LLM, aplicando controles de acceso y evaluando superficies de ataque (prompt injection, data leakage).</td>
 </tr>
 <tr class="even">
 <td><strong>CE-4</strong></td>
 <td>Sistemas RAG orientados a negocio</td>
-<td>Implementar y evaluar arquitecturas RAG sobre datos estructurados y desestructurados, midiendo su calidad con frameworks estándar (RAGAS) e iterando sobre componentes individuales.</td>
+<td>Implementar y evaluar arquitecturas RAG sobre datos estructurados y no estructurados, midiendo su calidad con frameworks estándar (RAGAS) e iterando sobre componentes individuales.</td>
 </tr>
 <tr class="odd">
 <td><strong>CE-5</strong></td>
@@ -628,6 +698,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </tr>
 </tbody>
 </table>
+</div>
+</figure>
+</div>
 
 
 <!-- -->
@@ -733,16 +806,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     }
     function toggleCodeHandler(show) {
       return function(e) {
-        const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
-        for (let i=0; i<detailsSrc.length; i++) {
-          const details = detailsSrc[i].parentElement;
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
           if (show) {
             details.open = true;
           } else {
             details.removeAttribute("open");
           }
         }
-        const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
         const fromCls = show ? "hidden" : "unhidden";
         const toCls = show ? "unhidden" : "hidden";
         for (let i=0; i<cellCodeDivs.length; i++) {
@@ -1108,42 +1181,50 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>Si prefieres descargar el <span class="in">`.ipynb`</span> y subirlo manualmente: <span class="co">[</span><span class="ot">Ver archivos en GitHub</span><span class="co">](https://github.com/Adamychen/m10_quarto/tree/main/notebooks/)</span>.</span>
 <span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="fu">## Distribución de la carga docente</span></span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Tipo de actividad <span class="pp">|</span> Horas <span class="pp">|</span> % del total <span class="pp">|</span> Formato <span class="pp">|</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Horas Teóricas (HT) <span class="pp">|</span> 18 <span class="pp">|</span> 24 % <span class="pp">|</span> Magistral + lectura técnica <span class="pp">|</span></span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Horas Prácticas Docentes (HPD) <span class="pp">|</span> 12 <span class="pp">|</span> 16 % <span class="pp">|</span> Talleres guiados / notebooks <span class="pp">|</span></span>
-<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Horas del Alumno (HA) <span class="pp">|</span> 45 <span class="pp">|</span> 60 % <span class="pp">|</span> Proyecto + estudio autónomo <span class="pp">|</span></span>
-<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **TOTAL** | **75** | **100 %** <span class="pp">|</span> <span class="pp">|</span></span>
-<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. Descripción del módulo</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Configura tu API key de Llamus antes de ejecutar las celdas</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>Los notebooks que usan LLM necesitan una API key de la Universidad de Sevilla. **Si la celda de setup te muestra `⚠️ LLM_API_KEY no encontrada`, configúrala antes de seguir:**</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**En Colab** (recomendado): abre el icono 🔑 (Secrets) en la barra lateral izquierda → "Add new secret" → nombre <span class="in">`LLAMUS_API_KEY`</span> → pega tu clave → activa "Notebook access" → vuelve a ejecutar la celda de setup.</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**En local**: crea un archivo <span class="in">`.env`</span> en la raíz del proyecto con <span class="in">`LLM_API_KEY=tu_clave`</span>.</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>La clave te la proporcionará el profesorado al inicio del módulo. Más detalles en <span class="co">[</span><span class="ot">Herramientas → Configuración de la API key</span><span class="co">](06-herramientas.qmd#sec-config-api-key)</span>.</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>Este módulo introduce al alumno en el ecosistema de la IA Generativa desde una perspectiva de ingeniería aplicada a Data Science. El objetivo es que el alumno adquiera criterio técnico para seleccionar, integrar y desplegar modelos generativos en contextos reales: desde la consulta semántica sobre datos corporativos hasta la automatización de flujos de análisis mediante agentes.</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. Descripción del módulo {#sec-descripcion-modulo}</span></span>
 <span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>El módulo está diseñado con un enfoque *hands-on*: cada bloque teórico tiene un correlato práctico directo, y todas las actividades se articulan en torno a un proyecto integrador que el alumno construye de forma incremental a lo largo del módulo.</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>Este módulo introduce al alumno en el ecosistema de la IA Generativa desde una perspectiva de ingeniería aplicada a Data Science. El objetivo es que el alumno adquiera criterio técnico para seleccionar, integrar y desplegar modelos generativos en contextos reales: desde la consulta semántica sobre datos corporativos hasta la automatización de flujos de análisis mediante agentes.</span>
 <span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Prerrequisitos:** haber superado los módulos anteriores del máster, con especial dominio de Python, manipulación de datos con pandas/NumPy y fundamentos de Machine Learning supervisado y no supervisado.</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>El módulo está diseñado con un enfoque *hands-on*: cada bloque teórico tiene un correlato práctico directo, y todas las actividades se articulan en torno a un proyecto integrador que el alumno construye de forma incremental a lo largo del módulo.</span>
 <span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a><span class="fu">## Contenidos</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>El recorrido comienza con una pregunta transversal: ¿cómo pasamos del texto y los datos a representaciones que una máquina pueda comparar, transformar y utilizar? La respuesta histórica va desde las representaciones dispersas de palabras hasta los embeddings contextuales, los LLM, la recuperación semántica y los agentes. Puedes consultar este mapa antes de empezar el Bloque 1 en el <span class="co">[</span><span class="ot">panorama histórico: del texto a los embeddings</span><span class="co">](bloque1/00-panorama.qmd)</span>.</span>
 <span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Bloque <span class="pp">|</span> Título <span class="pp">|</span> HT <span class="pp">|</span> HPD <span class="pp">|</span></span>
-<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
-<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 1 <span class="pp">|</span> Fundamentos: Transformers, LLMs y Representación Vectorial <span class="pp">|</span> 6h <span class="pp">|</span> 4h <span class="pp">|</span></span>
-<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 2 <span class="pp">|</span> Orquestación: Prompt Engineering, Frameworks y Agentes <span class="pp">|</span> 6h <span class="pp">|</span> 4h <span class="pp">|</span></span>
-<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 3 <span class="pp">|</span> Aplicaciones: RAG, Datos Sintéticos y Fine-tuning <span class="pp">|</span> 6h <span class="pp">|</span> 4h <span class="pp">|</span></span>
-<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 4 <span class="pp">|</span> Despliegue y Gobernanza <span class="pp">|</span> — <span class="pp">|</span> — <span class="pp">|</span></span>
-<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="fu">## Competencias específicas</span></span>
-<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cód. <span class="pp">|</span> Competencia <span class="pp">|</span> Descriptor de logro <span class="pp">|</span></span>
-<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-1** <span class="pp">|</span> Representación vectorial y búsqueda semántica <span class="pp">|</span> Diseñar pipelines de embeddings adecuados a la naturaleza del dato (texto, tabular, código) y seleccionar la base de datos vectorial más apropiada según requisitos de escala, latencia y privacidad. <span class="pp">|</span></span>
-<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-2** <span class="pp">|</span> Orquestación de modelos y agentes <span class="pp">|</span> Construir flujos complejos con LangChain/LlamaIndex y diseñar agentes autónomos con Tool Calling que integran herramientas externas de forma robusta y trazable. <span class="pp">|</span></span>
-<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-3** <span class="pp">|</span> Integración segura con entornos locales <span class="pp">|</span> Implementar servidores MCP que expongan fuentes de datos corporativas a LLMs, aplicando controles de acceso y evaluando superficies de ataque (prompt injection, data leakage). <span class="pp">|</span></span>
-<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-4** <span class="pp">|</span> Sistemas RAG orientados a negocio <span class="pp">|</span> Implementar y evaluar arquitecturas RAG sobre datos estructurados y desestructurados, midiendo su calidad con frameworks estándar (RAGAS) e iterando sobre componentes individuales. <span class="pp">|</span></span>
-<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-5** <span class="pp">|</span> Ajuste fino y datos sintéticos <span class="pp">|</span> Aplicar técnicas PEFT (LoRA/QLoRA) para adaptar modelos open-source a dominios específicos y generar datos sintéticos validados estadísticamente para aumentar o anonimizar datasets. <span class="pp">|</span></span>
-<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-6** <span class="pp">|</span> Gobernanza y despliegue responsable <span class="pp">|</span> Evaluar modelos con métricas LLM-as-a-judge, detectar y mitigar alucinaciones y sesgos, y documentar sistemas generativos siguiendo estándares de transparencia algorítmica. <span class="pp">|</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Prerrequisitos:** haber superado los módulos anteriores del máster, con especial dominio de Python, manipulación de datos con pandas/NumPy y fundamentos de Machine Learning supervisado y no supervisado.</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a><span class="fu">## Contenidos {#sec-contenidos}</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>: Bloques del módulo {#tbl-contenidos}</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Bloque <span class="pp">|</span> Título <span class="pp">|</span></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 1 <span class="pp">|</span> Fundamentos: Transformers, LLM y Representación Vectorial <span class="pp">|</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 2 <span class="pp">|</span> Orquestación: Prompt Engineering, Frameworks y Agentes <span class="pp">|</span></span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 3 <span class="pp">|</span> Aplicaciones: RAG, Datos Sintéticos y Fine-tuning <span class="pp">|</span></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> 4 <span class="pp">|</span> Despliegue y Gobernanza <span class="pp">|</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a><span class="fu">## Competencias específicas {#sec-competencias-especificas}</span></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>: Competencias específicas (CE) del módulo y su descriptor de logro {#tbl-competencias}</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cód. <span class="pp">|</span> Competencia <span class="pp">|</span> Descriptor de logro <span class="pp">|</span></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-1** <span class="pp">|</span> Representación vectorial y búsqueda semántica <span class="pp">|</span> Diseñar pipelines de embeddings adecuados a la naturaleza del dato (texto, tabular, código) y seleccionar la base de datos vectorial más apropiada según requisitos de escala, latencia y privacidad. <span class="pp">|</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-2** <span class="pp">|</span> Orquestación de modelos y agentes <span class="pp">|</span> Construir flujos complejos con LangChain/LlamaIndex y diseñar agentes autónomos con Tool Calling que integran herramientas externas de forma robusta y trazable. <span class="pp">|</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-3** <span class="pp">|</span> Integración segura con entornos locales <span class="pp">|</span> Implementar servidores MCP que expongan fuentes de datos corporativas a LLM, aplicando controles de acceso y evaluando superficies de ataque (prompt injection, data leakage). <span class="pp">|</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-4** <span class="pp">|</span> Sistemas RAG orientados a negocio <span class="pp">|</span> Implementar y evaluar arquitecturas RAG sobre datos estructurados y no estructurados, midiendo su calidad con frameworks estándar (RAGAS) e iterando sobre componentes individuales. <span class="pp">|</span></span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-5** <span class="pp">|</span> Ajuste fino y datos sintéticos <span class="pp">|</span> Aplicar técnicas PEFT (LoRA/QLoRA) para adaptar modelos open-source a dominios específicos y generar datos sintéticos validados estadísticamente para aumentar o anonimizar datasets. <span class="pp">|</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **CE-6** <span class="pp">|</span> Gobernanza y despliegue responsable <span class="pp">|</span> Evaluar modelos con métricas LLM-as-a-judge, detectar y mitigar alucinaciones y sesgos, y documentar sistemas generativos siguiendo estándares de transparencia algorítmica. <span class="pp">|</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
 
