@@ -1,0 +1,438 @@
+---
+title: "Demo — Búsqueda híbrida: palabras, significado y fusión"
+description: "Compara lado a lado la búsqueda por palabras (BM25), por significado (embeddings) y su fusión (RRF) sobre las mismas consultas, y comprueba cuál deja más veces la respuesta al alcance del LLM."
+engine: markdown
+---
+
+> Demo que acompaña a [Recuperación](../bloque1/01e-recuperacion.qmd#sec-hibrida). Usa el mismo FAQ, el mismo BM25 y el mismo modelo de embeddings (`paraphrase-multilingual-MiniLM-L12-v2`) que el capítulo, así que obtendrás los mismos rankings en el notebook. Los embeddings se calcularon una vez y se guardaron como datos estáticos; BM25 se calcula en tu navegador. No necesitas clave de API.
+
+Hay dos formas de buscar en una colección de documentos: por **palabras** (BM25 cuenta qué palabras de la consulta aparecen en cada documento) y por **significado** (los embeddings comparan de qué trata cada texto). La **búsqueda híbrida** las combina con *Reciprocal Rank Fusion* (RRF): ignora las puntuaciones y suma solo los puestos de cada documento en los dos rankings.
+
+Elige una consulta y mira dónde queda la respuesta correcta (en verde) en cada columna. Después mueve el peso de la fusión y vigila el marcador.
+
+```{shinylive-python}
+#| standalone: true
+#| viewerHeight: 900
+
+## file: app.py
+import html
+import math
+import re
+from collections import Counter
+
+from shiny import reactive
+from shiny.express import input, ui, render
+
+from data import DATA
+
+DOCS, LABELS, QUERIES = DATA["docs"], DATA["labels"], DATA["queries"]
+TOP = 5
+K = 3  # documentos que se pasarían al LLM
+C = 60  # constante de RRF
+BLUE, DARK, ORANGE, GREEN, GRAY = "#4B8BBE", "#306998", "#e65100", "#2e7d32", "#9ca3af"
+
+# ── BM25: el mismo código que en bloque1/01e-recuperacion.qmd ────────────────
+PALABRAS_VACIAS = set("el la los las un una unos unas de del al a en y o que qué me mi tu te se es por con para si su sus lo como cuánto cuál cómo cada".split())
+
+
+def tokenizar(texto):
+    palabras = re.findall(r"[a-záéíóúñü0-9\-]+", texto.lower())
+    return [p for p in palabras if p not in PALABRAS_VACIAS]
+
+
+class BM25:
+    def __init__(self, documentos, k1=1.5, b=0.75):
+        self.docs = [tokenizar(d) for d in documentos]
+        self.k1, self.b = k1, b
+        self.N = len(self.docs)
+        self.avgdl = sum(len(d) for d in self.docs) / self.N
+        self.df = Counter(p for d in self.docs for p in set(d))
+
+    def idf(self, palabra):
+        return math.log(1 + (self.N - self.df[palabra] + 0.5) / (self.df[palabra] + 0.5))
+
+    def puntuaciones(self, consulta):
+        resultado = [0.0] * self.N
+        for i, doc in enumerate(self.docs):
+            frecuencias = Counter(doc)
+            for p in tokenizar(consulta):
+                if p in frecuencias:
+                    f = frecuencias[p]
+                    norm = f + self.k1 * (1 - self.b + self.b * len(doc) / self.avgdl)
+                    resultado[i] += self.idf(p) * f * (self.k1 + 1) / norm
+        return resultado
+
+
+bm25 = BM25(DOCS)
+
+
+def rankings(qi, w):
+    """Rankings léxico, denso e híbrido (RRF ponderado) con sus puntuaciones."""
+    Q = QUERIES[qi]
+    b = bm25.puntuaciones(Q["q"])
+    lex = [j for j in sorted(range(len(DOCS)), key=lambda j: -b[j]) if b[j] > 0]
+    den = sorted(range(len(DOCS)), key=lambda j: -Q["cos"][j])
+    rrf = Counter()
+    for weight, rk in ((w, lex), (1 - w, den)):
+        for pos, j in enumerate(rk, start=1):
+            rrf[j] += weight / (C + pos)
+    hyb = [j for j in sorted(rrf, key=lambda j: -rrf[j]) if rrf[j] > 0]
+    return {"lex": (lex, b), "den": (den, Q["cos"]), "hyb": (hyb, rrf)}
+
+
+def place(R, key, j):
+    """Puesto de j con empates compartidos (1 + documentos con puntuación estrictamente mayor)."""
+    rk, sc = R[key]
+    if j not in rk:
+        return None
+    return 1 + sum(1 for i in rk if sc[i] > sc[j] + 1e-12)
+
+
+def tied(R, key, j):
+    rk, sc = R[key]
+    return j in rk and sum(1 for i in rk if abs(sc[i] - sc[j]) < 1e-12) > 1
+
+
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.muted{color:#6b7280;font-size:.85em}
+.chip{display:inline-block;border:1px solid #306998;color:#306998;background:#fff;border-radius:999px;
+  padding:3px 12px;margin:3px 6px 3px 0;font-size:.88em;cursor:pointer;user-select:none}
+.chip:hover{background:#e8f0f8}.chip.on{background:#306998;color:#fff}
+.query{font-size:1.15em;font-weight:600;margin:6px 0 2px}
+.lesson{border-left:4px solid #e65100;padding-left:10px;margin:8px 0;font-size:.92em}
+.board{display:flex;gap:10px;flex-wrap:wrap}
+.tile{flex:1;min-width:150px;border:1px solid #e5e7eb;border-radius:8px;padding:6px 10px}
+.tile b{font-size:1.5em;display:block}
+.doc rect{transition:none}.doc:hover rect{stroke:#111;stroke-width:1.8}
+.nums{font-size:.82em;border-collapse:collapse;width:100%}
+.nums td,.nums th{padding:3px 6px;border-bottom:1px solid #f3f4f6;text-align:right}
+.nums td:first-child,.nums th:first-child{text-align:left}
+""")
+
+sel = reactive.value(0)
+
+
+@reactive.effect
+@reactive.event(input.pick)
+def _pick():
+    sel.set(int(input.pick()))
+
+
+@render.ui
+def chips():
+    k = sel()
+    items = "".join(
+        f"<span class='chip{' on' if i == k else ''}' "
+        f"onclick=\"Shiny.setInputValue('pick', {i}, {{priority: 'event'}})\">Consulta {i + 1}</span>"
+        for i in range(len(QUERIES))
+    )
+    Q = QUERIES[k]
+    return ui.HTML(
+        f"<div>{items}</div><div class='query'>«{html.escape(Q['q'])}»</div>"
+        f"<div class='muted'>Respuesta correcta: <b style='color:{GREEN}'>{html.escape(DOCS[Q['gold']])}</b></div>"
+    )
+
+
+ui.input_slider(
+    "w", "Peso en la fusión: ← solo palabras (BM25) · solo significado (embeddings) →",
+    0, 1, 0.5, step=0.1, width="100%",
+)
+
+
+@render.ui
+def columns():
+    k, w = sel(), input.w()
+    gold = QUERIES[k]["gold"]
+    R = rankings(k, 1 - w)  # el deslizador va de palabras (0) a significado (1)
+    W, colw, rowh, top = 820, 230, 44, 58
+    xs = {"lex": 10, "hyb": (W - colw) / 2, "den": W - colw - 10}
+    titles = {"lex": "Palabras (BM25)", "hyb": "Fusión (RRF)", "den": "Significado (embeddings)"}
+    colors = {"lex": ORANGE, "hyb": DARK, "den": BLUE}
+    parts = []
+    # Pesos de cada método en la fusión, dibujados como grosor de la cabecera
+    weights = {"lex": 1 - w, "den": w}
+    pos = {}
+    for key in ("lex", "hyb", "den"):
+        rk, _ = R[key]
+        pos[key] = {j: i for i, j in enumerate(rk[:TOP])}
+    # Líneas: del puesto en cada método al puesto en la fusión
+    for side in ("lex", "den"):
+        for j, i in pos[side].items():
+            if j not in pos["hyb"]:
+                continue
+            h = pos["hyb"][j]
+            x1 = xs[side] + (colw if side == "lex" else 0)
+            x2 = xs["hyb"] + (0 if side == "lex" else colw)
+            y1, y2 = top + i * rowh + rowh / 2 - 3, top + h * rowh + rowh / 2 - 3
+            is_gold = j == gold
+            op = 0.15 + 0.85 * weights[side]
+            parts.append(
+                f"<path d='M{x1},{y1} C{(x1 + x2) / 2},{y1} {(x1 + x2) / 2},{y2} {x2},{y2}' fill='none' "
+                f"stroke='{GREEN if is_gold else GRAY}' stroke-width='{3.5 if is_gold else 1.5}' "
+                f"stroke-opacity='{op:.2f}'/>"
+            )
+    for key in ("lex", "hyb", "den"):
+        x = xs[key]
+        sub = (f"peso {weights[key]:.0%}" if key != "hyb" else "suma de 1/(60 + puesto)")
+        parts.append(
+            f"<text x='{x + colw / 2}' y='22' text-anchor='middle' font-size='14' font-weight='700' "
+            f"fill='{colors[key]}'>{titles[key]}</text>"
+            f"<text x='{x + colw / 2}' y='40' text-anchor='middle' font-size='11' fill='#6b7280'>{sub}</text>"
+        )
+        rk, sc = R[key]
+        if not rk:
+            parts.append(
+                f"<rect x='{x}' y='{top}' width='{colw}' height='{rowh - 6}' rx='8' fill='#fff' "
+                f"stroke='{GRAY}' stroke-dasharray='5 4'/>"
+                f"<text x='{x + colw / 2}' y='{top + 24}' text-anchor='middle' font-size='12' fill='#6b7280'>"
+                f"Ninguna palabra en común</text>"
+            )
+        best = max((sc[j] for j in rk), default=1) or 1
+        for i, j in enumerate(rk[:TOP]):
+            y = top + i * rowh
+            is_gold = j == gold
+            bar = colw - 54
+            parts.append(
+                f"<g class='doc'><title>{html.escape(DOCS[j])}</title>"
+                f"<rect x='{x}' y='{y}' width='{colw}' height='{rowh - 6}' rx='8' "
+                f"fill='{'#e8f5e9' if is_gold else '#fff'}' stroke='{GREEN if is_gold else '#d1d5db'}' "
+                f"stroke-width='{2.5 if is_gold else 1}'/>"
+                f"<text x='{x + 10}' y='{y + 17}' font-size='12.5' font-weight='{700 if is_gold else 500}' "
+                f"fill='#111'>{place(R, key, j)}{'=' if tied(R, key, j) else '.'} {html.escape(LABELS[j])}</text>"
+                f"<rect x='{x + 10}' y='{y + 25}' width='{bar}' height='6' rx='3' fill='#f3f4f6'/>"
+                f"<rect x='{x + 10}' y='{y + 25}' width='{bar * sc[j] / best:.1f}' height='6' rx='3' "
+                f"fill='{GREEN if is_gold else colors[key]}' fill-opacity='.8'/>"
+                f"<text x='{x + colw - 8}' y='{y + 31}' text-anchor='end' font-size='10' fill='#6b7280'>"
+                f"{sc[j]:.3f}</text></g>"
+            )
+    height = top + TOP * rowh + 4
+    places = {key: place(R, key, gold) for key in R}
+
+    def fmt(p):
+        return "no aparece" if p is None else f"puesto {p}"
+
+    tie_note = ""
+    if tied(R, "hyb", gold):
+        others = [LABELS[j] for j in R["hyb"][0] if j != gold and abs(R["hyb"][1][j] - R["hyb"][1][gold]) < 1e-12]
+        tie_note = (f" <span style='color:{ORANGE};font-weight:600'>(empatada con {', '.join(others)}: "
+                    f"suman exactamente lo mismo)</span>")
+
+    verdict = (
+        f"<p style='margin:6px 0 0'>Respuesta correcta: "
+        f"palabras → <b style='color:{ORANGE}'>{fmt(places['lex'])}</b> · "
+        f"significado → <b style='color:{BLUE}'>{fmt(places['den'])}</b> · "
+        f"fusión → <b style='color:{DARK}'>{fmt(places['hyb'])}</b>{tie_note}</p>"
+    )
+    return ui.HTML(
+        f"<div class='card'><svg viewBox='0 0 {W} {height}' width='100%' style='display:block' "
+        f"font-family='system-ui,sans-serif'>{''.join(parts)}</svg>"
+        f"<div class='muted'>Se muestran los {TOP} primeros de cada ranking. En verde, la respuesta correcta; «=» indica empate. "
+        f"Las líneas unen el puesto de cada documento en un método con su puesto en la fusión. "
+        f"Pasa el ratón por un documento para leerlo entero.</div>{verdict}"
+        f"<div class='lesson'>{html.escape(QUERIES[k]['lesson'])}</div></div>"
+    )
+
+
+@render.ui
+def scoreboard():
+    w = input.w()
+    hits = {"lex": 0, "den": 0, "hyb": 0}
+    for i, Q in enumerate(QUERIES):
+        R = rankings(i, 1 - w)
+        for key in hits:
+            p = place(R, key, Q["gold"])
+            if p is not None and p <= K:
+                hits[key] += 1
+    n = len(QUERIES)
+    best = max(hits.values())
+
+    def tile(key, name, color):
+        star = " ★" if hits[key] == best else ""
+        return (f"<div class='tile'><span class='muted'>{name}</span>"
+                f"<b style='color:{color}'>{hits[key]} de {n}{star}</b></div>")
+
+    return ui.HTML(
+        f"<div class='card'><b>Marcador: ¿en cuántas consultas entra la respuesta correcta entre las {K} primeras?</b> "
+        f"<div class='muted'>En un RAG, esas {K} son las que se le pasan al LLM: si la respuesta queda fuera, "
+        f"el modelo no la verá. Cuenta las {n} consultas con el peso actual.</div>"
+        f"<div class='board' style='margin-top:6px'>{tile('lex', 'Palabras (BM25)', ORANGE)}"
+        f"{tile('den', 'Significado (embeddings)', BLUE)}{tile('hyb', 'Fusión (RRF)', DARK)}</div></div>"
+    )
+
+
+ui.input_checkbox("nums", "Ver los números de la fusión", value=False, width="100%")
+
+
+@render.ui
+def numbers():
+    if not input.nums():
+        return ui.HTML("")
+    k, w = sel(), input.w()
+    R = rankings(k, 1 - w)
+    lex, den, (hyb, rrf) = R["lex"][0], R["den"][0], R["hyb"]
+    gold = QUERIES[k]["gold"]
+    rows = []
+    for j in hyb[:TOP]:
+        pl, pd = place(R, "lex", j), place(R, "den", j)
+        a = f"{1 - w:.1f} / (60 + {pl}) = {(1 - w) / (C + pl):.4f}" if pl else "—"
+        b = f"{w:.1f} / (60 + {pd}) = {w / (C + pd):.4f}"
+        style = f" style='color:{GREEN};font-weight:700'" if j == gold else ""
+        rows.append(f"<tr{style}><td>{html.escape(LABELS[j])}</td><td>{a}</td><td>{b}</td><td>{rrf[j]:.4f}</td></tr>")
+    return ui.HTML(
+        "<div class='card' style='overflow-x:auto'><table class='nums'><thead><tr><th>Documento</th>"
+        "<th>Palabras</th><th>Significado</th><th>Total</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody></table><p class='muted' style='margin:6px 0 0'>"
+        "Cada método aporta peso / (60 + puesto). Solo cuentan los puestos, no las puntuaciones: "
+        "por eso se pueden sumar un BM25 (de 0 a decenas) y un coseno (de 0 a 1). "
+        "Con peso 0,5 da el mismo orden que la RRF estándar del capítulo (con los números a la mitad).</p></div>"
+    )
+
+## file: data.py
+# DATA-START
+DATA = {
+ "model": "paraphrase-multilingual-MiniLM-L12-v2",
+ "docs": [
+  "Puedes pagar con tarjeta de crédito o débito en cualquier comercio adherido.",
+  "No se admite el pago con tarjeta en operaciones superiores a 3.000 euros; usa transferencia.",
+  "Para pedir un reembolso, solicita la devolución en la app en un plazo de 14 días.",
+  "La comisión por transferencia SEPA es de 0,50 euros por operación.",
+  "Las transferencias internacionales tienen una comisión del 2 % del importe.",
+  "Si pierdes tu tarjeta, bloquéala desde la app o llama al teléfono de atención 24 horas.",
+  "El IBAN es el código que identifica tu cuenta bancaria en transferencias nacionales e internacionales.",
+  "Para cambiar tu contraseña, entra en Ajustes > Seguridad y pulsa «Restablecer».",
+  "El límite diario de retirada en cajeros es de 600 euros.",
+  "Abrir una cuenta nueva es gratis y se completa en cinco minutos con tu DNI.",
+  "Los préstamos personales se conceden en 24 horas si tienes la nómina domiciliada.",
+  "La hipoteca a tipo variable se revisa cada seis meses según el Euríbor.",
+  "Error E-4021: la operación fue rechazada por saldo insuficiente.",
+  "Error E-4012: la tarjeta ha caducado y debe renovarse."
+ ],
+ "labels": [
+  "Pagar con tarjeta",
+  "Límite de pago con tarjeta",
+  "Reembolsos",
+  "Comisión SEPA",
+  "Transf. internacionales",
+  "Tarjeta perdida",
+  "Qué es el IBAN",
+  "Cambiar contraseña",
+  "Límite en cajeros",
+  "Abrir una cuenta",
+  "Préstamos personales",
+  "Hipoteca y Euríbor",
+  "Error E-4021",
+  "Error E-4012"
+ ],
+ "queries": [
+  {
+   "q": "Euríbor",
+   "gold": 11,
+   "lesson": "Nombre propio: BM25 lo encuentra al instante; los embeddings lo dejan en el puesto 5. La fusión lo rescata, porque basta con que un método lo ponga arriba.",
+   "cos": [
+    0.00989999994635582,
+    0.10980000346899033,
+    -0.03280000016093254,
+    0.11379999667406082,
+    0.07720000296831131,
+    0.016599999740719795,
+    0.1754000037908554,
+    -0.014999999664723873,
+    0.1655000001192093,
+    -0.013700000010430813,
+    -0.08179999887943268,
+    0.12389999628067017,
+    0.12460000067949295,
+    0.15850000083446503
+   ]
+  },
+  {
+   "q": "he olvidado mi clave de acceso",
+   "gold": 7,
+   "lesson": "«Clave de acceso» no comparte ninguna palabra con «contraseña»: BM25 no encuentra nada, el significado sí. La fusión acierta aunque uno de los dos métodos no aporte nada.",
+   "cos": [
+    -0.039799999445676804,
+    0.193900004029274,
+    0.19939999282360077,
+    0.07940000295639038,
+    0.02800000086426735,
+    0.2321999967098236,
+    0.18770000338554382,
+    0.5170000195503235,
+    0.11800000071525574,
+    0.20069999992847443,
+    -0.006800000090152025,
+    -0.06689999997615814,
+    0.2433999925851822,
+    0.3806000053882599
+   ]
+  },
+  {
+   "q": "¿qué significa el error E-4012?",
+   "gold": 13,
+   "lesson": "BM25 pone E-4012 primero y E-4021 segundo; los embeddings, al revés. Los dos suman exactamente lo mismo: empate. Cuando los métodos se contradicen así, la fusión no sabe decidir.",
+   "cos": [
+    -0.11330000311136246,
+    0.15860000252723694,
+    0.06800000369548798,
+    0.26339998841285706,
+    0.08150000125169754,
+    0.06939999759197235,
+    0.1720000058412552,
+    0.17059999704360962,
+    0.16089999675750732,
+    0.010200000368058681,
+    -0.013399999588727951,
+    0.15440000593662262,
+    0.6847000122070312,
+    0.5910000205039978
+   ]
+  },
+  {
+   "q": "límite para pagar con tarjeta",
+   "gold": 1,
+   "lesson": "«Pagar» y «tarjeta» salen en muchos documentos y BM25 entierra la respuesta en el puesto 5. La fusión no la pone primera, pero la mantiene entre las tres que leería el LLM.",
+   "cos": [
+    0.616599977016449,
+    0.5893999934196472,
+    0.3068999946117401,
+    0.22169999778270721,
+    0.2662000060081482,
+    0.4918000102043152,
+    0.2590000033378601,
+    0.05220000073313713,
+    0.27959999442100525,
+    0.26339998841285706,
+    0.37689998745918274,
+    0.1534000039100647,
+    0.12530000507831573,
+    0.420199990272522
+   ]
+  }
+ ]
+}
+# DATA-END
+```
+
+## Qué observar
+
+1. **Consulta 1 (Euríbor).** BM25 lo encuentra al instante: es un nombre propio y está escrito tal cual. Los embeddings lo dejan en el puesto 5, fuera de lo que leería el LLM. La fusión lo pone primero: le basta con que un método lo vea.
+2. **Consulta 2 (clave de acceso).** La columna de palabras está vacía: el documento dice «contraseña» y no hay ninguna palabra en común. Los embeddings la encuentran a la primera, y la fusión también.
+3. **Consulta 3 (error E-4012).** Los dos métodos se contradicen exactamente: uno pone E-4012 primero y E-4021 segundo, y el otro al revés. En la fusión suman lo mismo y quedan **empatados**. Activa «Ver los números» para comprobarlo.
+4. **Consulta 4 (límite para pagar con tarjeta).** «Pagar» y «tarjeta» aparecen en muchos documentos, así que BM25 entierra la respuesta en el puesto 5. La fusión no la pone primera, pero la deja segunda, dentro de las tres que leería el LLM.
+5. Mira el **marcador** con peso 50 %: la respuesta entra entre las 3 primeras en 2 de 4 consultas con palabras, 3 de 4 con significado y **4 de 4 con la fusión**. Lleva el deslizador a un extremo y la fusión se convierte en ese método por separado, con sus mismos fallos.
+
+## Qué has visto
+
+- **Cada método falla donde el otro acierta.** Las palabras aciertan con nombres propios, códigos y términos exactos; el significado, con sinónimos y paráfrasis.
+- **La fusión no es más lista que cada método: es más segura.** No siempre pone la respuesta la primera, e incluso puede empatar, pero casi nunca la deja fuera de los documentos que recibe el LLM. En un RAG, eso es lo que importa.
+- **Cuál es mejor depende de las preguntas.** Por eso, en un RAG real, se mide con un conjunto de preguntas de referencia, como en [la sección de métricas](../bloque1/01e-recuperacion.qmd#sec-metricas-recuperacion).
+
+::: {.callout-warning}
+## Qué es real y qué está simplificado
+
+- Los rankings son **reales**: BM25 y embeddings calculados sobre el FAQ del capítulo. Las cuatro consultas se **eligieron** para que cada una muestre un caso con claridad, entre unas sesenta probadas. Con muchas otras los dos métodos coinciden y no hay nada que fusionar.
+- El FAQ tiene 14 documentos. En una colección grande hay muchos más candidatos parecidos y las diferencias entre métodos son más frecuentes.
+- Con solo dos rankings, los empates exactos en la fusión son habituales (basta con que los métodos intercambien sus dos primeros puestos). Cada implementación los deshace a su manera; aquí se muestran tal cual.
+:::

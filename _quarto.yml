@@ -118,6 +118,8 @@ website:
             text: "Vecinos semánticos (embeddings)"
           - href: demos/chunking.qmd
             text: "Troceado para RAG"
+          - href: demos/hibrida.qmd
+            text: "Búsqueda híbrida"
           - href: demos/temperatura.qmd
             text: "Temperatura y muestreo"
           - href: demos/agente.qmd

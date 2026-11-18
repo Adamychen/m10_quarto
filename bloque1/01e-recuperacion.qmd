@@ -250,6 +250,8 @@ $$
 
 Un documento que aparece arriba en **los dos** rankings gana; uno que solo aparece en uno, queda en medio.
 
+> **Demo interactiva:** [búsqueda híbrida](../demos/hibrida.qmd). Compara las tres columnas (palabras, significado y fusión) sobre este mismo FAQ y comprueba cuál acierta más veces, y cuándo falla la fusión.
+
 ```{python}
 #| echo: true
 #| eval: true
