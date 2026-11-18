@@ -8,11 +8,11 @@ engine: markdown
 
 Un LLM no «decide» la siguiente palabra: calcula una **probabilidad para cada candidata** y saca una al azar. La **temperatura** controla cuánto se respetan esas probabilidades. Con temperatura baja casi siempre gana la favorita; con temperatura alta el abanico se aplana y las palabras raras tienen opción.
 
-Elige una frase, mueve la temperatura y pulsa **Generar 10 veces**. Compara cuántas palabras distintas salen.
+Elige una frase, mueve la temperatura (o usa los botones *Determinista*, *Equilibrada*, *Creativa* y *Caótica*) y pulsa **Generar 10**. Cada palabra que sale suma en su barra (×n), y la raya negra de cada barra marca la probabilidad original del modelo: así ves cuánto la ha deformado la temperatura.
 
 ```{shinylive-python}
 #| standalone: true
-#| viewerHeight: 860
+#| viewerHeight: 1200
 
 ## file: app.py
 import numpy as np
@@ -22,16 +22,40 @@ from shiny.express import input, ui, render
 from data import DATA
 
 PROMPTS = DATA["prompts"]
-BLUE, ORANGE, GRAY = "#4B8BBE", "#e65100", "#9e9e9e"
+BLUE, DARK, ORANGE, GREEN, GRAY = "#4B8BBE", "#306998", "#e65100", "#2e7d32", "#9e9e9e"
 RARE = 0.02  # una palabra es «poco plausible» si el modelo le da menos del 2 %
+MAX_SHOWN = 12
 
 CUTS = {
     "none": "Sin recorte (todas las candidatas)",
     "k3": "Solo las 3 más probables (top-k = 3)",
     "p90": "Solo las que suman el 90 % (top-p = 0,9)",
 }
+PRESETS = [(0.0, "Determinista"), (0.7, "Equilibrada"), (1.2, "Creativa"), (2.0, "Caótica")]
+
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.muted{color:#6b7280;font-size:.85em}
+.chip{display:inline-block;border:1px solid #306998;color:#306998;background:#fff;border-radius:999px;
+  padding:2px 12px;margin:2px 6px 2px 0;font-size:.85em;cursor:pointer;user-select:none}
+.chip:hover{background:#e8f0f8}.chip.on{background:#306998;color:#fff}
+.fan{display:grid;grid-template-columns:96px 1fr 46px 34px;gap:3px 8px;align-items:center}
+.fan .w{text-align:right}
+.track{position:relative;height:16px;background:#f3f4f6;border-radius:4px}
+.fill{position:absolute;left:0;top:0;bottom:0;border-radius:4px}
+.orig{position:absolute;top:-3px;bottom:-3px;width:2px;background:#111;opacity:.55}
+.count{font-size:.8em;font-weight:600;border-radius:999px;text-align:center;padding:0 4px}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0}
+.stat{flex:1;min-width:110px;border:1px solid #e5e7eb;border-radius:8px;padding:4px 10px}
+.stat b{font-size:1.4em;display:block}
+.gen{display:inline-block;margin:3px 6px 3px 0;padding:3px 10px;border-radius:999px;background:#f3f4f6}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.new{animation:pop .35s ease-out both}
+""")
 
 samples = reactive.value([])
+last_batch = reactive.value(0)
 
 
 def distribution(i, temp, cut):
@@ -56,63 +80,116 @@ def distribution(i, temp, cut):
     return q / q.sum(), keep
 
 
+def mood(temp):
+    if temp <= 0:
+        return "Determinista: siempre gana la favorita."
+    if temp < 0.6:
+        return "Conservadora: la favorita casi siempre gana."
+    if temp <= 1.05:
+        return "Cerca de 1: el abanico tal como lo calcula el modelo."
+    if temp < 1.6:
+        return "Creativa: las candidatas menos probables ganan peso."
+    return "Muy plana: lo raro sale a menudo."
+
+
 ui.input_select(
     "prompt", "Frase a continuar",
     {str(i): p["prompt"] + " …" for i, p in enumerate(PROMPTS)}, selected="0", width="100%",
 )
-ui.input_slider("temp", "Temperatura (0 = siempre la más probable)", 0, 2, 1, step=0.1, width="100%")
+ui.input_slider("temp", "Temperatura", 0, 2, 1, step=0.1, width="100%")
+
+
+@render.ui
+def presets():
+    t = input.temp()
+    chips = "".join(
+        f"<span class='chip{' on' if abs(t - v) < 1e-9 else ''}' "
+        f"onclick=\"Shiny.setInputValue('preset', {v}, {{priority: 'event'}})\">{name} · {v:g}</span>"
+        for v, name in PRESETS
+    )
+    return ui.HTML(f"<div style='margin:-8px 0 6px'>{chips}</div><p class='muted'>{mood(t)}</p>")
+
+
 ui.input_select("cut", "Recortar el abanico (opcional)", CUTS, selected="none", width="100%")
-ui.input_action_button("gen", "Generar 10 veces")
+
+with ui.div(style="display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 8px"):
+    ui.input_action_button("gen1", "Generar 1", class_="btn-outline-primary")
+    ui.input_action_button("gen10", "Generar 10", class_="btn-primary")
+    ui.input_action_button("clear", "Borrar", class_="btn-outline-secondary")
 
 
 @reactive.effect
-@reactive.event(input.prompt, input.temp, input.cut)
+@reactive.event(input.preset)
+def _preset():
+    ui.update_slider("temp", value=float(input.preset()))
+
+
+@reactive.effect
+@reactive.event(input.prompt, input.temp, input.cut, input.clear)
 def _reset():
     samples.set([])
+    last_batch.set(0)
+
+
+def _draw(n):
+    q, _ = distribution(int(input.prompt()), input.temp(), input.cut())
+    draws = np.random.default_rng().choice(len(q), size=n, p=q)
+    samples.set((samples() + [int(d) for d in draws])[-200:])
+    last_batch.set(n)
 
 
 @reactive.effect
-@reactive.event(input.gen)
-def _generate():
-    q, _ = distribution(int(input.prompt()), input.temp(), input.cut())
-    draws = np.random.default_rng().choice(len(q), size=10, p=q)
-    samples.set([int(d) for d in draws])
+@reactive.event(input.gen1)
+def _gen1():
+    _draw(1)
+
+
+@reactive.effect
+@reactive.event(input.gen10)
+def _gen10():
+    _draw(10)
 
 
 @render.ui
 def fan():
     i = int(input.prompt())
     words = PROMPTS[i]["words"]
-    base = PROMPTS[i]["probs"]
+    base = np.array(PROMPTS[i]["probs"], dtype=float)
     q, keep = distribution(i, input.temp(), input.cut())
-    rows = []
+    s = samples()
+    counts = np.bincount(s, minlength=len(words)) if s else np.zeros(len(words), dtype=int)
+    scale = max(q.max(), base.max())
+    cells = []
     for j, w in enumerate(words):
-        if not keep[j]:
-            color, label, style = GRAY, "descartada", "text-decoration:line-through;opacity:0.5"
+        rare = base[j] < RARE
+        color = ORANGE if rare else BLUE
+        orig = f"<span class='orig' style='left:{100 * base[j] / scale:.1f}%'></span>"
+        if keep[j]:
+            fill = f"<span class='fill' style='width:{100 * q[j] / scale:.1f}%;background:{color}'></span>"
+            label = f"{q[j]:.0%}" if q[j] >= 0.005 else "&lt;1 %"
+            wstyle = f"color:{ORANGE}" if rare else ""
         else:
-            color = ORANGE if base[j] < RARE else BLUE
-            label, style = f"{q[j]:.0%}" if q[j] >= 0.005 else "<1 %", ""
-        width = 300 * q[j] if keep[j] else 4
-        rows.append(
-            f"<div style='display:flex;align-items:center;gap:8px;margin:2px 0;{style}'>"
-            f"<span style='width:110px;text-align:right'>{w}</span>"
-            f"<span style='display:inline-block;height:14px;width:{width:.0f}px;min-width:2px;"
-            f"background:{color};border-radius:3px'></span><span>{label}</span></div>"
+            fill, label = "", "fuera"
+            wstyle = "text-decoration:line-through;opacity:.45"
+        badge = (
+            f"<span class='count' style='background:{color};color:#fff'>×{counts[j]}</span>"
+            if counts[j] else "<span></span>"
+        )
+        cells.append(
+            f"<span class='w' style='{wstyle}'>{w}</span>"
+            f"<span class='track' style='opacity:{1 if keep[j] else .4}'>{fill}{orig}</span>"
+            f"<span class='muted' style='font-size:.8em'>{label}</span>{badge}"
         )
     legend = (
-        f"<p style='font-size:0.85em;opacity:0.85'>"
-        f"<span style='color:{BLUE}'>■</span> candidata plausible · "
-        f"<span style='color:{ORANGE}'>■</span> candidata poco plausible (el modelo le daba menos del 2 %)</p>"
+        f"<p class='muted' style='margin-top:6px'>"
+        f"<span style='color:{BLUE}'>■</span> plausible · "
+        f"<span style='color:{ORANGE}'>■</span> poco plausible (el modelo le daba &lt;2 %) · "
+        f"<b>│</b> probabilidad original (T = 1) · <b>×n</b> veces que ha salido</p>"
     )
-    detail = "".join(
-        f"<tr><td>{w}</td><td>{base[j]:.1%}</td><td>{q[j]:.1%}</td></tr>" for j, w in enumerate(words)
+    return ui.HTML(
+        f"<div class='card'><b>Abanico de la siguiente palabra</b>"
+        f"<div class='fan' style='margin-top:8px'>{''.join(cells)}</div>{legend}</div>"
     )
-    table = (
-        "<details style='margin-top:8px'><summary>Ver los números</summary>"
-        "<table style='font-size:0.85em'><thead><tr><th>Palabra</th><th>Prob. original</th>"
-        f"<th>Prob. ahora</th></tr></thead><tbody>{detail}</tbody></table></details>"
-    )
-    return ui.HTML(f"<p><b>Abanico de la siguiente palabra:</b></p>{''.join(rows)}{legend}{table}")
 
 
 @render.ui
@@ -120,20 +197,54 @@ def results():
     i = int(input.prompt())
     s = samples()
     if not s:
-        return ui.HTML("<p style='opacity:0.7'>Pulsa «Generar 10 veces» para ver qué escribe el modelo.</p>")
+        return ui.HTML(
+            "<div class='card muted'>Pulsa «Generar 10» para ver qué escribe el modelo. "
+            "Las veces que sale cada palabra se acumulan en el abanico.</div>"
+        )
     words = PROMPTS[i]["words"]
     base = PROMPTS[i]["probs"]
-    lines = "".join(
-        f"<li>{PROMPTS[i]['prompt']} <b style='color:{ORANGE if base[d] < RARE else 'inherit'}'>"
-        f"{words[d]}</b></li>"
-        for d in s
+    n_new = last_batch()
+    shown = s[-MAX_SHOWN:][::-1]
+    chips = "".join(
+        f"<span class='gen{' new' if k < n_new else ''}' style='animation-delay:{0.04 * k:.2f}s'>"
+        f"{PROMPTS[i]['prompt']} <b style='color:{ORANGE if base[d] < RARE else DARK}'>{words[d]}</b></span>"
+        for k, d in enumerate(shown)
     )
     distinct = len(set(s))
     rare = sum(base[d] < RARE for d in s)
-    msg = f"<b>{distinct}</b> palabra{'s' if distinct != 1 else ''} distinta{'s' if distinct != 1 else ''} en 10"
-    if rare:
-        msg += f" · <span style='color:{ORANGE}'><b>{rare}</b> poco plausible{'s' if rare != 1 else ''}</span>"
-    return ui.HTML(f"<p>{msg}</p><ol style='margin:4px 0'>{lines}</ol>")
+    stats = (
+        f"<div class='stats'>"
+        f"<div class='stat'><span class='muted'>Generadas</span><b>{len(s)}</b></div>"
+        f"<div class='stat'><span class='muted'>Palabras distintas</span><b>{distinct}</b></div>"
+        f"<div class='stat'><span class='muted'>Poco plausibles</span>"
+        f"<b style='color:{ORANGE if rare else GREEN}'>{rare} <span style='font-size:.6em'>"
+        f"({rare / len(s):.0%})</span></b></div></div>"
+    )
+    more = f"<p class='muted'>Se muestran las {MAX_SHOWN} últimas.</p>" if len(s) > MAX_SHOWN else ""
+    return ui.HTML(f"<div class='card'><b>Lo que ha escrito el modelo</b>{stats}<div>{chips}</div>{more}</div>")
+
+
+ui.input_checkbox("nums", "Ver los números", value=False)
+
+
+@render.ui
+def numbers():
+    if not input.nums():
+        return ui.HTML("")
+    i = int(input.prompt())
+    words = PROMPTS[i]["words"]
+    base = PROMPTS[i]["probs"]
+    q, _ = distribution(i, input.temp(), input.cut())
+    rows = "".join(
+        f"<tr><td>{w}</td><td style='text-align:right'>{base[j]:.1%}</td>"
+        f"<td style='text-align:right'>{q[j]:.1%}</td></tr>"
+        for j, w in enumerate(words)
+    )
+    return ui.HTML(
+        "<table class='table table-sm' style='font-size:0.85em;max-width:360px'><thead><tr>"
+        "<th>Palabra</th><th style='text-align:right'>Prob. original</th>"
+        f"<th style='text-align:right'>Prob. ahora</th></tr></thead><tbody>{rows}</tbody></table>"
+    )
 
 ## file: data.py
 # DATA-START
@@ -271,7 +382,7 @@ DATA = {
 
 ## Qué observar
 
-1. Con la frase del **gato** y temperatura **0**, pulsa «Generar 10 veces» varias veces: sale siempre la misma palabra. Es el modo determinista, el que se usa cuando quieres respuestas reproducibles.
+1. Con la frase del **gato** y temperatura **0**, pulsa «Generar 10» varias veces: sale siempre la misma palabra. Es el modo determinista, el que se usa cuando quieres respuestas reproducibles.
 2. Sube a **1,0**. Ahora aparecen varias palabras, pero casi todas razonables. Es el abanico tal como lo calcula el modelo.
 3. Sube a **2,0**. El abanico se aplana: las barras naranjas (palabras que el modelo consideraba absurdas) empiezan a salir. Ese es el momento en que el texto deja de tener sentido.
 4. Cambia a la frase del **café**. El modelo está casi seguro de que sigue «leche», así que la temperatura apenas cambia nada hasta valores altos. La temperatura solo da libertad donde el modelo duda.

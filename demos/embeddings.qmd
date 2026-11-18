@@ -8,16 +8,16 @@ engine: markdown
 
 Elige una frase y mira cuáles son sus vecinas más cercanas en el espacio de embeddings. La columna **coseno** usa los vectores del modelo. La columna **palabras en común** cuenta solo coincidencias de vocabulario (sin palabras vacías como *el* o *de*).
 
-Busca casos en los que el coseno sea alto y las palabras en común sean pocas: ahí está la diferencia entre similitud semántica y léxica.
+Busca casos en los que el coseno sea alto y las palabras en común sean pocas: ahí está la diferencia entre similitud semántica y léxica. Puedes pulsar cualquier punto del mapa (o una fila de la tabla) para usar esa frase como consulta.
 
 ```{shinylive-python}
 #| standalone: true
-#| viewerHeight: 780
+#| viewerHeight: 1180
 
 ## file: app.py
+import html
 import re
 
-import matplotlib.pyplot as plt
 import numpy as np
 from shiny import reactive
 from shiny.express import input, ui, render
@@ -29,67 +29,159 @@ topics = DATA["topics"]
 xy = np.array(DATA["xy"])
 cos = np.array(DATA["cosine"])
 
-TOPIC_COLORS = {"ia": "#306998", "cocina": "#e65100", "finanzas": "#2e7d32", "deporte": "#4B8BBE"}
+TOPIC_COLORS = {"ia": "#306998", "cocina": "#e65100", "finanzas": "#2e7d32", "deporte": "#c99a00"}
+TOPIC_NAMES = {"ia": "IA", "cocina": "Cocina", "finanzas": "Finanzas", "deporte": "Deporte"}
 STOP = {"el", "la", "los", "las", "de", "del", "que", "y", "a", "en", "un", "una", "por",
         "para", "con", "se", "su", "sus", "al", "es", "lo", "o", "ya", "si", "sobre"}
+MODES = {"sem": "Significado (coseno de embeddings)", "lex": "Palabras en común (léxico)"}
+
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.muted{color:#6b7280;font-size:.85em}
+.pt{cursor:pointer}.pt:hover circle{stroke:#111;stroke-width:2}
+.nb{width:100%;font-size:.9em;border-collapse:collapse}
+.nb td,.nb th{padding:5px 6px;border-bottom:1px solid #f3f4f6;vertical-align:middle}
+.nb th{font-weight:600;font-size:.85em;text-align:left;color:#374151}
+.nb tr{cursor:pointer}.nb tbody tr:hover{background:#f9fafb}
+.track{display:inline-block;width:70px;height:10px;background:#f3f4f6;border-radius:3px;vertical-align:middle;margin-right:6px}
+.fill{display:block;height:100%;background:#306998;border-radius:3px}
+mark{background:#FFD43B;padding:0 2px;border-radius:2px}
+.zero{color:#e65100;font-weight:600}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.score{font-size:1.05em;font-weight:600}
+""")
 
 
 def words(text):
     return {w for w in re.findall(r"\w+", text.lower()) if w not in STOP}
 
 
-def shared_words(a, b):
-    return len(words(a) & words(b))
+def shared(a, b):
+    return words(a) & words(b)
+
+
+def highlight(text, keep):
+    out = []
+    for piece in re.split(r"(\w+)", text):
+        out.append(f"<mark>{html.escape(piece)}</mark>" if piece.lower() in keep else html.escape(piece))
+    return "".join(out)
+
+
+@reactive.effect
+@reactive.event(input.pick)
+def _pick():
+    ui.update_select("query", selected=str(int(input.pick())))
 
 
 @reactive.calc
 def neighbors():
     q = int(input.query())
-    order = [j for j in np.argsort(-cos[q]) if j != q][: input.k()]
-    return q, order
+    others = [j for j in range(len(sentences)) if j != q]
+    if input.mode() == "sem":
+        order = sorted(others, key=lambda j: -cos[q, j])
+    else:
+        def lex(j):
+            a, b = words(sentences[q]), words(sentences[j])
+            return (len(a & b), len(a & b) / (len(a | b) or 1))
+        # Los empates (muy frecuentes, casi todo a 0 palabras) se deshacen con un orden aleatorio fijo,
+        # no por índice: las frases están agrupadas por tema y el índice regalaría vecinas del mismo tema.
+        tie = np.random.default_rng(q).permutation(len(sentences))
+        order = sorted(others, key=lambda j: (-lex(j)[0], -lex(j)[1], tie[j]))
+    return q, order[: input.k()]
 
 
 ui.input_select(
-    "query", "Frase de consulta",
+    "query", "Frase de consulta (o pulsa un punto del mapa)",
     {str(i): s for i, s in enumerate(sentences)}, selected="0", width="100%",
 )
-ui.input_slider("k", "Vecinos a mostrar", 1, 6, 3)
+with ui.div(style="display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end"):
+    ui.input_radio_buttons("mode", "Buscar vecinas por", MODES, selected="sem", inline=True)
+    ui.input_slider("k", "Vecinas a mostrar", 1, 6, 3)
 
 
-@render.plot
+@render.ui
 def scatter():
     q, nb = neighbors()
-    fig, ax = plt.subplots(figsize=(6, 4.2))
-    for topic, color in TOPIC_COLORS.items():
-        idx = [i for i, t in enumerate(topics) if t == topic]
-        ax.scatter(xy[idx, 0], xy[idx, 1], c=color, s=55, alpha=0.85, label=topic)
-    for j in nb:
-        ax.plot([xy[q, 0], xy[j, 0]], [xy[q, 1], xy[j, 1]], color="grey", ls="--", lw=1)
-    ax.scatter(xy[q, 0], xy[q, 1], s=260, facecolors="none", edgecolors="black", linewidths=2)
-    ax.set_title("Proyección 2D (PCA) de los embeddings", fontsize=10)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.legend(frameon=False, fontsize=8, loc="best")
-    fig.tight_layout()
-    return fig
+    lex = input.mode() == "lex"
+    W, H, pad = 640, 380, 28
+    lo, hi = xy.min(axis=0), xy.max(axis=0)
+    px = lambda i: pad + (xy[i, 0] - lo[0]) / (hi[0] - lo[0]) * (W - 2 * pad)
+    py = lambda i: H - pad - (xy[i, 1] - lo[1]) / (hi[1] - lo[1]) * (H - 2 * pad)
+    line_col = "#e65100" if lex else "#306998"
+    dash = "stroke-dasharray='6 4'" if lex else ""
+    lines = "".join(
+        f"<line x1='{px(q):.1f}' y1='{py(q):.1f}' x2='{px(j):.1f}' y2='{py(j):.1f}' stroke='{line_col}' "
+        f"stroke-width='{1 + 5 * max(cos[q, j], 0):.1f}' stroke-opacity='.55' "
+        f"{dash}/>"
+        for j in nb
+    )
+    pts = []
+    for i, s in enumerate(sentences):
+        col = TOPIC_COLORS[topics[i]]
+        r = 11 if i == q else 7
+        ring = (
+            f"<circle cx='{px(i):.1f}' cy='{py(i):.1f}' r='16' fill='none' stroke='#111' stroke-width='2'/>"
+            if i == q else ""
+        )
+        rank = ""
+        if i in nb:
+            k = nb.index(i) + 1
+            rank = (
+                f"<text x='{px(i) + 10:.1f}' y='{py(i) - 8:.1f}' font-size='12' font-weight='700' fill='#111' "
+                f"stroke='#fff' stroke-width='3' paint-order='stroke'>{k}</text>"
+            )
+        pts.append(
+            f"<g class='pt' onclick=\"Shiny.setInputValue('pick', {i}, {{priority: 'event'}})\">"
+            f"<title>{html.escape(s)}</title>{ring}"
+            f"<circle cx='{px(i):.1f}' cy='{py(i):.1f}' r='{r}' fill='{col}' fill-opacity='.85' stroke='#fff' stroke-width='1.5'/>"
+            f"{rank}</g>"
+        )
+    legend = " · ".join(
+        f"<span class='dot' style='background:{c}'></span>{TOPIC_NAMES[t]}" for t, c in TOPIC_COLORS.items()
+    )
+    return ui.HTML(
+        f"<div class='card'><b>Mapa 2D de los embeddings</b> <span class='muted'>(PCA de 384 dimensiones a 2)</span>"
+        f"<svg viewBox='0 0 {W} {H}' width='100%' style='display:block;margin-top:4px' "
+        f"font-family='system-ui,sans-serif'>{lines}{''.join(pts)}</svg>"
+        f"<div class='muted'>{legend} · círculo negro = consulta · números = vecinas · "
+        f"pasa el ratón por un punto para leer la frase y púlsalo para usarla como consulta.</div></div>"
+    )
 
 
 @render.ui
 def table():
     q, nb = neighbors()
+    lex = input.mode() == "lex"
+    same = sum(topics[j] == topics[q] for j in nb)
+    all_shared = set().union(*(shared(sentences[q], sentences[j]) for j in nb)) if nb else set()
     rows = []
     for rank, j in enumerate(nb, start=1):
+        common = shared(sentences[q], sentences[j])
+        c = max(cos[q, j], 0)
+        n_common = f"<span class='zero'>0</span>" if not common else str(len(common))
         rows.append(
-            f"<tr><td>{rank}</td><td>{sentences[j]}</td><td>{topics[j]}</td>"
-            f"<td>{cos[q, j]:.3f}</td><td>{shared_words(sentences[q], sentences[j])}</td></tr>"
+            f"<tr onclick=\"Shiny.setInputValue('pick', {j}, {{priority: 'event'}})\" title='Usar como consulta'>"
+            f"<td>{rank}</td><td>{highlight(sentences[j], common)}</td>"
+            f"<td style='white-space:nowrap'><span class='dot' style='background:{TOPIC_COLORS[topics[j]]}'></span>{TOPIC_NAMES[topics[j]]}</td>"
+            f"<td style='white-space:nowrap'><span class='track'><span class='fill' style='width:{100 * c:.0f}%'></span></span>"
+            f"{cos[q, j]:.2f}</td><td style='text-align:center'>{n_common}</td></tr>"
         )
-    html = (
-        "<p><b>Consulta:</b> " + sentences[q] + "</p>"
-        "<table style='width:100%;font-size:0.9em'>"
-        "<thead><tr><th>#</th><th>Vecina</th><th>Tema</th><th>Coseno</th>"
-        "<th>Palabras en común</th></tr></thead><tbody>" + "".join(rows) + "</tbody></table>"
+    color = "#2e7d32" if same == len(nb) else ("#e65100" if same * 2 >= len(nb) else "#c62828")
+    criterion = "por palabras en común" if lex else "por significado"
+    tip = (
+        "Con pocas palabras compartidas, el orden léxico es casi arbitrario: empates a 0 palabras."
+        if lex else "Fíjate en las vecinas con <span class='zero'>0</span> palabras en común: "
+        "el embedding las encuentra igualmente."
     )
-    return ui.HTML(html)
+    return ui.HTML(
+        f"<div class='card'><p style='margin:0 0 6px'><b>Consulta:</b> {highlight(sentences[q], all_shared)}</p>"
+        f"<p class='score' style='color:{color};margin:0 0 6px'>{same} de {len(nb)} vecinas "
+        f"{criterion} son del mismo tema ({TOPIC_NAMES[topics[q]]}).</p>"
+        f"<table class='nb'><thead><tr><th>#</th><th>Vecina</th><th>Tema</th><th>Coseno</th>"
+        f"<th>Palabras en común</th></tr></thead><tbody>{''.join(rows)}</tbody></table>"
+        f"<p class='muted' style='margin:6px 0 0'>{tip} En amarillo, las palabras compartidas con la consulta.</p></div>"
+    )
 
 ## file: data.py
 # DATA-START
@@ -996,6 +1088,7 @@ DATA = {
 
 - Las frases de un mismo tema se agrupan, aunque no compartan palabras. El modelo entiende que *"Nadar cuida las articulaciones"* y *"Correr mejora la resistencia"* pertenecen al mismo campo.
 - Un método léxico, como contar palabras, falla con sinónimos y paráfrasis. Un embedding no depende de que las palabras coincidan.
+- Cambia **«Buscar vecinas por»** a *Palabras en común* y compara el marcador «x de k vecinas son del mismo tema». Casi todas las frases comparten 0 o 1 palabras con la consulta, así que el orden léxico es poco más que un empate.
 - La proyección 2D es una simplificación: de 384 dimensiones a dos se pierde información. Las distancias entre grupos en el dibujo pueden ser engañosas, pero los vecinos cercanos en el espacio original casi siempre se ven cerca.
 
 ::: {.callout-tip}

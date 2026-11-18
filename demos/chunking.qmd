@@ -14,7 +14,7 @@ La recuperación aquí usa TF-IDF y similitud coseno, así que es léxica y muy 
 
 ```{shinylive-python}
 #| standalone: true
-#| viewerHeight: 760
+#| viewerHeight: 1350
 
 import math
 import re
@@ -49,25 +49,58 @@ STOP = {"el", "la", "los", "las", "de", "del", "que", "y", "a", "en", "un", "una
         "con", "se", "su", "sus", "al", "es", "lo", "o", "tu", "tus", "mi", "si", "cuando",
         "quien", "cuanto", "cuánto", "quién", "cuándo", "mi", "me", "hay", "sin"}
 
+WORDS = DOC.split()
+SIZES = list(range(8, 81))
+GREEN, ORANGE, RED, GRAY = "#2e7d32", "#e65100", "#c62828", "#9ca3af"
+BANDS = ["#dbeafe", "#fef3c7"]  # colores alternos de los chunks
 
-def normalize(text):
-    return " ".join(text.split())
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.muted{color:#6b7280;font-size:.85em}
+.verdict{border-radius:8px;padding:8px 12px;font-weight:600;color:#fff;margin:8px 0}
+.doc{line-height:2.1;font-size:.92em}
+.doc span.w{padding:2px 1px;border-radius:2px}
+.doc .ans{border-bottom:3px solid #2e7d32}
+.doc .cut{display:inline-block;font-size:.7em;font-weight:700;color:#fff;background:#306998;border-radius:3px;
+  padding:0 4px;margin:0 2px;vertical-align:super}
+.doc .cut.ret{background:#2e7d32}
+.sweep{display:flex;gap:1px;margin:6px 0 2px}
+.sweep span{flex:1;height:22px;cursor:pointer;border-radius:2px}
+.sweep span:hover{outline:2px solid #111}
+.sweep span.cur{outline:3px solid #111;outline-offset:1px}
+.chunk{border-radius:8px;padding:8px 10px;margin:6px 0;font-size:.88em}
+.chunk .hd{display:flex;align-items:center;gap:8px;font-size:.78em;color:#6b7280;margin-bottom:2px}
+.track{display:inline-block;width:80px;height:8px;background:#f3f4f6;border-radius:3px}
+.fill{display:block;height:100%;border-radius:3px}
+mark.full{background:#c8e6c9}mark.part{background:#ffe0b2}
+""")
 
 
 def tokens(text):
     return [w for w in re.findall(r"\w+", text.lower()) if w not in STOP]
 
 
+def answer_span(answer):
+    """Índices [ini, fin) de la respuesta dentro de las palabras del documento."""
+    clean = lambda w: w.rstrip(".,;:")
+    a = [clean(w) for w in answer.split()]
+    for i in range(len(WORDS) - len(a) + 1):
+        if [clean(w) for w in WORDS[i:i + len(a)]] == a:
+            return i, i + len(a)
+    raise ValueError(answer)
+
+
 def make_chunks(size, overlap_pct):
-    words = normalize(DOC).split(" ")
+    """Lista de rangos [ini, fin) de palabras."""
     overlap = round(size * overlap_pct / 100)
     step = max(1, size - overlap)
-    chunks = []
-    for start in range(0, len(words), step):
-        chunks.append(" ".join(words[start:start + size]))
-        if start + size >= len(words):
+    spans = []
+    for start in range(0, len(WORDS), step):
+        spans.append((start, min(start + size, len(WORDS))))
+        if start + size >= len(WORDS):
             break
-    return chunks
+    return spans
 
 
 def retrieve_scores(query, chunks):
@@ -89,68 +122,152 @@ def retrieve_scores(query, chunks):
     return scores
 
 
+def outcome(size, overlap, k, qi):
+    """Troceado, puntuaciones, recuperados y veredicto ('ok' | 'miss' | 'split')."""
+    question, answer = QUESTIONS[qi]
+    a0, a1 = answer_span(answer)
+    spans = make_chunks(size, overlap)
+    texts = [" ".join(WORDS[s:e]) for s, e in spans]
+    scores = retrieve_scores(question, texts)
+    top = sorted(range(len(spans)), key=lambda i: -scores[i])[:k]
+    full = [i for i, (s, e) in enumerate(spans) if s <= a0 and a1 <= e]
+    if any(i in top for i in full):
+        verdict = "ok"
+    elif full:
+        verdict = "miss"
+    else:
+        verdict = "split"
+    return spans, scores, top, verdict, (a0, a1)
+
+
+VERDICTS = {
+    "ok": (GREEN, "✔ La respuesta completa está en los chunks recuperados."),
+    "miss": (ORANGE, "✘ La respuesta existe entera en un chunk, pero el recuperador no lo trae."),
+    "split": (RED, "✘ La respuesta está partida entre chunks: ninguno la contiene entera."),
+}
+
+
 @reactive.calc
-def chunks():
-    return make_chunks(input.size(), input.overlap())
+def state():
+    return outcome(input.size(), input.overlap(), input.k(), int(input.q()))
+
+
+@reactive.effect
+@reactive.event(input.pick_size)
+def _pick_size():
+    ui.update_slider("size", value=int(input.pick_size()))
 
 
 ui.input_select(
     "q", "Pregunta",
     {str(i): q for i, (q, _) in enumerate(QUESTIONS)}, selected="0", width="100%",
 )
-ui.input_slider("size", "Tamaño del chunk (palabras)", 8, 80, 25)
-ui.input_slider("overlap", "Solapamiento (%)", 0, 50, 0, step=5)
-ui.input_slider("k", "Chunks recuperados (top-k)", 1, 4, 2)
+with ui.layout_columns(col_widths=(4, 4, 4)):
+    ui.input_slider("size", "Tamaño del chunk (palabras)", 8, 80, 25)
+    ui.input_slider("overlap", "Solapamiento (%)", 0, 50, 0, step=5)
+    ui.input_slider("k", "Chunks recuperados (top-k)", 1, 4, 2)
 
 
 @render.ui
 def verdict():
-    cs = chunks()
-    question, answer = QUESTIONS[int(input.q())]
-    answer = normalize(answer)
-    scores = retrieve_scores(question, cs)
-    top = sorted(range(len(cs)), key=lambda i: -scores[i])[: input.k()]
-
-    if any(answer in cs[i] for i in top):
-        msg, color = "✔ La respuesta completa está en los chunks recuperados.", "#2e7d32"
-    elif any(answer in c for c in cs):
-        msg, color = "✘ La respuesta existe en un chunk, pero el recuperador no lo trae.", "#e65100"
-    else:
-        msg, color = "✘ La respuesta está partida entre dos chunks: ninguno la contiene entera.", "#c62828"
-
+    spans, _, _, v, _ = state()
+    color, msg = VERDICTS[v]
     return ui.HTML(
-        f"<p><b>{len(cs)} chunks</b> de {input.size()} palabras "
-        f"(solapamiento {input.overlap()}%).</p>"
-        f"<p style='color:{color};font-weight:600'>{msg}</p>"
+        f"<div class='verdict' style='background:{color}'>{msg}</div>"
+        f"<div class='muted'><b>{len(spans)} chunks</b> de {input.size()} palabras · "
+        f"solapamiento {input.overlap()} % · se recuperan {input.k()}.</div>"
+    )
+
+
+@render.ui
+def sweep():
+    qi, ov, k, cur = int(input.q()), input.overlap(), input.k(), input.size()
+    cells = []
+    for s in SIZES:
+        v = outcome(s, ov, k, qi)[3]
+        color = VERDICTS[v][0]
+        cells.append(
+            f"<span class='{'cur' if s == cur else ''}' style='background:{color}' title='{s} palabras' "
+            f"onclick=\"Shiny.setInputValue('pick_size', {s}, {{priority: 'event'}})\"></span>"
+        )
+    return ui.HTML(
+        f"<div class='card'><b>¿Y con otro tamaño?</b> "
+        f"<span class='muted'>Resultado para cada tamaño de 8 a 80 palabras con el solapamiento y top-k actuales. "
+        f"Pulsa una celda para probar ese tamaño.</span>"
+        f"<div class='sweep'>{''.join(cells)}</div>"
+        f"<div class='muted' style='display:flex;justify-content:space-between'><span>8</span>"
+        f"<span><span style='color:{GREEN}'>■</span> encontrada · <span style='color:{ORANGE}'>■</span> no recuperada · "
+        f"<span style='color:{RED}'>■</span> partida</span><span>80</span></div></div>"
+    )
+
+
+@render.ui
+def doc_view():
+    spans, _, top, _, (a0, a1) = state()
+    owner = [[] for _ in WORDS]
+    for c, (s, e) in enumerate(spans):
+        for i in range(s, e):
+            owner[i].append(c)
+    starts = {s: c for c, (s, _) in enumerate(spans)}
+    parts = []
+    for i, w in enumerate(WORDS):
+        if i in starts:
+            c = starts[i]
+            parts.append(f"<span class='cut{' ret' if c in top else ''}'>{c + 1}</span>")
+        cs = owner[i]
+        if len(cs) > 1:
+            bg = f"linear-gradient(180deg,{BANDS[cs[0] % 2]} 50%,{BANDS[cs[1] % 2]} 50%)"
+        else:
+            bg = BANDS[cs[0] % 2]
+        faded = not any(c in top for c in cs)
+        cls = "w ans" if a0 <= i < a1 else "w"
+        parts.append(f"<span class='{cls}' style='background:{bg};opacity:{0.45 if faded else 1}'>{w}</span>")
+    return ui.HTML(
+        f"<div class='card'><b>El documento, troceado</b>"
+        f"<div class='muted'>Cada número marca dónde empieza un chunk (verde = recuperado). "
+        f"Las palabras con dos colores están en dos chunks (solapamiento). "
+        f"Subrayada en verde, la respuesta. Atenuado, lo que el LLM no verá.</div>"
+        f"<div class='doc'>{' '.join(parts)}</div></div>"
     )
 
 
 @render.ui
 def chunk_view():
-    cs = chunks()
-    question, answer = QUESTIONS[int(input.q())]
-    answer = normalize(answer)
-    scores = retrieve_scores(question, cs)
-    top = set(sorted(range(len(cs)), key=lambda i: -scores[i])[: input.k()])
-
+    spans, scores, top, _, (a0, a1) = state()
+    best = max(scores) or 1.0
     blocks = []
-    for i, c in enumerate(cs):
-        text = c.replace(answer, f"<mark>{answer}</mark>") if answer in c else c
-        border = "#2e7d32" if i in top else "#9ca3af"
-        weight = "3px" if i in top else "1px"
-        tag = f"chunk {i + 1} · score {scores[i]:.2f}" + (" · recuperado" if i in top else "")
-        blocks.append(
-            f"<div style='border:{weight} solid {border};border-radius:8px;padding:8px 10px;"
-            f"margin:6px 0;font-size:0.9em'>"
-            f"<div style='font-size:0.75em;color:#6b7280'>{tag}</div>{text}</div>"
+    for c in sorted(range(len(spans)), key=lambda i: -scores[i]):
+        s, e = spans[c]
+        lo, hi = max(s, a0), min(e, a1)
+        cls = "full" if s <= a0 and a1 <= e else "part"
+        text = " ".join(
+            (f"<mark class='{cls}'>{w}</mark>" if lo <= s + i < hi else w)
+            for i, w in enumerate(WORDS[s:e])
         )
-    return ui.HTML("".join(blocks))
+        ret = c in top
+        border = f"2.5px solid {GREEN}" if ret else f"1px solid #e5e7eb"
+        badge = (f"<span style='color:{GREEN};font-weight:700'>recuperado</span>" if ret else "")
+        piece = ""
+        if lo < hi and cls == "part":
+            piece = f"<span style='color:{ORANGE}'>solo un trozo de la respuesta</span>"
+        blocks.append(
+            f"<div class='chunk' style='border:{border};opacity:{1 if ret else 0.75}'>"
+            f"<div class='hd'><b>chunk {c + 1}</b><span class='track'><span class='fill' "
+            f"style='width:{100 * scores[c] / best:.0f}%;background:{GREEN if ret else GRAY}'></span></span>"
+            f"score {scores[c]:.2f} {badge} {piece}</div>{text}</div>"
+        )
+    return ui.HTML(
+        f"<div class='card'><b>Chunks ordenados por puntuación</b>"
+        f"<div class='muted'><mark class='full'>verde</mark> = respuesta entera · "
+        f"<mark class='part'>naranja</mark> = solo un trozo.</div>{''.join(blocks)}</div>"
+    )
 ```
 
 ## Qué observar
 
 - Con chunks de 8 o 10 palabras, la respuesta a la pregunta sobre el envío queda partida. Ningún fragmento contiene la frase completa, y el LLM nunca la verá.
 - Subir el solapamiento hace que la frase cortada aparezca entera en algún chunk, pero también aumenta el número de chunks y el coste de indexar.
+- La franja **«¿Y con otro tamaño?»** prueba todos los tamaños de 8 a 80 con el solapamiento actual. Fíjate en que el verde y el rojo se alternan: no hay un umbral a partir del cual todo funcione, depende de dónde caigan los cortes. Pulsa una celda para ver ese caso.
 - Con chunks muy grandes (80 palabras), cada fragmento contiene casi todo el documento. La respuesta aparece entera, pero el recuperador deja de discriminar y el LLM recibe mucho texto que no necesita.
 
 Con los valores por defecto (25 palabras, sin solapamiento), la pregunta del plazo sale completa, pero la del envío aparece partida: cambia la pregunta a *«¿Quién paga el envío de la devolución?»* para verlo. Después sube el solapamiento a 25 % y comprueba cómo se arregla.

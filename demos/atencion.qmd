@@ -14,11 +14,11 @@ Los pesos de esta demo están **diseñados a mano** para que se vea la idea de l
 
 Una misma palabra puede significar cosas muy distintas según las que la rodean: no es lo mismo el *banco* donde te sientas que el *banco* que quiebra. La **atención** es el mecanismo con el que un Transformer le permite a cada palabra consultar al resto de la frase para decidir cómo interpretarse.
 
-Pulsa cualquier palabra y verás en cuáles se apoya: cuanto más grueso el arco, más atención le presta.
+Pulsa cualquier palabra y verás en cuáles se apoya: cuanto más grueso el arco, más atención le presta. Si es tu primera vez, pulsa **Empezar ▶** y sigue el recorrido guiado de seis pasos.
 
 ```{shinylive-python}
 #| standalone: true
-#| viewerHeight: 820
+#| viewerHeight: 1100
 
 from shiny import reactive
 from shiny.express import input, ui, render
@@ -80,7 +80,34 @@ SENTENCES = [
     },
 ]
 
+# Recorrido guiado: (frase, palabra, modo LLM generativo, texto)
+TOUR = [
+    (0, 4, False, "«banco» en el parque: mira en qué palabras se apoya para saber qué tipo de banco es."),
+    (1, 1, False, "La misma palabra en otra frase. Ahora las pistas son otras: «cerró» y «quiebra»."),
+    (2, 8, False, "«era» es un pronombre: no significa nada solo y busca a quién se refiere. Aquí, al trofeo."),
+    (3, 8, False, "Cambia «grande» por «pequeña» y «era» pasa a mirar a la maleta."),
+    (0, 4, True, "Modo LLM generativo: solo puede mirar hacia atrás. «parque» aún no existe y se pierde la pista clave."),
+    (2, 8, True, "Con el pronombre casi no cambia nada: las pistas ya estaban antes."),
+]
+
 BLUE, DARK, YELLOW, ORANGE, GRAY = "#4B8BBE", "#306998", "#FFD43B", "#e65100", "#9ca3af"
+
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.muted{color:#6b7280;font-size:.85em}
+.tour{display:flex;align-items:center;gap:10px;background:#eef4fa;border-radius:10px;padding:8px 12px;margin:0 0 10px}
+.tour .txt{flex:1}
+.tour .step{font-size:.8em;color:#306998;font-weight:600;white-space:nowrap}
+.bars{display:grid;grid-template-columns:90px 1fr 44px;gap:4px 8px;align-items:center;max-width:520px}
+.track{height:14px;background:#f3f4f6;border-radius:4px;overflow:hidden}
+.fill{height:100%;background:#4B8BBE;border-radius:4px}
+.word:hover rect{stroke:#306998;stroke-width:2.5}
+.mat{width:auto;border-collapse:collapse;margin:0 auto}
+.mat td{width:30px;height:26px;text-align:center;font-size:.72em;border:1px solid #fff;cursor:pointer}
+.mat th{font-weight:500;font-size:.8em;padding:0 4px}
+.mat th.col{writing-mode:vertical-rl;transform:rotate(180deg);height:70px;vertical-align:bottom}
+""")
 
 
 def attention(s, sel, causal):
@@ -107,17 +134,66 @@ def layout(words):
 
 
 current = reactive.value(None)
+pending = reactive.value(None)  # palabra que debe seleccionarse tras un cambio de frase del recorrido
+step = reactive.value(-1)
+
+
+def go(k):
+    sent, word, causal, _ = TOUR[k]
+    step.set(k)
+    if int(input.sent()) != sent:
+        pending.set(word)
+        ui.update_radio_buttons("sent", selected=str(sent))
+    else:
+        current.set(word)
+    ui.update_switch("causal", value=causal)
 
 
 @reactive.effect
 def _reset():
-    current.set(SENTENCES[int(input.sent())]["default"])
+    s = SENTENCES[int(input.sent())]
+    with reactive.isolate():
+        p = pending()
+    current.set(p if p is not None else s["default"])
+    pending.set(None)
 
 
 @reactive.effect
 @reactive.event(input.w)
 def _click():
     current.set(int(input.w()))
+
+
+@reactive.effect
+@reactive.event(input.next)
+def _next():
+    go(min(step() + 1, len(TOUR) - 1))
+
+
+@reactive.effect
+@reactive.event(input.prev)
+def _prev():
+    go(max(step() - 1, 0))
+
+
+@render.ui
+def tour():
+    k = step()
+    if k < 0:
+        txt = "¿Primera vez? Sigue el <b>recorrido guiado</b> en seis pasos, o pulsa tú cualquier palabra."
+        label = ""
+    else:
+        txt, label = TOUR[k][3], f"Paso {k + 1} de {len(TOUR)}"
+    prev_dis = "disabled" if k <= 0 else ""
+    next_lbl = "Empezar ▶" if k < 0 else "Siguiente ▶"
+    next_dis = "disabled" if k >= len(TOUR) - 1 else ""
+    return ui.HTML(
+        f"<div class='tour'><span class='step'>{label}</span><span class='txt'>{txt}</span>"
+        f"<button class='btn btn-sm btn-outline-primary' {prev_dis} "
+        f"onclick=\"Shiny.setInputValue('prev', Date.now(), {{priority: 'event'}})\">◀</button>"
+        f"<button class='btn btn-sm btn-primary' {next_dis} "
+        f"onclick=\"Shiny.setInputValue('next', Date.now(), {{priority: 'event'}})\">{next_lbl}</button></div>"
+    )
 
 
 ui.input_radio_buttons(
@@ -136,20 +212,29 @@ def figure():
         return ui.HTML("")
     att = attention(s, sel, causal)
     xs, total_w = layout(words)
-    base_y, h = 110, 44
+    base_y, h = 120, 44
 
     def cx(i):
         return xs[i][0] + xs[i][1] / 2
 
-    parts = []
+    parts, labels, placed, cands = [], [], [], []
     for j, w in sorted(att.items(), key=lambda kv: kv[1]):
         dist = abs(cx(j) - cx(sel))
-        top = base_y - min(125, 25 + dist * 0.22)
+        top = base_y - min(125, 25 + dist * 0.22) - 40
+        mx = (cx(sel) + cx(j)) / 2
         parts.append(
-            f"<path d='M{cx(sel)},{base_y} Q{(cx(sel) + cx(j)) / 2},{top - 40} {cx(j)},{base_y}' "
+            f"<path d='M{cx(sel)},{base_y} Q{mx},{top} {cx(j)},{base_y}' "
             f"fill='none' stroke='{DARK}' stroke-width='{1 + 11 * w:.1f}' "
             f"stroke-opacity='{0.25 + 0.75 * w:.2f}' stroke-linecap='round'/>"
         )
+        cands.append((w, mx, (base_y + top) / 2))
+    for w, mx, apex in sorted(cands, reverse=True):
+        if w >= 0.12 and all(abs(mx - px) > 40 or abs(apex - py) > 14 for px, py in placed):
+            placed.append((mx, apex))
+            labels.append(
+                f"<text x='{mx}' y='{apex - 4}' text-anchor='middle' font-size='12' font-weight='600' "
+                f"fill='{DARK}' stroke='#fff' stroke-width='4' paint-order='stroke'>{w:.0%}</text>"
+            )
     for i, word in enumerate(words):
         x, wd = xs[i]
         future = causal and i > sel
@@ -161,7 +246,7 @@ def figure():
             fill, fop, tcol, deco = "none", 1, "currentColor", "line-through" if future else "none"
         opacity = 0.4 if future else 1
         parts.append(
-            f"<g style='cursor:pointer' opacity='{opacity}' "
+            f"<g class='word' style='cursor:pointer' opacity='{opacity}' "
             f"onclick=\"Shiny.setInputValue('w', {i}, {{priority: 'event'}})\">"
             f"<rect x='{x}' y='{base_y}' width='{wd}' height='{h}' rx='8' fill='{fill}' "
             f"fill-opacity='{fop}' stroke='{DARK if i == sel else GRAY}' stroke-width='1.5'/>"
@@ -171,26 +256,18 @@ def figure():
     svg = (
         f"<svg viewBox='0 0 {total_w} {base_y + h + 8}' width='100%' "
         f"style='max-width:{max(total_w, 480)}px;display:block;margin:8px 0' "
-        f"font-family='system-ui,sans-serif'>{''.join(parts)}</svg>"
+        f"font-family='system-ui,sans-serif'>{''.join(parts)}{''.join(labels)}</svg>"
     )
 
     word = words[sel]
     if att:
         ranked = sorted(att.items(), key=lambda kv: -kv[1])
         bars = "".join(
-            f"<div style='display:flex;align-items:center;gap:8px;margin:3px 0'>"
-            f"<span style='width:90px'>{words[j]}</span>"
-            f"<span style='display:inline-block;height:14px;width:{w * 260:.0f}px;"
-            f"background:{BLUE};border-radius:3px'></span><span>{w:.0%}</span></div>"
+            f"<span>{words[j]}</span><span class='track'><span class='fill' style='display:block;"
+            f"width:{100 * w / ranked[0][1]:.0f}%'></span></span><span>{w:.0%}</span>"
             for j, w in ranked[:3]
         )
-        rest = "".join(f"<li>{words[j]}: {w:.1%}</li>" for j, w in ranked)
-        summary = (
-            f"<p>Al interpretar <b>«{word}»</b>, presta más atención a:</p>{bars}"
-            f"<details style='margin-top:8px'><summary>Ver los números</summary>"
-            f"<ul style='margin:4px 0'>{rest}</ul>"
-            f"<p style='font-size:0.85em;opacity:0.8'>Los pesos suman 100 % y son ilustrativos.</p></details>"
-        )
+        summary = f"<p style='margin:0 0 4px'>Al interpretar <b>«{word}»</b>, presta más atención a:</p><div class='bars'>{bars}</div>"
     else:
         summary = (
             f"<p><b>«{word}»</b> es la primera palabra: un LLM generativo todavía no tiene "
@@ -202,21 +279,61 @@ def figure():
     note = ""
     if causal and lost and why:
         note = (
-            f"<p style='border-left:4px solid {ORANGE};padding-left:10px'>"
+            f"<p style='border-left:4px solid {ORANGE};padding-left:10px;margin-top:10px'>"
             f"Un LLM generativo no puede ver lo que viene después: se pierde "
             f"<b>{', '.join('«' + w + '»' for w in lost)}</b>, justo las pistas que aclaraban el sentido. "
             f"Con lo que sí ve, la interpretación queda mucho menos clara.</p>"
         )
     elif why:
-        note = f"<p style='border-left:4px solid {ORANGE};padding-left:10px'>{why}</p>"
+        note = f"<p style='border-left:4px solid {ORANGE};padding-left:10px;margin-top:10px'>{why}</p>"
     mode = (
         "<b>Modo LLM generativo:</b> las palabras tachadas aún no existen."
         if causal
         else "<b>Modo codificador (tipo BERT):</b> cada palabra mira antes y después."
     )
     return ui.HTML(
-        f"<p style='font-size:0.9em;opacity:0.85'>{mode} · Pulsa otra palabra para cambiar.</p>"
-        f"{svg}{summary}{note}"
+        f"<div class='card'><div class='muted'>{mode} Pulsa otra palabra para cambiar.</div>"
+        f"{svg}{summary}{note}</div>"
+    )
+
+
+ui.input_checkbox("nums", "Ver los números: la tabla completa de atención", value=False, width="100%")
+
+
+@render.ui
+def matrix():
+    if not input.nums():
+        return ui.HTML("")
+    s = SENTENCES[int(input.sent())]
+    words, causal, sel = s["words"], input.causal(), current()
+    head = "".join(f"<th class='col'>{w}</th>" for w in words)
+    rows = []
+    for i, w in enumerate(words):
+        att = attention(s, i, causal)
+        cells = []
+        for j in range(len(words)):
+            if causal and j > i:
+                cells.append(
+                    "<td style='background:repeating-linear-gradient(45deg,#f3f4f6,#f3f4f6 4px,#e5e7eb 4px,#e5e7eb 8px)'></td>"
+                )
+                continue
+            v = att.get(j, 0.0)
+            txt = f"{v * 100:.0f}" if v >= 0.005 else ""
+            col = "#fff" if v > 0.35 else "#111"
+            cells.append(f"<td style='background:rgba(48,105,152,{min(1, v * 1.6):.2f});color:{col}'>{txt}</td>")
+        style = f"outline:2px solid {ORANGE};outline-offset:-1px" if i == sel else ""
+        rows.append(
+            f"<tr style='{style}' onclick=\"Shiny.setInputValue('w', {i}, {{priority: 'event'}})\">"
+            f"<th style='text-align:right'>{w}</th>{''.join(cells)}</tr>"
+        )
+    note = (
+        "Cada fila es una palabra y reparte su atención (100 %) entre las columnas. "
+        + ("La zona rayada es lo que un LLM generativo no puede ver: el triángulo de la <b>máscara causal</b>. " if causal else "")
+        + "Los pesos son ilustrativos. Pulsa una fila para seleccionar esa palabra."
+    )
+    return ui.HTML(
+        f"<div class='card' style='overflow-x:auto'><table class='mat'><thead><tr><th></th>{head}</tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody></table><p class='muted' style='margin:6px 0 0'>{note}</p></div>"
     )
 ```
 
@@ -226,6 +343,7 @@ def figure():
 2. En las dos frases del trofeo, **pulsa «era»**. Es un pronombre: no significa nada por sí mismo y necesita buscar a quién se refiere. Con «grande» mira al trofeo; con «pequeña», a la maleta. Cambia una palabra y cambia a quién mira.
 3. **Activa el interruptor «Ver como un LLM generativo»** y vuelve a pulsar «banco» en la frase del parque. «parque» queda tachada: un LLM que genera texto palabra a palabra todavía no la ha visto, así que no puede usarla para interpretar «banco».
 4. Con el interruptor activo, pulsa «era» en la frase del trofeo. Aquí no cambia casi nada, porque las pistas ya están antes.
+5. Marca **«Ver los números»** con el interruptor activo: la tabla completa muestra un triángulo rayado. Es la **máscara causal**: cada palabra (fila) solo puede atender a las columnas anteriores.
 
 ## Qué has visto
 
