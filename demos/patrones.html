@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.18">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="description" content="Procesa tres correos de cliente con cinco patrones, de la cadena simple al agente, y compara llamadas, resultado y previsibilidad.">
+
+<title>Demo — ¿Workflow o agente? Cuánta autonomía necesitas – Módulo 10 — IA Generativa para Data Science</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-9b0867969195664970c68a828357b7d7.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<meta name="shinylive:serviceworker_dir" content="..">
+<script src="../site_libs/quarto-contrib/shinylive-0.10.15/shinylive/load-shinylive-sw.js" type="module"></script>
+<script src="../site_libs/quarto-contrib/shinylive-0.10.15/shinylive/run-python-blocks.js" type="module"></script>
+<link href="../site_libs/quarto-contrib/shinylive-0.10.15/shinylive/shinylive.css" rel="stylesheet">
+<link href="../site_libs/quarto-contrib/shinylive-quarto-css/shinylive-quarto.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../demos/atencion.html">Demos interactivas</a></li><li class="breadcrumb-item"><a href="../demos/patrones.html">¿Workflow o agente?</a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Módulo 10 — IA Generativa para Data Science</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Inicio</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Presentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../about.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Acerca de</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 1 — Fundamentos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/00-panorama.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Panorama histórico</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01-fundamentos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01a-transformer.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Transformers</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01b-llms.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LLMs e inferencia</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01c-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01d-vectordb.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bases de datos vectoriales</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/01e-recuperacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">De documentos a recuperación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque1/hpd1-embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Embeddings</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd1-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 1 — Entregable: Pipeline de embeddings</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 2 — Orquestación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-3" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-3" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02-orquestacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02a-prompt-engineering.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Prompt Engineering</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02b-langchain.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LangChain</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02c-llamaindex.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">LlamaIndex</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02d-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02e-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Agentes Inteligentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/02f-patrones-agentes.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de diseño de agentes</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd2-agente-tool-calling.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Agente Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd2-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 2 — Entregable: Agente analítico con Tool Calling</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd3-workflows-langgraph.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 3 — Workflows con LangGraph</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque2/hpd4-servidor-mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Servidor MCP</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd4-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 4 — Entregable: Servidor MCP</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 3 — Aplicaciones</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-4" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-4" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03-aplicaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03b-rag-avanzado.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">RAG Avanzado</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03a-datos-sinteticos.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Datos Sintéticos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-previo-cabezas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Previo: cabezas y objetivos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque3/03c-fine-tuning.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Fine-tuning eficiente</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-rag-mixto.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — RAG Mixto</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/hpd5-entregable.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">HPD 5 — Entregable: RAG con evaluación</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true">
+ <span class="menu-text">Bloque 4 — Gobernanza</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-5" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-5" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04-gobernanza.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Visión general</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04a-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación de LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04b-alucinaciones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Alucinaciones</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04c-privacidad.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Privacidad y PII</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04d-sesgo.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Sesgo en LLMs</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04e-documentacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Documentación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../bloque4/04f-despliegue.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Patrones de despliegue</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true">
+ <span class="menu-text">Demos interactivas</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-6" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-6" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (1): la idea</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/atencion-modelo-real.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Atención (2): un modelo real</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/bpe.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Tokenización BPE</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/embeddings.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Vecinos semánticos (embeddings)</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/chunking.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Troceado para RAG</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/hibrida.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Búsqueda híbrida</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/temperatura.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Temperatura y muestreo</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/agente.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Dentro de un agente</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/patrones.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text">¿Workflow o agente?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP en dos minutos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/inyeccion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inyección de prompt</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true">
+ <span class="menu-text">Evaluación</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-7" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-7" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../05-evaluacion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Evaluación</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../evaluables/proyecto-final.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Proyecto integrador final</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true">
+ <span class="menu-text">Recursos</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-8" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-8" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../06-herramientas.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Herramientas</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../07-bibliografia.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Bibliografía</span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#qué-observar" id="toc-qué-observar" class="nav-link active" data-scroll-target="#qué-observar">Qué observar</a></li>
+  <li><a href="#qué-has-visto" id="toc-qué-has-visto" class="nav-link" data-scroll-target="#qué-has-visto">Qué has visto</a></li>
+  </ul>
+<div class="quarto-alternate-formats"><h2>Other Formats</h2><ul><li><a href="patrones.ipynb" download="patrones.ipynb"><i class="bi bi-journal-code"></i>Jupyter</a></li></ul></div></nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../demos/atencion.html">Demos interactivas</a></li><li class="breadcrumb-item"><a href="../demos/patrones.html">¿Workflow o agente?</a></li></ol></nav>
+<div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Demo — ¿Workflow o agente? Cuánta autonomía necesitas</h1><button type="button" class="btn code-tools-button" id="quarto-code-tools-source"><i class="bi"></i> Code</button></div></div>
+</div>
+
+<div>
+  <div class="description">
+    Procesa tres correos de cliente con cinco patrones, de la cadena simple al agente, y compara llamadas, resultado y previsibilidad.
+  </div>
+</div>
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<blockquote class="blockquote">
+<p>Demo que acompaña a <a href="../bloque2/02f-patrones-agentes.html#sec-workflows-vs-agentes">Patrones de diseño de agentes</a> y prepara el <a href="../bloque2/hpd3-workflows-langgraph.html">HPD 3 (LangGraph)</a>. Se ejecuta en el navegador y no necesita clave de API.</p>
+</blockquote>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Las ejecuciones son simuladas
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>No hay ningún LLM detrás: cada recorrido está escrito a mano para ilustrar cómo se comporta cada patrón. Las cifras de llamadas y tiempos son orientativas (unos 1,5 s por llamada al LLM).</p>
+</div>
+</div>
+<p>Una tienda online recibe correos de clientes y quiere responderlos con un LLM. Hay muchas formas de montar el sistema, desde una sola llamada hasta un agente que decide por sí mismo qué hacer. <strong>Más autonomía no siempre es mejor</strong>: cuesta más llamadas, más tiempo y es menos predecible.</p>
+<p>Elige un correo y un patrón. El diagrama marca el camino que sigue el correo; abajo, la tabla compara los cinco patrones con ese mismo correo.</p>
+<pre class="shinylive-python" data-engine="python"><code>#| '!! shinylive warning !!': |
+#|   shinylive does not work in self-contained HTML documents.
+#|   Please set `embed-resources: false` in your metadata.
+#| standalone: true
+#| viewerHeight: 1380
+
+import random
+
+from shiny import reactive
+from shiny.express import input, ui, render
+
+BLUE, DARK, YELLOW, ORANGE, GREEN, RED, GRAY = (
+    "#4B8BBE", "#306998", "#FFD43B", "#e65100", "#2e7d32", "#c62828", "#9ca3af")
+
+# ── Los correos ──────────────────────────────────────────────────────────────
+EMAILS = [
+    {"tag": "Pregunta sencilla", "from": "Lucía",
+     "text": "Hola, ¿a qué hora abre la tienda de Sevilla los sábados?"},
+    {"tag": "Devolución", "from": "Marcos",
+     "text": "Quiero devolver las zapatillas del pedido 4417, me quedan pequeñas."},
+    {"tag": "Dos problemas a la vez", "from": "Elena",
+     "text": "El pedido 5120 llegó con la pantalla rota y además me habéis cobrado dos veces. ¿Qué hago?"},
+]
+
+# ── Los patrones, de menos a más autonomía ───────────────────────────────────
+# Nodos: id -&gt; (x, y, etiqueta, tipo). Tipos: io, llm, code, tool.
+PATTERNS = {
+    "cadena": {
+        "name": "Cadena simple", "family": "workflow",
+        "desc": "Una sola llamada al LLM: «redacta una respuesta a este correo».",
+        "nodes": {"in": (60, 110, "Correo", "io"), "llm": (320, 110, "LLM redacta", "llm"),
+                  "out": (580, 110, "Respuesta", "io")},
+        "edges": [("in", "llm"), ("llm", "out")],
+    },
+    "encadenado": {
+        "name": "Encadenado", "family": "workflow",
+        "desc": "Pasos fijos: extraer datos, consultar el pedido, redactar y comprobar la política.", "w": 44,
+        "nodes": {"in": (45, 110, "Correo", "io"), "ext": (150, 110, "Extraer datos", "llm"),
+                  "db": (260, 110, "Consultar pedido", "code"), "red": (370, 110, "Redactar", "llm"),
+                  "pol": (480, 110, "¿Cumple política?", "code"), "out": (590, 110, "Respuesta", "io")},
+        "edges": [("in", "ext"), ("ext", "db"), ("db", "red"), ("red", "pol"), ("pol", "out")],
+    },
+    "enrutado": {
+        "name": "Enrutado", "family": "workflow",
+        "desc": "Un clasificador elige UNA rama especializada según el tipo de correo.",
+        "nodes": {"in": (60, 110, "Correo", "io"), "cls": (190, 110, "Clasificar", "llm"),
+                  "inf": (360, 40, "Información", "llm"), "dev": (360, 110, "Devoluciones", "llm"),
+                  "inc": (360, 180, "Incidencias", "llm"), "out": (560, 110, "Respuesta", "io")},
+        "edges": [("in", "cls"), ("cls", "inf"), ("cls", "dev"), ("cls", "inc"),
+                  ("inf", "out"), ("dev", "out"), ("inc", "out")],
+    },
+    "paralelo": {
+        "name": "Paralelización", "family": "workflow",
+        "desc": "Tres revisores revisan el correo a la vez (envíos, cobros, devoluciones) y un agregador une lo que encuentran.",
+        "nodes": {"in": (60, 110, "Correo", "io"), "env": (230, 40, "Revisor envíos", "llm"),
+                  "cob": (230, 110, "Revisor cobros", "llm"), "rdv": (230, 180, "Revisor devoluciones", "llm"),
+                  "agg": (420, 110, "Agregador", "llm"), "out": (580, 110, "Respuesta", "io")},
+        "edges": [("in", "env"), ("in", "cob"), ("in", "rdv"), ("env", "agg"), ("cob", "agg"),
+                  ("rdv", "agg"), ("agg", "out")],
+    },
+    "agente": {
+        "name": "Agente", "family": "agente",
+        "desc": "El LLM decide en un bucle qué herramienta usar y cuándo parar.",
+        "nodes": {"in": (60, 110, "Correo", "io"), "llm": (260, 110, "LLM decide", "llm"),
+                  "tools": (440, 40, "Herramientas", "tool"), "out": (580, 110, "Respuesta", "io")},
+        "edges": [("in", "llm"), ("llm", "tools"), ("tools", "llm"), ("llm", "out")],
+    },
+}
+ORDER = list(PATTERNS)
+
+# ── Qué pasa con cada correo ─────────────────────────────────────────────────
+# result: ok | partial | fail. trace: [(nodo, texto)]. calls: llamadas al LLM. secs: tiempo aprox.
+OK, PARTIAL, FAIL = "ok", "partial", "fail"
+CASES = {
+    ("cadena", 0): dict(calls=1, secs=1.5, result=OK, trace=[
+        ("in", "Llega el correo."),
+        ("llm", "El LLM tiene el horario en sus instrucciones y redacta la respuesta."),
+        ("out", "«Los sábados abrimos de 10:00 a 14:00. ¡Te esperamos!»")],
+        note="Basta y sobra: una pregunta de un paso no necesita más."),
+    ("cadena", 1): dict(calls=1, secs=1.5, result=PARTIAL, trace=[
+        ("in", "Llega el correo."),
+        ("llm", "El LLM redacta sin poder consultar el pedido: no sabe si está dentro de plazo."),
+        ("out", "«Claro, puedes devolverlas. Te enviaremos instrucciones.»")],
+        note="Suena bien, pero no comprueba el pedido ni genera la devolución: promete algo que nadie ha verificado."),
+    ("cadena", 2): dict(calls=1, secs=1.5, result=FAIL, trace=[
+        ("in", "Llega el correo."),
+        ("llm", "Sin datos ni herramientas, solo puede disculparse."),
+        ("out", "«Sentimos mucho las molestias. Revisaremos tu caso.»")],
+        note="No resuelve ninguno de los dos problemas."),
+
+    ("encadenado", 0): dict(calls=2, secs=3.2, result=OK, trace=[
+        ("in", "Llega el correo."), ("ext", "Extrae datos: no hay número de pedido."),
+        ("db", "No hay pedido que consultar: se salta."), ("red", "Redacta con el horario."),
+        ("pol", "No hay nada que comprobar."), ("out", "«Los sábados abrimos de 10:00 a 14:00.»")],
+        note="Funciona, pero con pasos que no hacían falta: el doble de llamadas que la cadena simple."),
+    ("encadenado", 1): dict(calls=2, secs=3.4, result=OK, trace=[
+        ("in", "Llega el correo."), ("ext", "Extrae: pedido 4417, motivo «talla»."),
+        ("db", "Pedido 4417: entregado hace 12 días."), ("red", "Redacta la respuesta con los datos reales."),
+        ("pol", "Plazo de devolución: 30 días. 12 &lt; 30 ✔. Genera la etiqueta DEV-4417."),
+        ("out", "«Tu pedido está dentro de plazo. Aquí tienes la etiqueta DEV-4417.»")],
+        note="El caso ideal para un workflow: la tarea tiene siempre los mismos pasos."),
+    ("encadenado", 2): dict(calls=2, secs=3.4, result=PARTIAL, trace=[
+        ("in", "Llega el correo."), ("ext", "Extrae: pedido 5120, motivo «rotura»."),
+        ("db", "Pedido 5120: entregado ayer."), ("red", "Redacta una devolución por rotura."),
+        ("pol", "Dentro de plazo ✔."), ("out", "«Te enviamos la etiqueta para devolver la pantalla.»")],
+        note="El flujo se diseñó para devoluciones: resuelve la rotura e ignora el doble cobro."),
+
+    ("enrutado", 0): dict(calls=2, secs=3.0, result=OK, trace=[
+        ("in", "Llega el correo."), ("cls", "Clasifica: «información»."),
+        ("inf", "La rama de información responde con el horario."),
+        ("out", "«Los sábados abrimos de 10:00 a 14:00.»")],
+        note="Funciona. Útil si llegan muchos tipos de correo distintos."),
+    ("enrutado", 1): dict(calls=3, secs=4.5, result=OK, trace=[
+        ("in", "Llega el correo."), ("cls", "Clasifica: «devolución»."),
+        ("dev", "La rama de devoluciones consulta el pedido (12 días, dentro de plazo) y genera DEV-4417."),
+        ("out", "«Tu pedido está dentro de plazo. Aquí tienes la etiqueta DEV-4417.»")],
+        note="Funciona: la rama especializada es, por dentro, un encadenado."),
+    ("enrutado", 2): dict(calls=3, secs=4.5, result=PARTIAL, trace=[
+        ("in", "Llega el correo."), ("cls", "Clasifica: «incidencia» (tiene que elegir una sola categoría)."),
+        ("inc", "La rama de incidencias abre un parte por la pantalla rota."),
+        ("out", "«Hemos abierto la incidencia INC-882 por la rotura.»")],
+        note="El enrutado manda cada correo por UNA rama: el doble cobro se queda sin atender."),
+
+    ("paralelo", 0): dict(calls=4, secs=3.0, result=OK, trace=[
+        ("in", "Llega el correo y se envía a los tres revisores a la vez."),
+        ("env", "Envíos: no aplica."), ("cob", "Cobros: no aplica."), ("rdv", "Devoluciones: no aplica."),
+        ("agg", "El agregador no encuentra problemas y responde con el horario."),
+        ("out", "«Los sábados abrimos de 10:00 a 14:00.»")],
+        note="Funciona, pero tres de las cuatro llamadas no aportan nada: coste desperdiciado."),
+    ("paralelo", 1): dict(calls=4, secs=3.2, result=OK, trace=[
+        ("in", "Llega el correo y se envía a los tres revisores a la vez."),
+        ("env", "Envíos: no aplica."), ("cob", "Cobros: no aplica."),
+        ("rdv", "Devoluciones: pedido 4417 dentro de plazo, genera DEV-4417."),
+        ("agg", "El agregador redacta la respuesta."),
+        ("out", "«Tu pedido está dentro de plazo. Aquí tienes la etiqueta DEV-4417.»")],
+        note="Funciona, pero cuesta el doble que el encadenado para el mismo resultado."),
+    ("paralelo", 2): dict(calls=4, secs=3.2, result=OK, trace=[
+        ("in", "Llega el correo y se envía a los tres revisores a la vez."),
+        ("env", "Envíos: pantalla rota en el pedido 5120 → abre la incidencia INC-882."),
+        ("cob", "Cobros: dos cargos de 249 € el mismo día → solicita el reembolso de uno."),
+        ("rdv", "Devoluciones: no aplica (se sustituye, no se devuelve)."),
+        ("agg", "El agregador junta los dos hallazgos en una sola respuesta."),
+        ("out", "«Te enviamos una pantalla nueva (INC-882) y te devolvemos el cargo duplicado de 249 €.»")],
+        note="Resuelve los dos problemas SIN agente: porque se diseñó un revisor para cada tipo de problema."),
+}
+
+# El agente no hace siempre lo mismo: varias ejecuciones posibles por correo.
+AGENT_RUNS = {
+    0: [
+        dict(result=OK, tools=["horario_tienda"],
+             answer="«Los sábados abrimos de 10:00 a 14:00.»"),
+        dict(result=OK, tools=["buscar_tienda", "horario_tienda"],
+             answer="«La tienda de Sevilla abre los sábados de 10:00 a 14:00.»"),
+        dict(result=OK, tools=["horario_tienda"],
+             answer="«Los sábados abrimos de 10:00 a 14:00.»"),
+    ],
+    1: [
+        dict(result=OK, tools=["consultar_pedido", "crear_devolucion"],
+             answer="«Tu pedido está dentro de plazo. Aquí tienes la etiqueta DEV-4417.»"),
+        dict(result=OK, tools=["consultar_pedido", "politica_devoluciones", "crear_devolucion"],
+             answer="«Tu pedido está dentro de plazo. Aquí tienes la etiqueta DEV-4417.»"),
+        dict(result=PARTIAL, tools=["consultar_pedido"],
+             answer="«Tu pedido está dentro de plazo, puedes devolverlo.» (no llega a crear la devolución)"),
+    ],
+    2: [
+        dict(calls=6, secs=9.4, result=OK,
+             tools=["consultar_pedido", "abrir_incidencia", "consultar_pagos", "solicitar_reembolso"],
+             answer="«Te enviamos una pantalla nueva (INC-882) y te devolvemos el cargo duplicado de 249 €.»"),
+        dict(calls=8, secs=12.5, result=OK,
+             tools=["consultar_pedido", "consultar_pagos", "abrir_incidencia", "consultar_pagos",
+                    "politica_reembolsos", "solicitar_reembolso"],
+             answer="«Te enviamos una pantalla nueva (INC-882) y te devolvemos el cargo duplicado de 249 €.»"),
+        dict(result=PARTIAL, tools=["consultar_pedido", "abrir_incidencia"],
+             answer="«Hemos abierto la incidencia INC-882 por la rotura.» (se olvida del doble cobro)"),
+    ],
+}
+
+RESULT = {OK: ("✔ Resuelto", GREEN), PARTIAL: ("⚠ A medias", ORANGE), FAIL: ("✘ No resuelve", RED)}
+KIND = {"io": (BLUE, "#fff"), "llm": (DARK, "#fff"), "code": (YELLOW, "#000"), "tool": (ORANGE, "#fff")}
+
+
+def case(p, e, run=0):
+    """Ejecución de un patrón sobre un correo (para el agente, la variante `run`)."""
+    if p != "agente":
+        return CASES[(p, e)]
+    r = AGENT_RUNS[e][run]
+    calls = len(r["tools"]) + 1  # una decisión por herramienta y otra para responder
+    trace = [("in", "Llega el correo.")]
+    for t in r["tools"]:
+        trace += [("llm", f"Decide usar &lt;code&gt;{t}&lt;/code&gt;."), ("tools", f"Ejecuta &lt;code&gt;{t}&lt;/code&gt; y devuelve el resultado.")]
+    trace += [("llm", "Decide que ya puede responder."), ("out", r["answer"])]
+    notes = {OK: "Lo resuelve, decidiendo él mismo qué consultar.",
+             PARTIAL: "Esta vez se para antes de tiempo: el agente decide cuándo ha terminado, y a veces se equivoca."}
+    return dict(calls=calls, secs=1.55 * calls, result=r["result"], trace=trace, note=notes[r["result"]],
+                loops=len(r["tools"]))
+
+
+# ── Interfaz ─────────────────────────────────────────────────────────────────
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.muted{color:#6b7280;font-size:.85em}
+.emails{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.email{border:1.5px solid #e5e7eb;border-radius:10px;padding:8px 10px;cursor:pointer;font-size:.86em;background:#fff}
+.email:hover{border-color:#4B8BBE}.email.on{border-color:#306998;box-shadow:0 0 0 3px #30699833}
+.email .t{font-weight:700;font-size:.8em;color:#306998;text-transform:uppercase;letter-spacing:.03em}
+.pats{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pat{border:1.5px solid #306998;color:#306998;border-radius:999px;padding:4px 14px;cursor:pointer;font-size:.9em;background:#fff}
+.pat:hover{background:#e8f0f8}.pat.on{background:#306998;color:#fff}
+.pat.ag{border-color:#e65100;color:#e65100}.pat.ag.on{background:#e65100;color:#fff}
+.axis{font-size:.75em;color:#6b7280;margin-top:3px}
+.tiles{display:flex;gap:8px;flex-wrap:wrap}
+.tile{flex:1;min-width:110px;border:1px solid #e5e7eb;border-radius:8px;padding:4px 10px}
+.tile b{display:block;font-size:1.35em}
+.trace{margin:0;padding-left:0;list-style:none;font-size:.88em}
+.trace li{display:flex;gap:8px;align-items:flex-start;margin:3px 0}
+.num{flex:none;width:20px;height:20px;border-radius:50%;background:#306998;color:#fff;font-size:.75em;
+  display:flex;align-items:center;justify-content:center;font-weight:700;margin-top:1px}
+.cmp{width:100%;font-size:.86em;border-collapse:collapse}
+.cmp td,.cmp th{padding:5px 6px;border-bottom:1px solid #f3f4f6;text-align:left}
+.cmp tr.on{background:#eef4fa}.cmp tr{cursor:pointer}
+.star{background:#2e7d32;color:#fff;border-radius:4px;padding:0 6px;font-size:.8em;font-weight:600}
+.runs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.run{border-radius:8px;padding:4px 10px;font-size:.82em;color:#fff}
+@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.run{animation:pop .3s ease-out both}
+@media (max-width:620px){.emails{grid-template-columns:1fr}}
+""")
+
+email = reactive.value(1)
+pattern = reactive.value("encadenado")
+runs = reactive.value([])
+agent_run = reactive.value(0)
+
+
+@reactive.effect
+@reactive.event(input.pick_email)
+def _pe():
+    email.set(int(input.pick_email()))
+    runs.set([])
+    agent_run.set(0)
+
+
+@reactive.effect
+@reactive.event(input.pick_pat)
+def _pp():
+    pattern.set(input.pick_pat())
+    runs.set([])
+    agent_run.set(0)
+
+
+@reactive.effect
+@reactive.event(input.run5)
+def _run5():
+    p, e = pattern(), email()
+    if p == "agente":
+        idx = [random.randrange(len(AGENT_RUNS[e])) for _ in range(5)]
+        agent_run.set(idx[-1])
+        runs.set([case(p, e, i) for i in idx])
+    else:
+        runs.set([case(p, e)] * 5)
+
+
+def onclick(name, value):
+    return f"onclick=\"Shiny.setInputValue('{name}', '{value}', {{priority: 'event'}})\""
+
+
+@render.ui
+def pickers():
+    e, p = email(), pattern()
+    cards = "".join(
+        f"&lt;div class='email{' on' if i == e else ''}' {onclick('pick_email', i)}&gt;"
+        f"&lt;div class='t'&gt;{m['tag']}&lt;/div&gt;&lt;b&gt;{m['from']}:&lt;/b&gt; {m['text']}&lt;/div&gt;"
+        for i, m in enumerate(EMAILS)
+    )
+    pats = "".join(
+        f"&lt;span class='pat{' ag' if PATTERNS[k]['family'] == 'agente' else ''}{' on' if k == p else ''}' "
+        f"{onclick('pick_pat', k)}&gt;{PATTERNS[k]['name']}&lt;/span&gt;"
+        for k in ORDER
+    )
+    return ui.HTML(
+        f"&lt;div style='font-weight:600;margin-bottom:4px'&gt;1. Elige un correo de cliente&lt;/div&gt;"
+        f"&lt;div class='emails'&gt;{cards}&lt;/div&gt;"
+        f"&lt;div style='font-weight:600;margin:12px 0 4px'&gt;2. Elige cómo lo procesa el sistema&lt;/div&gt;"
+        f"&lt;div class='pats'&gt;{pats}&lt;/div&gt;"
+        f"&lt;div class='axis'&gt;← el código decide el orden (workflow) · · · el LLM decide qué hacer (agente) →&lt;/div&gt;"
+    )
+
+
+def graph(p, path, loops):
+    P = PATTERNS[p]
+    nodes, visited = P["nodes"], set(path)
+    order = {}
+    for i, n in enumerate(path):
+        order.setdefault(n, i + 1)
+    parts = ["&lt;defs&gt;&lt;marker id='ar' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' "
+             "orient='auto'&gt;&lt;path d='M0,0 L10,5 L0,10 z' fill='#6b7280'/&gt;&lt;/marker&gt;"
+             "&lt;marker id='arh' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' "
+             "orient='auto'&gt;&lt;path d='M0,0 L10,5 L0,10 z' fill='#e65100'/&gt;&lt;/marker&gt;&lt;/defs&gt;"]
+    used = {(path[i], path[i + 1]) for i in range(len(path) - 1)}
+    if p == "paralelo":
+        used |= {("in", n) for n in ("env", "cob", "rdv")} | {(n, "agg") for n in ("env", "cob", "rdv")}
+    W = P.get("w", 52)
+    for a, b in P["edges"]:
+        (x1, y1, *_), (x2, y2, *_) = nodes[a], nodes[b]
+        on = (a, b) in used
+        dy = 0
+        if p == "agente" and {a, b} == {"llm", "tools"}:
+            dy = -8 if a == "llm" else 8
+        sx, sy = x1 + (W if x2 &gt; x1 else -W if x2 &lt; x1 else 0), y1 + dy
+        ex, ey = x2 - (W if x2 &gt; x1 else -W if x2 &lt; x1 else 0), y2 + dy
+        parts.append(
+            f"&lt;line x1='{sx}' y1='{sy}' x2='{ex}' y2='{ey}' stroke='{ORANGE if on else '#d1d5db'}' "
+            f"stroke-width='{2.6 if on else 1.4}' marker-end='url(#{'arh' if on else 'ar'})'/&gt;"
+        )
+    for n, (x, y, label, kind) in nodes.items():
+        fill, tc = KIND[kind]
+        on = n in visited
+        words = label.split(" ")
+        lines = [" ".join(words[: (len(words) + 1) // 2]), " ".join(words[(len(words) + 1) // 2:])] \
+            if len(label) &gt; 13 else [label]
+        text = "".join(
+            f"&lt;tspan x='{x}' dy='{0 if i == 0 else 13}'&gt;{l}&lt;/tspan&gt;" for i, l in enumerate(lines))
+        ty = y + 4 - 6 * (len(lines) - 1)
+        parts.append(
+            f"&lt;g opacity='{1 if on else 0.3}'&gt;&lt;rect x='{x - W}' y='{y - 22}' width='{2 * W}' height='44' rx='9' "
+            f"fill='{fill}' stroke='{'#111' if on else 'none'}' stroke-width='1.5'/&gt;"
+            f"&lt;text x='{x}' y='{ty}' text-anchor='middle' font-size='12' font-weight='600' fill='{tc}'&gt;{text}&lt;/text&gt;&lt;/g&gt;"
+        )
+        if n in order:
+            parts.append(
+                f"&lt;circle cx='{x + W - 4}' cy='{y - 22}' r='9' fill='#fff' stroke='#111'/&gt;"
+                f"&lt;text x='{x + W - 4}' y='{y - 18}' text-anchor='middle' font-size='10' font-weight='700'&gt;{order[n]}&lt;/text&gt;"
+            )
+    if p == "agente" and loops:
+        parts.append(
+            f"&lt;text x='440' y='8' text-anchor='middle' font-size='12' font-weight='700' fill='{ORANGE}'&gt;"
+            f"↻ {loops} vuelta{'s' if loops != 1 else ''}&lt;/text&gt;")
+    ys = [y for (_, y, *_) in nodes.values()]
+    top, bottom = min(ys) - 34, max(ys) + 30
+    if p == "agente":
+        top = -8
+    legend = "".join(
+        f"&lt;rect x='{20 + i * 150}' y='{bottom + 4}' width='12' height='12' rx='3' fill='{KIND[k][0]}'/&gt;"
+        f"&lt;text x='{38 + i * 150}' y='{bottom + 14}' font-size='11' fill='#374151'&gt;{t}&lt;/text&gt;"
+        for i, (k, t) in enumerate([("llm", "llamada al LLM"), ("code", "código normal"),
+                                    ("tool", "herramientas"), ("io", "entrada / salida")])
+    )
+    return (f"&lt;svg viewBox='0 {top} 640 {bottom - top + 22}' width='100%' "
+            f"style='display:block;max-width:680px;margin:6px auto' "
+            f"font-family='system-ui,sans-serif'&gt;{''.join(parts)}{legend}&lt;/svg&gt;")
+
+
+@render.ui
+def run_view():
+    p, e = pattern(), email()
+    c = case(p, e, agent_run())
+    path = [n for n, _ in c["trace"]]
+    label, color = RESULT[c["result"]]
+    steps = "".join(
+        f"&lt;li&gt;&lt;span class='num' style='background:{KIND[PATTERNS[p]['nodes'][n][3]][0]};"
+        f"color:{KIND[PATTERNS[p]['nodes'][n][3]][1]}'&gt;{i + 1}&lt;/span&gt;&lt;span&gt;"
+        f"&lt;b&gt;{PATTERNS[p]['nodes'][n][2]}:&lt;/b&gt; {t}&lt;/span&gt;&lt;/li&gt;"
+        for i, (n, t) in enumerate(c["trace"])
+    )
+    tiles = (
+        f"&lt;div class='tiles'&gt;"
+        f"&lt;div class='tile'&gt;&lt;span class='muted'&gt;Llamadas al LLM&lt;/span&gt;&lt;b&gt;{c['calls']}&lt;/b&gt;&lt;/div&gt;"
+        f"&lt;div class='tile'&gt;&lt;span class='muted'&gt;Tiempo aprox.&lt;/span&gt;&lt;b&gt;{c['secs']:.1f} s&lt;/b&gt;&lt;/div&gt;"
+        f"&lt;div class='tile'&gt;&lt;span class='muted'&gt;Resultado&lt;/span&gt;&lt;b style='color:{color}'&gt;{label}&lt;/b&gt;&lt;/div&gt;&lt;/div&gt;"
+    )
+    return ui.HTML(
+        f"&lt;div class='card'&gt;&lt;div&gt;&lt;b&gt;{PATTERNS[p]['name']}&lt;/b&gt; · &lt;span class='muted'&gt;{PATTERNS[p]['desc']}&lt;/span&gt;&lt;/div&gt;"
+        f"{graph(p, path, c.get('loops', 0))}{tiles}"
+        f"&lt;ol class='trace' style='margin-top:8px'&gt;{steps}&lt;/ol&gt;"
+        f"&lt;p style='border-left:4px solid {color};padding-left:10px;margin:8px 0 0'&gt;{c['note']}&lt;/p&gt;&lt;/div&gt;"
+    )
+
+
+ui.input_action_button("run5", "Ejecutar 5 veces el mismo correo", class_="btn-outline-primary btn-sm")
+
+
+@render.ui
+def runs_view():
+    rs = runs()
+    if not rs:
+        return ui.HTML("&lt;p class='muted' style='margin:4px 0'&gt;¿Hace siempre lo mismo? Pulsa el botón y compruébalo.&lt;/p&gt;")
+    chips = "".join(
+        f"&lt;span class='run' style='background:{RESULT[r['result']][1]};animation-delay:{0.08 * i:.2f}s'&gt;"
+        f"#{i + 1}: {r['calls']} llamadas · {RESULT[r['result']][0]}&lt;/span&gt;"
+        for i, r in enumerate(rs)
+    )
+    calls = [r["calls"] for r in rs]
+    same = len({(r["calls"], r["result"]) for r in rs}) == 1
+    msg = ("Las cinco ejecuciones son idénticas: el código decide el camino, así que es predecible y fácil de probar."
+           if same else
+           f"Entre {min(calls)} y {max(calls)} llamadas, y no siempre con el mismo resultado: "
+           f"el LLM decide el camino en cada ejecución. Más difícil de probar y de presupuestar.")
+    return ui.HTML(f"&lt;div class='runs'&gt;{chips}&lt;/div&gt;&lt;p class='muted' style='margin:6px 0 0'&gt;{msg}&lt;/p&gt;")
+
+
+@render.ui
+def compare():
+    e, p = email(), pattern()
+    rows, simplest = [], None
+    for k in ORDER:
+        if k == "agente":
+            rs = AGENT_RUNS[e]
+            n = [len(r["tools"]) + 1 for r in rs]
+            calls = f"{min(n)}–{max(n)}"
+            results = {r["result"] for r in rs}
+            res = "✔ casi siempre" if OK in results and len(results) &gt; 1 else RESULT[rs[0]["result"]][0]
+            color = ORANGE if len(results) &gt; 1 else RESULT[rs[0]["result"]][1]
+            pred = "No"
+            ok = OK in results
+        else:
+            c = CASES[(k, e)]
+            calls, (res, color), pred, ok = str(c["calls"]), RESULT[c["result"]], "Sí", c["result"] == OK
+        star = ""
+        if ok and simplest is None and k != "agente":
+            simplest = k
+            star = " &lt;span class='star'&gt;la más simple que lo resuelve&lt;/span&gt;"
+        rows.append(
+            f"&lt;tr class='{'on' if k == p else ''}' {onclick('pick_pat', k)}&gt;&lt;td&gt;&lt;b&gt;{PATTERNS[k]['name']}&lt;/b&gt;{star}&lt;/td&gt;"
+            f"&lt;td&gt;{calls}&lt;/td&gt;&lt;td style='color:{color};font-weight:600'&gt;{res}&lt;/td&gt;&lt;td&gt;{pred}&lt;/td&gt;&lt;/tr&gt;"
+        )
+    return ui.HTML(
+        f"&lt;div class='card'&gt;&lt;b&gt;Todos los patrones con este correo&lt;/b&gt; "
+        f"&lt;span class='muted'&gt;(pulsa una fila para verla)&lt;/span&gt;"
+        f"&lt;table class='cmp' style='margin-top:6px'&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Patrón&lt;/th&gt;&lt;th&gt;Llamadas&lt;/th&gt;"
+        f"&lt;th&gt;Resultado&lt;/th&gt;&lt;th&gt;¿Siempre igual?&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;{''.join(rows)}&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;"
+    )</code></pre>
+<section id="qué-observar" class="level2">
+<h2 class="anchored" data-anchor-id="qué-observar">Qué observar</h2>
+<ol type="1">
+<li><strong>Correo de Lucía (pregunta sencilla).</strong> La cadena simple lo resuelve con una llamada. Todo lo demás también funciona, pero gasta de dos a cuatro veces más. La tabla marca la cadena simple como «la más simple que lo resuelve».</li>
+<li><strong>Correo de Marcos (devolución).</strong> La cadena simple suena bien, pero no comprueba el pedido: promete algo que nadie ha verificado. El <strong>encadenado</strong> es el caso ideal: siempre los mismos pasos, con los datos reales del pedido.</li>
+<li><strong>Correo de Elena (dos problemas).</strong> El encadenado y el enrutado resuelven solo uno: están diseñados para un tipo de problema por correo. La <strong>paralelización</strong> resuelve los dos <em>sin agente</em>, porque tiene un revisor para cada tipo de problema. El agente también lo resuelve.</li>
+<li>Con el <strong>agente</strong> seleccionado, pulsa <strong>«Ejecutar 5 veces»</strong>. Cambian las llamadas y, a veces, el resultado: el agente decide cuándo ha terminado y en ocasiones se para antes de tiempo. Repite con un workflow: cinco ejecuciones idénticas.</li>
+</ol>
+</section>
+<section id="qué-has-visto" class="level2">
+<h2 class="anchored" data-anchor-id="qué-has-visto">Qué has visto</h2>
+<ul>
+<li><strong>Empieza por lo más simple que funcione.</strong> La tabla de cada correo responde a la pregunta «¿hace falta un agente?». En dos de los tres correos, no.</li>
+<li>Los <strong>workflows</strong> (el código decide el orden) son predecibles, baratos y fáciles de probar. Funcionan cuando conoces la estructura de la tarea, y fallan cuando llega algo para lo que no se diseñaron.</li>
+<li>Un <strong>agente</strong> se adapta a lo imprevisto, pero cada ejecución es distinta: más difícil de probar, de depurar y de presupuestar.</li>
+<li>A menudo un workflow bien diseñado (aquí, la paralelización) cubre el caso difícil sin ceder el control al LLM.</li>
+</ul>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Tip</span>Para el HPD 3
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>En LangGraph, cada uno de estos diagramas es un grafo: los nodos son las cajas y las aristas condicionales son las decisiones. La diferencia entre un workflow y un agente está en <strong>quién decide qué arista seguir</strong>: tu código o el LLM.</p>
+</div>
+</div>
+<p>Para la descripción completa de cada patrón, vuelve a <a href="../bloque2/02f-patrones-agentes.html#sec-workflow-patterns">Patrones de diseño de agentes</a>.</p>
+
+
+<!-- -->
+
+</section>
+
+</main> <!-- /main -->
+<footer class="footer-custom">
+  <div class="footer-logos">
+    <img src="../images/logo_cfp.png" alt="Formación Permanente · Universidad de Sevilla">
+  </div>
+  <p>© 2026 — Módulo 10 · IA Generativa para Data Science · Máster Data Science &amp; Big Data · Universidad de Sevilla</p>
+</footer>
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+    const viewSource = window.document.getElementById('quarto-view-source') ||
+                       window.document.getElementById('quarto-code-tools-source');
+    if (viewSource) {
+      const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+      viewSource.addEventListener("click", function(e) {
+        if (sourceUrl) {
+          // rstudio viewer pane
+          if (/\bcapabilities=\b/.test(window.location)) {
+            window.open(sourceUrl);
+          } else {
+            window.location.href = sourceUrl;
+          }
+        } else {
+          const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+          modal.show();
+        }
+        return false;
+      });
+    }
+    function toggleCodeHandler(show) {
+      return function(e) {
+        const cellDetails = window.document.querySelectorAll(".cell details.code-fold");
+        for (let i=0; i<cellDetails.length; i++) {
+          const details = cellDetails[i];
+          if (show) {
+            details.open = true;
+          } else {
+            details.removeAttribute("open");
+          }
+        }
+        const cellCodeDivs = window.document.querySelectorAll(".cell div.sourceCode.cell-code");
+        const fromCls = show ? "hidden" : "unhidden";
+        const toCls = show ? "unhidden" : "hidden";
+        for (let i=0; i<cellCodeDivs.length; i++) {
+          const codeDiv = cellCodeDivs[i];
+          if (codeDiv.classList.contains(fromCls)) {
+            codeDiv.classList.remove(fromCls);
+            codeDiv.classList.add(toCls);
+          } 
+        }
+        return false;
+      }
+    }
+    const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+    if (hideAllCode) {
+      hideAllCode.addEventListener("click", toggleCodeHandler(false));
+    }
+    const showAllCode = window.document.getElementById("quarto-show-all-code");
+    if (showAllCode) {
+      showAllCode.addEventListener("click", toggleCodeHandler(true));
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp("https:\/\/Adamychen\.github\.io\/m10_quarto\/");
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Demo — ¿Workflow o agente? Cuánta autonomía necesitas"</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="an">description:</span><span class="co"> "Procesa tres correos de cliente con cinco patrones, de la cadena simple al agente, y compara llamadas, resultado y previsibilidad."</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="an">engine:</span><span class="co"> markdown</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; Demo que acompaña a </span><span class="co">[</span><span class="ot">Patrones de diseño de agentes</span><span class="co">](../bloque2/02f-patrones-agentes.qmd#sec-workflows-vs-agentes)</span><span class="at"> y prepara el </span><span class="co">[</span><span class="ot">HPD 3 (LangGraph)</span><span class="co">](../bloque2/hpd3-workflows-langgraph.qmd)</span><span class="at">. Se ejecuta en el navegador y no necesita clave de API.</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">## Las ejecuciones son simuladas</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>No hay ningún LLM detrás: cada recorrido está escrito a mano para ilustrar cómo se comporta cada patrón. Las cifras de llamadas y tiempos son orientativas (unos 1,5 s por llamada al LLM).</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>Una tienda online recibe correos de clientes y quiere responderlos con un LLM. Hay muchas formas de montar el sistema, desde una sola llamada hasta un agente que decide por sí mismo qué hacer. **Más autonomía no siempre es mejor**: cuesta más llamadas, más tiempo y es menos predecible.</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>Elige un correo y un patrón. El diagrama marca el camino que sigue el correo; abajo, la tabla compara los cinco patrones con ese mismo correo.</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="in">```{shinylive-python}</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">#| standalone: true</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">#| viewerHeight: 1380</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="ex">import</span> random</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="ex">from</span> shiny import reactive</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="ex">from</span> shiny.express import input, ui, render</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="ex">BLUE,</span> DARK, YELLOW, ORANGE, GREEN, RED, GRAY = <span class="er">(</span></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>    <span class="st">"#4B8BBE"</span><span class="ex">,</span> <span class="st">"#306998"</span>, <span class="st">"#FFD43B"</span>, <span class="st">"#e65100"</span>, <span class="st">"#2e7d32"</span>, <span class="st">"#c62828"</span>, <span class="st">"#9ca3af"</span><span class="kw">)</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Los correos ──────────────────────────────────────────────────────────────</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="ex">EMAILS</span> = [</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="ex">{</span><span class="st">"tag"</span><span class="ex">:</span> <span class="st">"Pregunta sencilla"</span>, <span class="st">"from"</span>: <span class="st">"Lucía"</span>,</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>     <span class="st">"text"</span><span class="ex">:</span> <span class="st">"Hola, ¿a qué hora abre la tienda de Sevilla los sábados?"</span>},</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="ex">{</span><span class="st">"tag"</span><span class="ex">:</span> <span class="st">"Devolución"</span>, <span class="st">"from"</span>: <span class="st">"Marcos"</span>,</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>     <span class="st">"text"</span><span class="ex">:</span> <span class="st">"Quiero devolver las zapatillas del pedido 4417, me quedan pequeñas."</span>},</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="ex">{</span><span class="st">"tag"</span><span class="ex">:</span> <span class="st">"Dos problemas a la vez"</span>, <span class="st">"from"</span>: <span class="st">"Elena"</span>,</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>     <span class="st">"text"</span><span class="ex">:</span> <span class="st">"El pedido 5120 llegó con la pantalla rota y además me habéis cobrado dos veces. ¿Qué hago?"</span>},</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="ex">]</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Los patrones, de menos a más autonomía ───────────────────────────────────</span></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a><span class="co"># Nodos: id -&gt; (x, y, etiqueta, tipo). Tipos: io, llm, code, tool.</span></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="ex">PATTERNS</span> = {</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cadena"</span><span class="ex">:</span> {</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span><span class="ex">:</span> <span class="st">"Cadena simple"</span>, <span class="st">"family"</span>: <span class="st">"workflow"</span>,</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        <span class="st">"desc"</span><span class="ex">:</span> <span class="st">"Una sola llamada al LLM: «redacta una respuesta a este correo»."</span>,</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        <span class="st">"nodes"</span><span class="ex">:</span> {<span class="st">"in"</span>: <span class="er">(</span><span class="ex">60,</span> 110, <span class="st">"Correo"</span>, <span class="st">"io"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"llm"</span>: <span class="er">(</span><span class="ex">320,</span> 110, <span class="st">"LLM redacta"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"out"</span><span class="ex">:</span> <span class="er">(</span><span class="ex">580,</span> 110, <span class="st">"Respuesta"</span>, <span class="st">"io"</span><span class="kw">)</span><span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        <span class="st">"edges"</span><span class="ex">:</span> [<span class="er">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"llm"</span><span class="ex">,</span> <span class="st">"out"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="st">"encadenado"</span><span class="ex">:</span> {</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span><span class="ex">:</span> <span class="st">"Encadenado"</span>, <span class="st">"family"</span>: <span class="st">"workflow"</span>,</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>        <span class="st">"desc"</span><span class="ex">:</span> <span class="st">"Pasos fijos: extraer datos, consultar el pedido, redactar y comprobar la política."</span>, <span class="st">"w"</span>: 44,</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        <span class="st">"nodes"</span><span class="ex">:</span> {<span class="st">"in"</span>: <span class="er">(</span><span class="ex">45,</span> 110, <span class="st">"Correo"</span>, <span class="st">"io"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"ext"</span>: <span class="er">(</span><span class="ex">150,</span> 110, <span class="st">"Extraer datos"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"db"</span><span class="ex">:</span> <span class="er">(</span><span class="ex">260,</span> 110, <span class="st">"Consultar pedido"</span>, <span class="st">"code"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"red"</span>: <span class="er">(</span><span class="ex">370,</span> 110, <span class="st">"Redactar"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"pol"</span><span class="ex">:</span> <span class="er">(</span><span class="ex">480,</span> 110, <span class="st">"¿Cumple política?"</span>, <span class="st">"code"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"out"</span>: <span class="er">(</span><span class="ex">590,</span> 110, <span class="st">"Respuesta"</span>, <span class="st">"io"</span><span class="kw">)</span><span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>        <span class="st">"edges"</span><span class="ex">:</span> [<span class="er">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"ext"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"ext"</span><span class="ex">,</span> <span class="st">"db"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"db"</span><span class="ex">,</span> <span class="st">"red"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"red"</span><span class="ex">,</span> <span class="st">"pol"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"pol"</span><span class="ex">,</span> <span class="st">"out"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">"enrutado"</span><span class="ex">:</span> {</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span><span class="ex">:</span> <span class="st">"Enrutado"</span>, <span class="st">"family"</span>: <span class="st">"workflow"</span>,</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>        <span class="st">"desc"</span><span class="ex">:</span> <span class="st">"Un clasificador elige UNA rama especializada según el tipo de correo."</span>,</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>        <span class="st">"nodes"</span><span class="ex">:</span> {<span class="st">"in"</span>: <span class="er">(</span><span class="ex">60,</span> 110, <span class="st">"Correo"</span>, <span class="st">"io"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"cls"</span>: <span class="er">(</span><span class="ex">190,</span> 110, <span class="st">"Clasificar"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"inf"</span><span class="ex">:</span> <span class="er">(</span><span class="ex">360,</span> 40, <span class="st">"Información"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"dev"</span>: <span class="er">(</span><span class="ex">360,</span> 110, <span class="st">"Devoluciones"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"inc"</span><span class="ex">:</span> <span class="er">(</span><span class="ex">360,</span> 180, <span class="st">"Incidencias"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"out"</span>: <span class="er">(</span><span class="ex">560,</span> 110, <span class="st">"Respuesta"</span>, <span class="st">"io"</span><span class="kw">)</span><span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>        <span class="st">"edges"</span><span class="ex">:</span> [<span class="er">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"cls"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"cls"</span><span class="ex">,</span> <span class="st">"inf"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"cls"</span><span class="ex">,</span> <span class="st">"dev"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"cls"</span><span class="ex">,</span> <span class="st">"inc"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>                  <span class="kw">(</span><span class="st">"inf"</span><span class="ex">,</span> <span class="st">"out"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"dev"</span><span class="ex">,</span> <span class="st">"out"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"inc"</span><span class="ex">,</span> <span class="st">"out"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    <span class="st">"paralelo"</span><span class="ex">:</span> {</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span><span class="ex">:</span> <span class="st">"Paralelización"</span>, <span class="st">"family"</span>: <span class="st">"workflow"</span>,</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>        <span class="st">"desc"</span><span class="ex">:</span> <span class="st">"Tres revisores revisan el correo a la vez (envíos, cobros, devoluciones) y un agregador une lo que encuentran."</span>,</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        <span class="st">"nodes"</span><span class="ex">:</span> {<span class="st">"in"</span>: <span class="er">(</span><span class="ex">60,</span> 110, <span class="st">"Correo"</span>, <span class="st">"io"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"env"</span>: <span class="er">(</span><span class="ex">230,</span> 40, <span class="st">"Revisor envíos"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"cob"</span><span class="ex">:</span> <span class="er">(</span><span class="ex">230,</span> 110, <span class="st">"Revisor cobros"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"rdv"</span>: <span class="er">(</span><span class="ex">230,</span> 180, <span class="st">"Revisor devoluciones"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"agg"</span><span class="ex">:</span> <span class="er">(</span><span class="ex">420,</span> 110, <span class="st">"Agregador"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"out"</span>: <span class="er">(</span><span class="ex">580,</span> 110, <span class="st">"Respuesta"</span>, <span class="st">"io"</span><span class="kw">)</span><span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>        <span class="st">"edges"</span><span class="ex">:</span> [<span class="er">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"env"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"cob"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"rdv"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"env"</span><span class="ex">,</span> <span class="st">"agg"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"cob"</span><span class="ex">,</span> <span class="st">"agg"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>                  <span class="kw">(</span><span class="st">"rdv"</span><span class="ex">,</span> <span class="st">"agg"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"agg"</span><span class="ex">,</span> <span class="st">"out"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>    <span class="st">"agente"</span><span class="ex">:</span> {</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>        <span class="st">"name"</span><span class="ex">:</span> <span class="st">"Agente"</span>, <span class="st">"family"</span>: <span class="st">"agente"</span>,</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>        <span class="st">"desc"</span><span class="ex">:</span> <span class="st">"El LLM decide en un bucle qué herramienta usar y cuándo parar."</span>,</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>        <span class="st">"nodes"</span><span class="ex">:</span> {<span class="st">"in"</span>: <span class="er">(</span><span class="ex">60,</span> 110, <span class="st">"Correo"</span>, <span class="st">"io"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"llm"</span>: <span class="er">(</span><span class="ex">260,</span> 110, <span class="st">"LLM decide"</span>, <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>                  <span class="st">"tools"</span><span class="ex">:</span> <span class="er">(</span><span class="ex">440,</span> 40, <span class="st">"Herramientas"</span>, <span class="st">"tool"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"out"</span>: <span class="er">(</span><span class="ex">580,</span> 110, <span class="st">"Respuesta"</span>, <span class="st">"io"</span><span class="kw">)</span><span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>        <span class="st">"edges"</span><span class="ex">:</span> [<span class="er">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"llm"</span><span class="ex">,</span> <span class="st">"tools"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"tools"</span><span class="ex">,</span> <span class="st">"llm"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"llm"</span><span class="ex">,</span> <span class="st">"out"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>    <span class="er">}</span><span class="ex">,</span></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a><span class="ex">ORDER</span> = list<span class="er">(</span><span class="ex">PATTERNS</span><span class="kw">)</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Qué pasa con cada correo ─────────────────────────────────────────────────</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a><span class="co"># result: ok | partial | fail. trace: [(nodo, texto)]. calls: llamadas al LLM. secs: tiempo aprox.</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a><span class="ex">OK,</span> PARTIAL, FAIL = <span class="st">"ok"</span>, <span class="st">"partial"</span>, <span class="st">"fail"</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a><span class="ex">CASES</span> = {</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"cadena"</span><span class="ex">,</span> 0<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>1, <span class="va">secs</span><span class="op">=</span>1.5, <span class="va">result</span><span class="op">=</span>OK, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"llm"</span><span class="ex">,</span> <span class="st">"El LLM tiene el horario en sus instrucciones y redacta la respuesta."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Los sábados abrimos de 10:00 a 14:00. ¡Te esperamos!»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"Basta y sobra: una pregunta de un paso no necesita más."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"cadena"</span><span class="ex">,</span> 1<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>1, <span class="va">secs</span><span class="op">=</span>1.5, <span class="va">result</span><span class="op">=</span>PARTIAL, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"llm"</span><span class="ex">,</span> <span class="st">"El LLM redacta sin poder consultar el pedido: no sabe si está dentro de plazo."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Claro, puedes devolverlas. Te enviaremos instrucciones.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"Suena bien, pero no comprueba el pedido ni genera la devolución: promete algo que nadie ha verificado."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"cadena"</span><span class="ex">,</span> 2<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>1, <span class="va">secs</span><span class="op">=</span>1.5, <span class="va">result</span><span class="op">=</span>FAIL, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"llm"</span><span class="ex">,</span> <span class="st">"Sin datos ni herramientas, solo puede disculparse."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Sentimos mucho las molestias. Revisaremos tu caso.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"No resuelve ninguno de los dos problemas."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"encadenado"</span><span class="ex">,</span> 0<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>2, <span class="va">secs</span><span class="op">=</span>3.2, <span class="va">result</span><span class="op">=</span>OK, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"ext"</span><span class="ex">,</span> <span class="st">"Extrae datos: no hay número de pedido."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"db"</span><span class="ex">,</span> <span class="st">"No hay pedido que consultar: se salta."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"red"</span><span class="ex">,</span> <span class="st">"Redacta con el horario."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"pol"</span><span class="ex">,</span> <span class="st">"No hay nada que comprobar."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Los sábados abrimos de 10:00 a 14:00.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"Funciona, pero con pasos que no hacían falta: el doble de llamadas que la cadena simple."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"encadenado"</span><span class="ex">,</span> 1<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>2, <span class="va">secs</span><span class="op">=</span>3.4, <span class="va">result</span><span class="op">=</span>OK, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"ext"</span><span class="ex">,</span> <span class="st">"Extrae: pedido 4417, motivo «talla»."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"db"</span><span class="ex">,</span> <span class="st">"Pedido 4417: entregado hace 12 días."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"red"</span><span class="ex">,</span> <span class="st">"Redacta la respuesta con los datos reales."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"pol"</span><span class="ex">,</span> <span class="st">"Plazo de devolución: 30 días. 12 &lt; 30 ✔. Genera la etiqueta DEV-4417."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Tu pedido está dentro de plazo. Aquí tienes la etiqueta DEV-4417.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"El caso ideal para un workflow: la tarea tiene siempre los mismos pasos."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"encadenado"</span><span class="ex">,</span> 2<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>2, <span class="va">secs</span><span class="op">=</span>3.4, <span class="va">result</span><span class="op">=</span>PARTIAL, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"ext"</span><span class="ex">,</span> <span class="st">"Extrae: pedido 5120, motivo «rotura»."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"db"</span><span class="ex">,</span> <span class="st">"Pedido 5120: entregado ayer."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"red"</span><span class="ex">,</span> <span class="st">"Redacta una devolución por rotura."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"pol"</span><span class="ex">,</span> <span class="st">"Dentro de plazo ✔."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Te enviamos la etiqueta para devolver la pantalla.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"El flujo se diseñó para devoluciones: resuelve la rotura e ignora el doble cobro."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"enrutado"</span><span class="ex">,</span> 0<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>2, <span class="va">secs</span><span class="op">=</span>3.0, <span class="va">result</span><span class="op">=</span>OK, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"cls"</span><span class="ex">,</span> <span class="st">"Clasifica: «información»."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"inf"</span><span class="ex">,</span> <span class="st">"La rama de información responde con el horario."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Los sábados abrimos de 10:00 a 14:00.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"Funciona. Útil si llegan muchos tipos de correo distintos."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"enrutado"</span><span class="ex">,</span> 1<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>3, <span class="va">secs</span><span class="op">=</span>4.5, <span class="va">result</span><span class="op">=</span>OK, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"cls"</span><span class="ex">,</span> <span class="st">"Clasifica: «devolución»."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"dev"</span><span class="ex">,</span> <span class="st">"La rama de devoluciones consulta el pedido (12 días, dentro de plazo) y genera DEV-4417."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Tu pedido está dentro de plazo. Aquí tienes la etiqueta DEV-4417.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"Funciona: la rama especializada es, por dentro, un encadenado."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"enrutado"</span><span class="ex">,</span> 2<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>3, <span class="va">secs</span><span class="op">=</span>4.5, <span class="va">result</span><span class="op">=</span>PARTIAL, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"cls"</span><span class="ex">,</span> <span class="st">"Clasifica: «incidencia» (tiene que elegir una sola categoría)."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"inc"</span><span class="ex">,</span> <span class="st">"La rama de incidencias abre un parte por la pantalla rota."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Hemos abierto la incidencia INC-882 por la rotura.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"El enrutado manda cada correo por UNA rama: el doble cobro se queda sin atender."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"paralelo"</span><span class="ex">,</span> 0<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>4, <span class="va">secs</span><span class="op">=</span>3.0, <span class="va">result</span><span class="op">=</span>OK, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo y se envía a los tres revisores a la vez."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"env"</span><span class="ex">,</span> <span class="st">"Envíos: no aplica."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"cob"</span><span class="ex">,</span> <span class="st">"Cobros: no aplica."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"rdv"</span><span class="ex">,</span> <span class="st">"Devoluciones: no aplica."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"agg"</span><span class="ex">,</span> <span class="st">"El agregador no encuentra problemas y responde con el horario."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Los sábados abrimos de 10:00 a 14:00.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"Funciona, pero tres de las cuatro llamadas no aportan nada: coste desperdiciado."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"paralelo"</span><span class="ex">,</span> 1<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>4, <span class="va">secs</span><span class="op">=</span>3.2, <span class="va">result</span><span class="op">=</span>OK, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo y se envía a los tres revisores a la vez."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"env"</span><span class="ex">,</span> <span class="st">"Envíos: no aplica."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"cob"</span><span class="ex">,</span> <span class="st">"Cobros: no aplica."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"rdv"</span><span class="ex">,</span> <span class="st">"Devoluciones: pedido 4417 dentro de plazo, genera DEV-4417."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"agg"</span><span class="ex">,</span> <span class="st">"El agregador redacta la respuesta."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Tu pedido está dentro de plazo. Aquí tienes la etiqueta DEV-4417.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"Funciona, pero cuesta el doble que el encadenado para el mismo resultado."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>    <span class="kw">(</span><span class="st">"paralelo"</span><span class="ex">,</span> 2<span class="kw">)</span><span class="bu">:</span> dict<span class="er">(</span><span class="va">calls</span><span class="op">=</span>4, <span class="va">secs</span><span class="op">=</span>3.2, <span class="va">result</span><span class="op">=</span>OK, <span class="va">trace</span><span class="op">=</span>[</span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo y se envía a los tres revisores a la vez."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"env"</span><span class="ex">,</span> <span class="st">"Envíos: pantalla rota en el pedido 5120 → abre la incidencia INC-882."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"cob"</span><span class="ex">,</span> <span class="st">"Cobros: dos cargos de 249 € el mismo día → solicita el reembolso de uno."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"rdv"</span><span class="ex">,</span> <span class="st">"Devoluciones: no aplica (se sustituye, no se devuelve)."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"agg"</span><span class="ex">,</span> <span class="st">"El agregador junta los dos hallazgos en una sola respuesta."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="st">"out"</span><span class="ex">,</span> <span class="st">"«Te enviamos una pantalla nueva (INC-882) y te devolvemos el cargo duplicado de 249 €.»"</span><span class="kw">)</span><span class="ex">],</span></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>        <span class="va">note</span><span class="op">=</span><span class="st">"Resuelve los dos problemas SIN agente: porque se diseñó un revisor para cada tipo de problema."</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a><span class="co"># El agente no hace siempre lo mismo: varias ejecuciones posibles por correo.</span></span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a><span class="ex">AGENT_RUNS</span> = {</span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>    <span class="ex">0:</span> [</span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dict</span><span class="er">(</span><span class="va">result</span><span class="op">=</span>OK, <span class="va">tools</span><span class="op">=</span><span class="pp">[</span><span class="st">"horario_tienda"</span><span class="pp">]</span>,</span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>             <span class="va">answer</span><span class="op">=</span><span class="st">"«Los sábados abrimos de 10:00 a 14:00.»"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dict</span><span class="er">(</span><span class="va">result</span><span class="op">=</span>OK, <span class="va">tools</span><span class="op">=</span>[<span class="st">"buscar_tienda"</span>, <span class="st">"horario_tienda"</span><span class="ex">],</span></span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>             <span class="va">answer</span><span class="op">=</span><span class="st">"«La tienda de Sevilla abre los sábados de 10:00 a 14:00.»"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dict</span><span class="er">(</span><span class="va">result</span><span class="op">=</span>OK, <span class="va">tools</span><span class="op">=</span><span class="pp">[</span><span class="st">"horario_tienda"</span><span class="pp">]</span>,</span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>             <span class="va">answer</span><span class="op">=</span><span class="st">"«Los sábados abrimos de 10:00 a 14:00.»"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>    <span class="ex">],</span></span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>    <span class="ex">1:</span> [</span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dict</span><span class="er">(</span><span class="va">result</span><span class="op">=</span>OK, <span class="va">tools</span><span class="op">=</span>[<span class="st">"consultar_pedido"</span>, <span class="st">"crear_devolucion"</span><span class="ex">],</span></span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>             <span class="va">answer</span><span class="op">=</span><span class="st">"«Tu pedido está dentro de plazo. Aquí tienes la etiqueta DEV-4417.»"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dict</span><span class="er">(</span><span class="va">result</span><span class="op">=</span>OK, <span class="va">tools</span><span class="op">=</span>[<span class="st">"consultar_pedido"</span>, <span class="st">"politica_devoluciones"</span><span class="ex">,</span> <span class="st">"crear_devolucion"</span>],</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>             <span class="va">answer</span><span class="op">=</span><span class="st">"«Tu pedido está dentro de plazo. Aquí tienes la etiqueta DEV-4417.»"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dict</span><span class="er">(</span><span class="va">result</span><span class="op">=</span>PARTIAL, <span class="va">tools</span><span class="op">=</span><span class="pp">[</span><span class="st">"consultar_pedido"</span><span class="pp">]</span>,</span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a>             <span class="va">answer</span><span class="op">=</span><span class="st">"«Tu pedido está dentro de plazo, puedes devolverlo.» (no llega a crear la devolución)"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>    <span class="ex">],</span></span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>    <span class="ex">2:</span> [</span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dict</span><span class="er">(</span><span class="va">calls</span><span class="op">=</span>6, <span class="va">secs</span><span class="op">=</span>9.4, <span class="va">result</span><span class="op">=</span>OK,</span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>             <span class="va">tools</span><span class="op">=</span>[<span class="st">"consultar_pedido"</span>, <span class="st">"abrir_incidencia"</span><span class="ex">,</span> <span class="st">"consultar_pagos"</span>, <span class="st">"solicitar_reembolso"</span>],</span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>             <span class="va">answer</span><span class="op">=</span><span class="st">"«Te enviamos una pantalla nueva (INC-882) y te devolvemos el cargo duplicado de 249 €.»"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dict</span><span class="er">(</span><span class="va">calls</span><span class="op">=</span>8, <span class="va">secs</span><span class="op">=</span>12.5, <span class="va">result</span><span class="op">=</span>OK,</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>             <span class="va">tools</span><span class="op">=</span>[<span class="st">"consultar_pedido"</span>, <span class="st">"consultar_pagos"</span><span class="ex">,</span> <span class="st">"abrir_incidencia"</span>, <span class="st">"consultar_pagos"</span>,</span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"politica_reembolsos"</span><span class="ex">,</span> <span class="st">"solicitar_reembolso"</span>],</span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>             <span class="va">answer</span><span class="op">=</span><span class="st">"«Te enviamos una pantalla nueva (INC-882) y te devolvemos el cargo duplicado de 249 €.»"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dict</span><span class="er">(</span><span class="va">result</span><span class="op">=</span>PARTIAL, <span class="va">tools</span><span class="op">=</span>[<span class="st">"consultar_pedido"</span>, <span class="st">"abrir_incidencia"</span><span class="ex">],</span></span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>             <span class="va">answer</span><span class="op">=</span><span class="st">"«Hemos abierto la incidencia INC-882 por la rotura.» (se olvida del doble cobro)"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>    <span class="ex">],</span></span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a><span class="ex">RESULT</span> = {OK: <span class="er">(</span><span class="st">"✔ Resuelto"</span><span class="ex">,</span> GREEN<span class="kw">)</span><span class="ex">,</span> PARTIAL: <span class="er">(</span><span class="st">"⚠ A medias"</span><span class="ex">,</span> ORANGE<span class="kw">)</span><span class="ex">,</span> FAIL: <span class="er">(</span><span class="st">"✘ No resuelve"</span><span class="ex">,</span> RED<span class="kw">)</span><span class="er">}</span></span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a><span class="ex">KIND</span> = {<span class="st">"io"</span>: <span class="er">(</span><span class="ex">BLUE,</span> <span class="st">"#fff"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"llm"</span>: <span class="er">(</span><span class="ex">DARK,</span> <span class="st">"#fff"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"code"</span>: <span class="er">(</span><span class="ex">YELLOW,</span> <span class="st">"#000"</span><span class="kw">)</span><span class="ex">,</span> <span class="st">"tool"</span>: <span class="er">(</span><span class="ex">ORANGE,</span> <span class="st">"#fff"</span><span class="kw">)</span><span class="er">}</span></span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> case<span class="er">(</span><span class="ex">p,</span> e, run=0<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>    <span class="st">"""Ejecución de un patrón sobre un correo (para el agente, la variante </span><span class="kw">`</span><span class="ex">run</span><span class="kw">`</span><span class="st">)."""</span></span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">p</span> != <span class="st">"agente"</span>:</span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">CASES</span><span class="op">[</span>(p, e)<span class="op">]</span></span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>    <span class="ex">r</span> = AGENT_RUNS<span class="pp">[</span><span class="ss">e</span><span class="pp">][</span><span class="ss">run</span><span class="pp">]</span></span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a>    <span class="ex">calls</span> = len<span class="er">(</span><span class="va">r</span><span class="op">[</span><span class="st">"tools"</span><span class="op">]</span><span class="kw">)</span> <span class="ex">+</span> 1  <span class="co"># una decisión por herramienta y otra para responder</span></span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>    <span class="ex">trace</span> = [<span class="er">(</span><span class="st">"in"</span><span class="ex">,</span> <span class="st">"Llega el correo."</span><span class="kw">)</span><span class="ex">]</span></span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> t <span class="kw">in</span> r<span class="pp">[</span><span class="st">"tools"</span><span class="pp">]</span>:</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>        <span class="ex">trace</span> += [<span class="er">(</span><span class="st">"llm"</span><span class="ex">,</span> f<span class="st">"Decide usar &lt;code&gt;{t}&lt;/code&gt;."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"tools"</span><span class="ex">,</span> f<span class="st">"Ejecuta &lt;code&gt;{t}&lt;/code&gt; y devuelve el resultado."</span><span class="kw">)</span><span class="ex">]</span></span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a>    <span class="ex">trace</span> += [<span class="er">(</span><span class="st">"llm"</span><span class="ex">,</span> <span class="st">"Decide que ya puede responder."</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"out"</span><span class="ex">,</span> r<span class="pp">[</span><span class="st">"answer"</span><span class="pp">]</span><span class="kw">)</span><span class="ex">]</span></span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>    <span class="ex">notes</span> = {OK: <span class="st">"Lo resuelve, decidiendo él mismo qué consultar."</span>,</span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>             <span class="ex">PARTIAL:</span> <span class="st">"Esta vez se para antes de tiempo: el agente decide cuándo ha terminado, y a veces se equivoca."</span>}</span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">dict</span><span class="er">(</span><span class="va">calls</span><span class="op">=</span>calls, <span class="va">secs</span><span class="op">=</span>1.55 <span class="ex">*</span> calls, result=r<span class="pp">[</span><span class="st">"result"</span><span class="pp">]</span>, trace=trace, note=notes[r<span class="pp">[</span><span class="st">"result"</span><span class="pp">]</span>],</span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>                <span class="va">loops</span><span class="op">=</span>len<span class="kw">(</span><span class="va">r</span><span class="op">[</span><span class="st">"tools"</span><span class="op">]</span><span class="kw">))</span></span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a><span class="co"># ── Interfaz ─────────────────────────────────────────────────────────────────</span></span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a><span class="ex">ui.tags.style</span><span class="er">(</span><span class="st">"""</span></span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a><span class="st">body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}</span></span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a><span class="st">.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}</span></span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a><span class="st">.muted{color:#6b7280;font-size:.85em}</span></span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a><span class="st">.emails{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}</span></span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a><span class="st">.email{border:1.5px solid #e5e7eb;border-radius:10px;padding:8px 10px;cursor:pointer;font-size:.86em;background:#fff}</span></span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a><span class="st">.email:hover{border-color:#4B8BBE}.email.on{border-color:#306998;box-shadow:0 0 0 3px #30699833}</span></span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a><span class="st">.email .t{font-weight:700;font-size:.8em;color:#306998;text-transform:uppercase;letter-spacing:.03em}</span></span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a><span class="st">.pats{display:flex;gap:6px;flex-wrap:wrap;align-items:center}</span></span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a><span class="st">.pat{border:1.5px solid #306998;color:#306998;border-radius:999px;padding:4px 14px;cursor:pointer;font-size:.9em;background:#fff}</span></span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a><span class="st">.pat:hover{background:#e8f0f8}.pat.on{background:#306998;color:#fff}</span></span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a><span class="st">.pat.ag{border-color:#e65100;color:#e65100}.pat.ag.on{background:#e65100;color:#fff}</span></span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a><span class="st">.axis{font-size:.75em;color:#6b7280;margin-top:3px}</span></span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a><span class="st">.tiles{display:flex;gap:8px;flex-wrap:wrap}</span></span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a><span class="st">.tile{flex:1;min-width:110px;border:1px solid #e5e7eb;border-radius:8px;padding:4px 10px}</span></span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a><span class="st">.tile b{display:block;font-size:1.35em}</span></span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a><span class="st">.trace{margin:0;padding-left:0;list-style:none;font-size:.88em}</span></span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a><span class="st">.trace li{display:flex;gap:8px;align-items:flex-start;margin:3px 0}</span></span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a><span class="st">.num{flex:none;width:20px;height:20px;border-radius:50%;background:#306998;color:#fff;font-size:.75em;</span></span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a><span class="st">  display:flex;align-items:center;justify-content:center;font-weight:700;margin-top:1px}</span></span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a><span class="st">.cmp{width:100%;font-size:.86em;border-collapse:collapse}</span></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a><span class="st">.cmp td,.cmp th{padding:5px 6px;border-bottom:1px solid #f3f4f6;text-align:left}</span></span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a><span class="st">.cmp tr.on{background:#eef4fa}.cmp tr{cursor:pointer}</span></span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a><span class="st">.star{background:#2e7d32;color:#fff;border-radius:4px;padding:0 6px;font-size:.8em;font-weight:600}</span></span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a><span class="st">.runs{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}</span></span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a><span class="st">.run{border-radius:8px;padding:4px 10px;font-size:.82em;color:#fff}</span></span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a><span class="st">@keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}</span></span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a><span class="st">.run{animation:pop .3s ease-out both}</span></span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a><span class="st">@media (max-width:620px){.emails{grid-template-columns:1fr}}</span></span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span><span class="kw">)</span></span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a><span class="ex">email</span> = reactive.value<span class="er">(</span><span class="ex">1</span><span class="kw">)</span></span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a><span class="ex">pattern</span> = reactive.value<span class="er">(</span><span class="st">"encadenado"</span><span class="kw">)</span></span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a><span class="ex">runs</span> = reactive.value<span class="er">(</span><span class="ex">[]</span><span class="kw">)</span></span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a><span class="ex">agent_run</span> = reactive.value<span class="er">(</span><span class="ex">0</span><span class="kw">)</span></span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.pick_email</span><span class="kw">)</span></span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _pe<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>    <span class="ex">email.set</span><span class="er">(</span><span class="ex">int</span><span class="er">(</span><span class="fu">input.pick_email()</span><span class="kw">))</span></span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a>    <span class="ex">runs.set</span><span class="er">(</span><span class="ex">[]</span><span class="kw">)</span></span>
+<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>    <span class="ex">agent_run.set</span><span class="er">(</span><span class="ex">0</span><span class="kw">)</span></span>
+<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.pick_pat</span><span class="kw">)</span></span>
+<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _pp<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a>    <span class="ex">pattern.set</span><span class="er">(</span><span class="fu">input.pick_pat()</span><span class="kw">)</span></span>
+<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>    <span class="ex">runs.set</span><span class="er">(</span><span class="ex">[]</span><span class="kw">)</span></span>
+<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a>    <span class="ex">agent_run.set</span><span class="er">(</span><span class="ex">0</span><span class="kw">)</span></span>
+<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.effect</span></span>
+<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a><span class="ex">@reactive.event</span><span class="er">(</span><span class="ex">input.run5</span><span class="kw">)</span></span>
+<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> _run5<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a>    <span class="ex">p,</span> e = pattern<span class="er">(</span><span class="kw">)</span><span class="ex">,</span> email<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">p</span> == <span class="st">"agente"</span>:</span>
+<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a>        <span class="ex">idx</span> = [random.randrange<span class="er">(</span><span class="ex">len</span><span class="er">(</span><span class="va">AGENT_RUNS</span><span class="op">[</span>e<span class="op">]</span><span class="kw">))</span> <span class="cf">for</span> _ <span class="kw">in</span> range<span class="er">(</span><span class="ex">5</span><span class="kw">)</span><span class="ex">]</span></span>
+<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a>        <span class="ex">agent_run.set</span><span class="er">(</span><span class="va">idx</span><span class="op">[</span>-1<span class="op">]</span><span class="kw">)</span></span>
+<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a>        <span class="ex">runs.set</span><span class="er">(</span><span class="ex">[case</span><span class="er">(</span><span class="ex">p,</span> e, i<span class="kw">)</span> <span class="cf">for</span> i <span class="kw">in</span> idx]<span class="kw">)</span></span>
+<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a>    <span class="ex">else:</span></span>
+<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a>        <span class="ex">runs.set</span><span class="er">(</span><span class="ex">[case</span><span class="er">(</span><span class="ex">p,</span> e<span class="kw">)</span><span class="ex">]</span> <span class="pp">*</span> 5<span class="kw">)</span></span>
+<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> onclick<span class="er">(</span><span class="ex">name,</span> value<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">f</span><span class="st">"onclick=</span><span class="dt">\"</span><span class="st">Shiny.setInputValue('{name}', '{value}', {{priority: 'event'}})</span><span class="dt">\"</span><span class="st">"</span></span>
+<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a><span class="ex">@render.ui</span></span>
+<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> pickers<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a>    <span class="ex">e,</span> p = email<span class="er">(</span><span class="kw">)</span><span class="ex">,</span> pattern<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a>    <span class="ex">cards</span> = <span class="st">""</span>.join<span class="er">(</span></span>
+<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='email{' on' if i == e else ''}' {onclick('pick_email', i)}&gt;"</span></span>
+<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='t'&gt;{m['tag']}&lt;/div&gt;&lt;b&gt;{m['from']}:&lt;/b&gt; {m['text']}&lt;/div&gt;"</span></span>
+<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i<span class="ex">,</span> m in enumerate<span class="er">(</span><span class="ex">EMAILS</span><span class="kw">)</span></span>
+<span id="cb2-291"><a href="#cb2-291" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-292"><a href="#cb2-292" aria-hidden="true" tabindex="-1"></a>    <span class="ex">pats</span> = <span class="st">""</span>.join<span class="er">(</span></span>
+<span id="cb2-293"><a href="#cb2-293" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;span class='pat{' ag' if PATTERNS[k]['family'] == 'agente' else ''}{' on' if k == p else ''}' "</span></span>
+<span id="cb2-294"><a href="#cb2-294" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"{onclick('pick_pat', k)}&gt;{PATTERNS[k]['name']}&lt;/span&gt;"</span></span>
+<span id="cb2-295"><a href="#cb2-295" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> k <span class="kw">in</span> ORDER</span>
+<span id="cb2-296"><a href="#cb2-296" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-297"><a href="#cb2-297" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span></span>
+<span id="cb2-298"><a href="#cb2-298" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div style='font-weight:600;margin-bottom:4px'&gt;1. Elige un correo de cliente&lt;/div&gt;"</span></span>
+<span id="cb2-299"><a href="#cb2-299" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='emails'&gt;{cards}&lt;/div&gt;"</span></span>
+<span id="cb2-300"><a href="#cb2-300" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div style='font-weight:600;margin:12px 0 4px'&gt;2. Elige cómo lo procesa el sistema&lt;/div&gt;"</span></span>
+<span id="cb2-301"><a href="#cb2-301" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='pats'&gt;{pats}&lt;/div&gt;"</span></span>
+<span id="cb2-302"><a href="#cb2-302" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='axis'&gt;← el código decide el orden (workflow) · · · el LLM decide qué hacer (agente) →&lt;/div&gt;"</span></span>
+<span id="cb2-303"><a href="#cb2-303" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-304"><a href="#cb2-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-305"><a href="#cb2-305" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-306"><a href="#cb2-306" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> graph<span class="er">(</span><span class="ex">p,</span> path, loops<span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-307"><a href="#cb2-307" aria-hidden="true" tabindex="-1"></a>    <span class="ex">P</span> = PATTERNS<span class="pp">[</span><span class="ss">p</span><span class="pp">]</span></span>
+<span id="cb2-308"><a href="#cb2-308" aria-hidden="true" tabindex="-1"></a>    <span class="ex">nodes,</span> visited = P<span class="pp">[</span><span class="st">"nodes"</span><span class="pp">]</span>, set<span class="er">(</span><span class="ex">path</span><span class="kw">)</span></span>
+<span id="cb2-309"><a href="#cb2-309" aria-hidden="true" tabindex="-1"></a>    <span class="ex">order</span> = {}</span>
+<span id="cb2-310"><a href="#cb2-310" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i<span class="ex">,</span> n in enumerate<span class="er">(</span><span class="ex">path</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-311"><a href="#cb2-311" aria-hidden="true" tabindex="-1"></a>        <span class="ex">order.setdefault</span><span class="er">(</span><span class="ex">n,</span> i + 1<span class="kw">)</span></span>
+<span id="cb2-312"><a href="#cb2-312" aria-hidden="true" tabindex="-1"></a>    <span class="ex">parts</span> = [<span class="st">"&lt;defs&gt;&lt;marker id='ar' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' "</span></span>
+<span id="cb2-313"><a href="#cb2-313" aria-hidden="true" tabindex="-1"></a>             <span class="st">"orient='auto'&gt;&lt;path d='M0,0 L10,5 L0,10 z' fill='#6b7280'/&gt;&lt;/marker&gt;"</span></span>
+<span id="cb2-314"><a href="#cb2-314" aria-hidden="true" tabindex="-1"></a>             <span class="st">"&lt;marker id='arh' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' "</span></span>
+<span id="cb2-315"><a href="#cb2-315" aria-hidden="true" tabindex="-1"></a>             <span class="st">"orient='auto'&gt;&lt;path d='M0,0 L10,5 L0,10 z' fill='#e65100'/&gt;&lt;/marker&gt;&lt;/defs&gt;"</span><span class="ex">]</span></span>
+<span id="cb2-316"><a href="#cb2-316" aria-hidden="true" tabindex="-1"></a>    <span class="ex">used</span> = {<span class="er">(</span><span class="va">path</span><span class="op">[</span>i<span class="op">]</span><span class="ex">,</span> path[i + 1]<span class="kw">)</span> <span class="cf">for</span> i <span class="kw">in</span> range<span class="er">(</span><span class="ex">len</span><span class="er">(</span><span class="ex">path</span><span class="kw">)</span> <span class="ex">-</span> 1<span class="kw">)</span><span class="er">}</span></span>
+<span id="cb2-317"><a href="#cb2-317" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">p</span> == <span class="st">"paralelo"</span>:</span>
+<span id="cb2-318"><a href="#cb2-318" aria-hidden="true" tabindex="-1"></a>        <span class="ex">used</span> <span class="kw">|</span><span class="ex">=</span> {<span class="er">(</span><span class="st">"in"</span><span class="ex">,</span> n<span class="kw">)</span> <span class="cf">for</span> n <span class="kw">in</span> <span class="er">(</span><span class="st">"env"</span><span class="ex">,</span> <span class="st">"cob"</span>, <span class="st">"rdv"</span><span class="kw">)</span><span class="er">}</span> <span class="kw">|</span> <span class="ex">{</span><span class="kw">(</span><span class="ex">n,</span> <span class="st">"agg"</span><span class="kw">)</span> <span class="cf">for</span> n <span class="kw">in</span> <span class="er">(</span><span class="st">"env"</span><span class="ex">,</span> <span class="st">"cob"</span>, <span class="st">"rdv"</span><span class="kw">)</span><span class="er">}</span></span>
+<span id="cb2-319"><a href="#cb2-319" aria-hidden="true" tabindex="-1"></a>    <span class="ex">W</span> = P.get<span class="er">(</span><span class="st">"w"</span><span class="ex">,</span> 52<span class="kw">)</span></span>
+<span id="cb2-320"><a href="#cb2-320" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> a<span class="ex">,</span> b in P<span class="pp">[</span><span class="st">"edges"</span><span class="pp">]</span>:</span>
+<span id="cb2-321"><a href="#cb2-321" aria-hidden="true" tabindex="-1"></a>        <span class="kw">(</span><span class="ex">x1,</span> y1, <span class="pp">*</span>_<span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="ex">x2,</span> y2, <span class="pp">*</span>_<span class="kw">)</span> <span class="ex">=</span> nodes<span class="pp">[</span><span class="ss">a</span><span class="pp">]</span>, nodes<span class="pp">[</span><span class="ss">b</span><span class="pp">]</span></span>
+<span id="cb2-322"><a href="#cb2-322" aria-hidden="true" tabindex="-1"></a>        <span class="ex">on</span> = <span class="er">(</span><span class="ex">a,</span> b<span class="kw">)</span> <span class="er">in</span> <span class="ex">used</span></span>
+<span id="cb2-323"><a href="#cb2-323" aria-hidden="true" tabindex="-1"></a>        <span class="ex">dy</span> = 0</span>
+<span id="cb2-324"><a href="#cb2-324" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="ex">p</span> == <span class="st">"agente"</span> and {a, b} == {<span class="st">"llm"</span>, <span class="st">"tools"</span>}:</span>
+<span id="cb2-325"><a href="#cb2-325" aria-hidden="true" tabindex="-1"></a>            <span class="ex">dy</span> = <span class="at">-8</span> if a == <span class="st">"llm"</span> else 8</span>
+<span id="cb2-326"><a href="#cb2-326" aria-hidden="true" tabindex="-1"></a>        <span class="ex">sx,</span> sy = x1 + <span class="er">(</span><span class="ex">W</span> if x2 <span class="op">&gt;</span> x1 else <span class="at">-W</span> if x2 <span class="op">&lt;</span> x1 else 0<span class="kw">)</span><span class="ex">,</span> y1 + dy</span>
+<span id="cb2-327"><a href="#cb2-327" aria-hidden="true" tabindex="-1"></a>        <span class="ex">ex,</span> ey = x2 <span class="at">-</span> <span class="er">(</span><span class="ex">W</span> if x2 <span class="op">&gt;</span> x1 else <span class="at">-W</span> if x2 <span class="op">&lt;</span> x1 else 0<span class="kw">)</span><span class="ex">,</span> y2 + dy</span>
+<span id="cb2-328"><a href="#cb2-328" aria-hidden="true" tabindex="-1"></a>        <span class="ex">parts.append</span><span class="er">(</span></span>
+<span id="cb2-329"><a href="#cb2-329" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;line x1='{sx}' y1='{sy}' x2='{ex}' y2='{ey}' stroke='{ORANGE if on else '#d1d5db'}' "</span></span>
+<span id="cb2-330"><a href="#cb2-330" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"stroke-width='{2.6 if on else 1.4}' marker-end='url(#{'arh' if on else 'ar'})'/&gt;"</span></span>
+<span id="cb2-331"><a href="#cb2-331" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-332"><a href="#cb2-332" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> n<span class="ex">,</span> <span class="er">(</span><span class="ex">x,</span> y, label, kind<span class="kw">)</span> <span class="er">in</span> <span class="fu">nodes.items()</span><span class="bu">:</span></span>
+<span id="cb2-333"><a href="#cb2-333" aria-hidden="true" tabindex="-1"></a>        <span class="ex">fill,</span> tc = KIND<span class="pp">[</span><span class="ss">kind</span><span class="pp">]</span></span>
+<span id="cb2-334"><a href="#cb2-334" aria-hidden="true" tabindex="-1"></a>        <span class="ex">on</span> = n in visited</span>
+<span id="cb2-335"><a href="#cb2-335" aria-hidden="true" tabindex="-1"></a>        <span class="ex">words</span> = label.split<span class="er">(</span><span class="st">" "</span><span class="kw">)</span></span>
+<span id="cb2-336"><a href="#cb2-336" aria-hidden="true" tabindex="-1"></a>        <span class="ex">lines</span> = [<span class="st">" "</span>.join<span class="er">(</span><span class="va">words</span><span class="op">[</span>: (len(words) + 1) // 2<span class="op">]</span><span class="kw">)</span><span class="ex">,</span> <span class="st">" "</span>.join<span class="er">(</span><span class="va">words</span><span class="op">[</span>(len(words) + 1) // 2:<span class="op">]</span><span class="kw">)</span><span class="ex">]</span> <span class="dt">\</span></span>
+<span id="cb2-337"><a href="#cb2-337" aria-hidden="true" tabindex="-1"></a>            if len<span class="er">(</span><span class="ex">label</span><span class="kw">)</span> <span class="op">&gt;</span> 13 <span class="cf">else</span> <span class="ex">[label]</span></span>
+<span id="cb2-338"><a href="#cb2-338" aria-hidden="true" tabindex="-1"></a>        <span class="ex">text</span> = <span class="st">""</span>.join<span class="er">(</span></span>
+<span id="cb2-339"><a href="#cb2-339" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;tspan x='{x}' dy='{0 if i == 0 else 13}'&gt;{l}&lt;/tspan&gt;"</span> for i, l in enumerate<span class="er">(</span><span class="ex">lines</span><span class="kw">))</span></span>
+<span id="cb2-340"><a href="#cb2-340" aria-hidden="true" tabindex="-1"></a>        <span class="ex">ty</span> = y + 4 <span class="at">-</span> 6 <span class="pp">*</span> <span class="er">(</span><span class="ex">len</span><span class="er">(</span><span class="ex">lines</span><span class="kw">)</span> <span class="ex">-</span> 1<span class="kw">)</span></span>
+<span id="cb2-341"><a href="#cb2-341" aria-hidden="true" tabindex="-1"></a>        <span class="ex">parts.append</span><span class="er">(</span></span>
+<span id="cb2-342"><a href="#cb2-342" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;g opacity='{1 if on else 0.3}'&gt;&lt;rect x='{x - W}' y='{y - 22}' width='{2 * W}' height='44' rx='9' "</span></span>
+<span id="cb2-343"><a href="#cb2-343" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"fill='{fill}' stroke='{'#111' if on else 'none'}' stroke-width='1.5'/&gt;"</span></span>
+<span id="cb2-344"><a href="#cb2-344" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;text x='{x}' y='{ty}' text-anchor='middle' font-size='12' font-weight='600' fill='{tc}'&gt;{text}&lt;/text&gt;&lt;/g&gt;"</span></span>
+<span id="cb2-345"><a href="#cb2-345" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-346"><a href="#cb2-346" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="ex">n</span> in order:</span>
+<span id="cb2-347"><a href="#cb2-347" aria-hidden="true" tabindex="-1"></a>            <span class="ex">parts.append</span><span class="er">(</span></span>
+<span id="cb2-348"><a href="#cb2-348" aria-hidden="true" tabindex="-1"></a>                <span class="ex">f</span><span class="st">"&lt;circle cx='{x + W - 4}' cy='{y - 22}' r='9' fill='#fff' stroke='#111'/&gt;"</span></span>
+<span id="cb2-349"><a href="#cb2-349" aria-hidden="true" tabindex="-1"></a>                <span class="ex">f</span><span class="st">"&lt;text x='{x + W - 4}' y='{y - 18}' text-anchor='middle' font-size='10' font-weight='700'&gt;{order[n]}&lt;/text&gt;"</span></span>
+<span id="cb2-350"><a href="#cb2-350" aria-hidden="true" tabindex="-1"></a>            <span class="kw">)</span></span>
+<span id="cb2-351"><a href="#cb2-351" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">p</span> == <span class="st">"agente"</span> and loops:</span>
+<span id="cb2-352"><a href="#cb2-352" aria-hidden="true" tabindex="-1"></a>        <span class="ex">parts.append</span><span class="er">(</span></span>
+<span id="cb2-353"><a href="#cb2-353" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;text x='440' y='8' text-anchor='middle' font-size='12' font-weight='700' fill='{ORANGE}'&gt;"</span></span>
+<span id="cb2-354"><a href="#cb2-354" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"↻ {loops} vuelta{'s' if loops != 1 else ''}&lt;/text&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-355"><a href="#cb2-355" aria-hidden="true" tabindex="-1"></a>    <span class="ex">ys</span> = [y for <span class="er">(</span><span class="ex">_,</span> y, <span class="pp">*</span>_<span class="kw">)</span> <span class="er">in</span> <span class="fu">nodes.values()</span><span class="ex">]</span></span>
+<span id="cb2-356"><a href="#cb2-356" aria-hidden="true" tabindex="-1"></a>    <span class="ex">top,</span> bottom = min<span class="er">(</span><span class="ex">ys</span><span class="kw">)</span> <span class="ex">-</span> 34, max<span class="er">(</span><span class="ex">ys</span><span class="kw">)</span> <span class="ex">+</span> 30</span>
+<span id="cb2-357"><a href="#cb2-357" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">p</span> == <span class="st">"agente"</span>:</span>
+<span id="cb2-358"><a href="#cb2-358" aria-hidden="true" tabindex="-1"></a>        <span class="ex">top</span> = <span class="at">-8</span></span>
+<span id="cb2-359"><a href="#cb2-359" aria-hidden="true" tabindex="-1"></a>    <span class="ex">legend</span> = <span class="st">""</span>.join<span class="er">(</span></span>
+<span id="cb2-360"><a href="#cb2-360" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;rect x='{20 + i * 150}' y='{bottom + 4}' width='12' height='12' rx='3' fill='{KIND[k][0]}'/&gt;"</span></span>
+<span id="cb2-361"><a href="#cb2-361" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;text x='{38 + i * 150}' y='{bottom + 14}' font-size='11' fill='#374151'&gt;{t}&lt;/text&gt;"</span></span>
+<span id="cb2-362"><a href="#cb2-362" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i<span class="ex">,</span> <span class="er">(</span><span class="ex">k,</span> t<span class="kw">)</span> <span class="er">in</span> <span class="ex">enumerate</span><span class="er">(</span><span class="ex">[</span><span class="er">(</span><span class="st">"llm"</span><span class="ex">,</span> <span class="st">"llamada al LLM"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"code"</span><span class="ex">,</span> <span class="st">"código normal"</span><span class="kw">)</span><span class="ex">,</span></span>
+<span id="cb2-363"><a href="#cb2-363" aria-hidden="true" tabindex="-1"></a>                                    <span class="kw">(</span><span class="st">"tool"</span><span class="ex">,</span> <span class="st">"herramientas"</span><span class="kw">)</span><span class="ex">,</span> <span class="er">(</span><span class="st">"io"</span><span class="ex">,</span> <span class="st">"entrada / salida"</span><span class="kw">)</span><span class="ex">]</span><span class="kw">)</span></span>
+<span id="cb2-364"><a href="#cb2-364" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-365"><a href="#cb2-365" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="kw">(</span><span class="ex">f</span><span class="st">"&lt;svg viewBox='0 {top} 640 {bottom - top + 22}' width='100%' "</span></span>
+<span id="cb2-366"><a href="#cb2-366" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"style='display:block;max-width:680px;margin:6px auto' "</span></span>
+<span id="cb2-367"><a href="#cb2-367" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"font-family='system-ui,sans-serif'&gt;{''.join(parts)}{legend}&lt;/svg&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-368"><a href="#cb2-368" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-369"><a href="#cb2-369" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-370"><a href="#cb2-370" aria-hidden="true" tabindex="-1"></a><span class="ex">@render.ui</span></span>
+<span id="cb2-371"><a href="#cb2-371" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> run_view<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-372"><a href="#cb2-372" aria-hidden="true" tabindex="-1"></a>    <span class="ex">p,</span> e = pattern<span class="er">(</span><span class="kw">)</span><span class="ex">,</span> email<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-373"><a href="#cb2-373" aria-hidden="true" tabindex="-1"></a>    <span class="ex">c</span> = case<span class="er">(</span><span class="ex">p,</span> e, agent_run<span class="er">(</span><span class="kw">))</span></span>
+<span id="cb2-374"><a href="#cb2-374" aria-hidden="true" tabindex="-1"></a>    <span class="ex">path</span> = [n for n, _ in c<span class="pp">[</span><span class="st">"trace"</span><span class="pp">]</span>]</span>
+<span id="cb2-375"><a href="#cb2-375" aria-hidden="true" tabindex="-1"></a>    <span class="ex">label,</span> color = RESULT[c<span class="pp">[</span><span class="st">"result"</span><span class="pp">]</span>]</span>
+<span id="cb2-376"><a href="#cb2-376" aria-hidden="true" tabindex="-1"></a>    <span class="ex">steps</span> = <span class="st">""</span>.join<span class="er">(</span></span>
+<span id="cb2-377"><a href="#cb2-377" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;li&gt;&lt;span class='num' style='background:{KIND[PATTERNS[p]['nodes'][n][3]][0]};"</span></span>
+<span id="cb2-378"><a href="#cb2-378" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"color:{KIND[PATTERNS[p]['nodes'][n][3]][1]}'&gt;{i + 1}&lt;/span&gt;&lt;span&gt;"</span></span>
+<span id="cb2-379"><a href="#cb2-379" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;b&gt;{PATTERNS[p]['nodes'][n][2]}:&lt;/b&gt; {t}&lt;/span&gt;&lt;/li&gt;"</span></span>
+<span id="cb2-380"><a href="#cb2-380" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i<span class="ex">,</span> <span class="er">(</span><span class="ex">n,</span> t<span class="kw">)</span> <span class="er">in</span> <span class="ex">enumerate</span><span class="er">(</span><span class="va">c</span><span class="op">[</span><span class="st">"trace"</span><span class="op">]</span><span class="kw">)</span></span>
+<span id="cb2-381"><a href="#cb2-381" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-382"><a href="#cb2-382" aria-hidden="true" tabindex="-1"></a>    <span class="ex">tiles</span> = <span class="er">(</span></span>
+<span id="cb2-383"><a href="#cb2-383" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='tiles'&gt;"</span></span>
+<span id="cb2-384"><a href="#cb2-384" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='tile'&gt;&lt;span class='muted'&gt;Llamadas al LLM&lt;/span&gt;&lt;b&gt;{c['calls']}&lt;/b&gt;&lt;/div&gt;"</span></span>
+<span id="cb2-385"><a href="#cb2-385" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='tile'&gt;&lt;span class='muted'&gt;Tiempo aprox.&lt;/span&gt;&lt;b&gt;{c['secs']:.1f} s&lt;/b&gt;&lt;/div&gt;"</span></span>
+<span id="cb2-386"><a href="#cb2-386" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='tile'&gt;&lt;span class='muted'&gt;Resultado&lt;/span&gt;&lt;b style='color:{color}'&gt;{label}&lt;/b&gt;&lt;/div&gt;&lt;/div&gt;"</span></span>
+<span id="cb2-387"><a href="#cb2-387" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-388"><a href="#cb2-388" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span></span>
+<span id="cb2-389"><a href="#cb2-389" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='card'&gt;&lt;div&gt;&lt;b&gt;{PATTERNS[p]['name']}&lt;/b&gt; · &lt;span class='muted'&gt;{PATTERNS[p]['desc']}&lt;/span&gt;&lt;/div&gt;"</span></span>
+<span id="cb2-390"><a href="#cb2-390" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"{graph(p, path, c.get('loops', 0))}{tiles}"</span></span>
+<span id="cb2-391"><a href="#cb2-391" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;ol class='trace' style='margin-top:8px'&gt;{steps}&lt;/ol&gt;"</span></span>
+<span id="cb2-392"><a href="#cb2-392" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;p style='border-left:4px solid {color};padding-left:10px;margin:8px 0 0'&gt;{c['note']}&lt;/p&gt;&lt;/div&gt;"</span></span>
+<span id="cb2-393"><a href="#cb2-393" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-394"><a href="#cb2-394" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-395"><a href="#cb2-395" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-396"><a href="#cb2-396" aria-hidden="true" tabindex="-1"></a><span class="ex">ui.input_action_button</span><span class="er">(</span><span class="st">"run5"</span><span class="ex">,</span> <span class="st">"Ejecutar 5 veces el mismo correo"</span>, class_=<span class="st">"btn-outline-primary btn-sm"</span><span class="kw">)</span></span>
+<span id="cb2-397"><a href="#cb2-397" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-398"><a href="#cb2-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-399"><a href="#cb2-399" aria-hidden="true" tabindex="-1"></a><span class="ex">@render.ui</span></span>
+<span id="cb2-400"><a href="#cb2-400" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> runs_view<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-401"><a href="#cb2-401" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rs</span> = runs<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-402"><a href="#cb2-402" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="ex">not</span> rs:</span>
+<span id="cb2-403"><a href="#cb2-403" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span><span class="st">"&lt;p class='muted' style='margin:4px 0'&gt;¿Hace siempre lo mismo? Pulsa el botón y compruébalo.&lt;/p&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-404"><a href="#cb2-404" aria-hidden="true" tabindex="-1"></a>    <span class="ex">chips</span> = <span class="st">""</span>.join<span class="er">(</span></span>
+<span id="cb2-405"><a href="#cb2-405" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;span class='run' style='background:{RESULT[r['result']][1]};animation-delay:{0.08 * i:.2f}s'&gt;"</span></span>
+<span id="cb2-406"><a href="#cb2-406" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"#{i + 1}: {r['calls']} llamadas · {RESULT[r['result']][0]}&lt;/span&gt;"</span></span>
+<span id="cb2-407"><a href="#cb2-407" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i<span class="ex">,</span> r in enumerate<span class="er">(</span><span class="ex">rs</span><span class="kw">)</span></span>
+<span id="cb2-408"><a href="#cb2-408" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-409"><a href="#cb2-409" aria-hidden="true" tabindex="-1"></a>    <span class="ex">calls</span> = [r<span class="pp">[</span><span class="st">"calls"</span><span class="pp">]</span> for r in rs]</span>
+<span id="cb2-410"><a href="#cb2-410" aria-hidden="true" tabindex="-1"></a>    <span class="ex">same</span> = len<span class="er">(</span><span class="ex">{</span><span class="kw">(</span><span class="va">r</span><span class="op">[</span><span class="st">"calls"</span><span class="op">]</span><span class="ex">,</span> r<span class="pp">[</span><span class="st">"result"</span><span class="pp">]</span><span class="kw">)</span> <span class="cf">for</span> r <span class="kw">in</span> rs}<span class="kw">)</span> <span class="ex">==</span> 1</span>
+<span id="cb2-411"><a href="#cb2-411" aria-hidden="true" tabindex="-1"></a>    <span class="ex">msg</span> = <span class="er">(</span><span class="st">"Las cinco ejecuciones son idénticas: el código decide el camino, así que es predecible y fácil de probar."</span></span>
+<span id="cb2-412"><a href="#cb2-412" aria-hidden="true" tabindex="-1"></a>           <span class="cf">if</span> <span class="ex">same</span> else</span>
+<span id="cb2-413"><a href="#cb2-413" aria-hidden="true" tabindex="-1"></a>           <span class="ex">f</span><span class="st">"Entre {min(calls)} y {max(calls)} llamadas, y no siempre con el mismo resultado: "</span></span>
+<span id="cb2-414"><a href="#cb2-414" aria-hidden="true" tabindex="-1"></a>           <span class="ex">f</span><span class="st">"el LLM decide el camino en cada ejecución. Más difícil de probar y de presupuestar."</span><span class="kw">)</span></span>
+<span id="cb2-415"><a href="#cb2-415" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span><span class="ex">f</span><span class="st">"&lt;div class='runs'&gt;{chips}&lt;/div&gt;&lt;p class='muted' style='margin:6px 0 0'&gt;{msg}&lt;/p&gt;"</span><span class="kw">)</span></span>
+<span id="cb2-416"><a href="#cb2-416" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-417"><a href="#cb2-417" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-418"><a href="#cb2-418" aria-hidden="true" tabindex="-1"></a><span class="ex">@render.ui</span></span>
+<span id="cb2-419"><a href="#cb2-419" aria-hidden="true" tabindex="-1"></a><span class="ex">def</span> compare<span class="er">(</span><span class="kw">)</span><span class="bu">:</span></span>
+<span id="cb2-420"><a href="#cb2-420" aria-hidden="true" tabindex="-1"></a>    <span class="ex">e,</span> p = email<span class="er">(</span><span class="kw">)</span><span class="ex">,</span> pattern<span class="er">(</span><span class="kw">)</span></span>
+<span id="cb2-421"><a href="#cb2-421" aria-hidden="true" tabindex="-1"></a>    <span class="ex">rows,</span> simplest = [], None</span>
+<span id="cb2-422"><a href="#cb2-422" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> k <span class="kw">in</span> ORDER:</span>
+<span id="cb2-423"><a href="#cb2-423" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="ex">k</span> == <span class="st">"agente"</span>:</span>
+<span id="cb2-424"><a href="#cb2-424" aria-hidden="true" tabindex="-1"></a>            <span class="ex">rs</span> = AGENT_RUNS<span class="pp">[</span><span class="ss">e</span><span class="pp">]</span></span>
+<span id="cb2-425"><a href="#cb2-425" aria-hidden="true" tabindex="-1"></a>            <span class="ex">n</span> = [len<span class="er">(</span><span class="va">r</span><span class="op">[</span><span class="st">"tools"</span><span class="op">]</span><span class="kw">)</span> <span class="ex">+</span> 1 for r in rs]</span>
+<span id="cb2-426"><a href="#cb2-426" aria-hidden="true" tabindex="-1"></a>            <span class="ex">calls</span> = f<span class="st">"{min(n)}–{max(n)}"</span></span>
+<span id="cb2-427"><a href="#cb2-427" aria-hidden="true" tabindex="-1"></a>            <span class="ex">results</span> = {r<span class="pp">[</span><span class="st">"result"</span><span class="pp">]</span> for r in rs}</span>
+<span id="cb2-428"><a href="#cb2-428" aria-hidden="true" tabindex="-1"></a>            <span class="ex">res</span> = <span class="st">"✔ casi siempre"</span> if OK in results and len<span class="er">(</span><span class="ex">results</span><span class="kw">)</span> <span class="op">&gt;</span> 1 <span class="cf">else</span> <span class="va">RESULT</span><span class="op">[</span>rs[0<span class="op">][</span><span class="st">"result"</span><span class="op">]</span><span class="ex">][0]</span></span>
+<span id="cb2-429"><a href="#cb2-429" aria-hidden="true" tabindex="-1"></a>            <span class="ex">color</span> = ORANGE if len<span class="er">(</span><span class="ex">results</span><span class="kw">)</span> <span class="op">&gt;</span> 1 <span class="cf">else</span> <span class="va">RESULT</span><span class="op">[</span>rs[0<span class="op">][</span><span class="st">"result"</span><span class="op">]</span><span class="ex">][1]</span></span>
+<span id="cb2-430"><a href="#cb2-430" aria-hidden="true" tabindex="-1"></a>            <span class="ex">pred</span> = <span class="st">"No"</span></span>
+<span id="cb2-431"><a href="#cb2-431" aria-hidden="true" tabindex="-1"></a>            <span class="ex">ok</span> = OK in results</span>
+<span id="cb2-432"><a href="#cb2-432" aria-hidden="true" tabindex="-1"></a>        <span class="ex">else:</span></span>
+<span id="cb2-433"><a href="#cb2-433" aria-hidden="true" tabindex="-1"></a>            <span class="ex">c</span> = CASES[<span class="er">(</span><span class="ex">k,</span> e<span class="kw">)</span><span class="ex">]</span></span>
+<span id="cb2-434"><a href="#cb2-434" aria-hidden="true" tabindex="-1"></a>            <span class="ex">calls,</span> <span class="er">(</span><span class="ex">res,</span> color<span class="kw">)</span><span class="ex">,</span> pred, ok = str<span class="er">(</span><span class="va">c</span><span class="op">[</span><span class="st">"calls"</span><span class="op">]</span><span class="kw">)</span><span class="ex">,</span> RESULT[c<span class="pp">[</span><span class="st">"result"</span><span class="pp">]</span>], <span class="st">"Sí"</span>, c<span class="pp">[</span><span class="st">"result"</span><span class="pp">]</span> == OK</span>
+<span id="cb2-435"><a href="#cb2-435" aria-hidden="true" tabindex="-1"></a>        <span class="ex">star</span> = <span class="st">""</span></span>
+<span id="cb2-436"><a href="#cb2-436" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="ex">ok</span> and simplest is None and k != <span class="st">"agente"</span>:</span>
+<span id="cb2-437"><a href="#cb2-437" aria-hidden="true" tabindex="-1"></a>            <span class="ex">simplest</span> = k</span>
+<span id="cb2-438"><a href="#cb2-438" aria-hidden="true" tabindex="-1"></a>            <span class="ex">star</span> = <span class="st">" &lt;span class='star'&gt;la más simple que lo resuelve&lt;/span&gt;"</span></span>
+<span id="cb2-439"><a href="#cb2-439" aria-hidden="true" tabindex="-1"></a>        <span class="ex">rows.append</span><span class="er">(</span></span>
+<span id="cb2-440"><a href="#cb2-440" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;tr class='{'on' if k == p else ''}' {onclick('pick_pat', k)}&gt;&lt;td&gt;&lt;b&gt;{PATTERNS[k]['name']}&lt;/b&gt;{star}&lt;/td&gt;"</span></span>
+<span id="cb2-441"><a href="#cb2-441" aria-hidden="true" tabindex="-1"></a>            <span class="ex">f</span><span class="st">"&lt;td&gt;{calls}&lt;/td&gt;&lt;td style='color:{color};font-weight:600'&gt;{res}&lt;/td&gt;&lt;td&gt;{pred}&lt;/td&gt;&lt;/tr&gt;"</span></span>
+<span id="cb2-442"><a href="#cb2-442" aria-hidden="true" tabindex="-1"></a>        <span class="kw">)</span></span>
+<span id="cb2-443"><a href="#cb2-443" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ex">ui.HTML</span><span class="er">(</span></span>
+<span id="cb2-444"><a href="#cb2-444" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;div class='card'&gt;&lt;b&gt;Todos los patrones con este correo&lt;/b&gt; "</span></span>
+<span id="cb2-445"><a href="#cb2-445" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;span class='muted'&gt;(pulsa una fila para verla)&lt;/span&gt;"</span></span>
+<span id="cb2-446"><a href="#cb2-446" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;table class='cmp' style='margin-top:6px'&gt;&lt;thead&gt;&lt;tr&gt;&lt;th&gt;Patrón&lt;/th&gt;&lt;th&gt;Llamadas&lt;/th&gt;"</span></span>
+<span id="cb2-447"><a href="#cb2-447" aria-hidden="true" tabindex="-1"></a>        <span class="ex">f</span><span class="st">"&lt;th&gt;Resultado&lt;/th&gt;&lt;th&gt;¿Siempre igual?&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;{''.join(rows)}&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;"</span></span>
+<span id="cb2-448"><a href="#cb2-448" aria-hidden="true" tabindex="-1"></a>    <span class="kw">)</span></span>
+<span id="cb2-449"><a href="#cb2-449" aria-hidden="true" tabindex="-1"></a><span class="kw">```</span></span>
+<span id="cb2-450"><a href="#cb2-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-451"><a href="#cb2-451" aria-hidden="true" tabindex="-1"></a><span class="co">## Qué observar</span></span>
+<span id="cb2-452"><a href="#cb2-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-453"><a href="#cb2-453" aria-hidden="true" tabindex="-1"></a><span class="ex">1.</span> <span class="pp">**</span>Correo de Lucía <span class="er">(</span><span class="ex">pregunta</span> sencilla<span class="kw">)</span><span class="bu">.</span><span class="pp">**</span> La cadena simple lo resuelve con una llamada. Todo lo demás también funciona, pero gasta de dos a cuatro veces más. La tabla marca la cadena simple como «la más simple que lo resuelve».</span>
+<span id="cb2-454"><a href="#cb2-454" aria-hidden="true" tabindex="-1"></a><span class="ex">2.</span> <span class="pp">**</span>Correo de Marcos <span class="er">(</span><span class="ex">devolución</span><span class="kw">)</span><span class="bu">.</span><span class="pp">**</span> La cadena simple suena bien, pero no comprueba el pedido: promete algo que nadie ha verificado. El <span class="pp">**</span>encadenado<span class="pp">**</span> es el caso ideal: siempre los mismos pasos, con los datos reales del pedido.</span>
+<span id="cb2-455"><a href="#cb2-455" aria-hidden="true" tabindex="-1"></a><span class="ex">3.</span> <span class="pp">**</span>Correo de Elena <span class="er">(</span><span class="ex">dos</span> problemas<span class="kw">)</span><span class="bu">.</span><span class="pp">**</span> El encadenado y el enrutado resuelven solo uno: están diseñados para un tipo de problema por correo. La <span class="pp">**</span>paralelización<span class="pp">**</span> resuelve los dos <span class="pp">*</span>sin agente<span class="pp">*</span>, porque tiene un revisor para cada tipo de problema. El agente también lo resuelve.</span>
+<span id="cb2-456"><a href="#cb2-456" aria-hidden="true" tabindex="-1"></a><span class="ex">4.</span> Con el <span class="pp">**</span>agente<span class="pp">**</span> seleccionado, pulsa <span class="pp">**</span>«Ejecutar 5 veces»<span class="pp">**</span>. Cambian las llamadas y, a veces, el resultado: el agente decide cuándo ha terminado y en ocasiones se para antes de tiempo. Repite con un workflow: cinco ejecuciones idénticas.</span>
+<span id="cb2-457"><a href="#cb2-457" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-458"><a href="#cb2-458" aria-hidden="true" tabindex="-1"></a><span class="co">## Qué has visto</span></span>
+<span id="cb2-459"><a href="#cb2-459" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-460"><a href="#cb2-460" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> <span class="pp">**</span>Empieza por lo más simple que funcione.<span class="pp">**</span> La tabla de cada correo responde a la pregunta «¿hace falta un agente<span class="pp">?</span>». En dos de los tres correos, no.</span>
+<span id="cb2-461"><a href="#cb2-461" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> Los <span class="pp">**</span>workflows<span class="pp">**</span> <span class="er">(</span><span class="ex">el</span> código decide el orden<span class="kw">)</span> <span class="ex">son</span> predecibles, baratos y fáciles de probar. Funcionan cuando conoces la estructura de la tarea, y fallan cuando llega algo para lo que no se diseñaron.</span>
+<span id="cb2-462"><a href="#cb2-462" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> Un <span class="pp">**</span>agente<span class="pp">**</span> se adapta a lo imprevisto, pero cada ejecución es distinta: más difícil de probar, de depurar y de presupuestar.</span>
+<span id="cb2-463"><a href="#cb2-463" aria-hidden="true" tabindex="-1"></a><span class="ex">-</span> A menudo un workflow bien diseñado <span class="er">(</span><span class="ex">aquí,</span> la paralelización<span class="kw">)</span> <span class="ex">cubre</span> el caso difícil sin ceder el control al LLM.</span>
+<span id="cb2-464"><a href="#cb2-464" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-465"><a href="#cb2-465" aria-hidden="true" tabindex="-1"></a><span class="ex">:::</span> {.callout-tip}</span>
+<span id="cb2-466"><a href="#cb2-466" aria-hidden="true" tabindex="-1"></a><span class="co">## Para el HPD 3</span></span>
+<span id="cb2-467"><a href="#cb2-467" aria-hidden="true" tabindex="-1"></a><span class="ex">En</span> LangGraph, cada uno de estos diagramas es un grafo: los nodos son las cajas y las aristas condicionales son las decisiones. La diferencia entre un workflow y un agente está en <span class="pp">**</span>quién decide qué arista seguir<span class="pp">**</span>: tu código o el LLM.</span>
+<span id="cb2-468"><a href="#cb2-468" aria-hidden="true" tabindex="-1"></a><span class="ex">:::</span></span>
+<span id="cb2-469"><a href="#cb2-469" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-470"><a href="#cb2-470" aria-hidden="true" tabindex="-1"></a><span class="ex">Para</span> la descripción completa de cada patrón, vuelve a [Patrones de diseño de agentes]<span class="er">(</span><span class="ex">../bloque2/02f-patrones-agentes.qmd#sec-workflow-patterns</span><span class="kw">)</span><span class="bu">.</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

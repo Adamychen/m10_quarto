@@ -534,6 +534,24 @@ window.Quarto = {
  <span class="menu-text">Dentro de un agente</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/patrones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">¿Workflow o agente?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP en dos minutos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/inyeccion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inyección de prompt</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -640,10 +658,10 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p>Este tema forma parte del Bloque 2 — Orquestación. Aquí se aprende a exponer datos y herramientas a LLM de forma estandarizada con MCP.</p>
 </blockquote>
-<div id="d18f5cfe" class="cell" data-execution_count="1">
+<div id="85dd8c0e" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q fastmcp</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="b945d675" class="cell" data-execution_count="2">
+<div id="28fae660" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">"TOKENIZERS_PARALLELISM"</span>] <span class="op">=</span> <span class="st">"false"</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> warnings</span>
@@ -720,6 +738,9 @@ Figure&nbsp;1: Sin MCP hacen falta M × N integraciones ad hoc (3 × 3 = 9); con
 </figcaption>
 </figure>
 </div>
+<blockquote class="blockquote">
+<p><strong>Demo interactiva:</strong> <a href="../demos/mcp.html">MCP en dos minutos</a>. Mueve los deslizadores para ver N × M frente a N + M, y recorre mensaje a mensaje la conversación con el servidor Chinook del HPD 4.</p>
+</blockquote>
 </section>
 <section id="sec-mcp-arquitectura" class="level3">
 <h3 class="anchored" data-anchor-id="sec-mcp-arquitectura">Arquitectura de MCP</h3>
@@ -855,7 +876,7 @@ Table&nbsp;2: Transportes disponibles en MCP y cuándo usar cada uno
 <section id="sec-fastmcp" class="level3">
 <h3 class="anchored" data-anchor-id="sec-fastmcp">FastMCP: el SDK simplificado</h3>
 <p>FastMCP es una capa por encima del SDK oficial que simplifica mucho crear servidores. Basta con decorar funciones Python normales:</p>
-<div id="af4e4b1e" class="cell" data-execution_count="3">
+<div id="bb1f5a01" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> FastMCP</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>mcp <span class="op">=</span> FastMCP(<span class="st">"Mi Primer Servidor"</span>)</span>
@@ -904,7 +925,7 @@ Tip
 <section id="sec-mcp-recursos" class="level3">
 <h3 class="anchored" data-anchor-id="sec-mcp-recursos">Recursos MCP</h3>
 <p>Los Resources exponen datos de solo lectura que el LLM puede consultar:</p>
-<div id="72bd910a" class="cell" data-execution_count="4">
+<div id="9c38ba0f" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"config://version"</span>)</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_version() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Versión del servidor."""</span></span>
@@ -928,7 +949,7 @@ Estadísticas: Tools registradas: 3</code></pre>
 <section id="sec-mcp-sqlite" class="level3">
 <h3 class="anchored" data-anchor-id="sec-mcp-sqlite">MCP + SQLite: herramienta de consulta</h3>
 <p>El caso de uso más común: permitir que un LLM consulte una base de datos SQLite de forma segura:</p>
-<div id="0bb147ca" class="cell" data-execution_count="5">
+<div id="12534545" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos una BD de ejemplo con datos corporativos</span></span>
@@ -960,7 +981,7 @@ Estadísticas: Tools registradas: 3</code></pre>
   Venta 5: 2025-05-18 | DataViz      |  19000€ | IberTech SA</code></pre>
 </div>
 </div>
-<div id="05a366dd" class="cell" data-execution_count="6">
+<div id="7856754d" class="cell" data-execution_count="6">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Herramienta MCP con validación de seguridad</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sanitizar_query(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
@@ -1119,11 +1140,14 @@ Figure&nbsp;3
 </table>
 </div>
 </div>
+<blockquote class="blockquote">
+<p><strong>Demo interactiva:</strong> <a href="../demos/inyeccion.html">inyección de prompt</a>. Un correo con texto oculto intenta que un agente envíe datos fuera de la empresa; activa defensas y comprueba cuáles lo paran.</p>
+</blockquote>
 </section>
 <section id="sec-servidor-mcp-script" class="level3">
 <h3 class="anchored" data-anchor-id="sec-servidor-mcp-script">Servidor MCP completo para ejecutar como script</h3>
 <p>Guarda el siguiente código en <code>servidor_mcp.py</code> y ejecútalo con <code>python servidor_mcp.py</code>. Los clientes LLM pueden conectarse vía stdio:</p>
-<div id="8baa034d" class="cell" data-execution_count="7">
+<div id="519d9ef5" class="cell" data-execution_count="7">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># servidor_mcp.py — Servidor listo para producción</span></span>
 <span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Para ejecutar: python servidor_mcp.py</span></span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="co"># El servidor queda escuchando por stdio</span></span>
@@ -1182,7 +1206,7 @@ Figure&nbsp;3
 <section id="sec-mcp-cliente" class="level3">
 <h3 class="anchored" data-anchor-id="sec-mcp-cliente">Conexión desde un cliente LLM</h3>
 <p>Un cliente (LLM o aplicación) se conecta al servidor MCP lanzándolo como subproceso:</p>
-<div id="115ba00b" class="cell" data-execution_count="8">
+<div id="3df93a58" class="cell" data-execution_count="8">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cliente_mcp.py — Cómo conectar un LLM al servidor MCP</span></span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> asyncio</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> Client</span>
@@ -1819,384 +1843,388 @@ Anthropic. (2024). <em>Model context protocol specification</em>. Especificació
 <span id="cb14-86"><a href="#cb14-86" aria-hidden="true" tabindex="-1"></a>Sin MCP hacen falta M × N integraciones ad hoc (3 × 3 = 9); con MCP bastan M + N implementaciones estandarizadas (3 + 3 = 6).</span>
 <span id="cb14-87"><a href="#cb14-87" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb14-88"><a href="#cb14-88" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arquitectura de MCP {#sec-mcp-arquitectura}</span></span>
+<span id="cb14-89"><a href="#cb14-89" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Demo interactiva:** </span><span class="co">[</span><span class="ot">MCP en dos minutos</span><span class="co">](../demos/mcp.qmd)</span><span class="at">. Mueve los deslizadores para ver N × M frente a N + M, y recorre mensaje a mensaje la conversación con el servidor Chinook del HPD 4.</span></span>
 <span id="cb14-90"><a href="#cb14-90" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a>MCP sigue el modelo cliente-servidor. Cada servidor expone capacidades en 3 categorías:</span>
+<span id="cb14-91"><a href="#cb14-91" aria-hidden="true" tabindex="-1"></a><span class="fu">### Arquitectura de MCP {#sec-mcp-arquitectura}</span></span>
 <span id="cb14-92"><a href="#cb14-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a>: Primitivas del Model Context Protocol y ejemplos {#tbl-mcp-primitivas}</span>
+<span id="cb14-93"><a href="#cb14-93" aria-hidden="true" tabindex="-1"></a>MCP sigue el modelo cliente-servidor. Cada servidor expone capacidades en 3 categorías:</span>
 <span id="cb14-94"><a href="#cb14-94" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primitiva <span class="pp">|</span> ¿Qué es? <span class="pp">|</span> Ejemplo <span class="pp">|</span></span>
-<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Tools** <span class="pp">|</span> Funciones que el LLM puede invocar <span class="pp">|</span> <span class="in">`ejecutar_sql(query)`</span>, <span class="in">`buscar_cliente(id)`</span> <span class="pp">|</span></span>
-<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Resources** <span class="pp">|</span> Datos expuestos como recursos de solo lectura <span class="pp">|</span> <span class="in">`schema://tablas`</span>, <span class="in">`datos://ventas_2025`</span> <span class="pp">|</span></span>
-<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Prompts** <span class="pp">|</span> Plantillas de prompt predefinidas <span class="pp">|</span> <span class="in">`analisis_ventas(mes)`</span>, <span class="in">`resumen_ejecutivo()`</span> <span class="pp">|</span></span>
-<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a>::: {#fig-mcp-arquitectura}</span>
-<span id="cb14-104"><a href="#cb14-104" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb14-105"><a href="#cb14-105" aria-hidden="true" tabindex="-1"></a>graph LR</span>
-<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Cliente LLM</span><span class="ot">"</span></span>
-<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a>        A[LLM&lt;br/&gt;Claude / Qwen / GPT]</span>
-<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Servidor MCP</span><span class="ot">"</span></span>
-<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a>        B[Resources&lt;br/&gt;datos expuestos]</span>
-<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a>        C[Tools&lt;br/&gt;funciones invocables]</span>
-<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a>        D[Prompts&lt;br/&gt;plantillas]</span>
-<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb14-115"><a href="#cb14-115" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Backend</span><span class="ot">"</span></span>
-<span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a>        E[(Base de datos)]</span>
-<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a>        F[API REST]</span>
-<span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a>        G[Archivos locales]</span>
-<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb14-121"><a href="#cb14-121" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-122"><a href="#cb14-122" aria-hidden="true" tabindex="-1"></a>    A &lt;--&gt;|stdio / HTTP| B</span>
-<span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a>    A &lt;--&gt;|stdio / HTTP| C</span>
-<span id="cb14-124"><a href="#cb14-124" aria-hidden="true" tabindex="-1"></a>    A &lt;--&gt;|stdio / HTTP| D</span>
-<span id="cb14-125"><a href="#cb14-125" aria-hidden="true" tabindex="-1"></a>    B --&gt; E</span>
-<span id="cb14-126"><a href="#cb14-126" aria-hidden="true" tabindex="-1"></a>    C --&gt; F</span>
-<span id="cb14-127"><a href="#cb14-127" aria-hidden="true" tabindex="-1"></a>    D --&gt; G</span>
-<span id="cb14-128"><a href="#cb14-128" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-129"><a href="#cb14-129" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a>    style B fill:<span class="co">#FFD43B,color:#000</span></span>
-<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a>    style C fill:<span class="co">#e65100,color:#fff</span></span>
-<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#306998,color:#fff</span></span>
-<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-134"><a href="#cb14-134" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-136"><a href="#cb14-136" aria-hidden="true" tabindex="-1"></a><span class="fu">### Transporte: stdio vs HTTP {#sec-mcp-transporte}</span></span>
+<span id="cb14-95"><a href="#cb14-95" aria-hidden="true" tabindex="-1"></a>: Primitivas del Model Context Protocol y ejemplos {#tbl-mcp-primitivas}</span>
+<span id="cb14-96"><a href="#cb14-96" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-97"><a href="#cb14-97" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Primitiva <span class="pp">|</span> ¿Qué es? <span class="pp">|</span> Ejemplo <span class="pp">|</span></span>
+<span id="cb14-98"><a href="#cb14-98" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb14-99"><a href="#cb14-99" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Tools** <span class="pp">|</span> Funciones que el LLM puede invocar <span class="pp">|</span> <span class="in">`ejecutar_sql(query)`</span>, <span class="in">`buscar_cliente(id)`</span> <span class="pp">|</span></span>
+<span id="cb14-100"><a href="#cb14-100" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Resources** <span class="pp">|</span> Datos expuestos como recursos de solo lectura <span class="pp">|</span> <span class="in">`schema://tablas`</span>, <span class="in">`datos://ventas_2025`</span> <span class="pp">|</span></span>
+<span id="cb14-101"><a href="#cb14-101" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Prompts** <span class="pp">|</span> Plantillas de prompt predefinidas <span class="pp">|</span> <span class="in">`analisis_ventas(mes)`</span>, <span class="in">`resumen_ejecutivo()`</span> <span class="pp">|</span></span>
+<span id="cb14-102"><a href="#cb14-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-103"><a href="#cb14-103" aria-hidden="true" tabindex="-1"></a>::: {#fig-mcp-arquitectura}</span>
+<span id="cb14-106"><a href="#cb14-106" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb14-107"><a href="#cb14-107" aria-hidden="true" tabindex="-1"></a>graph LR</span>
+<span id="cb14-108"><a href="#cb14-108" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Cliente LLM</span><span class="ot">"</span></span>
+<span id="cb14-109"><a href="#cb14-109" aria-hidden="true" tabindex="-1"></a>        A[LLM&lt;br/&gt;Claude / Qwen / GPT]</span>
+<span id="cb14-110"><a href="#cb14-110" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb14-111"><a href="#cb14-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-112"><a href="#cb14-112" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Servidor MCP</span><span class="ot">"</span></span>
+<span id="cb14-113"><a href="#cb14-113" aria-hidden="true" tabindex="-1"></a>        B[Resources&lt;br/&gt;datos expuestos]</span>
+<span id="cb14-114"><a href="#cb14-114" aria-hidden="true" tabindex="-1"></a>        C[Tools&lt;br/&gt;funciones invocables]</span>
+<span id="cb14-115"><a href="#cb14-115" aria-hidden="true" tabindex="-1"></a>        D[Prompts&lt;br/&gt;plantillas]</span>
+<span id="cb14-116"><a href="#cb14-116" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb14-117"><a href="#cb14-117" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-118"><a href="#cb14-118" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Backend</span><span class="ot">"</span></span>
+<span id="cb14-119"><a href="#cb14-119" aria-hidden="true" tabindex="-1"></a>        E[(Base de datos)]</span>
+<span id="cb14-120"><a href="#cb14-120" aria-hidden="true" tabindex="-1"></a>        F[API REST]</span>
+<span id="cb14-121"><a href="#cb14-121" aria-hidden="true" tabindex="-1"></a>        G[Archivos locales]</span>
+<span id="cb14-122"><a href="#cb14-122" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb14-123"><a href="#cb14-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-124"><a href="#cb14-124" aria-hidden="true" tabindex="-1"></a>    A &lt;--&gt;|stdio / HTTP| B</span>
+<span id="cb14-125"><a href="#cb14-125" aria-hidden="true" tabindex="-1"></a>    A &lt;--&gt;|stdio / HTTP| C</span>
+<span id="cb14-126"><a href="#cb14-126" aria-hidden="true" tabindex="-1"></a>    A &lt;--&gt;|stdio / HTTP| D</span>
+<span id="cb14-127"><a href="#cb14-127" aria-hidden="true" tabindex="-1"></a>    B --&gt; E</span>
+<span id="cb14-128"><a href="#cb14-128" aria-hidden="true" tabindex="-1"></a>    C --&gt; F</span>
+<span id="cb14-129"><a href="#cb14-129" aria-hidden="true" tabindex="-1"></a>    D --&gt; G</span>
+<span id="cb14-130"><a href="#cb14-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-131"><a href="#cb14-131" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb14-132"><a href="#cb14-132" aria-hidden="true" tabindex="-1"></a>    style B fill:<span class="co">#FFD43B,color:#000</span></span>
+<span id="cb14-133"><a href="#cb14-133" aria-hidden="true" tabindex="-1"></a>    style C fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb14-134"><a href="#cb14-134" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#306998,color:#fff</span></span>
+<span id="cb14-135"><a href="#cb14-135" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-136"><a href="#cb14-136" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb14-137"><a href="#cb14-137" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-138"><a href="#cb14-138" aria-hidden="true" tabindex="-1"></a>: Transportes disponibles en MCP y cuándo usar cada uno {#tbl-mcp-transportes}</span>
+<span id="cb14-138"><a href="#cb14-138" aria-hidden="true" tabindex="-1"></a><span class="fu">### Transporte: stdio vs HTTP {#sec-mcp-transporte}</span></span>
 <span id="cb14-139"><a href="#cb14-139" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-140"><a href="#cb14-140" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Transporte <span class="pp">|</span> Cómo funciona <span class="pp">|</span> Cuándo usarlo <span class="pp">|</span></span>
-<span id="cb14-141"><a href="#cb14-141" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb14-142"><a href="#cb14-142" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **stdio** <span class="pp">|</span> El cliente lanza el servidor como subproceso, comunicación por stdin/stdout <span class="pp">|</span> Local, sin red, máxima seguridad <span class="pp">|</span></span>
-<span id="cb14-143"><a href="#cb14-143" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **HTTP (SSE)** <span class="pp">|</span> El servidor escucha en un puerto, el cliente se conecta por HTTP <span class="pp">|</span> Remoto, multi-cliente, cloud <span class="pp">|</span></span>
-<span id="cb14-144"><a href="#cb14-144" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-145"><a href="#cb14-145" aria-hidden="true" tabindex="-1"></a>En este curso usamos stdio porque es el más simple y seguro para entornos locales.</span>
+<span id="cb14-140"><a href="#cb14-140" aria-hidden="true" tabindex="-1"></a>: Transportes disponibles en MCP y cuándo usar cada uno {#tbl-mcp-transportes}</span>
+<span id="cb14-141"><a href="#cb14-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-142"><a href="#cb14-142" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Transporte <span class="pp">|</span> Cómo funciona <span class="pp">|</span> Cuándo usarlo <span class="pp">|</span></span>
+<span id="cb14-143"><a href="#cb14-143" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb14-144"><a href="#cb14-144" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **stdio** <span class="pp">|</span> El cliente lanza el servidor como subproceso, comunicación por stdin/stdout <span class="pp">|</span> Local, sin red, máxima seguridad <span class="pp">|</span></span>
+<span id="cb14-145"><a href="#cb14-145" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **HTTP (SSE)** <span class="pp">|</span> El servidor escucha en un puerto, el cliente se conecta por HTTP <span class="pp">|</span> Remoto, multi-cliente, cloud <span class="pp">|</span></span>
 <span id="cb14-146"><a href="#cb14-146" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-147"><a href="#cb14-147" aria-hidden="true" tabindex="-1"></a><span class="fu">### FastMCP: el SDK simplificado {#sec-fastmcp}</span></span>
+<span id="cb14-147"><a href="#cb14-147" aria-hidden="true" tabindex="-1"></a>En este curso usamos stdio porque es el más simple y seguro para entornos locales.</span>
 <span id="cb14-148"><a href="#cb14-148" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-149"><a href="#cb14-149" aria-hidden="true" tabindex="-1"></a>FastMCP es una capa por encima del SDK oficial que simplifica mucho crear servidores. Basta con decorar funciones Python normales:</span>
+<span id="cb14-149"><a href="#cb14-149" aria-hidden="true" tabindex="-1"></a><span class="fu">### FastMCP: el SDK simplificado {#sec-fastmcp}</span></span>
 <span id="cb14-150"><a href="#cb14-150" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-153"><a href="#cb14-153" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-154"><a href="#cb14-154" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb14-155"><a href="#cb14-155" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> FastMCP</span>
+<span id="cb14-151"><a href="#cb14-151" aria-hidden="true" tabindex="-1"></a>FastMCP es una capa por encima del SDK oficial que simplifica mucho crear servidores. Basta con decorar funciones Python normales:</span>
+<span id="cb14-152"><a href="#cb14-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-155"><a href="#cb14-155" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-156"><a href="#cb14-156" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
 <span id="cb14-157"><a href="#cb14-157" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-158"><a href="#cb14-158" aria-hidden="true" tabindex="-1"></a>mcp <span class="op">=</span> FastMCP(<span class="st">"Mi Primer Servidor"</span>)</span>
+<span id="cb14-158"><a href="#cb14-158" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> FastMCP</span>
 <span id="cb14-159"><a href="#cb14-159" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-160"><a href="#cb14-160" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
-<span id="cb14-161"><a href="#cb14-161" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sumar(a: <span class="bu">float</span>, b: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
-<span id="cb14-162"><a href="#cb14-162" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Suma dos números. Ejemplo: sumar(3, 5) → 8"""</span></span>
-<span id="cb14-163"><a href="#cb14-163" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a <span class="op">+</span> b</span>
-<span id="cb14-164"><a href="#cb14-164" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-165"><a href="#cb14-165" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
-<span id="cb14-166"><a href="#cb14-166" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> multiplicar(a: <span class="bu">float</span>, b: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
-<span id="cb14-167"><a href="#cb14-167" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Multiplica dos números. Ejemplo: multiplicar(4, 7) → 28"""</span></span>
-<span id="cb14-168"><a href="#cb14-168" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a <span class="op">*</span> b</span>
-<span id="cb14-169"><a href="#cb14-169" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-170"><a href="#cb14-170" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
-<span id="cb14-171"><a href="#cb14-171" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> contar_palabras(texto: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
-<span id="cb14-172"><a href="#cb14-172" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Cuenta el número de palabras en un texto."""</span></span>
-<span id="cb14-173"><a href="#cb14-173" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">len</span>(texto.split())</span>
-<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-175"><a href="#cb14-175" aria-hidden="true" tabindex="-1"></a><span class="co"># Las herramientas son funciones Python normales: se pueden probar directamente</span></span>
-<span id="cb14-176"><a href="#cb14-176" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando herramientas directamente ==="</span>)</span>
-<span id="cb14-177"><a href="#cb14-177" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"sumar(3, 5) = </span><span class="sc">{</span>sumar(<span class="dv">3</span>, <span class="dv">5</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-178"><a href="#cb14-178" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"multiplicar(4, 7) = </span><span class="sc">{</span>multiplicar(<span class="dv">4</span>, <span class="dv">7</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-179"><a href="#cb14-179" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"contar_palabras('Hola mundo MCP') = </span><span class="sc">{</span>contar_palabras(<span class="st">'Hola mundo MCP'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-180"><a href="#cb14-180" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-181"><a href="#cb14-181" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-182"><a href="#cb14-182" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
-<span id="cb14-183"><a href="#cb14-183" aria-hidden="true" tabindex="-1"></a>FastMCP infiere automáticamente el JSON Schema a partir de los type hints de Python. <span class="in">`a: float`</span> se convierte en <span class="in">`{"type": "number"}`</span>, <span class="in">`texto: str`</span> en <span class="in">`{"type": "string"}`</span>, etc. No necesitas escribir el schema manualmente.</span>
-<span id="cb14-184"><a href="#cb14-184" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb14-185"><a href="#cb14-185" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-186"><a href="#cb14-186" aria-hidden="true" tabindex="-1"></a><span class="fu">### Recursos MCP {#sec-mcp-recursos}</span></span>
+<span id="cb14-160"><a href="#cb14-160" aria-hidden="true" tabindex="-1"></a>mcp <span class="op">=</span> FastMCP(<span class="st">"Mi Primer Servidor"</span>)</span>
+<span id="cb14-161"><a href="#cb14-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-162"><a href="#cb14-162" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
+<span id="cb14-163"><a href="#cb14-163" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sumar(a: <span class="bu">float</span>, b: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb14-164"><a href="#cb14-164" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Suma dos números. Ejemplo: sumar(3, 5) → 8"""</span></span>
+<span id="cb14-165"><a href="#cb14-165" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a <span class="op">+</span> b</span>
+<span id="cb14-166"><a href="#cb14-166" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-167"><a href="#cb14-167" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
+<span id="cb14-168"><a href="#cb14-168" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> multiplicar(a: <span class="bu">float</span>, b: <span class="bu">float</span>) <span class="op">-&gt;</span> <span class="bu">float</span>:</span>
+<span id="cb14-169"><a href="#cb14-169" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Multiplica dos números. Ejemplo: multiplicar(4, 7) → 28"""</span></span>
+<span id="cb14-170"><a href="#cb14-170" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a <span class="op">*</span> b</span>
+<span id="cb14-171"><a href="#cb14-171" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-172"><a href="#cb14-172" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
+<span id="cb14-173"><a href="#cb14-173" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> contar_palabras(texto: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">int</span>:</span>
+<span id="cb14-174"><a href="#cb14-174" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Cuenta el número de palabras en un texto."""</span></span>
+<span id="cb14-175"><a href="#cb14-175" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">len</span>(texto.split())</span>
+<span id="cb14-176"><a href="#cb14-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-177"><a href="#cb14-177" aria-hidden="true" tabindex="-1"></a><span class="co"># Las herramientas son funciones Python normales: se pueden probar directamente</span></span>
+<span id="cb14-178"><a href="#cb14-178" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando herramientas directamente ==="</span>)</span>
+<span id="cb14-179"><a href="#cb14-179" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"sumar(3, 5) = </span><span class="sc">{</span>sumar(<span class="dv">3</span>, <span class="dv">5</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-180"><a href="#cb14-180" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"multiplicar(4, 7) = </span><span class="sc">{</span>multiplicar(<span class="dv">4</span>, <span class="dv">7</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-181"><a href="#cb14-181" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"contar_palabras('Hola mundo MCP') = </span><span class="sc">{</span>contar_palabras(<span class="st">'Hola mundo MCP'</span>)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-182"><a href="#cb14-182" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-183"><a href="#cb14-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-184"><a href="#cb14-184" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb14-185"><a href="#cb14-185" aria-hidden="true" tabindex="-1"></a>FastMCP infiere automáticamente el JSON Schema a partir de los type hints de Python. <span class="in">`a: float`</span> se convierte en <span class="in">`{"type": "number"}`</span>, <span class="in">`texto: str`</span> en <span class="in">`{"type": "string"}`</span>, etc. No necesitas escribir el schema manualmente.</span>
+<span id="cb14-186"><a href="#cb14-186" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb14-187"><a href="#cb14-187" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-188"><a href="#cb14-188" aria-hidden="true" tabindex="-1"></a>Los Resources exponen datos de solo lectura que el LLM puede consultar:</span>
+<span id="cb14-188"><a href="#cb14-188" aria-hidden="true" tabindex="-1"></a><span class="fu">### Recursos MCP {#sec-mcp-recursos}</span></span>
 <span id="cb14-189"><a href="#cb14-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-192"><a href="#cb14-192" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-193"><a href="#cb14-193" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb14-194"><a href="#cb14-194" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-195"><a href="#cb14-195" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"config://version"</span>)</span>
-<span id="cb14-196"><a href="#cb14-196" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_version() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb14-197"><a href="#cb14-197" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Versión del servidor."""</span></span>
-<span id="cb14-198"><a href="#cb14-198" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"1.0.0"</span></span>
-<span id="cb14-199"><a href="#cb14-199" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-200"><a href="#cb14-200" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"stats://herramientas"</span>)</span>
-<span id="cb14-201"><a href="#cb14-201" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> get_stats() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb14-202"><a href="#cb14-202" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Estadísticas del servidor."""</span></span>
-<span id="cb14-203"><a href="#cb14-203" aria-hidden="true" tabindex="-1"></a>    tools <span class="op">=</span> <span class="cf">await</span> mcp.list_tools()</span>
-<span id="cb14-204"><a href="#cb14-204" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Tools registradas: </span><span class="sc">{</span><span class="bu">len</span>(tools)<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb14-205"><a href="#cb14-205" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-206"><a href="#cb14-206" aria-hidden="true" tabindex="-1"></a><span class="co"># Los recursos también son funciones normales</span></span>
-<span id="cb14-207"><a href="#cb14-207" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Versión del servidor: </span><span class="sc">{</span>get_version()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-208"><a href="#cb14-208" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Estadísticas: </span><span class="sc">{</span><span class="cf">await</span> get_stats()<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-209"><a href="#cb14-209" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-210"><a href="#cb14-210" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-211"><a href="#cb14-211" aria-hidden="true" tabindex="-1"></a><span class="fu">### MCP + SQLite: herramienta de consulta {#sec-mcp-sqlite}</span></span>
+<span id="cb14-190"><a href="#cb14-190" aria-hidden="true" tabindex="-1"></a>Los Resources exponen datos de solo lectura que el LLM puede consultar:</span>
+<span id="cb14-191"><a href="#cb14-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-194"><a href="#cb14-194" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-195"><a href="#cb14-195" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb14-196"><a href="#cb14-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-197"><a href="#cb14-197" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"config://version"</span>)</span>
+<span id="cb14-198"><a href="#cb14-198" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_version() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb14-199"><a href="#cb14-199" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Versión del servidor."""</span></span>
+<span id="cb14-200"><a href="#cb14-200" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"1.0.0"</span></span>
+<span id="cb14-201"><a href="#cb14-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-202"><a href="#cb14-202" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"stats://herramientas"</span>)</span>
+<span id="cb14-203"><a href="#cb14-203" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> get_stats() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb14-204"><a href="#cb14-204" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Estadísticas del servidor."""</span></span>
+<span id="cb14-205"><a href="#cb14-205" aria-hidden="true" tabindex="-1"></a>    tools <span class="op">=</span> <span class="cf">await</span> mcp.list_tools()</span>
+<span id="cb14-206"><a href="#cb14-206" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="ss">f"Tools registradas: </span><span class="sc">{</span><span class="bu">len</span>(tools)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb14-207"><a href="#cb14-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-208"><a href="#cb14-208" aria-hidden="true" tabindex="-1"></a><span class="co"># Los recursos también son funciones normales</span></span>
+<span id="cb14-209"><a href="#cb14-209" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Versión del servidor: </span><span class="sc">{</span>get_version()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-210"><a href="#cb14-210" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Estadísticas: </span><span class="sc">{</span><span class="cf">await</span> get_stats()<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-211"><a href="#cb14-211" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-212"><a href="#cb14-212" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-213"><a href="#cb14-213" aria-hidden="true" tabindex="-1"></a>El caso de uso más común: permitir que un LLM consulte una base de datos SQLite de forma segura:</span>
+<span id="cb14-213"><a href="#cb14-213" aria-hidden="true" tabindex="-1"></a><span class="fu">### MCP + SQLite: herramienta de consulta {#sec-mcp-sqlite}</span></span>
 <span id="cb14-214"><a href="#cb14-214" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-217"><a href="#cb14-217" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-218"><a href="#cb14-218" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb14-219"><a href="#cb14-219" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-220"><a href="#cb14-220" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
+<span id="cb14-215"><a href="#cb14-215" aria-hidden="true" tabindex="-1"></a>El caso de uso más común: permitir que un LLM consulte una base de datos SQLite de forma segura:</span>
+<span id="cb14-216"><a href="#cb14-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-219"><a href="#cb14-219" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-220"><a href="#cb14-220" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
 <span id="cb14-221"><a href="#cb14-221" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-222"><a href="#cb14-222" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos una BD de ejemplo con datos corporativos</span></span>
-<span id="cb14-223"><a href="#cb14-223" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> sqlite3.<span class="ex">connect</span>(<span class="st">":memory:"</span>)</span>
-<span id="cb14-224"><a href="#cb14-224" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"CREATE TABLE ventas (id INTEGER, fecha TEXT, producto TEXT, importe REAL, cliente_id INTEGER)"</span>)</span>
-<span id="cb14-225"><a href="#cb14-225" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"CREATE TABLE clientes (id INTEGER, nombre TEXT, sector TEXT, facturacion REAL)"</span>)</span>
-<span id="cb14-226"><a href="#cb14-226" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO clientes VALUES (1, 'ACME Corp', 'Tecnología', 500000)"</span>)</span>
-<span id="cb14-227"><a href="#cb14-227" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO clientes VALUES (2, 'IberTech SA', 'Industrial', 1200000)"</span>)</span>
-<span id="cb14-228"><a href="#cb14-228" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO clientes VALUES (3, 'Datafy Analytics', 'Consultoría', 300000)"</span>)</span>
-<span id="cb14-229"><a href="#cb14-229" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (1, '2025-01-15', 'CloudSync', 45000, 1)"</span>)</span>
-<span id="cb14-230"><a href="#cb14-230" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (2, '2025-02-20', 'DataViz', 32000, 2)"</span>)</span>
-<span id="cb14-231"><a href="#cb14-231" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (3, '2025-03-10', 'CloudSync', 51000, 1)"</span>)</span>
-<span id="cb14-232"><a href="#cb14-232" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (4, '2025-04-05', 'AI Toolkit', 28000, 3)"</span>)</span>
-<span id="cb14-233"><a href="#cb14-233" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (5, '2025-05-18', 'DataViz', 19000, 2)"</span>)</span>
-<span id="cb14-234"><a href="#cb14-234" aria-hidden="true" tabindex="-1"></a>db.commit()</span>
-<span id="cb14-235"><a href="#cb14-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-236"><a href="#cb14-236" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Base de datos corporativa ==="</span>)</span>
-<span id="cb14-237"><a href="#cb14-237" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> db.execute(<span class="st">"SELECT v.id, v.fecha, v.producto, v.importe, c.nombre FROM ventas v JOIN clientes c ON v.cliente_id = c.id"</span>):</span>
-<span id="cb14-238"><a href="#cb14-238" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Venta </span><span class="sc">{</span>row[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>row[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>row[<span class="dv">2</span>]<span class="sc">:12s}</span><span class="ss"> | </span><span class="sc">{</span>row[<span class="dv">3</span>]<span class="sc">:6.0f}</span><span class="ss">€ | </span><span class="sc">{</span>row[<span class="dv">4</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-239"><a href="#cb14-239" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-240"><a href="#cb14-240" aria-hidden="true" tabindex="-1"></a><span class="co"># NOTA: db sigue abierta en memoria; las tools la usarán directamente</span></span>
-<span id="cb14-241"><a href="#cb14-241" aria-hidden="true" tabindex="-1"></a><span class="co"># No necesita backup a disco porque las tools comparten el mismo kernel</span></span>
-<span id="cb14-242"><a href="#cb14-242" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-243"><a href="#cb14-243" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-246"><a href="#cb14-246" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-247"><a href="#cb14-247" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb14-248"><a href="#cb14-248" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-249"><a href="#cb14-249" aria-hidden="true" tabindex="-1"></a><span class="co"># Herramienta MCP con validación de seguridad</span></span>
+<span id="cb14-222"><a href="#cb14-222" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
+<span id="cb14-223"><a href="#cb14-223" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-224"><a href="#cb14-224" aria-hidden="true" tabindex="-1"></a><span class="co"># Creamos una BD de ejemplo con datos corporativos</span></span>
+<span id="cb14-225"><a href="#cb14-225" aria-hidden="true" tabindex="-1"></a>db <span class="op">=</span> sqlite3.<span class="ex">connect</span>(<span class="st">":memory:"</span>)</span>
+<span id="cb14-226"><a href="#cb14-226" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"CREATE TABLE ventas (id INTEGER, fecha TEXT, producto TEXT, importe REAL, cliente_id INTEGER)"</span>)</span>
+<span id="cb14-227"><a href="#cb14-227" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"CREATE TABLE clientes (id INTEGER, nombre TEXT, sector TEXT, facturacion REAL)"</span>)</span>
+<span id="cb14-228"><a href="#cb14-228" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO clientes VALUES (1, 'ACME Corp', 'Tecnología', 500000)"</span>)</span>
+<span id="cb14-229"><a href="#cb14-229" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO clientes VALUES (2, 'IberTech SA', 'Industrial', 1200000)"</span>)</span>
+<span id="cb14-230"><a href="#cb14-230" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO clientes VALUES (3, 'Datafy Analytics', 'Consultoría', 300000)"</span>)</span>
+<span id="cb14-231"><a href="#cb14-231" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (1, '2025-01-15', 'CloudSync', 45000, 1)"</span>)</span>
+<span id="cb14-232"><a href="#cb14-232" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (2, '2025-02-20', 'DataViz', 32000, 2)"</span>)</span>
+<span id="cb14-233"><a href="#cb14-233" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (3, '2025-03-10', 'CloudSync', 51000, 1)"</span>)</span>
+<span id="cb14-234"><a href="#cb14-234" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (4, '2025-04-05', 'AI Toolkit', 28000, 3)"</span>)</span>
+<span id="cb14-235"><a href="#cb14-235" aria-hidden="true" tabindex="-1"></a>db.execute(<span class="st">"INSERT INTO ventas VALUES (5, '2025-05-18', 'DataViz', 19000, 2)"</span>)</span>
+<span id="cb14-236"><a href="#cb14-236" aria-hidden="true" tabindex="-1"></a>db.commit()</span>
+<span id="cb14-237"><a href="#cb14-237" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-238"><a href="#cb14-238" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Base de datos corporativa ==="</span>)</span>
+<span id="cb14-239"><a href="#cb14-239" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> row <span class="kw">in</span> db.execute(<span class="st">"SELECT v.id, v.fecha, v.producto, v.importe, c.nombre FROM ventas v JOIN clientes c ON v.cliente_id = c.id"</span>):</span>
+<span id="cb14-240"><a href="#cb14-240" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f"  Venta </span><span class="sc">{</span>row[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>row[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>row[<span class="dv">2</span>]<span class="sc">:12s}</span><span class="ss"> | </span><span class="sc">{</span>row[<span class="dv">3</span>]<span class="sc">:6.0f}</span><span class="ss">€ | </span><span class="sc">{</span>row[<span class="dv">4</span>]<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-241"><a href="#cb14-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-242"><a href="#cb14-242" aria-hidden="true" tabindex="-1"></a><span class="co"># NOTA: db sigue abierta en memoria; las tools la usarán directamente</span></span>
+<span id="cb14-243"><a href="#cb14-243" aria-hidden="true" tabindex="-1"></a><span class="co"># No necesita backup a disco porque las tools comparten el mismo kernel</span></span>
+<span id="cb14-244"><a href="#cb14-244" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-245"><a href="#cb14-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-248"><a href="#cb14-248" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-249"><a href="#cb14-249" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
 <span id="cb14-250"><a href="#cb14-250" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-251"><a href="#cb14-251" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sanitizar_query(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb14-252"><a href="#cb14-252" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Bloquea comandos peligrosos. Solo permite SELECT."""</span></span>
-<span id="cb14-253"><a href="#cb14-253" aria-hidden="true" tabindex="-1"></a>    peligrosos <span class="op">=</span> [<span class="st">"DROP"</span>, <span class="st">"DELETE"</span>, <span class="st">"UPDATE"</span>, <span class="st">"INSERT"</span>, <span class="st">"ALTER"</span>, <span class="st">"CREATE"</span>, <span class="st">"TRUNCATE"</span>]</span>
-<span id="cb14-254"><a href="#cb14-254" aria-hidden="true" tabindex="-1"></a>    query_upper <span class="op">=</span> query.upper()</span>
-<span id="cb14-255"><a href="#cb14-255" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> cmd <span class="kw">in</span> peligrosos:</span>
-<span id="cb14-256"><a href="#cb14-256" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cmd <span class="kw">in</span> query_upper:</span>
-<span id="cb14-257"><a href="#cb14-257" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Operación no permitida: </span><span class="sc">{</span>cmd<span class="sc">}</span><span class="ss">. Solo se admiten consultas SELECT."</span>)</span>
-<span id="cb14-258"><a href="#cb14-258" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> query_upper.strip().startswith(<span class="st">"SELECT"</span>):</span>
-<span id="cb14-259"><a href="#cb14-259" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Solo se permiten consultas SELECT."</span>)</span>
-<span id="cb14-260"><a href="#cb14-260" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> query</span>
-<span id="cb14-261"><a href="#cb14-261" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-262"><a href="#cb14-262" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
-<span id="cb14-263"><a href="#cb14-263" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> consultar_sql(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb14-264"><a href="#cb14-264" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb14-265"><a href="#cb14-265" aria-hidden="true" tabindex="-1"></a><span class="co">    Ejecuta una consulta SELECT en la base de datos corporativa.</span></span>
-<span id="cb14-266"><a href="#cb14-266" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-267"><a href="#cb14-267" aria-hidden="true" tabindex="-1"></a><span class="co">    Schema disponible:</span></span>
-<span id="cb14-268"><a href="#cb14-268" aria-hidden="true" tabindex="-1"></a><span class="co">    - ventas(id, fecha, producto, importe, cliente_id)</span></span>
-<span id="cb14-269"><a href="#cb14-269" aria-hidden="true" tabindex="-1"></a><span class="co">    - clientes(id, nombre, sector, facturacion)</span></span>
-<span id="cb14-270"><a href="#cb14-270" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-271"><a href="#cb14-271" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
-<span id="cb14-272"><a href="#cb14-272" aria-hidden="true" tabindex="-1"></a><span class="co">        query: consulta SQL SELECT. Ejemplo: 'SELECT * FROM ventas WHERE importe &gt; 30000'</span></span>
-<span id="cb14-273"><a href="#cb14-273" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-274"><a href="#cb14-274" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
-<span id="cb14-275"><a href="#cb14-275" aria-hidden="true" tabindex="-1"></a><span class="co">        Resultados de la consulta en formato tabla.</span></span>
-<span id="cb14-276"><a href="#cb14-276" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb14-277"><a href="#cb14-277" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb14-278"><a href="#cb14-278" aria-hidden="true" tabindex="-1"></a>        query <span class="op">=</span> sanitizar_query(query)</span>
-<span id="cb14-279"><a href="#cb14-279" aria-hidden="true" tabindex="-1"></a>        cursor <span class="op">=</span> db.execute(query)</span>
-<span id="cb14-280"><a href="#cb14-280" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-281"><a href="#cb14-281" aria-hidden="true" tabindex="-1"></a>        columnas <span class="op">=</span> [d[<span class="dv">0</span>] <span class="cf">for</span> d <span class="kw">in</span> cursor.description]</span>
-<span id="cb14-282"><a href="#cb14-282" aria-hidden="true" tabindex="-1"></a>        filas <span class="op">=</span> cursor.fetchall()</span>
-<span id="cb14-283"><a href="#cb14-283" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-284"><a href="#cb14-284" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> filas:</span>
-<span id="cb14-285"><a href="#cb14-285" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">"La consulta no devolvió resultados."</span></span>
-<span id="cb14-286"><a href="#cb14-286" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-287"><a href="#cb14-287" aria-hidden="true" tabindex="-1"></a>        resultado <span class="op">=</span> <span class="st">" | "</span>.join(columnas) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span> <span class="op">+</span> <span class="st">"-"</span> <span class="op">*</span> <span class="dv">40</span> <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span></span>
-<span id="cb14-288"><a href="#cb14-288" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> fila <span class="kw">in</span> filas[:<span class="dv">20</span>]:</span>
-<span id="cb14-289"><a href="#cb14-289" aria-hidden="true" tabindex="-1"></a>            resultado <span class="op">+=</span> <span class="st">" | "</span>.join(<span class="bu">str</span>(v) <span class="cf">for</span> v <span class="kw">in</span> fila) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span></span>
-<span id="cb14-290"><a href="#cb14-290" aria-hidden="true" tabindex="-1"></a>        resultado <span class="op">+=</span> <span class="ss">f"</span><span class="ch">\n</span><span class="ss">Total filas: </span><span class="sc">{</span><span class="bu">len</span>(filas)<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb14-291"><a href="#cb14-291" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> resultado</span>
-<span id="cb14-292"><a href="#cb14-292" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb14-293"><a href="#cb14-293" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb14-294"><a href="#cb14-294" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-295"><a href="#cb14-295" aria-hidden="true" tabindex="-1"></a><span class="co"># Probar directamente (sin servidor MCP)</span></span>
-<span id="cb14-296"><a href="#cb14-296" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando herramienta SQL ==="</span>)</span>
-<span id="cb14-297"><a href="#cb14-297" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(consultar_sql(<span class="st">"SELECT * FROM ventas WHERE producto = 'CloudSync'"</span>))</span>
-<span id="cb14-298"><a href="#cb14-298" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb14-299"><a href="#cb14-299" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(consultar_sql(<span class="st">"SELECT c.nombre, SUM(v.importe) as total_ventas FROM ventas v JOIN clientes c ON v.cliente_id = c.id GROUP BY c.nombre"</span>))</span>
+<span id="cb14-251"><a href="#cb14-251" aria-hidden="true" tabindex="-1"></a><span class="co"># Herramienta MCP con validación de seguridad</span></span>
+<span id="cb14-252"><a href="#cb14-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-253"><a href="#cb14-253" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sanitizar_query(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb14-254"><a href="#cb14-254" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Bloquea comandos peligrosos. Solo permite SELECT."""</span></span>
+<span id="cb14-255"><a href="#cb14-255" aria-hidden="true" tabindex="-1"></a>    peligrosos <span class="op">=</span> [<span class="st">"DROP"</span>, <span class="st">"DELETE"</span>, <span class="st">"UPDATE"</span>, <span class="st">"INSERT"</span>, <span class="st">"ALTER"</span>, <span class="st">"CREATE"</span>, <span class="st">"TRUNCATE"</span>]</span>
+<span id="cb14-256"><a href="#cb14-256" aria-hidden="true" tabindex="-1"></a>    query_upper <span class="op">=</span> query.upper()</span>
+<span id="cb14-257"><a href="#cb14-257" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> cmd <span class="kw">in</span> peligrosos:</span>
+<span id="cb14-258"><a href="#cb14-258" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cmd <span class="kw">in</span> query_upper:</span>
+<span id="cb14-259"><a href="#cb14-259" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Operación no permitida: </span><span class="sc">{</span>cmd<span class="sc">}</span><span class="ss">. Solo se admiten consultas SELECT."</span>)</span>
+<span id="cb14-260"><a href="#cb14-260" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> query_upper.strip().startswith(<span class="st">"SELECT"</span>):</span>
+<span id="cb14-261"><a href="#cb14-261" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Solo se permiten consultas SELECT."</span>)</span>
+<span id="cb14-262"><a href="#cb14-262" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> query</span>
+<span id="cb14-263"><a href="#cb14-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-264"><a href="#cb14-264" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
+<span id="cb14-265"><a href="#cb14-265" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> consultar_sql(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb14-266"><a href="#cb14-266" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb14-267"><a href="#cb14-267" aria-hidden="true" tabindex="-1"></a><span class="co">    Ejecuta una consulta SELECT en la base de datos corporativa.</span></span>
+<span id="cb14-268"><a href="#cb14-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-269"><a href="#cb14-269" aria-hidden="true" tabindex="-1"></a><span class="co">    Schema disponible:</span></span>
+<span id="cb14-270"><a href="#cb14-270" aria-hidden="true" tabindex="-1"></a><span class="co">    - ventas(id, fecha, producto, importe, cliente_id)</span></span>
+<span id="cb14-271"><a href="#cb14-271" aria-hidden="true" tabindex="-1"></a><span class="co">    - clientes(id, nombre, sector, facturacion)</span></span>
+<span id="cb14-272"><a href="#cb14-272" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-273"><a href="#cb14-273" aria-hidden="true" tabindex="-1"></a><span class="co">    Args:</span></span>
+<span id="cb14-274"><a href="#cb14-274" aria-hidden="true" tabindex="-1"></a><span class="co">        query: consulta SQL SELECT. Ejemplo: 'SELECT * FROM ventas WHERE importe &gt; 30000'</span></span>
+<span id="cb14-275"><a href="#cb14-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-276"><a href="#cb14-276" aria-hidden="true" tabindex="-1"></a><span class="co">    Returns:</span></span>
+<span id="cb14-277"><a href="#cb14-277" aria-hidden="true" tabindex="-1"></a><span class="co">        Resultados de la consulta en formato tabla.</span></span>
+<span id="cb14-278"><a href="#cb14-278" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb14-279"><a href="#cb14-279" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb14-280"><a href="#cb14-280" aria-hidden="true" tabindex="-1"></a>        query <span class="op">=</span> sanitizar_query(query)</span>
+<span id="cb14-281"><a href="#cb14-281" aria-hidden="true" tabindex="-1"></a>        cursor <span class="op">=</span> db.execute(query)</span>
+<span id="cb14-282"><a href="#cb14-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-283"><a href="#cb14-283" aria-hidden="true" tabindex="-1"></a>        columnas <span class="op">=</span> [d[<span class="dv">0</span>] <span class="cf">for</span> d <span class="kw">in</span> cursor.description]</span>
+<span id="cb14-284"><a href="#cb14-284" aria-hidden="true" tabindex="-1"></a>        filas <span class="op">=</span> cursor.fetchall()</span>
+<span id="cb14-285"><a href="#cb14-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-286"><a href="#cb14-286" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> filas:</span>
+<span id="cb14-287"><a href="#cb14-287" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">"La consulta no devolvió resultados."</span></span>
+<span id="cb14-288"><a href="#cb14-288" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-289"><a href="#cb14-289" aria-hidden="true" tabindex="-1"></a>        resultado <span class="op">=</span> <span class="st">" | "</span>.join(columnas) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span> <span class="op">+</span> <span class="st">"-"</span> <span class="op">*</span> <span class="dv">40</span> <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb14-290"><a href="#cb14-290" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> fila <span class="kw">in</span> filas[:<span class="dv">20</span>]:</span>
+<span id="cb14-291"><a href="#cb14-291" aria-hidden="true" tabindex="-1"></a>            resultado <span class="op">+=</span> <span class="st">" | "</span>.join(<span class="bu">str</span>(v) <span class="cf">for</span> v <span class="kw">in</span> fila) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb14-292"><a href="#cb14-292" aria-hidden="true" tabindex="-1"></a>        resultado <span class="op">+=</span> <span class="ss">f"</span><span class="ch">\n</span><span class="ss">Total filas: </span><span class="sc">{</span><span class="bu">len</span>(filas)<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb14-293"><a href="#cb14-293" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> resultado</span>
+<span id="cb14-294"><a href="#cb14-294" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb14-295"><a href="#cb14-295" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb14-296"><a href="#cb14-296" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-297"><a href="#cb14-297" aria-hidden="true" tabindex="-1"></a><span class="co"># Probar directamente (sin servidor MCP)</span></span>
+<span id="cb14-298"><a href="#cb14-298" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"=== Probando herramienta SQL ==="</span>)</span>
+<span id="cb14-299"><a href="#cb14-299" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(consultar_sql(<span class="st">"SELECT * FROM ventas WHERE producto = 'CloudSync'"</span>))</span>
 <span id="cb14-300"><a href="#cb14-300" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
-<span id="cb14-301"><a href="#cb14-301" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Test de seguridad ---"</span>)</span>
-<span id="cb14-302"><a href="#cb14-302" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(consultar_sql(<span class="st">"DROP TABLE ventas"</span>))</span>
-<span id="cb14-303"><a href="#cb14-303" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-304"><a href="#cb14-304" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-305"><a href="#cb14-305" aria-hidden="true" tabindex="-1"></a><span class="fu">### Seguridad en MCP: el checklist imprescindible {#sec-mcp-seguridad}</span></span>
+<span id="cb14-301"><a href="#cb14-301" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(consultar_sql(<span class="st">"SELECT c.nombre, SUM(v.importe) as total_ventas FROM ventas v JOIN clientes c ON v.cliente_id = c.id GROUP BY c.nombre"</span>))</span>
+<span id="cb14-302"><a href="#cb14-302" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>()</span>
+<span id="cb14-303"><a href="#cb14-303" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"--- Test de seguridad ---"</span>)</span>
+<span id="cb14-304"><a href="#cb14-304" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(consultar_sql(<span class="st">"DROP TABLE ventas"</span>))</span>
+<span id="cb14-305"><a href="#cb14-305" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-306"><a href="#cb14-306" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-307"><a href="#cb14-307" aria-hidden="true" tabindex="-1"></a>Cada servidor MCP es una superficie de ataque. El LLM escribe la entrada de las herramientas y un atacante puede manipular el prompt para inyectar comandos maliciosos (prompt injection):</span>
+<span id="cb14-307"><a href="#cb14-307" aria-hidden="true" tabindex="-1"></a><span class="fu">### Seguridad en MCP: el checklist imprescindible {#sec-mcp-seguridad}</span></span>
 <span id="cb14-308"><a href="#cb14-308" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-309"><a href="#cb14-309" aria-hidden="true" tabindex="-1"></a>::: {#fig-mcp-seguridad}</span>
-<span id="cb14-312"><a href="#cb14-312" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb14-313"><a href="#cb14-313" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb14-314"><a href="#cb14-314" aria-hidden="true" tabindex="-1"></a>    A[Usuario malicioso&lt;br/&gt;inyecta comandos en el prompt] --&gt; B[LLM&lt;br/&gt;genera query alterada]</span>
-<span id="cb14-315"><a href="#cb14-315" aria-hidden="true" tabindex="-1"></a>    B --&gt; C[Servidor MCP&lt;br/&gt;¿valida?]</span>
-<span id="cb14-316"><a href="#cb14-316" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Sin validación| D[<span class="ot">"</span><span class="st">Ejecuta&lt;br/&gt;DROP TABLE</span><span class="ot">"</span>]</span>
-<span id="cb14-317"><a href="#cb14-317" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Con validación| E[✅ Bloquea&lt;br/&gt;y notifica]</span>
-<span id="cb14-318"><a href="#cb14-318" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-319"><a href="#cb14-319" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#c62828,color:#fff</span></span>
-<span id="cb14-320"><a href="#cb14-320" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#c62828,color:#fff</span></span>
-<span id="cb14-321"><a href="#cb14-321" aria-hidden="true" tabindex="-1"></a>    style E fill:<span class="co">#2e7d32,color:#fff</span></span>
-<span id="cb14-322"><a href="#cb14-322" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-323"><a href="#cb14-323" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb14-324"><a href="#cb14-324" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-325"><a href="#cb14-325" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
-<span id="cb14-326"><a href="#cb14-326" aria-hidden="true" tabindex="-1"></a><span class="fu">## Checklist de seguridad MCP</span></span>
-<span id="cb14-327"><a href="#cb14-327" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-328"><a href="#cb14-328" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Riesgo <span class="pp">|</span> Mitigación <span class="pp">|</span></span>
-<span id="cb14-329"><a href="#cb14-329" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
-<span id="cb14-330"><a href="#cb14-330" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **SQL Injection vía prompt** <span class="pp">|</span> Solo permitir SELECT, sanitizar query <span class="pp">|</span></span>
-<span id="cb14-331"><a href="#cb14-331" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Data leakage** <span class="pp">|</span> Limitar filas devueltas (TOP 100), no exponer columnas sensibles <span class="pp">|</span></span>
-<span id="cb14-332"><a href="#cb14-332" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Path traversal** <span class="pp">|</span> Validar rutas con <span class="in">`os.path.abspath`</span>, restringir a un directorio base <span class="pp">|</span></span>
-<span id="cb14-333"><a href="#cb14-333" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Denegación de servicio** <span class="pp">|</span> Timeout en queries (máx. 5s), límite de memoria <span class="pp">|</span></span>
-<span id="cb14-334"><a href="#cb14-334" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Acceso no autorizado** <span class="pp">|</span> Autenticación en el transporte (API keys), logs de auditoría <span class="pp">|</span></span>
-<span id="cb14-335"><a href="#cb14-335" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Escalada de privilegios** <span class="pp">|</span> Principio de mínimo privilegio: cada tool accede solo a lo que necesita <span class="pp">|</span></span>
-<span id="cb14-336"><a href="#cb14-336" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-337"><a href="#cb14-337" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-309"><a href="#cb14-309" aria-hidden="true" tabindex="-1"></a>Cada servidor MCP es una superficie de ataque. El LLM escribe la entrada de las herramientas y un atacante puede manipular el prompt para inyectar comandos maliciosos (prompt injection):</span>
+<span id="cb14-310"><a href="#cb14-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-311"><a href="#cb14-311" aria-hidden="true" tabindex="-1"></a>::: {#fig-mcp-seguridad}</span>
+<span id="cb14-314"><a href="#cb14-314" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb14-315"><a href="#cb14-315" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb14-316"><a href="#cb14-316" aria-hidden="true" tabindex="-1"></a>    A[Usuario malicioso&lt;br/&gt;inyecta comandos en el prompt] --&gt; B[LLM&lt;br/&gt;genera query alterada]</span>
+<span id="cb14-317"><a href="#cb14-317" aria-hidden="true" tabindex="-1"></a>    B --&gt; C[Servidor MCP&lt;br/&gt;¿valida?]</span>
+<span id="cb14-318"><a href="#cb14-318" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Sin validación| D[<span class="ot">"</span><span class="st">Ejecuta&lt;br/&gt;DROP TABLE</span><span class="ot">"</span>]</span>
+<span id="cb14-319"><a href="#cb14-319" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Con validación| E[✅ Bloquea&lt;br/&gt;y notifica]</span>
+<span id="cb14-320"><a href="#cb14-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-321"><a href="#cb14-321" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#c62828,color:#fff</span></span>
+<span id="cb14-322"><a href="#cb14-322" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#c62828,color:#fff</span></span>
+<span id="cb14-323"><a href="#cb14-323" aria-hidden="true" tabindex="-1"></a>    style E fill:<span class="co">#2e7d32,color:#fff</span></span>
+<span id="cb14-324"><a href="#cb14-324" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-325"><a href="#cb14-325" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-326"><a href="#cb14-326" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-327"><a href="#cb14-327" aria-hidden="true" tabindex="-1"></a>::: {.callout-warning}</span>
+<span id="cb14-328"><a href="#cb14-328" aria-hidden="true" tabindex="-1"></a><span class="fu">## Checklist de seguridad MCP</span></span>
+<span id="cb14-329"><a href="#cb14-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-330"><a href="#cb14-330" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Riesgo <span class="pp">|</span> Mitigación <span class="pp">|</span></span>
+<span id="cb14-331"><a href="#cb14-331" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|</span></span>
+<span id="cb14-332"><a href="#cb14-332" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **SQL Injection vía prompt** <span class="pp">|</span> Solo permitir SELECT, sanitizar query <span class="pp">|</span></span>
+<span id="cb14-333"><a href="#cb14-333" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Data leakage** <span class="pp">|</span> Limitar filas devueltas (TOP 100), no exponer columnas sensibles <span class="pp">|</span></span>
+<span id="cb14-334"><a href="#cb14-334" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Path traversal** <span class="pp">|</span> Validar rutas con <span class="in">`os.path.abspath`</span>, restringir a un directorio base <span class="pp">|</span></span>
+<span id="cb14-335"><a href="#cb14-335" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Denegación de servicio** <span class="pp">|</span> Timeout en queries (máx. 5s), límite de memoria <span class="pp">|</span></span>
+<span id="cb14-336"><a href="#cb14-336" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Acceso no autorizado** <span class="pp">|</span> Autenticación en el transporte (API keys), logs de auditoría <span class="pp">|</span></span>
+<span id="cb14-337"><a href="#cb14-337" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> **Escalada de privilegios** <span class="pp">|</span> Principio de mínimo privilegio: cada tool accede solo a lo que necesita <span class="pp">|</span></span>
 <span id="cb14-338"><a href="#cb14-338" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-339"><a href="#cb14-339" aria-hidden="true" tabindex="-1"></a><span class="fu">### Servidor MCP completo para ejecutar como script {#sec-servidor-mcp-script}</span></span>
+<span id="cb14-339"><a href="#cb14-339" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb14-340"><a href="#cb14-340" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-341"><a href="#cb14-341" aria-hidden="true" tabindex="-1"></a>Guarda el siguiente código en <span class="in">`servidor_mcp.py`</span> y ejecútalo con <span class="in">`python servidor_mcp.py`</span>. Los clientes LLM pueden conectarse vía stdio:</span>
+<span id="cb14-341"><a href="#cb14-341" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Demo interactiva:** </span><span class="co">[</span><span class="ot">inyección de prompt</span><span class="co">](../demos/inyeccion.qmd)</span><span class="at">. Un correo con texto oculto intenta que un agente envíe datos fuera de la empresa; activa defensas y comprueba cuáles lo paran.</span></span>
 <span id="cb14-342"><a href="#cb14-342" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-345"><a href="#cb14-345" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-346"><a href="#cb14-346" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb14-347"><a href="#cb14-347" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb14-348"><a href="#cb14-348" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-349"><a href="#cb14-349" aria-hidden="true" tabindex="-1"></a><span class="co"># servidor_mcp.py — Servidor listo para producción</span></span>
-<span id="cb14-350"><a href="#cb14-350" aria-hidden="true" tabindex="-1"></a><span class="co"># Para ejecutar: python servidor_mcp.py</span></span>
-<span id="cb14-351"><a href="#cb14-351" aria-hidden="true" tabindex="-1"></a><span class="co"># El servidor queda escuchando por stdio</span></span>
+<span id="cb14-343"><a href="#cb14-343" aria-hidden="true" tabindex="-1"></a><span class="fu">### Servidor MCP completo para ejecutar como script {#sec-servidor-mcp-script}</span></span>
+<span id="cb14-344"><a href="#cb14-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-345"><a href="#cb14-345" aria-hidden="true" tabindex="-1"></a>Guarda el siguiente código en <span class="in">`servidor_mcp.py`</span> y ejecútalo con <span class="in">`python servidor_mcp.py`</span>. Los clientes LLM pueden conectarse vía stdio:</span>
+<span id="cb14-346"><a href="#cb14-346" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-349"><a href="#cb14-349" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-350"><a href="#cb14-350" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb14-351"><a href="#cb14-351" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
 <span id="cb14-352"><a href="#cb14-352" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-353"><a href="#cb14-353" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> FastMCP</span>
-<span id="cb14-354"><a href="#cb14-354" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
-<span id="cb14-355"><a href="#cb14-355" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb14-353"><a href="#cb14-353" aria-hidden="true" tabindex="-1"></a><span class="co"># servidor_mcp.py — Servidor listo para producción</span></span>
+<span id="cb14-354"><a href="#cb14-354" aria-hidden="true" tabindex="-1"></a><span class="co"># Para ejecutar: python servidor_mcp.py</span></span>
+<span id="cb14-355"><a href="#cb14-355" aria-hidden="true" tabindex="-1"></a><span class="co"># El servidor queda escuchando por stdio</span></span>
 <span id="cb14-356"><a href="#cb14-356" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-357"><a href="#cb14-357" aria-hidden="true" tabindex="-1"></a>mcp <span class="op">=</span> FastMCP(<span class="st">"Servidor Corporativo"</span>)</span>
-<span id="cb14-358"><a href="#cb14-358" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-359"><a href="#cb14-359" aria-hidden="true" tabindex="-1"></a>DB_PATH <span class="op">=</span> os.path.join(os.path.dirname(<span class="va">__file__</span>), <span class="st">"datos"</span>, <span class="st">"corporativa.db"</span>)</span>
+<span id="cb14-357"><a href="#cb14-357" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> FastMCP</span>
+<span id="cb14-358"><a href="#cb14-358" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sqlite3</span>
+<span id="cb14-359"><a href="#cb14-359" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
 <span id="cb14-360"><a href="#cb14-360" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-361"><a href="#cb14-361" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _sanitizar(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb14-362"><a href="#cb14-362" aria-hidden="true" tabindex="-1"></a>    prohibidos <span class="op">=</span> [<span class="st">"DROP"</span>, <span class="st">"DELETE"</span>, <span class="st">"UPDATE"</span>, <span class="st">"INSERT"</span>, <span class="st">"ALTER"</span>, <span class="st">"CREATE"</span>, <span class="st">"TRUNCATE"</span>]</span>
-<span id="cb14-363"><a href="#cb14-363" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> cmd <span class="kw">in</span> prohibidos:</span>
-<span id="cb14-364"><a href="#cb14-364" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cmd <span class="kw">in</span> query.upper():</span>
-<span id="cb14-365"><a href="#cb14-365" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Operación bloqueada: </span><span class="sc">{</span>cmd<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-366"><a href="#cb14-366" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> query.upper().strip().startswith(<span class="st">"SELECT"</span>):</span>
-<span id="cb14-367"><a href="#cb14-367" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Solo SELECT permitido"</span>)</span>
-<span id="cb14-368"><a href="#cb14-368" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> query</span>
-<span id="cb14-369"><a href="#cb14-369" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-370"><a href="#cb14-370" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
-<span id="cb14-371"><a href="#cb14-371" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> consultar_ventas(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb14-372"><a href="#cb14-372" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
-<span id="cb14-373"><a href="#cb14-373" aria-hidden="true" tabindex="-1"></a><span class="co">    Ejecuta una consulta SELECT en la BD corporativa.</span></span>
-<span id="cb14-374"><a href="#cb14-374" aria-hidden="true" tabindex="-1"></a><span class="co">    Tablas: ventas(id, fecha, producto, importe, cliente_id), clientes(id, nombre, sector)</span></span>
-<span id="cb14-375"><a href="#cb14-375" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
-<span id="cb14-376"><a href="#cb14-376" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
-<span id="cb14-377"><a href="#cb14-377" aria-hidden="true" tabindex="-1"></a>        query <span class="op">=</span> _sanitizar(query)</span>
-<span id="cb14-378"><a href="#cb14-378" aria-hidden="true" tabindex="-1"></a>        conn <span class="op">=</span> sqlite3.<span class="ex">connect</span>(DB_PATH)</span>
-<span id="cb14-379"><a href="#cb14-379" aria-hidden="true" tabindex="-1"></a>        cursor <span class="op">=</span> conn.cursor()</span>
-<span id="cb14-380"><a href="#cb14-380" aria-hidden="true" tabindex="-1"></a>        cursor.execute(query)</span>
-<span id="cb14-381"><a href="#cb14-381" aria-hidden="true" tabindex="-1"></a>        cols <span class="op">=</span> [d[<span class="dv">0</span>] <span class="cf">for</span> d <span class="kw">in</span> cursor.description]</span>
-<span id="cb14-382"><a href="#cb14-382" aria-hidden="true" tabindex="-1"></a>        rows <span class="op">=</span> cursor.fetchall()</span>
-<span id="cb14-383"><a href="#cb14-383" aria-hidden="true" tabindex="-1"></a>        conn.close()</span>
-<span id="cb14-384"><a href="#cb14-384" aria-hidden="true" tabindex="-1"></a>        header <span class="op">=</span> <span class="st">" | "</span>.join(cols) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span> <span class="op">+</span> <span class="st">"-"</span> <span class="op">*</span> <span class="dv">50</span> <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span></span>
-<span id="cb14-385"><a href="#cb14-385" aria-hidden="true" tabindex="-1"></a>        body <span class="op">=</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(<span class="st">" | "</span>.join(<span class="bu">str</span>(v) <span class="cf">for</span> v <span class="kw">in</span> r) <span class="cf">for</span> r <span class="kw">in</span> rows[:<span class="dv">100</span>])</span>
-<span id="cb14-386"><a href="#cb14-386" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> header <span class="op">+</span> body <span class="op">+</span> <span class="ss">f"</span><span class="ch">\n\n</span><span class="sc">{</span><span class="bu">len</span>(rows)<span class="sc">}</span><span class="ss"> filas."</span></span>
-<span id="cb14-387"><a href="#cb14-387" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
-<span id="cb14-388"><a href="#cb14-388" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span></span>
-<span id="cb14-389"><a href="#cb14-389" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-390"><a href="#cb14-390" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"schema://tablas"</span>)</span>
-<span id="cb14-391"><a href="#cb14-391" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> esquema_bd() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb14-392"><a href="#cb14-392" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Devuelve el esquema SQL de todas las tablas."""</span></span>
-<span id="cb14-393"><a href="#cb14-393" aria-hidden="true" tabindex="-1"></a>    conn <span class="op">=</span> sqlite3.<span class="ex">connect</span>(DB_PATH)</span>
-<span id="cb14-394"><a href="#cb14-394" aria-hidden="true" tabindex="-1"></a>    cursor <span class="op">=</span> conn.cursor()</span>
-<span id="cb14-395"><a href="#cb14-395" aria-hidden="true" tabindex="-1"></a>    cursor.execute(<span class="st">"SELECT sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"</span>)</span>
-<span id="cb14-396"><a href="#cb14-396" aria-hidden="true" tabindex="-1"></a>    schemas <span class="op">=</span> [r[<span class="dv">0</span>] <span class="cf">for</span> r <span class="kw">in</span> cursor.fetchall() <span class="cf">if</span> r[<span class="dv">0</span>]]</span>
-<span id="cb14-397"><a href="#cb14-397" aria-hidden="true" tabindex="-1"></a>    conn.close()</span>
-<span id="cb14-398"><a href="#cb14-398" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"</span><span class="ch">\n\n</span><span class="st">"</span>.join(schemas) <span class="cf">if</span> schemas <span class="cf">else</span> <span class="st">"Sin tablas definidas."</span></span>
-<span id="cb14-399"><a href="#cb14-399" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-400"><a href="#cb14-400" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
-<span id="cb14-401"><a href="#cb14-401" aria-hidden="true" tabindex="-1"></a>    mcp.run()</span>
-<span id="cb14-402"><a href="#cb14-402" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-361"><a href="#cb14-361" aria-hidden="true" tabindex="-1"></a>mcp <span class="op">=</span> FastMCP(<span class="st">"Servidor Corporativo"</span>)</span>
+<span id="cb14-362"><a href="#cb14-362" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-363"><a href="#cb14-363" aria-hidden="true" tabindex="-1"></a>DB_PATH <span class="op">=</span> os.path.join(os.path.dirname(<span class="va">__file__</span>), <span class="st">"datos"</span>, <span class="st">"corporativa.db"</span>)</span>
+<span id="cb14-364"><a href="#cb14-364" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-365"><a href="#cb14-365" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> _sanitizar(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb14-366"><a href="#cb14-366" aria-hidden="true" tabindex="-1"></a>    prohibidos <span class="op">=</span> [<span class="st">"DROP"</span>, <span class="st">"DELETE"</span>, <span class="st">"UPDATE"</span>, <span class="st">"INSERT"</span>, <span class="st">"ALTER"</span>, <span class="st">"CREATE"</span>, <span class="st">"TRUNCATE"</span>]</span>
+<span id="cb14-367"><a href="#cb14-367" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> cmd <span class="kw">in</span> prohibidos:</span>
+<span id="cb14-368"><a href="#cb14-368" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cmd <span class="kw">in</span> query.upper():</span>
+<span id="cb14-369"><a href="#cb14-369" aria-hidden="true" tabindex="-1"></a>            <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="ss">f"Operación bloqueada: </span><span class="sc">{</span>cmd<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-370"><a href="#cb14-370" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> query.upper().strip().startswith(<span class="st">"SELECT"</span>):</span>
+<span id="cb14-371"><a href="#cb14-371" aria-hidden="true" tabindex="-1"></a>        <span class="cf">raise</span> <span class="pp">ValueError</span>(<span class="st">"Solo SELECT permitido"</span>)</span>
+<span id="cb14-372"><a href="#cb14-372" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> query</span>
+<span id="cb14-373"><a href="#cb14-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-374"><a href="#cb14-374" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.tool</span>()</span>
+<span id="cb14-375"><a href="#cb14-375" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> consultar_ventas(query: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb14-376"><a href="#cb14-376" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""</span></span>
+<span id="cb14-377"><a href="#cb14-377" aria-hidden="true" tabindex="-1"></a><span class="co">    Ejecuta una consulta SELECT en la BD corporativa.</span></span>
+<span id="cb14-378"><a href="#cb14-378" aria-hidden="true" tabindex="-1"></a><span class="co">    Tablas: ventas(id, fecha, producto, importe, cliente_id), clientes(id, nombre, sector)</span></span>
+<span id="cb14-379"><a href="#cb14-379" aria-hidden="true" tabindex="-1"></a><span class="co">    """</span></span>
+<span id="cb14-380"><a href="#cb14-380" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb14-381"><a href="#cb14-381" aria-hidden="true" tabindex="-1"></a>        query <span class="op">=</span> _sanitizar(query)</span>
+<span id="cb14-382"><a href="#cb14-382" aria-hidden="true" tabindex="-1"></a>        conn <span class="op">=</span> sqlite3.<span class="ex">connect</span>(DB_PATH)</span>
+<span id="cb14-383"><a href="#cb14-383" aria-hidden="true" tabindex="-1"></a>        cursor <span class="op">=</span> conn.cursor()</span>
+<span id="cb14-384"><a href="#cb14-384" aria-hidden="true" tabindex="-1"></a>        cursor.execute(query)</span>
+<span id="cb14-385"><a href="#cb14-385" aria-hidden="true" tabindex="-1"></a>        cols <span class="op">=</span> [d[<span class="dv">0</span>] <span class="cf">for</span> d <span class="kw">in</span> cursor.description]</span>
+<span id="cb14-386"><a href="#cb14-386" aria-hidden="true" tabindex="-1"></a>        rows <span class="op">=</span> cursor.fetchall()</span>
+<span id="cb14-387"><a href="#cb14-387" aria-hidden="true" tabindex="-1"></a>        conn.close()</span>
+<span id="cb14-388"><a href="#cb14-388" aria-hidden="true" tabindex="-1"></a>        header <span class="op">=</span> <span class="st">" | "</span>.join(cols) <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span> <span class="op">+</span> <span class="st">"-"</span> <span class="op">*</span> <span class="dv">50</span> <span class="op">+</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span></span>
+<span id="cb14-389"><a href="#cb14-389" aria-hidden="true" tabindex="-1"></a>        body <span class="op">=</span> <span class="st">"</span><span class="ch">\n</span><span class="st">"</span>.join(<span class="st">" | "</span>.join(<span class="bu">str</span>(v) <span class="cf">for</span> v <span class="kw">in</span> r) <span class="cf">for</span> r <span class="kw">in</span> rows[:<span class="dv">100</span>])</span>
+<span id="cb14-390"><a href="#cb14-390" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> header <span class="op">+</span> body <span class="op">+</span> <span class="ss">f"</span><span class="ch">\n\n</span><span class="sc">{</span><span class="bu">len</span>(rows)<span class="sc">}</span><span class="ss"> filas."</span></span>
+<span id="cb14-391"><a href="#cb14-391" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span> <span class="pp">Exception</span> <span class="im">as</span> e:</span>
+<span id="cb14-392"><a href="#cb14-392" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f"Error: </span><span class="sc">{</span>e<span class="sc">}</span><span class="ss">"</span></span>
+<span id="cb14-393"><a href="#cb14-393" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-394"><a href="#cb14-394" aria-hidden="true" tabindex="-1"></a><span class="at">@mcp.resource</span>(<span class="st">"schema://tablas"</span>)</span>
+<span id="cb14-395"><a href="#cb14-395" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> esquema_bd() <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb14-396"><a href="#cb14-396" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""Devuelve el esquema SQL de todas las tablas."""</span></span>
+<span id="cb14-397"><a href="#cb14-397" aria-hidden="true" tabindex="-1"></a>    conn <span class="op">=</span> sqlite3.<span class="ex">connect</span>(DB_PATH)</span>
+<span id="cb14-398"><a href="#cb14-398" aria-hidden="true" tabindex="-1"></a>    cursor <span class="op">=</span> conn.cursor()</span>
+<span id="cb14-399"><a href="#cb14-399" aria-hidden="true" tabindex="-1"></a>    cursor.execute(<span class="st">"SELECT sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"</span>)</span>
+<span id="cb14-400"><a href="#cb14-400" aria-hidden="true" tabindex="-1"></a>    schemas <span class="op">=</span> [r[<span class="dv">0</span>] <span class="cf">for</span> r <span class="kw">in</span> cursor.fetchall() <span class="cf">if</span> r[<span class="dv">0</span>]]</span>
+<span id="cb14-401"><a href="#cb14-401" aria-hidden="true" tabindex="-1"></a>    conn.close()</span>
+<span id="cb14-402"><a href="#cb14-402" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"</span><span class="ch">\n\n</span><span class="st">"</span>.join(schemas) <span class="cf">if</span> schemas <span class="cf">else</span> <span class="st">"Sin tablas definidas."</span></span>
 <span id="cb14-403"><a href="#cb14-403" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-404"><a href="#cb14-404" aria-hidden="true" tabindex="-1"></a><span class="fu">### Conexión desde un cliente LLM {#sec-mcp-cliente}</span></span>
-<span id="cb14-405"><a href="#cb14-405" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-406"><a href="#cb14-406" aria-hidden="true" tabindex="-1"></a>Un cliente (LLM o aplicación) se conecta al servidor MCP lanzándolo como subproceso:</span>
+<span id="cb14-404"><a href="#cb14-404" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">"__main__"</span>:</span>
+<span id="cb14-405"><a href="#cb14-405" aria-hidden="true" tabindex="-1"></a>    mcp.run()</span>
+<span id="cb14-406"><a href="#cb14-406" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb14-407"><a href="#cb14-407" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-410"><a href="#cb14-410" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb14-411"><a href="#cb14-411" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb14-412"><a href="#cb14-412" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb14-413"><a href="#cb14-413" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-414"><a href="#cb14-414" aria-hidden="true" tabindex="-1"></a><span class="co"># cliente_mcp.py — Cómo conectar un LLM al servidor MCP</span></span>
-<span id="cb14-415"><a href="#cb14-415" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> asyncio</span>
-<span id="cb14-416"><a href="#cb14-416" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> Client</span>
+<span id="cb14-408"><a href="#cb14-408" aria-hidden="true" tabindex="-1"></a><span class="fu">### Conexión desde un cliente LLM {#sec-mcp-cliente}</span></span>
+<span id="cb14-409"><a href="#cb14-409" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-410"><a href="#cb14-410" aria-hidden="true" tabindex="-1"></a>Un cliente (LLM o aplicación) se conecta al servidor MCP lanzándolo como subproceso:</span>
+<span id="cb14-411"><a href="#cb14-411" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-414"><a href="#cb14-414" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb14-415"><a href="#cb14-415" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb14-416"><a href="#cb14-416" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
 <span id="cb14-417"><a href="#cb14-417" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-418"><a href="#cb14-418" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
-<span id="cb14-419"><a href="#cb14-419" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">with</span> Client(<span class="st">"python"</span>, <span class="st">"servidor_mcp.py"</span>) <span class="im">as</span> client:</span>
-<span id="cb14-420"><a href="#cb14-420" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Listar herramientas disponibles</span></span>
-<span id="cb14-421"><a href="#cb14-421" aria-hidden="true" tabindex="-1"></a>        tools <span class="op">=</span> <span class="cf">await</span> client.list_tools()</span>
-<span id="cb14-422"><a href="#cb14-422" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Herramientas disponibles:"</span>)</span>
-<span id="cb14-423"><a href="#cb14-423" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> t <span class="kw">in</span> tools:</span>
-<span id="cb14-424"><a href="#cb14-424" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  - </span><span class="sc">{</span>t<span class="sc">.</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>t<span class="sc">.</span>description<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-425"><a href="#cb14-425" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-426"><a href="#cb14-426" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Ejecutar una consulta</span></span>
-<span id="cb14-427"><a href="#cb14-427" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> <span class="cf">await</span> client.call_tool(</span>
-<span id="cb14-428"><a href="#cb14-428" aria-hidden="true" tabindex="-1"></a>            <span class="st">"consultar_ventas"</span>,</span>
-<span id="cb14-429"><a href="#cb14-429" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"query"</span>: <span class="st">"SELECT * FROM ventas WHERE importe &gt; 30000"</span>}</span>
-<span id="cb14-430"><a href="#cb14-430" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb14-431"><a href="#cb14-431" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Resultado:</span><span class="ch">\n</span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb14-432"><a href="#cb14-432" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-433"><a href="#cb14-433" aria-hidden="true" tabindex="-1"></a>asyncio.run(main())</span>
-<span id="cb14-434"><a href="#cb14-434" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-435"><a href="#cb14-435" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-436"><a href="#cb14-436" aria-hidden="true" tabindex="-1"></a><span class="fu">### Resumen visual {#sec-mcp-resumen}</span></span>
-<span id="cb14-437"><a href="#cb14-437" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-438"><a href="#cb14-438" aria-hidden="true" tabindex="-1"></a>::: {#fig-mcp-resumen-visual}</span>
-<span id="cb14-441"><a href="#cb14-441" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb14-442"><a href="#cb14-442" aria-hidden="true" tabindex="-1"></a>graph TD</span>
-<span id="cb14-443"><a href="#cb14-443" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Tu aplicación</span><span class="ot">"</span></span>
-<span id="cb14-444"><a href="#cb14-444" aria-hidden="true" tabindex="-1"></a>        A[Usuario&lt;br/&gt;pregunta en NL]</span>
-<span id="cb14-445"><a href="#cb14-445" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb14-446"><a href="#cb14-446" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-447"><a href="#cb14-447" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Cliente MCP</span><span class="ot">"</span></span>
-<span id="cb14-448"><a href="#cb14-448" aria-hidden="true" tabindex="-1"></a>        B[LLM&lt;br/&gt;interpreta pregunta]</span>
-<span id="cb14-449"><a href="#cb14-449" aria-hidden="true" tabindex="-1"></a>        C[Decision&lt;br/&gt;¿qué tool usar?]</span>
-<span id="cb14-450"><a href="#cb14-450" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb14-451"><a href="#cb14-451" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-452"><a href="#cb14-452" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Servidor MCP (stdio)</span><span class="ot">"</span></span>
-<span id="cb14-453"><a href="#cb14-453" aria-hidden="true" tabindex="-1"></a>        D[Tool: consultar_ventas]</span>
-<span id="cb14-454"><a href="#cb14-454" aria-hidden="true" tabindex="-1"></a>        E[Tool: contar_palabras]</span>
-<span id="cb14-455"><a href="#cb14-455" aria-hidden="true" tabindex="-1"></a>        F[Resource: schema]</span>
-<span id="cb14-456"><a href="#cb14-456" aria-hidden="true" tabindex="-1"></a>    end</span>
-<span id="cb14-457"><a href="#cb14-457" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-458"><a href="#cb14-458" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Datos</span><span class="ot">"</span></span>
-<span id="cb14-459"><a href="#cb14-459" aria-hidden="true" tabindex="-1"></a>        G[(SQLite)]</span>
+<span id="cb14-418"><a href="#cb14-418" aria-hidden="true" tabindex="-1"></a><span class="co"># cliente_mcp.py — Cómo conectar un LLM al servidor MCP</span></span>
+<span id="cb14-419"><a href="#cb14-419" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> asyncio</span>
+<span id="cb14-420"><a href="#cb14-420" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> fastmcp <span class="im">import</span> Client</span>
+<span id="cb14-421"><a href="#cb14-421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-422"><a href="#cb14-422" aria-hidden="true" tabindex="-1"></a><span class="cf">async</span> <span class="kw">def</span> main():</span>
+<span id="cb14-423"><a href="#cb14-423" aria-hidden="true" tabindex="-1"></a>    <span class="cf">async</span> <span class="cf">with</span> Client(<span class="st">"python"</span>, <span class="st">"servidor_mcp.py"</span>) <span class="im">as</span> client:</span>
+<span id="cb14-424"><a href="#cb14-424" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Listar herramientas disponibles</span></span>
+<span id="cb14-425"><a href="#cb14-425" aria-hidden="true" tabindex="-1"></a>        tools <span class="op">=</span> <span class="cf">await</span> client.list_tools()</span>
+<span id="cb14-426"><a href="#cb14-426" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">"Herramientas disponibles:"</span>)</span>
+<span id="cb14-427"><a href="#cb14-427" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> t <span class="kw">in</span> tools:</span>
+<span id="cb14-428"><a href="#cb14-428" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f"  - </span><span class="sc">{</span>t<span class="sc">.</span>name<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>t<span class="sc">.</span>description<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-429"><a href="#cb14-429" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-430"><a href="#cb14-430" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Ejecutar una consulta</span></span>
+<span id="cb14-431"><a href="#cb14-431" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> <span class="cf">await</span> client.call_tool(</span>
+<span id="cb14-432"><a href="#cb14-432" aria-hidden="true" tabindex="-1"></a>            <span class="st">"consultar_ventas"</span>,</span>
+<span id="cb14-433"><a href="#cb14-433" aria-hidden="true" tabindex="-1"></a>            {<span class="st">"query"</span>: <span class="st">"SELECT * FROM ventas WHERE importe &gt; 30000"</span>}</span>
+<span id="cb14-434"><a href="#cb14-434" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb14-435"><a href="#cb14-435" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">Resultado:</span><span class="ch">\n</span><span class="sc">{</span>result<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb14-436"><a href="#cb14-436" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-437"><a href="#cb14-437" aria-hidden="true" tabindex="-1"></a>asyncio.run(main())</span>
+<span id="cb14-438"><a href="#cb14-438" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-439"><a href="#cb14-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-440"><a href="#cb14-440" aria-hidden="true" tabindex="-1"></a><span class="fu">### Resumen visual {#sec-mcp-resumen}</span></span>
+<span id="cb14-441"><a href="#cb14-441" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-442"><a href="#cb14-442" aria-hidden="true" tabindex="-1"></a>::: {#fig-mcp-resumen-visual}</span>
+<span id="cb14-445"><a href="#cb14-445" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb14-446"><a href="#cb14-446" aria-hidden="true" tabindex="-1"></a>graph TD</span>
+<span id="cb14-447"><a href="#cb14-447" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Tu aplicación</span><span class="ot">"</span></span>
+<span id="cb14-448"><a href="#cb14-448" aria-hidden="true" tabindex="-1"></a>        A[Usuario&lt;br/&gt;pregunta en NL]</span>
+<span id="cb14-449"><a href="#cb14-449" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb14-450"><a href="#cb14-450" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-451"><a href="#cb14-451" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Cliente MCP</span><span class="ot">"</span></span>
+<span id="cb14-452"><a href="#cb14-452" aria-hidden="true" tabindex="-1"></a>        B[LLM&lt;br/&gt;interpreta pregunta]</span>
+<span id="cb14-453"><a href="#cb14-453" aria-hidden="true" tabindex="-1"></a>        C[Decision&lt;br/&gt;¿qué tool usar?]</span>
+<span id="cb14-454"><a href="#cb14-454" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb14-455"><a href="#cb14-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-456"><a href="#cb14-456" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Servidor MCP (stdio)</span><span class="ot">"</span></span>
+<span id="cb14-457"><a href="#cb14-457" aria-hidden="true" tabindex="-1"></a>        D[Tool: consultar_ventas]</span>
+<span id="cb14-458"><a href="#cb14-458" aria-hidden="true" tabindex="-1"></a>        E[Tool: contar_palabras]</span>
+<span id="cb14-459"><a href="#cb14-459" aria-hidden="true" tabindex="-1"></a>        F[Resource: schema]</span>
 <span id="cb14-460"><a href="#cb14-460" aria-hidden="true" tabindex="-1"></a>    end</span>
 <span id="cb14-461"><a href="#cb14-461" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-462"><a href="#cb14-462" aria-hidden="true" tabindex="-1"></a>    A --&gt; B</span>
-<span id="cb14-463"><a href="#cb14-463" aria-hidden="true" tabindex="-1"></a>    B --&gt; C</span>
-<span id="cb14-464"><a href="#cb14-464" aria-hidden="true" tabindex="-1"></a>    C --&gt; D</span>
-<span id="cb14-465"><a href="#cb14-465" aria-hidden="true" tabindex="-1"></a>    C --&gt; E</span>
-<span id="cb14-466"><a href="#cb14-466" aria-hidden="true" tabindex="-1"></a>    D --&gt; G</span>
-<span id="cb14-467"><a href="#cb14-467" aria-hidden="true" tabindex="-1"></a>    F --&gt; G</span>
-<span id="cb14-468"><a href="#cb14-468" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-469"><a href="#cb14-469" aria-hidden="true" tabindex="-1"></a>    H[Sanitización&lt;br/&gt;+ límites + logs] -.-&gt; D</span>
-<span id="cb14-470"><a href="#cb14-470" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-471"><a href="#cb14-471" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
-<span id="cb14-472"><a href="#cb14-472" aria-hidden="true" tabindex="-1"></a>    style B fill:<span class="co">#306998,color:#fff</span></span>
-<span id="cb14-473"><a href="#cb14-473" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#e65100,color:#fff</span></span>
-<span id="cb14-474"><a href="#cb14-474" aria-hidden="true" tabindex="-1"></a>    style G fill:<span class="co">#FFD43B,color:#000</span></span>
-<span id="cb14-475"><a href="#cb14-475" aria-hidden="true" tabindex="-1"></a>    style H fill:<span class="co">#c62828,color:#fff</span></span>
-<span id="cb14-476"><a href="#cb14-476" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb14-477"><a href="#cb14-477" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb14-478"><a href="#cb14-478" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-479"><a href="#cb14-479" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Lectura recomendada:** </span><span class="co">[</span><span class="ot">Model Context Protocol Specification</span><span class="co">](https://spec.modelcontextprotocol.io/)</span><span class="at"> </span><span class="pp">|</span><span class="at"> </span><span class="co">[</span><span class="ot">FastMCP Documentation</span><span class="co">](https://gofastmcp.com/)</span><span class="at"> </span><span class="co">[</span><span class="ot">@mcp</span><span class="co">]</span><span class="at">.</span></span>
-<span id="cb14-480"><a href="#cb14-480" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-481"><a href="#cb14-481" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb14-462"><a href="#cb14-462" aria-hidden="true" tabindex="-1"></a>    subgraph <span class="ot">"</span><span class="st">Datos</span><span class="ot">"</span></span>
+<span id="cb14-463"><a href="#cb14-463" aria-hidden="true" tabindex="-1"></a>        G[(SQLite)]</span>
+<span id="cb14-464"><a href="#cb14-464" aria-hidden="true" tabindex="-1"></a>    end</span>
+<span id="cb14-465"><a href="#cb14-465" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-466"><a href="#cb14-466" aria-hidden="true" tabindex="-1"></a>    A --&gt; B</span>
+<span id="cb14-467"><a href="#cb14-467" aria-hidden="true" tabindex="-1"></a>    B --&gt; C</span>
+<span id="cb14-468"><a href="#cb14-468" aria-hidden="true" tabindex="-1"></a>    C --&gt; D</span>
+<span id="cb14-469"><a href="#cb14-469" aria-hidden="true" tabindex="-1"></a>    C --&gt; E</span>
+<span id="cb14-470"><a href="#cb14-470" aria-hidden="true" tabindex="-1"></a>    D --&gt; G</span>
+<span id="cb14-471"><a href="#cb14-471" aria-hidden="true" tabindex="-1"></a>    F --&gt; G</span>
+<span id="cb14-472"><a href="#cb14-472" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-473"><a href="#cb14-473" aria-hidden="true" tabindex="-1"></a>    H[Sanitización&lt;br/&gt;+ límites + logs] -.-&gt; D</span>
+<span id="cb14-474"><a href="#cb14-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-475"><a href="#cb14-475" aria-hidden="true" tabindex="-1"></a>    style A fill:<span class="co">#4B8BBE,color:#fff</span></span>
+<span id="cb14-476"><a href="#cb14-476" aria-hidden="true" tabindex="-1"></a>    style B fill:<span class="co">#306998,color:#fff</span></span>
+<span id="cb14-477"><a href="#cb14-477" aria-hidden="true" tabindex="-1"></a>    style D fill:<span class="co">#e65100,color:#fff</span></span>
+<span id="cb14-478"><a href="#cb14-478" aria-hidden="true" tabindex="-1"></a>    style G fill:<span class="co">#FFD43B,color:#000</span></span>
+<span id="cb14-479"><a href="#cb14-479" aria-hidden="true" tabindex="-1"></a>    style H fill:<span class="co">#c62828,color:#fff</span></span>
+<span id="cb14-480"><a href="#cb14-480" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb14-481"><a href="#cb14-481" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb14-482"><a href="#cb14-482" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb14-483"><a href="#cb14-483" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
-<span id="cb14-484"><a href="#cb14-484" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb14-483"><a href="#cb14-483" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Lectura recomendada:** </span><span class="co">[</span><span class="ot">Model Context Protocol Specification</span><span class="co">](https://spec.modelcontextprotocol.io/)</span><span class="at"> </span><span class="pp">|</span><span class="at"> </span><span class="co">[</span><span class="ot">FastMCP Documentation</span><span class="co">](https://gofastmcp.com/)</span><span class="at"> </span><span class="co">[</span><span class="ot">@mcp</span><span class="co">]</span><span class="at">.</span></span>
+<span id="cb14-484"><a href="#cb14-484" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-485"><a href="#cb14-485" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb14-486"><a href="#cb14-486" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-487"><a href="#cb14-487" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb14-488"><a href="#cb14-488" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

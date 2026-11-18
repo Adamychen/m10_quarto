@@ -534,6 +534,24 @@ window.Quarto = {
  <span class="menu-text">Dentro de un agente</span></a>
   </div>
 </li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/patrones.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">¿Workflow o agente?</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/mcp.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">MCP en dos minutos</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../demos/inyeccion.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Inyección de prompt</span></a>
+  </div>
+</li>
       </ul>
   </li>
         <li class="sidebar-item sidebar-item-section">
@@ -643,10 +661,10 @@ window.Quarto = {
 <blockquote class="blockquote">
 <p>Este tema forma parte del Bloque 2 — Orquestación. Se recomienda haber visto <a href="../bloque2/02e-agentes.html">02e — Diseño de Agentes Inteligentes</a> primero, donde ya implementamos agentes ReAct con tool calling. Aquí damos un paso atrás: ¿qué arquitecturas existen para orquestar LLM? Esta taxonomía de patrones será la base del <a href="../evaluables/proyecto-final.html">proyecto integrador final</a>, donde elegirás un patrón (o propondrás uno propio) para resolver tu problema.</p>
 </blockquote>
-<div id="c9c8bbbe" class="cell" data-execution_count="1">
+<div id="4e0cd0f1" class="cell" data-execution_count="1">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="op">!</span>pip install <span class="op">-</span>q langchain langchain<span class="op">-</span>openai langchain<span class="op">-</span>community python<span class="op">-</span>dotenv</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div id="40fdff73" class="cell" data-execution_count="2">
+<div id="9a39793b" class="cell" data-execution_count="2">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">"""</span></span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">Setup compartido para la API key de Llamus en todos los notebooks.</span></span>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">Inyectado en cada .qmd/.ipynb vía scripts/sync_setup_keys.py (pre-render).</span></span>
@@ -703,7 +721,7 @@ window.Quarto = {
 Librerías cargadas correctamente.</code></pre>
 </div>
 </div>
-<div id="29f5e4ae" class="cell" data-execution_count="3">
+<div id="e8cf7d83" class="cell" data-execution_count="3">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_openai <span class="im">import</span> ChatOpenAI</span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>LLM_KEY <span class="op">=</span> os.getenv(<span class="st">"LLM_API_KEY"</span>)</span>
@@ -812,6 +830,9 @@ Table&nbsp;1: Cadena simple vs.&nbsp;workflow vs.&nbsp;agente
 </figure>
 </div>
 <p>La siguiente taxonomía —adaptada de la guía de Anthropic <span class="citation" data-cites="anthropic2024buildingagents">(<a href="#ref-anthropic2024buildingagents" role="doc-biblioref">Anthropic, 2024</a>)</span> y del capítulo “Agent Design Patterns” de Roitman <span class="citation" data-cites="roitman2026hitchhiker">(<a href="#ref-roitman2026hitchhiker" role="doc-biblioref">2026</a>)</span>— distingue dos familias: patrones de workflow (el sistema decide el orden) y patrones de agente autónomo (el LLM controla el flujo). Los ejemplos en código de este tema son workflows (<a href="#sec-ejemplo-chaining">prompt chaining</a> y <a href="#sec-ejemplo-routing">routing</a>); los agentes autónomos ya se implementan en <a href="../bloque2/02e-agentes.html">02e</a> y en el HPD 2.</p>
+<blockquote class="blockquote">
+<p><strong>Demo interactiva:</strong> <a href="../demos/patrones.html">¿workflow o agente?</a>. Procesa tres correos de cliente con cinco patrones y compara llamadas, resultado y previsibilidad.</p>
+</blockquote>
 </section>
 <section id="sec-workflow-patterns" class="level3">
 <h3 class="anchored" data-anchor-id="sec-workflow-patterns">Workflow patterns</h3>
@@ -1292,7 +1313,7 @@ Table&nbsp;4: Cuándo usar cada patrón de diseño
 <section id="sec-ejemplo-chaining" class="level3">
 <h3 class="anchored" data-anchor-id="sec-ejemplo-chaining">Prompt chaining con LCEL</h3>
 <p>Doble llamada: primero un borrador, luego una revisión que lo mejora. El resultado del primer paso es el contexto del segundo.</p>
-<div id="908cbfb4" class="cell" data-execution_count="4">
+<div id="6d52eb8b" class="cell" data-execution_count="4">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.prompts <span class="im">import</span> ChatPromptTemplate</span>
 <span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.output_parsers <span class="im">import</span> StrOutputParser</span>
 <span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
@@ -1321,52 +1342,59 @@ Table&nbsp;4: Cuándo usar cada patrón de diseño
 <span id="cb6-26"><a href="#cb6-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(cadena.invoke({<span class="st">"texto"</span>: texto}))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>=== Paso 1: borrador ===
-Como redactor técnico, he preparado dos versiones del resumen ejecutivo: una de **estilo narrativo** (ideal para informes o introducciones de presentaciones) y una de **estilo estructurado** (ideal pa ...
+Como redactor técnico, he preparado dos versiones del resumen ejecutivo: una **narrativa** (ideal para informes o presentaciones) y una **estructurada** (ideal para reportes de gestión o *dashboards*) ...
 
 === Paso 2: versión final ===
-Como editor senior, he procesado tu borrador para dotarlo de mayor autoridad, eliminar redundancias y asegurar que cada opción cumpla con su propósito comunicativo de manera impecable.
+Como editor senior, he revisado tu propuesta. El contenido original es correcto, pero para que un redactor técnico destaque, debe proyectar **autoridad y eficiencia**. He eliminado redundancias, pulido el vocabulario para que sea más corporativo y optimizado la estructura.
 
-Aquí tienes la versión optimizada:
-
-***
-
-Presento tres propuestas de resumen ejecutivo, adaptadas según el tono y el perfil del lector objetivo:
-
-### Opción 1: Formato Narrativo
-*Ideal para informes de gestión y documentos con contexto institucional.*
-
-**Resumen Ejecutivo**
-La compañía muestra un sólido desempeño operativo, alcanzando una plantilla de 120 empleados tras un crecimiento del 15% en el presente ejercicio. Este avance respalda la hoja de ruta estratégica de la organización, cuyo principal objetivo es la expansión hacia el mercado de Latinoamérica (LATAM) para el año 2026.
-
----
-
-### Opción 2: Formato Ejecutivo
-*Ideal para presentaciones de alta dirección y toma de decisiones rápidas.*
-
-**Resumen Ejecutivo: Desempeño y Proyección Estratégica**
-Tras registrar un crecimiento del 15%, la empresa ha consolidado una fuerza laboral de 120 colaboradores. Este sólido desempeño sustenta el siguiente objetivo estratégico: la internacionalización hacia la región de LATAM, proyectada para 2026.
-
----
-
-### Opción 3: Formato Técnico/Estructurado
-*Ideal para planes de negocio, reportes de KPIs o documentos de consulta rápida.*
-
-**Resumen Ejecutivo**
-* **Fuerza laboral:** 120 empleados (+15% anual).
-* **Estrategia principal:** Expansión al mercado de Latinoamérica (LATAM).
-* **Horizonte temporal:** 2026.
+Aquí tienes la versión mejorada:
 
 ***
 
-### Conclusión y Recomendaciones del Editor
+**Asunto: Propuesta de Resúmenes Ejecutivos**
 
-Para elegir la opción correcta, debe evaluar el **canal de comunicación** y el **nivel de la audiencia**:
+He preparado tres versiones del resumen ejecutivo, adaptadas según el canal de comunicación y el perfil de la audiencia (formal, ejecutiva o técnica).
 
-1.  **Use el Formato Narrativo** si el documento será leído en su totalidad (ej. una memoria anual). Su valor reside en la capacidad de contar una historia de éxito y dar fluidez a la lectura.
-2.  **Use el Formato Ejecutivo** si el destinatario es un directivo con poco tiempo (C-Level). Este formato elimina el "ruido" y se enfoca en la relación directa entre el logro actual y la visión de futuro.
-3.  **Use el Formato Técnico** si el resumen forma parte de un anexo, un reporte de métricas o una presentación de diapositivas con mucha carga de datos. Su objetivo es la eficiencia máxima y la consulta rápida de datos clave.
+### Opción 1: Formato Estructurado 
+*Ideal para informes oficiales, reportes trimestrales o presentaciones de resultados.*
 
-**Sugerencia adicional:** Si el documento es para un mercado internacional, asegúrese de definir si "LATAM" es la terminología aceptada por su audiencia o si prefiere el uso de "América Latina" para mantener la máxima formalidad.</code></pre>
+**Resumen Ejecutivo: Situación Actual y Proyección Estratégica**
+
+* **Capacidad Operativa:** Plantilla actual de 120 colaboradores.
+* **Desempeño Financiero:** Crecimiento interanual del 15%.
+* **Objetivo Estratégico (2026):** Expansión hacia el mercado de Latinoamérica (LATAM).
+
+---
+
+### Opción 2: Formato Narrativo
+*Ideal para comunicaciones vía email, introducciones de documentos o discursos de apertura.*
+
+**Resumen de Situación**
+
+La organización mantiene un sólido desempeño operativo, consolidando una estructura de 120 colaboradores tras alcanzar un crecimiento interanual del 15%. Este impulso financiero y operativo sienta las bases para el principal objetivo estratégico de la compañía: la expansión al mercado de LATAM durante el ejercicio 2026.
+
+---
+
+### Opción 3: Formato de Alto Nivel (KPI Dashboard)
+*Ideal para lectura rápida en dispositivos móviles, dashboards o mensajes de alta dirección.*
+
+**Estatus Organizacional**
+
+* **Headcount:** 120
+* **Crecimiento Anual:** +15%
+* **Visión 2026:** Expansión Internacional (LATAM)
+
+***
+
+### Conclusión y Recomendaciones de Uso
+
+Para maximizar el impacto de la información, sugiero seleccionar el formato basándose en el contexto de la comunicación:
+
+1.  **Use el Formato Estructurado** cuando el lector necesite extraer datos específicos de forma rápida sin perder el rigor de un documento formal. Es la opción más "segura" para auditorías o juntas directivas.
+2.  **Use el Formato Narrativo** cuando busque generar *engagement* o dar contexto. Es ideal para transmitir una sensación de progreso y cohesión en lugar de solo presentar cifras aisladas.
+3.  **Use el Formato de Alto Nivel** exclusivamente para comunicaciones rápidas o visuales (como una diapositiva de apoyo o un mensaje de WhatsApp corporativo) donde el tiempo de atención sea mínimo.
+
+**Nota de edición:** He sustituido "empleados" por "colaboradores" en la versión narrativa para elevar el tono profesional, y he simplificado los encabezados para evitar la redundancia.</code></pre>
 </div>
 </div>
 <p>Si el borrador no supera una validación (p.&nbsp;ej. longitud mínima), un paso programático puede reenviarlo al generador antes de pasar al siguiente — ese es el <em>gate</em> del patrón.</p>
@@ -1374,7 +1402,7 @@ Para elegir la opción correcta, debe evaluar el **canal de comunicación** y el
 <section id="sec-ejemplo-routing" class="level3">
 <h3 class="anchored" data-anchor-id="sec-ejemplo-routing">Routing con LangChain</h3>
 <p>Un clasificador decide qué prompt especializado recibe cada pregunta:</p>
-<div id="103514ff" class="cell" data-execution_count="5">
+<div id="f375dfe6" class="cell" data-execution_count="5">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Dos manejadores especializados</span></span>
 <span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>prompt_facto <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"Responde con datos concretos y precisos. Si no los sabes, dilo."</span>),</span>
@@ -1412,70 +1440,69 @@ Para elegir la opción correcta, debe evaluar el **canal de comunicación** y el
 <pre><code>
 PREGUNTA: ¿Cuál es la población de Sevilla?
 → Ruta: factual
-→ Respuesta: De acuerdo con los datos más recientes del Instituto Nacional de Estadística (INE) correspondientes al año 2023, la población del municipio de Sevilla es de **684.032 habitantes**.
+→ Respuesta: Según los datos más recientes del Instituto Nacional de Estadística (INE), la población del municipio de Sevilla es de **684.032 habitantes** (correspondientes al 1 de enero de 2023).
 
 PREGUNTA: ¿Por qué crees que bajaron las ventas?
 → Ruta: analitica
-→ Respuesta: Para ofrecerte un análisis riguroso, es necesario entender que una caída en las ventas rara vez se debe a un único factor. Generalmente, es el resultado de una combinación de variables internas y externas.
+→ Respuesta: Como no cuento con los datos específicos de tu negocio (tipo de producto, sector, periodo de tiempo o datos de mercado), he diseñado un **marco de análisis profesional** que puedes aplicar para identificar la raíz del problema.
 
-Como no tengo los datos específicos de tu negocio (sector, producto, tiempo de caída), he diseñado un **marco de análisis estructural** que puedes aplicar para identificar tu problema exacto.
-
----
-
-### 1. Análisis de Causas (El "¿Por qué?")
-
-Podemos dividir las causas en dos grandes grupos: **Factores Internos** (lo que puedes controlar) y **Factores Externos** (lo que el mercado te impone).
-
-#### A. Causas Internas (Controlables)
-*   **Degradación del Producto/Servicio:** ¿Ha bajado la calidad? ¿Se ha quedado el producto obsoleto frente a nuevas tecnologías?
-*   **Estrategia de Precios:** ¿Un competidor bajó precios o tu producto ahora se percibe como "caro" para el valor que ofrece?
-*   **Fallas en el Funnel de Ventas (Conversión):** Quizás recibes la misma cantidad de clientes, pero no cierras la venta. Puede ser por mala atención, procesos de pago complejos o falta de stock.
-*   **Marketing Ineficiente:** El costo de adquisición de clientes (CAC) subió o tus campañas dejaron de llegar al público objetivo.
-*   **Rotación de Personal:** La pérdida de vendedores clave o la falta de capacitación afecta directamente el cierre de ventas.
-
-#### B. Causas Externas (No Controlables)
-*   **Ciclo Económico:** Inflación, pérdida del poder adquisitivo del consumidor o cambios en las tasas de interés.
-*   **Nuevos Competidores:** La entrada de un actor con precios agresivos o una propuesta de valor más moderna.
-*   **Estacionalidad:** ¿Es una caída esperada por la época del año o es una caída atípica?
-*   **Cambios en el Comportamiento del Consumidor:** Un cambio en las preferencias (ej. la gente dejó de comprar X para comprar Y) o un cambio en el canal (de tienda física a e-commerce).
+Para encontrar la respuesta, debemos dividir el problema en tres dimensiones: **Causas** (el origen), **Tendencias** (el comportamiento del mercado) y **Recomendaciones** (la solución).
 
 ---
 
-### 2. Tendencias Actuales del Mercado (El Contexto)
+### 1. Análisis de Causas (¿Qué está pasando?)
 
-Si tu caída es generalizada en tu industria, es probable que estés siendo afectado por estas tendencias globales:
+Las causas de una caída en ventas suelen dividirse en dos categorías: factores internos (bajo tu control) y factores externos (fuera de tu control).
 
-1.  **Consumo Consciente y Selectivo:** Los consumidores están filtrando más sus gastos. No solo buscan precio, sino propósito, sostenibilidad y experiencia.
-2.  **Omnicanalidad Obligatoria:** Ya no basta con tener una tienda o una web; el cliente espera una experiencia fluida entre el mundo online y offline.
-3.  **Economía de la Atención:** El exceso de oferta hace que retener la atención del cliente sea más caro y difícil. Si tu marketing no es disruptivo, simplemente no existes.
-4.  **Digitalización del Proceso de Decisión:** El cliente llega a tu negocio ya "educado". Ya investigó en Google, leyó reseñas y comparó precios. Si no tienes una buena reputación digital, la venta se pierde antes de empezar.
+#### **A. Causas Internas (Factores Controlables)**
+*   **Degradación del producto/servicio:** ¿Ha bajado la calidad? ¿El producto se ha quedado obsoleto?
+*   **Problemas en el proceso de ventas:** ¿El equipo de ventas está desmotivado? ¿Ha habido rotación de personal? ¿El proceso de cierre es lento o ineficiente?
+*   **Estrategia de precios:** ¿Subiste los precios sin añadir valor? ¿O los bajaste tanto que la percepción de calidad cayó?
+*   **Falta de inventario o logística:** ¿No hay stock de lo que la gente quiere comprar? ¿Los tiempos de entrega son demasiado largos?
+*   **Marketing ineficiente:** ¿Estás llegando al público equivocado? ¿Tu presupuesto de publicidad se ha estancado o se ha optimizado mal?
 
----
-
-### 3. Recomendaciones (El "¿Qué hacer?")
-
-Para revertir la situación, te sugiero seguir este plan de acción:
-
-#### Fase 1: Diagnóstico Basado en Datos (Inmediato)
-*   **Audita tu Funnel:** Revisa en qué punto exacto se pierden los clientes. ¿Es en el tráfico (nadie llega), en la conversión (llegan pero no compran) o en la retención (compran una vez y no vuelven)?
-*   **Análisis de Cohortes:** Mira si la caída viene de clientes nuevos o de la pérdida de clientes recurrentes.
-*   **Escucha Activa (Feedback):** Pregunta directamente a los clientes que no compraron o que se fueron. La verdad suele estar en las quejas no atendidas.
-
-#### Fase 2: Ajuste Estratégico (Corto Plazo)
-*   **Optimización de la Oferta:** Si el problema es el precio, no necesariamente bajes el precio; añade valor (combos, garantías, servicios adicionales) para mejorar la percepción de valor.
-*   **Fidelización (Retention Marketing):** Es mucho más barato venderle a un cliente actual que conseguir uno nuevo. Implementa programas de lealtad o campañas de re-activación.
-*   **Revisión de Canales:** Si el tráfico bajó, diversifica tus fuentes de adquisición (Ads, SEO, Redes Sociales, Alianzas).
-
-#### Fase 3: Optimización Operativa (Mediano Plazo)
-*   **Capacitación de Fuerza de Ventas:** Asegúrate de que tu equipo no solo "despache", sino que sepa detectar necesidades y resolver objeciones.
-*   **Mejora de la Experiencia del Cliente (CX):** Elimina cualquier "fricción" en el proceso de compra (tienda desordenada, web lenta, falta de medios de pago).
+#### **B. Causas Externas (Factores No Controlables)**
+*   **Cambios macroeconómicos:** Inflación alta, aumento de tasas de interés o recesión que reduce el poder adquisitivo del consumidor.
+*   **Competencia agresiva:** ¿Un nuevo competidor entró al mercado con precios más bajos o una tecnología superior?
+*   **Estacionalidad:** ¿Es un periodo naturalmente bajo para tu industria?
+*   **Cambio en el comportamiento del consumidor:** ¿Las necesidades de tus clientes cambiaron (ej. preferencia por lo digital vs. lo físico)?
 
 ---
 
-**¿Te gustaría que profundicemos en alguno de estos puntos?** Para un análisis más exacto, podrías decirme:
-1. *¿A qué se dedica tu empresa?*
-2. *¿La caída fue repentina o gradual?*
-3. *¿Has notado si el problema es que llega menos gente o que los que llegan no compran?*</code></pre>
+### 2. Análisis de Tendencias (¿Cómo se está moviendo el mercado?)
+
+No basta con saber que las ventas bajaron; hay que entender *cómo* lo están haciendo para saber si es un evento aislado o una tendencia estructural.
+
+*   **Tasa de Churn (Abandono):** ¿Estás perdiendo clientes antiguos o es que no estás captando clientes nuevos? (Si pierdes clientes antiguos, el problema es de *fidelización*; si no captas nuevos, es de *adquisición*).
+*   **Ticket Promedio:** ¿La gente sigue comprando, pero gasta menos dinero en cada transacción? (Esto indica una pérdida de valor percibido).
+*   **Tasa de Conversión:** ¿Tienes el mismo tráfico de gente preguntando/visitando, pero menos cierres? (Esto indica un problema en el proceso de venta o en el precio).
+*   **Tendencia de Mercado:** ¿Toda tu industria está cayendo o solo tú? Si toda la industria cae, es un factor macroeconómico. Si solo tú caes, es un problema de ejecución o de producto.
+
+---
+
+### 3. Recomendaciones (¿Qué debemos hacer?)
+
+Dependiendo de lo que el análisis anterior revele, las acciones deben ser diferenciadas:
+
+#### **Estrategia de Corto Plazo (Rescate de flujo de caja)**
+*   **Promociones de urgencia:** Lanzar ofertas para mover stock o reactivar clientes inactivos.
+*   **Optimización de conversión:** Revisar el "funnel" de ventas para eliminar fricciones (ej. mejorar la web, entrenar al vendedor en cierre).
+*   **Fidelización inmediata:** Contactar a tus mejores clientes para ofrecerles algo exclusivo; es más barato retener que captar.
+
+#### **Estrategia de Mediano/Largo Plazo (Sostenibilidad)**
+*   **Pivotaje de producto/servicio:** Si la tendencia de mercado indica que tu producto ya no es relevante, debes innovar o añadir nuevas funcionalidades.
+*   **Revisión de la Propuesta de Valor:** Diferenciarse claramente de la competencia. No compitas por precio, compite por valor (servicio, rapidez, exclusividad).
+*   **Inversión en Inteligencia de Datos:** Implementar un CRM o herramientas de análisis para dejar de "suponer" y empezar a "saber" qué hace el cliente.
+
+---
+
+### **Hoja de Ruta para tu Diagnóstico:**
+
+Si quieres que yo te ayude con un análisis más profundo, por favor proporcióname información sobre:
+1.  **¿Qué vendes?**
+2.  **¿Cuándo empezó la caída?** (¿Fue repentino o gradual?)
+3.  **¿Has detectado si el problema es que llega menos gente, o que la gente que llega no compra?**
+4.  **¿Ha habido cambios en la competencia o en el entorno económico de tu zona?**</code></pre>
 </div>
 </div>
 <p>Fíjate en que el routing suele costar solo 1 llamada extra (la clasificación) y evita que un prompt genérico degrade las respuestas especializadas — por eso aparece como complejidad “baja” en <a href="#tbl-guia-seleccion" class="quarto-xref">Table&nbsp;4</a>.</p>
@@ -2114,345 +2141,347 @@ Yao, S., Zhao, J., Yu, D., Du, N., Shafran, I., Narasimhan, K. R., &amp; Cao, Y.
 <span id="cb10-123"><a href="#cb10-123" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-124"><a href="#cb10-124" aria-hidden="true" tabindex="-1"></a>La siguiente taxonomía —adaptada de la guía de Anthropic <span class="co">[</span><span class="ot">@anthropic2024buildingagents</span><span class="co">]</span> y del capítulo "Agent Design Patterns" de Roitman <span class="co">[</span><span class="ot">-@roitman2026hitchhiker</span><span class="co">]</span>— distingue dos familias: patrones de workflow (el sistema decide el orden) y patrones de agente autónomo (el LLM controla el flujo). Los ejemplos en código de este tema son workflows (<span class="co">[</span><span class="ot">prompt chaining</span><span class="co">](#sec-ejemplo-chaining)</span> y <span class="co">[</span><span class="ot">routing</span><span class="co">](#sec-ejemplo-routing)</span>); los agentes autónomos ya se implementan en <span class="co">[</span><span class="ot">02e</span><span class="co">](02e-agentes.qmd)</span> y en el HPD 2.</span>
 <span id="cb10-125"><a href="#cb10-125" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-126"><a href="#cb10-126" aria-hidden="true" tabindex="-1"></a><span class="fu">### Workflow patterns {#sec-workflow-patterns}</span></span>
+<span id="cb10-126"><a href="#cb10-126" aria-hidden="true" tabindex="-1"></a><span class="at">&gt; **Demo interactiva:** </span><span class="co">[</span><span class="ot">¿workflow o agente?</span><span class="co">](../demos/patrones.qmd)</span><span class="at">. Procesa tres correos de cliente con cinco patrones y compara llamadas, resultado y previsibilidad.</span></span>
 <span id="cb10-127"><a href="#cb10-127" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-128"><a href="#cb10-128" aria-hidden="true" tabindex="-1"></a>Estos patrones usan LLM dentro de un flujo de control *predefinido*. El sistema (no el modelo) decide el orden de ejecución.</span>
+<span id="cb10-128"><a href="#cb10-128" aria-hidden="true" tabindex="-1"></a><span class="fu">### Workflow patterns {#sec-workflow-patterns}</span></span>
 <span id="cb10-129"><a href="#cb10-129" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-130"><a href="#cb10-130" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Prompt Chaining {#sec-prompt-chaining}</span></span>
+<span id="cb10-130"><a href="#cb10-130" aria-hidden="true" tabindex="-1"></a>Estos patrones usan LLM dentro de un flujo de control *predefinido*. El sistema (no el modelo) decide el orden de ejecución.</span>
 <span id="cb10-131"><a href="#cb10-131" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-132"><a href="#cb10-132" aria-hidden="true" tabindex="-1"></a>El patrón más simple: dividir una tarea compleja en una secuencia fija de llamadas al LLM, encadenando la salida de un paso como contexto del siguiente. Entre pasos se pueden insertar validaciones (programáticas o con LLM) que detectan errores pronto, antes de que se propaguen.</span>
+<span id="cb10-132"><a href="#cb10-132" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Prompt Chaining {#sec-prompt-chaining}</span></span>
 <span id="cb10-133"><a href="#cb10-133" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-134"><a href="#cb10-134" aria-hidden="true" tabindex="-1"></a>::: {#fig-prompt-chaining}</span>
-<span id="cb10-137"><a href="#cb10-137" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb10-138"><a href="#cb10-138" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
-<span id="cb10-139"><a href="#cb10-139" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
-<span id="cb10-140"><a href="#cb10-140" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
-<span id="cb10-141"><a href="#cb10-141" aria-hidden="true" tabindex="-1"></a>    classDef gate fill:<span class="co">#FFD43B,stroke:#b8960f,color:#000,stroke-width:1.5px</span></span>
-<span id="cb10-142"><a href="#cb10-142" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
-<span id="cb10-143"><a href="#cb10-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-144"><a href="#cb10-144" aria-hidden="true" tabindex="-1"></a>    A[Entrada]:::input --&gt; B[Paso <span class="dv">1</span>&lt;br/&gt;LLM]:::proc</span>
-<span id="cb10-145"><a href="#cb10-145" aria-hidden="true" tabindex="-1"></a>    B --&gt; G1{¿Válido?}:::gate</span>
-<span id="cb10-146"><a href="#cb10-146" aria-hidden="true" tabindex="-1"></a>    G1 --&gt;|No| B</span>
-<span id="cb10-147"><a href="#cb10-147" aria-hidden="true" tabindex="-1"></a>    G1 --&gt;|Sí| C[Paso <span class="dv">2</span>&lt;br/&gt;LLM]:::proc</span>
-<span id="cb10-148"><a href="#cb10-148" aria-hidden="true" tabindex="-1"></a>    C --&gt; G2{¿Válido?}:::gate</span>
-<span id="cb10-149"><a href="#cb10-149" aria-hidden="true" tabindex="-1"></a>    G2 --&gt;|No| C</span>
-<span id="cb10-150"><a href="#cb10-150" aria-hidden="true" tabindex="-1"></a>    G2 --&gt;|Sí| D[Salida final]:::out</span>
-<span id="cb10-151"><a href="#cb10-151" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-152"><a href="#cb10-152" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb10-153"><a href="#cb10-153" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-154"><a href="#cb10-154" aria-hidden="true" tabindex="-1"></a>**Cuándo usarlo**: tareas naturalmente secuenciales — generación de contenido, transformación de datos, análisis multietapa.</span>
+<span id="cb10-134"><a href="#cb10-134" aria-hidden="true" tabindex="-1"></a>El patrón más simple: dividir una tarea compleja en una secuencia fija de llamadas al LLM, encadenando la salida de un paso como contexto del siguiente. Entre pasos se pueden insertar validaciones (programáticas o con LLM) que detectan errores pronto, antes de que se propaguen.</span>
+<span id="cb10-135"><a href="#cb10-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-136"><a href="#cb10-136" aria-hidden="true" tabindex="-1"></a>::: {#fig-prompt-chaining}</span>
+<span id="cb10-139"><a href="#cb10-139" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb10-140"><a href="#cb10-140" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb10-141"><a href="#cb10-141" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb10-142"><a href="#cb10-142" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb10-143"><a href="#cb10-143" aria-hidden="true" tabindex="-1"></a>    classDef gate fill:<span class="co">#FFD43B,stroke:#b8960f,color:#000,stroke-width:1.5px</span></span>
+<span id="cb10-144"><a href="#cb10-144" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
+<span id="cb10-145"><a href="#cb10-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-146"><a href="#cb10-146" aria-hidden="true" tabindex="-1"></a>    A[Entrada]:::input --&gt; B[Paso <span class="dv">1</span>&lt;br/&gt;LLM]:::proc</span>
+<span id="cb10-147"><a href="#cb10-147" aria-hidden="true" tabindex="-1"></a>    B --&gt; G1{¿Válido?}:::gate</span>
+<span id="cb10-148"><a href="#cb10-148" aria-hidden="true" tabindex="-1"></a>    G1 --&gt;|No| B</span>
+<span id="cb10-149"><a href="#cb10-149" aria-hidden="true" tabindex="-1"></a>    G1 --&gt;|Sí| C[Paso <span class="dv">2</span>&lt;br/&gt;LLM]:::proc</span>
+<span id="cb10-150"><a href="#cb10-150" aria-hidden="true" tabindex="-1"></a>    C --&gt; G2{¿Válido?}:::gate</span>
+<span id="cb10-151"><a href="#cb10-151" aria-hidden="true" tabindex="-1"></a>    G2 --&gt;|No| C</span>
+<span id="cb10-152"><a href="#cb10-152" aria-hidden="true" tabindex="-1"></a>    G2 --&gt;|Sí| D[Salida final]:::out</span>
+<span id="cb10-153"><a href="#cb10-153" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-154"><a href="#cb10-154" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb10-155"><a href="#cb10-155" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-156"><a href="#cb10-156" aria-hidden="true" tabindex="-1"></a>**Ventaja clave**: cada paso puede usar un prompt, modelo o temperatura distintos; los resultados intermedios son inspeccionables y depurables.</span>
+<span id="cb10-156"><a href="#cb10-156" aria-hidden="true" tabindex="-1"></a>**Cuándo usarlo**: tareas naturalmente secuenciales — generación de contenido, transformación de datos, análisis multietapa.</span>
 <span id="cb10-157"><a href="#cb10-157" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-158"><a href="#cb10-158" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Routing {#sec-routing}</span></span>
+<span id="cb10-158"><a href="#cb10-158" aria-hidden="true" tabindex="-1"></a>**Ventaja clave**: cada paso puede usar un prompt, modelo o temperatura distintos; los resultados intermedios son inspeccionables y depurables.</span>
 <span id="cb10-159"><a href="#cb10-159" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-160"><a href="#cb10-160" aria-hidden="true" tabindex="-1"></a>Un clasificador (LLM o tradicional) examina la entrada y la envía a un manejador especializado (prompt, herramienta o modelo óptimo para ese tipo de entrada).</span>
+<span id="cb10-160"><a href="#cb10-160" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Routing {#sec-routing}</span></span>
 <span id="cb10-161"><a href="#cb10-161" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-162"><a href="#cb10-162" aria-hidden="true" tabindex="-1"></a>::: {#fig-routing}</span>
-<span id="cb10-165"><a href="#cb10-165" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb10-166"><a href="#cb10-166" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
-<span id="cb10-167"><a href="#cb10-167" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
-<span id="cb10-168"><a href="#cb10-168" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
-<span id="cb10-169"><a href="#cb10-169" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
-<span id="cb10-170"><a href="#cb10-170" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-171"><a href="#cb10-171" aria-hidden="true" tabindex="-1"></a>    A[Entrada]:::input --&gt; C[Clasificador]:::proc</span>
-<span id="cb10-172"><a href="#cb10-172" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Tipo <span class="dv">1</span>| B1[Manejador&lt;br/&gt;especializado <span class="dv">1</span>]:::proc</span>
-<span id="cb10-173"><a href="#cb10-173" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Tipo <span class="dv">2</span>| B2[Manejador&lt;br/&gt;especializado <span class="dv">2</span>]:::proc</span>
-<span id="cb10-174"><a href="#cb10-174" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Tipo <span class="dv">3</span>| B3[Manejador&lt;br/&gt;especializado <span class="dv">3</span>]:::proc</span>
-<span id="cb10-175"><a href="#cb10-175" aria-hidden="true" tabindex="-1"></a>    B1 --&gt; R[Respuesta]:::out</span>
-<span id="cb10-176"><a href="#cb10-176" aria-hidden="true" tabindex="-1"></a>    B2 --&gt; R</span>
-<span id="cb10-177"><a href="#cb10-177" aria-hidden="true" tabindex="-1"></a>    B3 --&gt; R</span>
-<span id="cb10-178"><a href="#cb10-178" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-179"><a href="#cb10-179" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb10-180"><a href="#cb10-180" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-181"><a href="#cb10-181" aria-hidden="true" tabindex="-1"></a>**Cuándo usarlo**: tipos de tarea distintos con prompts, herramientas o modelos óptimos diferentes — triaje de soporte, entrada multimodal, preguntas factuales frente a analíticas.</span>
+<span id="cb10-162"><a href="#cb10-162" aria-hidden="true" tabindex="-1"></a>Un clasificador (LLM o tradicional) examina la entrada y la envía a un manejador especializado (prompt, herramienta o modelo óptimo para ese tipo de entrada).</span>
+<span id="cb10-163"><a href="#cb10-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-164"><a href="#cb10-164" aria-hidden="true" tabindex="-1"></a>::: {#fig-routing}</span>
+<span id="cb10-167"><a href="#cb10-167" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb10-168"><a href="#cb10-168" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb10-169"><a href="#cb10-169" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb10-170"><a href="#cb10-170" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb10-171"><a href="#cb10-171" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
+<span id="cb10-172"><a href="#cb10-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-173"><a href="#cb10-173" aria-hidden="true" tabindex="-1"></a>    A[Entrada]:::input --&gt; C[Clasificador]:::proc</span>
+<span id="cb10-174"><a href="#cb10-174" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Tipo <span class="dv">1</span>| B1[Manejador&lt;br/&gt;especializado <span class="dv">1</span>]:::proc</span>
+<span id="cb10-175"><a href="#cb10-175" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Tipo <span class="dv">2</span>| B2[Manejador&lt;br/&gt;especializado <span class="dv">2</span>]:::proc</span>
+<span id="cb10-176"><a href="#cb10-176" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Tipo <span class="dv">3</span>| B3[Manejador&lt;br/&gt;especializado <span class="dv">3</span>]:::proc</span>
+<span id="cb10-177"><a href="#cb10-177" aria-hidden="true" tabindex="-1"></a>    B1 --&gt; R[Respuesta]:::out</span>
+<span id="cb10-178"><a href="#cb10-178" aria-hidden="true" tabindex="-1"></a>    B2 --&gt; R</span>
+<span id="cb10-179"><a href="#cb10-179" aria-hidden="true" tabindex="-1"></a>    B3 --&gt; R</span>
+<span id="cb10-180"><a href="#cb10-180" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-181"><a href="#cb10-181" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb10-182"><a href="#cb10-182" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-183"><a href="#cb10-183" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Parallelization {#sec-parallelization}</span></span>
+<span id="cb10-183"><a href="#cb10-183" aria-hidden="true" tabindex="-1"></a>**Cuándo usarlo**: tipos de tarea distintos con prompts, herramientas o modelos óptimos diferentes — triaje de soporte, entrada multimodal, preguntas factuales frente a analíticas.</span>
 <span id="cb10-184"><a href="#cb10-184" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-185"><a href="#cb10-185" aria-hidden="true" tabindex="-1"></a>Múltiples llamadas al LLM se ejecutan en paralelo, con una capa programática que combina sus salidas. Dos sub-patrones:</span>
+<span id="cb10-185"><a href="#cb10-185" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Parallelization {#sec-parallelization}</span></span>
 <span id="cb10-186"><a href="#cb10-186" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-187"><a href="#cb10-187" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sectioning (fan-out)**: se particiona la entrada en trozos disjuntos y cada uno se procesa independientemente — p. ej. auditorías de seguridad, rendimiento y estilo sobre el mismo código.</span>
-<span id="cb10-188"><a href="#cb10-188" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Voting (redundancia)**: se lanza el mismo prompt N veces con seeds o temperaturas distintas y se selecciona el mejor resultado por mayoría, score de reward model o LLM-as-judge <span class="co">[</span><span class="ot">@wang2022selfconsistency</span><span class="co">]</span>.</span>
-<span id="cb10-189"><a href="#cb10-189" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-190"><a href="#cb10-190" aria-hidden="true" tabindex="-1"></a>::: {#fig-parallelization}</span>
-<span id="cb10-193"><a href="#cb10-193" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb10-194"><a href="#cb10-194" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
-<span id="cb10-195"><a href="#cb10-195" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
-<span id="cb10-196"><a href="#cb10-196" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
-<span id="cb10-197"><a href="#cb10-197" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
-<span id="cb10-198"><a href="#cb10-198" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-199"><a href="#cb10-199" aria-hidden="true" tabindex="-1"></a>    A[Entrada]:::input --&gt; P[Particiona&lt;br/&gt;o replica]:::proc</span>
-<span id="cb10-200"><a href="#cb10-200" aria-hidden="true" tabindex="-1"></a>    P --&gt; L1[LLM <span class="dv">1</span>]:::proc</span>
-<span id="cb10-201"><a href="#cb10-201" aria-hidden="true" tabindex="-1"></a>    P --&gt; L2[LLM <span class="dv">2</span>]:::proc</span>
-<span id="cb10-202"><a href="#cb10-202" aria-hidden="true" tabindex="-1"></a>    P --&gt; L3[LLM <span class="dv">3</span>]:::proc</span>
-<span id="cb10-203"><a href="#cb10-203" aria-hidden="true" tabindex="-1"></a>    L1 --&gt; M[Aggregador&lt;br/&gt;combina / vota]:::proc</span>
-<span id="cb10-204"><a href="#cb10-204" aria-hidden="true" tabindex="-1"></a>    L2 --&gt; M</span>
-<span id="cb10-205"><a href="#cb10-205" aria-hidden="true" tabindex="-1"></a>    L3 --&gt; M</span>
-<span id="cb10-206"><a href="#cb10-206" aria-hidden="true" tabindex="-1"></a>    M --&gt; R[Resultado]:::out</span>
-<span id="cb10-207"><a href="#cb10-207" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-208"><a href="#cb10-208" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb10-209"><a href="#cb10-209" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-210"><a href="#cb10-210" aria-hidden="true" tabindex="-1"></a>La latencia resultante es $\max$ de las llamadas individuales, no su suma.</span>
+<span id="cb10-187"><a href="#cb10-187" aria-hidden="true" tabindex="-1"></a>Múltiples llamadas al LLM se ejecutan en paralelo, con una capa programática que combina sus salidas. Dos sub-patrones:</span>
+<span id="cb10-188"><a href="#cb10-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-189"><a href="#cb10-189" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Sectioning (fan-out)**: se particiona la entrada en trozos disjuntos y cada uno se procesa independientemente — p. ej. auditorías de seguridad, rendimiento y estilo sobre el mismo código.</span>
+<span id="cb10-190"><a href="#cb10-190" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Voting (redundancia)**: se lanza el mismo prompt N veces con seeds o temperaturas distintas y se selecciona el mejor resultado por mayoría, score de reward model o LLM-as-judge <span class="co">[</span><span class="ot">@wang2022selfconsistency</span><span class="co">]</span>.</span>
+<span id="cb10-191"><a href="#cb10-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-192"><a href="#cb10-192" aria-hidden="true" tabindex="-1"></a>::: {#fig-parallelization}</span>
+<span id="cb10-195"><a href="#cb10-195" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb10-196"><a href="#cb10-196" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb10-197"><a href="#cb10-197" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb10-198"><a href="#cb10-198" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb10-199"><a href="#cb10-199" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
+<span id="cb10-200"><a href="#cb10-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-201"><a href="#cb10-201" aria-hidden="true" tabindex="-1"></a>    A[Entrada]:::input --&gt; P[Particiona&lt;br/&gt;o replica]:::proc</span>
+<span id="cb10-202"><a href="#cb10-202" aria-hidden="true" tabindex="-1"></a>    P --&gt; L1[LLM <span class="dv">1</span>]:::proc</span>
+<span id="cb10-203"><a href="#cb10-203" aria-hidden="true" tabindex="-1"></a>    P --&gt; L2[LLM <span class="dv">2</span>]:::proc</span>
+<span id="cb10-204"><a href="#cb10-204" aria-hidden="true" tabindex="-1"></a>    P --&gt; L3[LLM <span class="dv">3</span>]:::proc</span>
+<span id="cb10-205"><a href="#cb10-205" aria-hidden="true" tabindex="-1"></a>    L1 --&gt; M[Aggregador&lt;br/&gt;combina / vota]:::proc</span>
+<span id="cb10-206"><a href="#cb10-206" aria-hidden="true" tabindex="-1"></a>    L2 --&gt; M</span>
+<span id="cb10-207"><a href="#cb10-207" aria-hidden="true" tabindex="-1"></a>    L3 --&gt; M</span>
+<span id="cb10-208"><a href="#cb10-208" aria-hidden="true" tabindex="-1"></a>    M --&gt; R[Resultado]:::out</span>
+<span id="cb10-209"><a href="#cb10-209" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-210"><a href="#cb10-210" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb10-211"><a href="#cb10-211" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-212"><a href="#cb10-212" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Orchestrator-Workers {#sec-orchestrator-workers}</span></span>
+<span id="cb10-212"><a href="#cb10-212" aria-hidden="true" tabindex="-1"></a>La latencia resultante es $\max$ de las llamadas individuales, no su suma.</span>
 <span id="cb10-213"><a href="#cb10-213" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-214"><a href="#cb10-214" aria-hidden="true" tabindex="-1"></a>Aquí el LLM decide cómo dividir el trabajo: un orquestador analiza la tarea, produce un plan de subtareas, las despacha a workers (posiblemente con prompts o herramientas distintas) y finalmente fusiona sus salidas en un resultado coherente. La diferencia clave con parallelization: la descomposición es generada por el modelo, no hardcodeada.</span>
+<span id="cb10-214"><a href="#cb10-214" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Orchestrator-Workers {#sec-orchestrator-workers}</span></span>
 <span id="cb10-215"><a href="#cb10-215" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-216"><a href="#cb10-216" aria-hidden="true" tabindex="-1"></a>::: {#fig-orchestrator-workers}</span>
-<span id="cb10-219"><a href="#cb10-219" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb10-220"><a href="#cb10-220" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
-<span id="cb10-221"><a href="#cb10-221" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
-<span id="cb10-222"><a href="#cb10-222" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
-<span id="cb10-223"><a href="#cb10-223" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
-<span id="cb10-224"><a href="#cb10-224" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-225"><a href="#cb10-225" aria-hidden="true" tabindex="-1"></a>    T[Tarea compleja]:::input --&gt; O[Orquestador&lt;br/&gt;descompone y planifica]:::proc</span>
-<span id="cb10-226"><a href="#cb10-226" aria-hidden="true" tabindex="-1"></a>    O --&gt; W1[Worker A]:::proc</span>
-<span id="cb10-227"><a href="#cb10-227" aria-hidden="true" tabindex="-1"></a>    O --&gt; W2[Worker B]:::proc</span>
-<span id="cb10-228"><a href="#cb10-228" aria-hidden="true" tabindex="-1"></a>    O --&gt; W3[Worker C]:::proc</span>
-<span id="cb10-229"><a href="#cb10-229" aria-hidden="true" tabindex="-1"></a>    W1 --&gt; S[Fusión&lt;br/&gt;de resultados]:::proc</span>
-<span id="cb10-230"><a href="#cb10-230" aria-hidden="true" tabindex="-1"></a>    W2 --&gt; S</span>
-<span id="cb10-231"><a href="#cb10-231" aria-hidden="true" tabindex="-1"></a>    W3 --&gt; S</span>
-<span id="cb10-232"><a href="#cb10-232" aria-hidden="true" tabindex="-1"></a>    S --&gt; R[Resultado final]:::out</span>
-<span id="cb10-233"><a href="#cb10-233" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-234"><a href="#cb10-234" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb10-235"><a href="#cb10-235" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-236"><a href="#cb10-236" aria-hidden="true" tabindex="-1"></a>**Cuándo usarlo**: problemas abiertos donde el número y naturaleza de subtareas no pueden enumerarse en diseño — p. ej. "refactoriza este codebase" requiere primero entender el grafo de dependencias antes de decidir qué archivos modificar.</span>
+<span id="cb10-216"><a href="#cb10-216" aria-hidden="true" tabindex="-1"></a>Aquí el LLM decide cómo dividir el trabajo: un orquestador analiza la tarea, produce un plan de subtareas, las despacha a workers (posiblemente con prompts o herramientas distintas) y finalmente fusiona sus salidas en un resultado coherente. La diferencia clave con parallelization: la descomposición es generada por el modelo, no hardcodeada.</span>
+<span id="cb10-217"><a href="#cb10-217" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-218"><a href="#cb10-218" aria-hidden="true" tabindex="-1"></a>::: {#fig-orchestrator-workers}</span>
+<span id="cb10-221"><a href="#cb10-221" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb10-222"><a href="#cb10-222" aria-hidden="true" tabindex="-1"></a>flowchart TD</span>
+<span id="cb10-223"><a href="#cb10-223" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb10-224"><a href="#cb10-224" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb10-225"><a href="#cb10-225" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
+<span id="cb10-226"><a href="#cb10-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-227"><a href="#cb10-227" aria-hidden="true" tabindex="-1"></a>    T[Tarea compleja]:::input --&gt; O[Orquestador&lt;br/&gt;descompone y planifica]:::proc</span>
+<span id="cb10-228"><a href="#cb10-228" aria-hidden="true" tabindex="-1"></a>    O --&gt; W1[Worker A]:::proc</span>
+<span id="cb10-229"><a href="#cb10-229" aria-hidden="true" tabindex="-1"></a>    O --&gt; W2[Worker B]:::proc</span>
+<span id="cb10-230"><a href="#cb10-230" aria-hidden="true" tabindex="-1"></a>    O --&gt; W3[Worker C]:::proc</span>
+<span id="cb10-231"><a href="#cb10-231" aria-hidden="true" tabindex="-1"></a>    W1 --&gt; S[Fusión&lt;br/&gt;de resultados]:::proc</span>
+<span id="cb10-232"><a href="#cb10-232" aria-hidden="true" tabindex="-1"></a>    W2 --&gt; S</span>
+<span id="cb10-233"><a href="#cb10-233" aria-hidden="true" tabindex="-1"></a>    W3 --&gt; S</span>
+<span id="cb10-234"><a href="#cb10-234" aria-hidden="true" tabindex="-1"></a>    S --&gt; R[Resultado final]:::out</span>
+<span id="cb10-235"><a href="#cb10-235" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-236"><a href="#cb10-236" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb10-237"><a href="#cb10-237" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-238"><a href="#cb10-238" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Evaluator-Optimizer {#sec-evaluator-optimizer}</span></span>
+<span id="cb10-238"><a href="#cb10-238" aria-hidden="true" tabindex="-1"></a>**Cuándo usarlo**: problemas abiertos donde el número y naturaleza de subtareas no pueden enumerarse en diseño — p. ej. "refactoriza este codebase" requiere primero entender el grafo de dependencias antes de decidir qué archivos modificar.</span>
 <span id="cb10-239"><a href="#cb10-239" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-240"><a href="#cb10-240" aria-hidden="true" tabindex="-1"></a>Un bucle de retroalimentación de dos modelos: un generador produce candidatos mientras un evaluador separado los puntúa contra criterios explícitos. Si el score no alcanza el umbral, la crítica del evaluador se añade al contexto del generador y el ciclo se repite hasta cumplir el umbral de calidad o agotar un presupuesto de reintentos <span class="co">[</span><span class="ot">@madaan2023selfrefine</span><span class="co">]</span>.</span>
+<span id="cb10-240"><a href="#cb10-240" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Evaluator-Optimizer {#sec-evaluator-optimizer}</span></span>
 <span id="cb10-241"><a href="#cb10-241" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-242"><a href="#cb10-242" aria-hidden="true" tabindex="-1"></a>::: {#fig-evaluator-optimizer}</span>
-<span id="cb10-245"><a href="#cb10-245" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
-<span id="cb10-246"><a href="#cb10-246" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
-<span id="cb10-247"><a href="#cb10-247" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
-<span id="cb10-248"><a href="#cb10-248" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
-<span id="cb10-249"><a href="#cb10-249" aria-hidden="true" tabindex="-1"></a>    classDef gate fill:<span class="co">#FFD43B,stroke:#b8960f,color:#000,stroke-width:1.5px</span></span>
-<span id="cb10-250"><a href="#cb10-250" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
-<span id="cb10-251"><a href="#cb10-251" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-252"><a href="#cb10-252" aria-hidden="true" tabindex="-1"></a>    G[Generador]:::proc --&gt; E[Evaluador&lt;br/&gt;+ criterios]:::proc</span>
-<span id="cb10-253"><a href="#cb10-253" aria-hidden="true" tabindex="-1"></a>    E --&gt; C{¿Calidad&lt;br/&gt;suficiente?}:::gate</span>
-<span id="cb10-254"><a href="#cb10-254" aria-hidden="true" tabindex="-1"></a>    C --&gt;|No + crítica| G</span>
-<span id="cb10-255"><a href="#cb10-255" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Sí| R[Resultado]:::out</span>
-<span id="cb10-256"><a href="#cb10-256" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-257"><a href="#cb10-257" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb10-258"><a href="#cb10-258" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-259"><a href="#cb10-259" aria-hidden="true" tabindex="-1"></a>**Cuándo usarlo**: tareas con criterios de calidad claros — código que debe pasar tests, traducciones que deben preservar significado, escritura que debe ajustarse a una guía de estilo.</span>
+<span id="cb10-242"><a href="#cb10-242" aria-hidden="true" tabindex="-1"></a>Un bucle de retroalimentación de dos modelos: un generador produce candidatos mientras un evaluador separado los puntúa contra criterios explícitos. Si el score no alcanza el umbral, la crítica del evaluador se añade al contexto del generador y el ciclo se repite hasta cumplir el umbral de calidad o agotar un presupuesto de reintentos <span class="co">[</span><span class="ot">@madaan2023selfrefine</span><span class="co">]</span>.</span>
+<span id="cb10-243"><a href="#cb10-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-244"><a href="#cb10-244" aria-hidden="true" tabindex="-1"></a>::: {#fig-evaluator-optimizer}</span>
+<span id="cb10-247"><a href="#cb10-247" aria-hidden="true" tabindex="-1"></a><span class="in">```{mermaid}</span></span>
+<span id="cb10-248"><a href="#cb10-248" aria-hidden="true" tabindex="-1"></a>flowchart LR</span>
+<span id="cb10-249"><a href="#cb10-249" aria-hidden="true" tabindex="-1"></a>    classDef input fill:<span class="co">#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb10-250"><a href="#cb10-250" aria-hidden="true" tabindex="-1"></a>    classDef proc fill:<span class="co">#306998,stroke:#1e3a5f,color:#fff,stroke-width:1.5px</span></span>
+<span id="cb10-251"><a href="#cb10-251" aria-hidden="true" tabindex="-1"></a>    classDef gate fill:<span class="co">#FFD43B,stroke:#b8960f,color:#000,stroke-width:1.5px</span></span>
+<span id="cb10-252"><a href="#cb10-252" aria-hidden="true" tabindex="-1"></a>    classDef out fill:<span class="co">#2e7d32,stroke:#0d3010,color:#fff,stroke-width:2px</span></span>
+<span id="cb10-253"><a href="#cb10-253" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-254"><a href="#cb10-254" aria-hidden="true" tabindex="-1"></a>    G[Generador]:::proc --&gt; E[Evaluador&lt;br/&gt;+ criterios]:::proc</span>
+<span id="cb10-255"><a href="#cb10-255" aria-hidden="true" tabindex="-1"></a>    E --&gt; C{¿Calidad&lt;br/&gt;suficiente?}:::gate</span>
+<span id="cb10-256"><a href="#cb10-256" aria-hidden="true" tabindex="-1"></a>    C --&gt;|No + crítica| G</span>
+<span id="cb10-257"><a href="#cb10-257" aria-hidden="true" tabindex="-1"></a>    C --&gt;|Sí| R[Resultado]:::out</span>
+<span id="cb10-258"><a href="#cb10-258" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb10-259"><a href="#cb10-259" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb10-260"><a href="#cb10-260" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-261"><a href="#cb10-261" aria-hidden="true" tabindex="-1"></a><span class="fu">### Patrones de agente autónomo {#sec-patrones-autonomos}</span></span>
+<span id="cb10-261"><a href="#cb10-261" aria-hidden="true" tabindex="-1"></a>**Cuándo usarlo**: tareas con criterios de calidad claros — código que debe pasar tests, traducciones que deben preservar significado, escritura que debe ajustarse a una guía de estilo.</span>
 <span id="cb10-262"><a href="#cb10-262" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-263"><a href="#cb10-263" aria-hidden="true" tabindex="-1"></a>Estos patrones ceden al LLM el control del flujo de ejecución.</span>
+<span id="cb10-263"><a href="#cb10-263" aria-hidden="true" tabindex="-1"></a><span class="fu">### Patrones de agente autónomo {#sec-patrones-autonomos}</span></span>
 <span id="cb10-264"><a href="#cb10-264" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-265"><a href="#cb10-265" aria-hidden="true" tabindex="-1"></a><span class="fu">#### ReAct (Reasoning + Acting) {#sec-react-patron}</span></span>
+<span id="cb10-265"><a href="#cb10-265" aria-hidden="true" tabindex="-1"></a>Estos patrones ceden al LLM el control del flujo de ejecución.</span>
 <span id="cb10-266"><a href="#cb10-266" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-267"><a href="#cb10-267" aria-hidden="true" tabindex="-1"></a>El patrón fundacional <span class="co">[</span><span class="ot">@yao2023react</span><span class="co">]</span>, ya implementado en <span class="co">[</span><span class="ot">02e — Agentes</span><span class="co">](02e-agentes.qmd#sec-react)</span>. El LLM alterna razonamiento (Thought), acción (Action) y observación (Observation) en un bucle hasta producir la respuesta final. Es la base de <span class="in">`create_agent`</span> en LangChain y del HPD 2.</span>
+<span id="cb10-267"><a href="#cb10-267" aria-hidden="true" tabindex="-1"></a><span class="fu">#### ReAct (Reasoning + Acting) {#sec-react-patron}</span></span>
 <span id="cb10-268"><a href="#cb10-268" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-269"><a href="#cb10-269" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Planning: Plan-and-Execute {#sec-planning}</span></span>
+<span id="cb10-269"><a href="#cb10-269" aria-hidden="true" tabindex="-1"></a>El patrón fundacional <span class="co">[</span><span class="ot">@yao2023react</span><span class="co">]</span>, ya implementado en <span class="co">[</span><span class="ot">02e — Agentes</span><span class="co">](02e-agentes.qmd#sec-react)</span>. El LLM alterna razonamiento (Thought), acción (Action) y observación (Observation) en un bucle hasta producir la respuesta final. Es la base de <span class="in">`create_agent`</span> en LangChain y del HPD 2.</span>
 <span id="cb10-270"><a href="#cb10-270" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-271"><a href="#cb10-271" aria-hidden="true" tabindex="-1"></a>En lugar de decidir un paso cada vez, el agente genera primero un plan completo y luego lo ejecuta <span class="co">[</span><span class="ot">@wang2023planandsolve</span><span class="co">]</span>:</span>
+<span id="cb10-271"><a href="#cb10-271" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Planning: Plan-and-Execute {#sec-planning}</span></span>
 <span id="cb10-272"><a href="#cb10-272" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-273"><a href="#cb10-273" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Fase de planificación**: dado el objetivo, generar un plan estructurado (lista de subtareas con dependencias).</span>
-<span id="cb10-274"><a href="#cb10-274" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Fase de ejecución**: ejecutar cada subtarea, posiblemente con un modelo más barato.</span>
-<span id="cb10-275"><a href="#cb10-275" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Revisión del plan**: si un paso falla o produce resultados inesperados, re-planificar desde el estado actual.</span>
-<span id="cb10-276"><a href="#cb10-276" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-277"><a href="#cb10-277" aria-hidden="true" tabindex="-1"></a>El plan es un documento vivo: da estructura pero se adapta a las observaciones. Cuatro estrategias de replanning:</span>
+<span id="cb10-273"><a href="#cb10-273" aria-hidden="true" tabindex="-1"></a>En lugar de decidir un paso cada vez, el agente genera primero un plan completo y luego lo ejecuta <span class="co">[</span><span class="ot">@wang2023planandsolve</span><span class="co">]</span>:</span>
+<span id="cb10-274"><a href="#cb10-274" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-275"><a href="#cb10-275" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Fase de planificación**: dado el objetivo, generar un plan estructurado (lista de subtareas con dependencias).</span>
+<span id="cb10-276"><a href="#cb10-276" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Fase de ejecución**: ejecutar cada subtarea, posiblemente con un modelo más barato.</span>
+<span id="cb10-277"><a href="#cb10-277" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Revisión del plan**: si un paso falla o produce resultados inesperados, re-planificar desde el estado actual.</span>
 <span id="cb10-278"><a href="#cb10-278" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-279"><a href="#cb10-279" aria-hidden="true" tabindex="-1"></a>: Estrategias de replanning en agentes de planificación {#tbl-replanning}</span>
+<span id="cb10-279"><a href="#cb10-279" aria-hidden="true" tabindex="-1"></a>El plan es un documento vivo: da estructura pero se adapta a las observaciones. Cuatro estrategias de replanning:</span>
 <span id="cb10-280"><a href="#cb10-280" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-281"><a href="#cb10-281" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Estrategia <span class="pp">|</span> ¿Cuándo re-planifica? <span class="pp">|</span> Características <span class="pp">|</span></span>
-<span id="cb10-282"><a href="#cb10-282" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb10-283"><a href="#cb10-283" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Plan-then-Execute <span class="pp">|</span> Nunca <span class="pp">|</span> Simple; frágil ante resultados inesperados <span class="pp">|</span></span>
-<span id="cb10-284"><a href="#cb10-284" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Adaptativa <span class="pp">|</span> Al fallar un paso <span class="pp">|</span> Solo cuando un paso falla; coste moderado <span class="pp">|</span></span>
-<span id="cb10-285"><a href="#cb10-285" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Continua <span class="pp">|</span> En cada paso <span class="pp">|</span> Reevaluación completa tras cada observación; cara pero robusta <span class="pp">|</span></span>
-<span id="cb10-286"><a href="#cb10-286" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Jerárquica <span class="pp">|</span> Al terminar un sub-plan <span class="pp">|</span> Plan de alto nivel fijo; sub-planes dinámicos <span class="pp">|</span></span>
-<span id="cb10-287"><a href="#cb10-287" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-288"><a href="#cb10-288" aria-hidden="true" tabindex="-1"></a>**Cuándo usarlo**: tareas de horizonte largo con muchos pasos. Más eficiente que ReAct para ese tipo de tareas (menos llamadas al LLM), pero menos adaptativo a observaciones inesperadas.</span>
+<span id="cb10-281"><a href="#cb10-281" aria-hidden="true" tabindex="-1"></a>: Estrategias de replanning en agentes de planificación {#tbl-replanning}</span>
+<span id="cb10-282"><a href="#cb10-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-283"><a href="#cb10-283" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Estrategia <span class="pp">|</span> ¿Cuándo re-planifica? <span class="pp">|</span> Características <span class="pp">|</span></span>
+<span id="cb10-284"><a href="#cb10-284" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb10-285"><a href="#cb10-285" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Plan-then-Execute <span class="pp">|</span> Nunca <span class="pp">|</span> Simple; frágil ante resultados inesperados <span class="pp">|</span></span>
+<span id="cb10-286"><a href="#cb10-286" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Adaptativa <span class="pp">|</span> Al fallar un paso <span class="pp">|</span> Solo cuando un paso falla; coste moderado <span class="pp">|</span></span>
+<span id="cb10-287"><a href="#cb10-287" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Continua <span class="pp">|</span> En cada paso <span class="pp">|</span> Reevaluación completa tras cada observación; cara pero robusta <span class="pp">|</span></span>
+<span id="cb10-288"><a href="#cb10-288" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Jerárquica <span class="pp">|</span> Al terminar un sub-plan <span class="pp">|</span> Plan de alto nivel fijo; sub-planes dinámicos <span class="pp">|</span></span>
 <span id="cb10-289"><a href="#cb10-289" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-290"><a href="#cb10-290" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Reflection y Reflexion {#sec-reflection}</span></span>
+<span id="cb10-290"><a href="#cb10-290" aria-hidden="true" tabindex="-1"></a>**Cuándo usarlo**: tareas de horizonte largo con muchos pasos. Más eficiente que ReAct para ese tipo de tareas (menos llamadas al LLM), pero menos adaptativo a observaciones inesperadas.</span>
 <span id="cb10-291"><a href="#cb10-291" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-292"><a href="#cb10-292" aria-hidden="true" tabindex="-1"></a>El agente se pausa para evaluar su propia trayectoria y corregir el rumbo:</span>
+<span id="cb10-292"><a href="#cb10-292" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Reflection y Reflexion {#sec-reflection}</span></span>
 <span id="cb10-293"><a href="#cb10-293" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-294"><a href="#cb10-294" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Validación de salida**: "¿es correcto esto? ¿me he dejado algo?"</span>
-<span id="cb10-295"><a href="#cb10-295" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Revisión de trayectoria**: Revisar los últimos k pasos e identificar errores o ineficiencias</span>
-<span id="cb10-296"><a href="#cb10-296" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Revisión de estrategia**: Reconsiderar el enfoque global ("¿estoy resolviendo el problema correcto?")</span>
-<span id="cb10-297"><a href="#cb10-297" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-298"><a href="#cb10-298" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
-<span id="cb10-299"><a href="#cb10-299" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reflexion: aprender del fracaso</span></span>
-<span id="cb10-300"><a href="#cb10-300" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-301"><a href="#cb10-301" aria-hidden="true" tabindex="-1"></a>El patrón Reflexion <span class="co">[</span><span class="ot">@shinn2023reflexion</span><span class="co">]</span> mantiene una "memoria de reflexión" persistente: tras cada intento fallido, el agente escribe una reflexión en lenguaje natural ("fallé porque no comprobé el caso límite"). En el siguiente intento, estas reflexiones se incluyen en el prompt — aprendizaje entre episodios sin actualizar pesos.</span>
-<span id="cb10-302"><a href="#cb10-302" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb10-303"><a href="#cb10-303" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-304"><a href="#cb10-304" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Tool-use patterns {#sec-tool-use-patterns}</span></span>
+<span id="cb10-294"><a href="#cb10-294" aria-hidden="true" tabindex="-1"></a>El agente se pausa para evaluar su propia trayectoria y corregir el rumbo:</span>
+<span id="cb10-295"><a href="#cb10-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-296"><a href="#cb10-296" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Validación de salida**: "¿es correcto esto? ¿me he dejado algo?"</span>
+<span id="cb10-297"><a href="#cb10-297" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Revisión de trayectoria**: Revisar los últimos k pasos e identificar errores o ineficiencias</span>
+<span id="cb10-298"><a href="#cb10-298" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Revisión de estrategia**: Reconsiderar el enfoque global ("¿estoy resolviendo el problema correcto?")</span>
+<span id="cb10-299"><a href="#cb10-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-300"><a href="#cb10-300" aria-hidden="true" tabindex="-1"></a>::: {.callout-note}</span>
+<span id="cb10-301"><a href="#cb10-301" aria-hidden="true" tabindex="-1"></a><span class="fu">## Reflexion: aprender del fracaso</span></span>
+<span id="cb10-302"><a href="#cb10-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-303"><a href="#cb10-303" aria-hidden="true" tabindex="-1"></a>El patrón Reflexion <span class="co">[</span><span class="ot">@shinn2023reflexion</span><span class="co">]</span> mantiene una "memoria de reflexión" persistente: tras cada intento fallido, el agente escribe una reflexión en lenguaje natural ("fallé porque no comprobé el caso límite"). En el siguiente intento, estas reflexiones se incluyen en el prompt — aprendizaje entre episodios sin actualizar pesos.</span>
+<span id="cb10-304"><a href="#cb10-304" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb10-305"><a href="#cb10-305" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-306"><a href="#cb10-306" aria-hidden="true" tabindex="-1"></a>Cómo invoca el agente sus herramientas afecta a fiabilidad, latencia y coste. Cinco patrones canónicos <span class="co">[</span><span class="ot">@schick2023toolformer</span><span class="co">]</span>:</span>
+<span id="cb10-306"><a href="#cb10-306" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Tool-use patterns {#sec-tool-use-patterns}</span></span>
 <span id="cb10-307"><a href="#cb10-307" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-308"><a href="#cb10-308" aria-hidden="true" tabindex="-1"></a>: Patrones de invocación de herramientas {#tbl-tool-use-patterns}</span>
+<span id="cb10-308"><a href="#cb10-308" aria-hidden="true" tabindex="-1"></a>Cómo invoca el agente sus herramientas afecta a fiabilidad, latencia y coste. Cinco patrones canónicos <span class="co">[</span><span class="ot">@schick2023toolformer</span><span class="co">]</span>:</span>
 <span id="cb10-309"><a href="#cb10-309" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-310"><a href="#cb10-310" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Patrón <span class="pp">|</span> Descripción <span class="pp">|</span> Ejemplo <span class="pp">|</span></span>
-<span id="cb10-311"><a href="#cb10-311" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
-<span id="cb10-312"><a href="#cb10-312" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Single-turn <span class="pp">|</span> Una llamada a tool por respuesta <span class="pp">|</span> Q&amp;A simple con búsqueda <span class="pp">|</span></span>
-<span id="cb10-313"><a href="#cb10-313" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Multi-tool <span class="pp">|</span> Varias llamadas en paralelo en una respuesta <span class="pp">|</span> Buscar + calcular + formatear <span class="pp">|</span></span>
-<span id="cb10-314"><a href="#cb10-314" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Sequential <span class="pp">|</span> La salida de una tool alimenta la siguiente <span class="pp">|</span> Buscar → leer → extraer <span class="pp">|</span></span>
-<span id="cb10-315"><a href="#cb10-315" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Nested <span class="pp">|</span> Una tool invoca a otro agente <span class="pp">|</span> Agente de código llama a test-runner <span class="pp">|</span></span>
-<span id="cb10-316"><a href="#cb10-316" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fallback <span class="pp">|</span> Si la tool preferida falla, probar alternativa <span class="pp">|</span> API → scrape → caché <span class="pp">|</span></span>
-<span id="cb10-317"><a href="#cb10-317" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-318"><a href="#cb10-318" aria-hidden="true" tabindex="-1"></a>El nested (agent-as-tool) merece atención: una herramienta invoca a un agente completamente separado, con su propio prompt, tools y contexto. El agente padre trata al sub-agente como una caja negra. El patrón Swarm <span class="co">[</span><span class="ot">@openai2024swarm</span><span class="co">]</span> lo generaliza mediante handoffs entre agentes especializados.</span>
+<span id="cb10-310"><a href="#cb10-310" aria-hidden="true" tabindex="-1"></a>: Patrones de invocación de herramientas {#tbl-tool-use-patterns}</span>
+<span id="cb10-311"><a href="#cb10-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-312"><a href="#cb10-312" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Patrón <span class="pp">|</span> Descripción <span class="pp">|</span> Ejemplo <span class="pp">|</span></span>
+<span id="cb10-313"><a href="#cb10-313" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|</span></span>
+<span id="cb10-314"><a href="#cb10-314" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Single-turn <span class="pp">|</span> Una llamada a tool por respuesta <span class="pp">|</span> Q&amp;A simple con búsqueda <span class="pp">|</span></span>
+<span id="cb10-315"><a href="#cb10-315" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Multi-tool <span class="pp">|</span> Varias llamadas en paralelo en una respuesta <span class="pp">|</span> Buscar + calcular + formatear <span class="pp">|</span></span>
+<span id="cb10-316"><a href="#cb10-316" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Sequential <span class="pp">|</span> La salida de una tool alimenta la siguiente <span class="pp">|</span> Buscar → leer → extraer <span class="pp">|</span></span>
+<span id="cb10-317"><a href="#cb10-317" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Nested <span class="pp">|</span> Una tool invoca a otro agente <span class="pp">|</span> Agente de código llama a test-runner <span class="pp">|</span></span>
+<span id="cb10-318"><a href="#cb10-318" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Fallback <span class="pp">|</span> Si la tool preferida falla, probar alternativa <span class="pp">|</span> API → scrape → caché <span class="pp">|</span></span>
 <span id="cb10-319"><a href="#cb10-319" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-320"><a href="#cb10-320" aria-hidden="true" tabindex="-1"></a><span class="fu">### Human-in-the-loop {#sec-human-in-the-loop}</span></span>
+<span id="cb10-320"><a href="#cb10-320" aria-hidden="true" tabindex="-1"></a>El nested (agent-as-tool) merece atención: una herramienta invoca a un agente completamente separado, con su propio prompt, tools y contexto. El agente padre trata al sub-agente como una caja negra. El patrón Swarm <span class="co">[</span><span class="ot">@openai2024swarm</span><span class="co">]</span> lo generaliza mediante handoffs entre agentes especializados.</span>
 <span id="cb10-321"><a href="#cb10-321" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-322"><a href="#cb10-322" aria-hidden="true" tabindex="-1"></a>Los agentes de producción deben saber cuándo pausar y pedir intervención humana:</span>
+<span id="cb10-322"><a href="#cb10-322" aria-hidden="true" tabindex="-1"></a><span class="fu">### Human-in-the-loop {#sec-human-in-the-loop}</span></span>
 <span id="cb10-323"><a href="#cb10-323" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-324"><a href="#cb10-324" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Gates de aprobación**: antes de acciones irreversibles (enviar emails, borrar archivos, comprar), requerir confirmación humana explícita.</span>
-<span id="cb10-325"><a href="#cb10-325" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Criterios de escalado**: escalar cuando la confianza es baja, la tarea está fuera de alcance o se dispara una regla de seguridad.</span>
-<span id="cb10-326"><a href="#cb10-326" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Integración de feedback**: las correcciones humanas se insertan en el contexto y pueden actualizar el plan del agente.</span>
-<span id="cb10-327"><a href="#cb10-327" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Aprobación asíncrona**: en tareas largas, el agente pausa, notifica (email/Slack) y reanuda al aprobarse.</span>
-<span id="cb10-328"><a href="#cb10-328" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-329"><a href="#cb10-329" aria-hidden="true" tabindex="-1"></a>Este patrón conecta directamente con la gobernanza del <span class="co">[</span><span class="ot">Bloque 4</span><span class="co">](../bloque4/04-gobernanza.qmd)</span>.</span>
+<span id="cb10-324"><a href="#cb10-324" aria-hidden="true" tabindex="-1"></a>Los agentes de producción deben saber cuándo pausar y pedir intervención humana:</span>
+<span id="cb10-325"><a href="#cb10-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-326"><a href="#cb10-326" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Gates de aprobación**: antes de acciones irreversibles (enviar emails, borrar archivos, comprar), requerir confirmación humana explícita.</span>
+<span id="cb10-327"><a href="#cb10-327" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Criterios de escalado**: escalar cuando la confianza es baja, la tarea está fuera de alcance o se dispara una regla de seguridad.</span>
+<span id="cb10-328"><a href="#cb10-328" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Integración de feedback**: las correcciones humanas se insertan en el contexto y pueden actualizar el plan del agente.</span>
+<span id="cb10-329"><a href="#cb10-329" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Aprobación asíncrona**: en tareas largas, el agente pausa, notifica (email/Slack) y reanuda al aprobarse.</span>
 <span id="cb10-330"><a href="#cb10-330" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-331"><a href="#cb10-331" aria-hidden="true" tabindex="-1"></a><span class="fu">### Workflow graphs {#sec-workflow-graphs}</span></span>
+<span id="cb10-331"><a href="#cb10-331" aria-hidden="true" tabindex="-1"></a>Este patrón conecta directamente con la gobernanza del <span class="co">[</span><span class="ot">Bloque 4</span><span class="co">](../bloque4/04-gobernanza.qmd)</span>.</span>
 <span id="cb10-332"><a href="#cb10-332" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-333"><a href="#cb10-333" aria-hidden="true" tabindex="-1"></a>Para workflows complejos, la lógica de orquestación se expresa como un grafo dirigido acíclico (DAG) o máquina de estados:</span>
+<span id="cb10-333"><a href="#cb10-333" aria-hidden="true" tabindex="-1"></a><span class="fu">### Workflow graphs {#sec-workflow-graphs}</span></span>
 <span id="cb10-334"><a href="#cb10-334" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-335"><a href="#cb10-335" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**LangGraph** <span class="co">[</span><span class="ot">@langchain2024langgraph</span><span class="co">]</span>: extiende LangChain con ejecución basada en grafos. Los nodos son pasos del agente; las aristas, transiciones condicionales. Soporta ciclos (para bucles ReAct) y ramas paralelas. Ya lo usamos en <span class="co">[</span><span class="ot">02e</span><span class="co">](02e-agentes.qmd#sec-rag-langgraph)</span> para el pipeline RAG supervisado.</span>
-<span id="cb10-336"><a href="#cb10-336" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**AutoGen** <span class="co">[</span><span class="ot">@wu2023autogen</span><span class="co">]</span>: framework de Microsoft para grafos de conversación multi-agente: nested chats, group chats y human-in-the-loop.</span>
-<span id="cb10-337"><a href="#cb10-337" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Máquinas de estado**: estados explícitos (<span class="in">`PLANNING`</span>, <span class="in">`EXECUTING`</span>, <span class="in">`WAITING_FOR_HUMAN`</span>, <span class="in">`DONE`</span>) con transiciones definidas. Más fáciles de razonar y testear que bucles implícitos.</span>
-<span id="cb10-338"><a href="#cb10-338" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-339"><a href="#cb10-339" aria-hidden="true" tabindex="-1"></a><span class="fu">### Principios de diseño {#sec-principios-diseno}</span></span>
+<span id="cb10-335"><a href="#cb10-335" aria-hidden="true" tabindex="-1"></a>Para workflows complejos, la lógica de orquestación se expresa como un grafo dirigido acíclico (DAG) o máquina de estados:</span>
+<span id="cb10-336"><a href="#cb10-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-337"><a href="#cb10-337" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**LangGraph** <span class="co">[</span><span class="ot">@langchain2024langgraph</span><span class="co">]</span>: extiende LangChain con ejecución basada en grafos. Los nodos son pasos del agente; las aristas, transiciones condicionales. Soporta ciclos (para bucles ReAct) y ramas paralelas. Ya lo usamos en <span class="co">[</span><span class="ot">02e</span><span class="co">](02e-agentes.qmd#sec-rag-langgraph)</span> para el pipeline RAG supervisado.</span>
+<span id="cb10-338"><a href="#cb10-338" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**AutoGen** <span class="co">[</span><span class="ot">@wu2023autogen</span><span class="co">]</span>: framework de Microsoft para grafos de conversación multi-agente: nested chats, group chats y human-in-the-loop.</span>
+<span id="cb10-339"><a href="#cb10-339" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>**Máquinas de estado**: estados explícitos (<span class="in">`PLANNING`</span>, <span class="in">`EXECUTING`</span>, <span class="in">`WAITING_FOR_HUMAN`</span>, <span class="in">`DONE`</span>) con transiciones definidas. Más fáciles de razonar y testear que bucles implícitos.</span>
 <span id="cb10-340"><a href="#cb10-340" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-341"><a href="#cb10-341" aria-hidden="true" tabindex="-1"></a>Los siguientes principios, destilados de la guía de Anthropic <span class="co">[</span><span class="ot">@anthropic2024buildingagents</span><span class="co">]</span>, aplican a todos los patrones:</span>
+<span id="cb10-341"><a href="#cb10-341" aria-hidden="true" tabindex="-1"></a><span class="fu">### Principios de diseño {#sec-principios-diseno}</span></span>
 <span id="cb10-342"><a href="#cb10-342" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-343"><a href="#cb10-343" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Manténlo simple.** Usa la arquitectura más simple que funcione. Añade complejidad solo cuando se demuestre necesaria. Una cadena de prompts que resuelve el problema es siempre preferible a un sistema multi-agente que *podría* resolverlo.</span>
-<span id="cb10-344"><a href="#cb10-344" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Transparencia sobre ingenio.** Cada paso debe ser inspeccionable. Evita estado oculto o razonamiento implícito: cuando un agente falla, necesitas entender *por qué*.</span>
-<span id="cb10-345"><a href="#cb10-345" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Proporciona buenas herramientas.** Herramientas bien documentadas, bien tipadas y con mensajes de error claros son multiplicadores de fuerza.</span>
-<span id="cb10-346"><a href="#cb10-346" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Planifica para el fallo.** Toda llamada a tool puede fallar. Construye reintentos, fallbacks y degradación elegante a nivel del harness, para que el modelo no tenga que razonar sobre fallos de infraestructura.</span>
-<span id="cb10-347"><a href="#cb10-347" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Usa salidas estructuradas.** La generación restringida (JSON schema, function calling) evita fallos de parseo.</span>
-<span id="cb10-348"><a href="#cb10-348" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Testea con entradas diversas.** El comportamiento del agente es más variable que el chat de un solo turno: el mismo prompt puede producir secuencias de tool calls distintas en ejecuciones diferentes.</span>
-<span id="cb10-349"><a href="#cb10-349" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-350"><a href="#cb10-350" aria-hidden="true" tabindex="-1"></a><span class="fu">### Guía de selección de patrones {#sec-guia-seleccion}</span></span>
+<span id="cb10-343"><a href="#cb10-343" aria-hidden="true" tabindex="-1"></a>Los siguientes principios, destilados de la guía de Anthropic <span class="co">[</span><span class="ot">@anthropic2024buildingagents</span><span class="co">]</span>, aplican a todos los patrones:</span>
+<span id="cb10-344"><a href="#cb10-344" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-345"><a href="#cb10-345" aria-hidden="true" tabindex="-1"></a><span class="ss">1. </span>**Manténlo simple.** Usa la arquitectura más simple que funcione. Añade complejidad solo cuando se demuestre necesaria. Una cadena de prompts que resuelve el problema es siempre preferible a un sistema multi-agente que *podría* resolverlo.</span>
+<span id="cb10-346"><a href="#cb10-346" aria-hidden="true" tabindex="-1"></a><span class="ss">2. </span>**Transparencia sobre ingenio.** Cada paso debe ser inspeccionable. Evita estado oculto o razonamiento implícito: cuando un agente falla, necesitas entender *por qué*.</span>
+<span id="cb10-347"><a href="#cb10-347" aria-hidden="true" tabindex="-1"></a><span class="ss">3. </span>**Proporciona buenas herramientas.** Herramientas bien documentadas, bien tipadas y con mensajes de error claros son multiplicadores de fuerza.</span>
+<span id="cb10-348"><a href="#cb10-348" aria-hidden="true" tabindex="-1"></a><span class="ss">4. </span>**Planifica para el fallo.** Toda llamada a tool puede fallar. Construye reintentos, fallbacks y degradación elegante a nivel del harness, para que el modelo no tenga que razonar sobre fallos de infraestructura.</span>
+<span id="cb10-349"><a href="#cb10-349" aria-hidden="true" tabindex="-1"></a><span class="ss">5. </span>**Usa salidas estructuradas.** La generación restringida (JSON schema, function calling) evita fallos de parseo.</span>
+<span id="cb10-350"><a href="#cb10-350" aria-hidden="true" tabindex="-1"></a><span class="ss">6. </span>**Testea con entradas diversas.** El comportamiento del agente es más variable que el chat de un solo turno: el mismo prompt puede producir secuencias de tool calls distintas en ejecuciones diferentes.</span>
 <span id="cb10-351"><a href="#cb10-351" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-352"><a href="#cb10-352" aria-hidden="true" tabindex="-1"></a>Elegir el patrón correcto depende de tres factores: (1) lo predecible que es la estructura de la tarea, (2) cuántas llamadas al LLM puedes permitirte en latencia y coste, y (3) si la calidad requiere iteración. Usa esta matriz como punto de partida — empieza por arriba (lo más simple) y baja solo cuando el patrón simple falle demostrablemente:</span>
+<span id="cb10-352"><a href="#cb10-352" aria-hidden="true" tabindex="-1"></a><span class="fu">### Guía de selección de patrones {#sec-guia-seleccion}</span></span>
 <span id="cb10-353"><a href="#cb10-353" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-354"><a href="#cb10-354" aria-hidden="true" tabindex="-1"></a>: Cuándo usar cada patrón de diseño {#tbl-guia-seleccion}</span>
+<span id="cb10-354"><a href="#cb10-354" aria-hidden="true" tabindex="-1"></a>Elegir el patrón correcto depende de tres factores: (1) lo predecible que es la estructura de la tarea, (2) cuántas llamadas al LLM puedes permitirte en latencia y coste, y (3) si la calidad requiere iteración. Usa esta matriz como punto de partida — empieza por arriba (lo más simple) y baja solo cuando el patrón simple falle demostrablemente:</span>
 <span id="cb10-355"><a href="#cb10-355" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-356"><a href="#cb10-356" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Patrón <span class="pp">|</span> Complejidad <span class="pp">|</span> Llamadas LLM <span class="pp">|</span> Mejor para <span class="pp">|</span></span>
-<span id="cb10-357"><a href="#cb10-357" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
-<span id="cb10-358"><a href="#cb10-358" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cadena simple <span class="pp">|</span> Mínima <span class="pp">|</span> 1-2 <span class="pp">|</span> Baseline, tareas de 1-2 pasos <span class="pp">|</span></span>
-<span id="cb10-359"><a href="#cb10-359" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Prompt chaining <span class="pp">|</span> Baja <span class="pp">|</span> N (fijas) <span class="pp">|</span> Tareas secuenciales, pipelines de contenido <span class="pp">|</span></span>
-<span id="cb10-360"><a href="#cb10-360" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Routing <span class="pp">|</span> Baja <span class="pp">|</span> 1 + 1 <span class="pp">|</span> Entradas multi-tipo, triaje <span class="pp">|</span></span>
-<span id="cb10-361"><a href="#cb10-361" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Parallelization <span class="pp">|</span> Baja <span class="pp">|</span> N (paralelas) <span class="pp">|</span> Subtareas independientes, votación <span class="pp">|</span></span>
-<span id="cb10-362"><a href="#cb10-362" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Orchestrator-workers <span class="pp">|</span> Media <span class="pp">|</span> Variable <span class="pp">|</span> Descomposición desconocida <span class="pp">|</span></span>
-<span id="cb10-363"><a href="#cb10-363" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Evaluator-optimizer <span class="pp">|</span> Media <span class="pp">|</span> 2-10 (bucle) <span class="pp">|</span> Salidas críticas en calidad <span class="pp">|</span></span>
-<span id="cb10-364"><a href="#cb10-364" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> ReAct <span class="pp">|</span> Media <span class="pp">|</span> 3-25 (bucle) <span class="pp">|</span> Uso general de tools, exploración <span class="pp">|</span></span>
-<span id="cb10-365"><a href="#cb10-365" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Planning <span class="pp">|</span> Alta <span class="pp">|</span> 5-50+ <span class="pp">|</span> Tareas de horizonte largo <span class="pp">|</span></span>
-<span id="cb10-366"><a href="#cb10-366" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reflection <span class="pp">|</span> Alta <span class="pp">|</span> +50 % overhead <span class="pp">|</span> Tareas donde el primer intento suele fallar <span class="pp">|</span></span>
-<span id="cb10-367"><a href="#cb10-367" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Multi-agente <span class="pp">|</span> Alta <span class="pp">|</span> Muchas <span class="pp">|</span> Dominios complejos, especialización <span class="pp">|</span></span>
-<span id="cb10-368"><a href="#cb10-368" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-369"><a href="#cb10-369" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
-<span id="cb10-370"><a href="#cb10-370" aria-hidden="true" tabindex="-1"></a><span class="fu">## Los patrones se componen</span></span>
-<span id="cb10-371"><a href="#cb10-371" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-372"><a href="#cb10-372" aria-hidden="true" tabindex="-1"></a>Un agente de planificación puede usar prompt chaining para pasos individuales, un evaluator-optimizer dentro de su fase de revisión y routing para despachar subtareas a especialistas. El arte está en saber cuándo dejar de añadir capas.</span>
-<span id="cb10-373"><a href="#cb10-373" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb10-374"><a href="#cb10-374" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-375"><a href="#cb10-375" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ejemplos prácticos {#sec-ejemplos-practicos}</span></span>
+<span id="cb10-356"><a href="#cb10-356" aria-hidden="true" tabindex="-1"></a>: Cuándo usar cada patrón de diseño {#tbl-guia-seleccion}</span>
+<span id="cb10-357"><a href="#cb10-357" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-358"><a href="#cb10-358" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Patrón <span class="pp">|</span> Complejidad <span class="pp">|</span> Llamadas LLM <span class="pp">|</span> Mejor para <span class="pp">|</span></span>
+<span id="cb10-359"><a href="#cb10-359" aria-hidden="true" tabindex="-1"></a><span class="pp">|---|---|---|---|</span></span>
+<span id="cb10-360"><a href="#cb10-360" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Cadena simple <span class="pp">|</span> Mínima <span class="pp">|</span> 1-2 <span class="pp">|</span> Baseline, tareas de 1-2 pasos <span class="pp">|</span></span>
+<span id="cb10-361"><a href="#cb10-361" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Prompt chaining <span class="pp">|</span> Baja <span class="pp">|</span> N (fijas) <span class="pp">|</span> Tareas secuenciales, pipelines de contenido <span class="pp">|</span></span>
+<span id="cb10-362"><a href="#cb10-362" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Routing <span class="pp">|</span> Baja <span class="pp">|</span> 1 + 1 <span class="pp">|</span> Entradas multi-tipo, triaje <span class="pp">|</span></span>
+<span id="cb10-363"><a href="#cb10-363" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Parallelization <span class="pp">|</span> Baja <span class="pp">|</span> N (paralelas) <span class="pp">|</span> Subtareas independientes, votación <span class="pp">|</span></span>
+<span id="cb10-364"><a href="#cb10-364" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Orchestrator-workers <span class="pp">|</span> Media <span class="pp">|</span> Variable <span class="pp">|</span> Descomposición desconocida <span class="pp">|</span></span>
+<span id="cb10-365"><a href="#cb10-365" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Evaluator-optimizer <span class="pp">|</span> Media <span class="pp">|</span> 2-10 (bucle) <span class="pp">|</span> Salidas críticas en calidad <span class="pp">|</span></span>
+<span id="cb10-366"><a href="#cb10-366" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> ReAct <span class="pp">|</span> Media <span class="pp">|</span> 3-25 (bucle) <span class="pp">|</span> Uso general de tools, exploración <span class="pp">|</span></span>
+<span id="cb10-367"><a href="#cb10-367" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Planning <span class="pp">|</span> Alta <span class="pp">|</span> 5-50+ <span class="pp">|</span> Tareas de horizonte largo <span class="pp">|</span></span>
+<span id="cb10-368"><a href="#cb10-368" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Reflection <span class="pp">|</span> Alta <span class="pp">|</span> +50 % overhead <span class="pp">|</span> Tareas donde el primer intento suele fallar <span class="pp">|</span></span>
+<span id="cb10-369"><a href="#cb10-369" aria-hidden="true" tabindex="-1"></a><span class="pp">|</span> Multi-agente <span class="pp">|</span> Alta <span class="pp">|</span> Muchas <span class="pp">|</span> Dominios complejos, especialización <span class="pp">|</span></span>
+<span id="cb10-370"><a href="#cb10-370" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-371"><a href="#cb10-371" aria-hidden="true" tabindex="-1"></a>::: {.callout-tip}</span>
+<span id="cb10-372"><a href="#cb10-372" aria-hidden="true" tabindex="-1"></a><span class="fu">## Los patrones se componen</span></span>
+<span id="cb10-373"><a href="#cb10-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-374"><a href="#cb10-374" aria-hidden="true" tabindex="-1"></a>Un agente de planificación puede usar prompt chaining para pasos individuales, un evaluator-optimizer dentro de su fase de revisión y routing para despachar subtareas a especialistas. El arte está en saber cuándo dejar de añadir capas.</span>
+<span id="cb10-375"><a href="#cb10-375" aria-hidden="true" tabindex="-1"></a>:::</span>
 <span id="cb10-376"><a href="#cb10-376" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-377"><a href="#cb10-377" aria-hidden="true" tabindex="-1"></a>Veamos dos patrones de workflow en código: prompt chaining y routing con LangChain.</span>
+<span id="cb10-377"><a href="#cb10-377" aria-hidden="true" tabindex="-1"></a><span class="fu">## Ejemplos prácticos {#sec-ejemplos-practicos}</span></span>
 <span id="cb10-378"><a href="#cb10-378" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-379"><a href="#cb10-379" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prompt chaining con LCEL {#sec-ejemplo-chaining}</span></span>
+<span id="cb10-379"><a href="#cb10-379" aria-hidden="true" tabindex="-1"></a>Veamos dos patrones de workflow en código: prompt chaining y routing con LangChain.</span>
 <span id="cb10-380"><a href="#cb10-380" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-381"><a href="#cb10-381" aria-hidden="true" tabindex="-1"></a>Doble llamada: primero un borrador, luego una revisión que lo mejora. El resultado del primer paso es el contexto del segundo.</span>
+<span id="cb10-381"><a href="#cb10-381" aria-hidden="true" tabindex="-1"></a><span class="fu">### Prompt chaining con LCEL {#sec-ejemplo-chaining}</span></span>
 <span id="cb10-382"><a href="#cb10-382" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-385"><a href="#cb10-385" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb10-386"><a href="#cb10-386" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb10-387"><a href="#cb10-387" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-388"><a href="#cb10-388" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.prompts <span class="im">import</span> ChatPromptTemplate</span>
-<span id="cb10-389"><a href="#cb10-389" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.output_parsers <span class="im">import</span> StrOutputParser</span>
-<span id="cb10-390"><a href="#cb10-390" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-391"><a href="#cb10-391" aria-hidden="true" tabindex="-1"></a><span class="co"># Paso 1: generar el borrador</span></span>
-<span id="cb10-392"><a href="#cb10-392" aria-hidden="true" tabindex="-1"></a>paso1 <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
-<span id="cb10-393"><a href="#cb10-393" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"Eres un redactor técnico. Escribe un resumen ejecutivo del texto dado."</span>),</span>
-<span id="cb10-394"><a href="#cb10-394" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"user"</span>, <span class="st">"</span><span class="sc">{texto}</span><span class="st">"</span>)</span>
-<span id="cb10-395"><a href="#cb10-395" aria-hidden="true" tabindex="-1"></a>]) <span class="op">|</span> llm <span class="op">|</span> StrOutputParser()</span>
-<span id="cb10-396"><a href="#cb10-396" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-397"><a href="#cb10-397" aria-hidden="true" tabindex="-1"></a><span class="co"># Paso 2: revisar el borrador</span></span>
-<span id="cb10-398"><a href="#cb10-398" aria-hidden="true" tabindex="-1"></a>paso2 <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
-<span id="cb10-399"><a href="#cb10-399" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"Eres un editor senior. Mejora el borrador: corrige imprecisiones, "</span></span>
-<span id="cb10-400"><a href="#cb10-400" aria-hidden="true" tabindex="-1"></a>               <span class="st">"hazlo más conciso y añade una conclusión con recomendaciones."</span>),</span>
-<span id="cb10-401"><a href="#cb10-401" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"user"</span>, <span class="st">"Borrador:</span><span class="ch">\n</span><span class="sc">{borrador}</span><span class="st">"</span>)</span>
-<span id="cb10-402"><a href="#cb10-402" aria-hidden="true" tabindex="-1"></a>]) <span class="op">|</span> llm <span class="op">|</span> StrOutputParser()</span>
-<span id="cb10-403"><a href="#cb10-403" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-404"><a href="#cb10-404" aria-hidden="true" tabindex="-1"></a>cadena <span class="op">=</span> paso1 <span class="op">|</span> paso2  <span class="co"># LCEL: la salida del paso 1 alimenta al paso 2</span></span>
+<span id="cb10-383"><a href="#cb10-383" aria-hidden="true" tabindex="-1"></a>Doble llamada: primero un borrador, luego una revisión que lo mejora. El resultado del primer paso es el contexto del segundo.</span>
+<span id="cb10-384"><a href="#cb10-384" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-387"><a href="#cb10-387" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb10-388"><a href="#cb10-388" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb10-389"><a href="#cb10-389" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-390"><a href="#cb10-390" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.prompts <span class="im">import</span> ChatPromptTemplate</span>
+<span id="cb10-391"><a href="#cb10-391" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> langchain_core.output_parsers <span class="im">import</span> StrOutputParser</span>
+<span id="cb10-392"><a href="#cb10-392" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-393"><a href="#cb10-393" aria-hidden="true" tabindex="-1"></a><span class="co"># Paso 1: generar el borrador</span></span>
+<span id="cb10-394"><a href="#cb10-394" aria-hidden="true" tabindex="-1"></a>paso1 <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
+<span id="cb10-395"><a href="#cb10-395" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"Eres un redactor técnico. Escribe un resumen ejecutivo del texto dado."</span>),</span>
+<span id="cb10-396"><a href="#cb10-396" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"user"</span>, <span class="st">"</span><span class="sc">{texto}</span><span class="st">"</span>)</span>
+<span id="cb10-397"><a href="#cb10-397" aria-hidden="true" tabindex="-1"></a>]) <span class="op">|</span> llm <span class="op">|</span> StrOutputParser()</span>
+<span id="cb10-398"><a href="#cb10-398" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-399"><a href="#cb10-399" aria-hidden="true" tabindex="-1"></a><span class="co"># Paso 2: revisar el borrador</span></span>
+<span id="cb10-400"><a href="#cb10-400" aria-hidden="true" tabindex="-1"></a>paso2 <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
+<span id="cb10-401"><a href="#cb10-401" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"Eres un editor senior. Mejora el borrador: corrige imprecisiones, "</span></span>
+<span id="cb10-402"><a href="#cb10-402" aria-hidden="true" tabindex="-1"></a>               <span class="st">"hazlo más conciso y añade una conclusión con recomendaciones."</span>),</span>
+<span id="cb10-403"><a href="#cb10-403" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"user"</span>, <span class="st">"Borrador:</span><span class="ch">\n</span><span class="sc">{borrador}</span><span class="st">"</span>)</span>
+<span id="cb10-404"><a href="#cb10-404" aria-hidden="true" tabindex="-1"></a>]) <span class="op">|</span> llm <span class="op">|</span> StrOutputParser()</span>
 <span id="cb10-405"><a href="#cb10-405" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-406"><a href="#cb10-406" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
-<span id="cb10-407"><a href="#cb10-407" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ejecutar el ejemplo."</span>)</span>
-<span id="cb10-408"><a href="#cb10-408" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb10-409"><a href="#cb10-409" aria-hidden="true" tabindex="-1"></a>    texto <span class="op">=</span> <span class="st">"La empresa tiene 120 empleados, creció un 15</span><span class="sc">% e</span><span class="st">ste año y planea expandirse a LATAM en 2026."</span></span>
-<span id="cb10-410"><a href="#cb10-410" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"=== Paso 1: borrador ==="</span>)</span>
-<span id="cb10-411"><a href="#cb10-411" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(paso1.invoke({<span class="st">"texto"</span>: texto})[:<span class="dv">200</span>], <span class="st">"..."</span>)</span>
-<span id="cb10-412"><a href="#cb10-412" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Paso 2: versión final ==="</span>)</span>
-<span id="cb10-413"><a href="#cb10-413" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(cadena.invoke({<span class="st">"texto"</span>: texto}))</span>
-<span id="cb10-414"><a href="#cb10-414" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-415"><a href="#cb10-415" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-416"><a href="#cb10-416" aria-hidden="true" tabindex="-1"></a>Si el borrador no supera una validación (p. ej. longitud mínima), un paso programático puede reenviarlo al generador antes de pasar al siguiente — ese es el *gate* del patrón.</span>
+<span id="cb10-406"><a href="#cb10-406" aria-hidden="true" tabindex="-1"></a>cadena <span class="op">=</span> paso1 <span class="op">|</span> paso2  <span class="co"># LCEL: la salida del paso 1 alimenta al paso 2</span></span>
+<span id="cb10-407"><a href="#cb10-407" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-408"><a href="#cb10-408" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb10-409"><a href="#cb10-409" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ejecutar el ejemplo."</span>)</span>
+<span id="cb10-410"><a href="#cb10-410" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb10-411"><a href="#cb10-411" aria-hidden="true" tabindex="-1"></a>    texto <span class="op">=</span> <span class="st">"La empresa tiene 120 empleados, creció un 15</span><span class="sc">% e</span><span class="st">ste año y planea expandirse a LATAM en 2026."</span></span>
+<span id="cb10-412"><a href="#cb10-412" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"=== Paso 1: borrador ==="</span>)</span>
+<span id="cb10-413"><a href="#cb10-413" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(paso1.invoke({<span class="st">"texto"</span>: texto})[:<span class="dv">200</span>], <span class="st">"..."</span>)</span>
+<span id="cb10-414"><a href="#cb10-414" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">=== Paso 2: versión final ==="</span>)</span>
+<span id="cb10-415"><a href="#cb10-415" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(cadena.invoke({<span class="st">"texto"</span>: texto}))</span>
+<span id="cb10-416"><a href="#cb10-416" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb10-417"><a href="#cb10-417" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-418"><a href="#cb10-418" aria-hidden="true" tabindex="-1"></a><span class="fu">### Routing con LangChain {#sec-ejemplo-routing}</span></span>
+<span id="cb10-418"><a href="#cb10-418" aria-hidden="true" tabindex="-1"></a>Si el borrador no supera una validación (p. ej. longitud mínima), un paso programático puede reenviarlo al generador antes de pasar al siguiente — ese es el *gate* del patrón.</span>
 <span id="cb10-419"><a href="#cb10-419" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-420"><a href="#cb10-420" aria-hidden="true" tabindex="-1"></a>Un clasificador decide qué prompt especializado recibe cada pregunta:</span>
+<span id="cb10-420"><a href="#cb10-420" aria-hidden="true" tabindex="-1"></a><span class="fu">### Routing con LangChain {#sec-ejemplo-routing}</span></span>
 <span id="cb10-421"><a href="#cb10-421" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-424"><a href="#cb10-424" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
-<span id="cb10-425"><a href="#cb10-425" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
-<span id="cb10-426"><a href="#cb10-426" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-427"><a href="#cb10-427" aria-hidden="true" tabindex="-1"></a><span class="co"># Dos manejadores especializados</span></span>
-<span id="cb10-428"><a href="#cb10-428" aria-hidden="true" tabindex="-1"></a>prompt_facto <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
-<span id="cb10-429"><a href="#cb10-429" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"Responde con datos concretos y precisos. Si no los sabes, dilo."</span>),</span>
-<span id="cb10-430"><a href="#cb10-430" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"user"</span>, <span class="st">"</span><span class="sc">{pregunta}</span><span class="st">"</span>)</span>
-<span id="cb10-431"><a href="#cb10-431" aria-hidden="true" tabindex="-1"></a>]) <span class="op">|</span> llm <span class="op">|</span> StrOutputParser()</span>
-<span id="cb10-432"><a href="#cb10-432" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-433"><a href="#cb10-433" aria-hidden="true" tabindex="-1"></a>prompt_analisis <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
-<span id="cb10-434"><a href="#cb10-434" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"Da una respuesta analítica: causas, tendencias y recomendaciones."</span>),</span>
-<span id="cb10-435"><a href="#cb10-435" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"user"</span>, <span class="st">"</span><span class="sc">{pregunta}</span><span class="st">"</span>)</span>
-<span id="cb10-436"><a href="#cb10-436" aria-hidden="true" tabindex="-1"></a>]) <span class="op">|</span> llm <span class="op">|</span> StrOutputParser()</span>
-<span id="cb10-437"><a href="#cb10-437" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-438"><a href="#cb10-438" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clasificar(pregunta: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb10-439"><a href="#cb10-439" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""El propio LLM decide la ruta: 'factual' o 'analitica'."""</span></span>
-<span id="cb10-440"><a href="#cb10-440" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=</span> llm.invoke(</span>
-<span id="cb10-441"><a href="#cb10-441" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Clasifica la pregunta como 'factual' (pide datos concretos) "</span></span>
-<span id="cb10-442"><a href="#cb10-442" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"o 'analitica' (pide interpretación). Pregunta: </span><span class="sc">{</span>pregunta<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span></span>
-<span id="cb10-443"><a href="#cb10-443" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Responde solo con una palabra: factual o analitica"</span></span>
-<span id="cb10-444"><a href="#cb10-444" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb10-445"><a href="#cb10-445" aria-hidden="true" tabindex="-1"></a>    ruta <span class="op">=</span> resp.content.strip().lower()</span>
-<span id="cb10-446"><a href="#cb10-446" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"factual"</span> <span class="cf">if</span> ruta.startswith(<span class="st">"fact"</span>) <span class="cf">else</span> <span class="st">"analitica"</span></span>
-<span id="cb10-447"><a href="#cb10-447" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-448"><a href="#cb10-448" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> router(pregunta: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
-<span id="cb10-449"><a href="#cb10-449" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> clasificar(pregunta) <span class="op">==</span> <span class="st">"factual"</span>:</span>
-<span id="cb10-450"><a href="#cb10-450" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> prompt_facto.invoke({<span class="st">"pregunta"</span>: pregunta})</span>
-<span id="cb10-451"><a href="#cb10-451" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> prompt_analisis.invoke({<span class="st">"pregunta"</span>: pregunta})</span>
-<span id="cb10-452"><a href="#cb10-452" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-453"><a href="#cb10-453" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
-<span id="cb10-454"><a href="#cb10-454" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ejecutar el ejemplo."</span>)</span>
-<span id="cb10-455"><a href="#cb10-455" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
-<span id="cb10-456"><a href="#cb10-456" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> p <span class="kw">in</span> [<span class="st">"¿Cuál es la población de Sevilla?"</span>, <span class="st">"¿Por qué crees que bajaron las ventas?"</span>]:</span>
-<span id="cb10-457"><a href="#cb10-457" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">PREGUNTA: </span><span class="sc">{</span>p<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb10-458"><a href="#cb10-458" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"→ Ruta: </span><span class="sc">{</span>clasificar(p)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb10-459"><a href="#cb10-459" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"→ Respuesta: </span><span class="sc">{</span>router(p)<span class="sc">}</span><span class="ss">"</span>)</span>
-<span id="cb10-460"><a href="#cb10-460" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb10-461"><a href="#cb10-461" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-462"><a href="#cb10-462" aria-hidden="true" tabindex="-1"></a>Fíjate en que el routing suele costar solo 1 llamada extra (la clasificación) y evita que un prompt genérico degrade las respuestas especializadas — por eso aparece como complejidad "baja" en @tbl-guia-seleccion.</span>
+<span id="cb10-422"><a href="#cb10-422" aria-hidden="true" tabindex="-1"></a>Un clasificador decide qué prompt especializado recibe cada pregunta:</span>
+<span id="cb10-423"><a href="#cb10-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-426"><a href="#cb10-426" aria-hidden="true" tabindex="-1"></a><span class="in">```{python}</span></span>
+<span id="cb10-427"><a href="#cb10-427" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb10-428"><a href="#cb10-428" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-429"><a href="#cb10-429" aria-hidden="true" tabindex="-1"></a><span class="co"># Dos manejadores especializados</span></span>
+<span id="cb10-430"><a href="#cb10-430" aria-hidden="true" tabindex="-1"></a>prompt_facto <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
+<span id="cb10-431"><a href="#cb10-431" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"Responde con datos concretos y precisos. Si no los sabes, dilo."</span>),</span>
+<span id="cb10-432"><a href="#cb10-432" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"user"</span>, <span class="st">"</span><span class="sc">{pregunta}</span><span class="st">"</span>)</span>
+<span id="cb10-433"><a href="#cb10-433" aria-hidden="true" tabindex="-1"></a>]) <span class="op">|</span> llm <span class="op">|</span> StrOutputParser()</span>
+<span id="cb10-434"><a href="#cb10-434" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-435"><a href="#cb10-435" aria-hidden="true" tabindex="-1"></a>prompt_analisis <span class="op">=</span> ChatPromptTemplate.from_messages([</span>
+<span id="cb10-436"><a href="#cb10-436" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"system"</span>, <span class="st">"Da una respuesta analítica: causas, tendencias y recomendaciones."</span>),</span>
+<span id="cb10-437"><a href="#cb10-437" aria-hidden="true" tabindex="-1"></a>    (<span class="st">"user"</span>, <span class="st">"</span><span class="sc">{pregunta}</span><span class="st">"</span>)</span>
+<span id="cb10-438"><a href="#cb10-438" aria-hidden="true" tabindex="-1"></a>]) <span class="op">|</span> llm <span class="op">|</span> StrOutputParser()</span>
+<span id="cb10-439"><a href="#cb10-439" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-440"><a href="#cb10-440" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> clasificar(pregunta: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb10-441"><a href="#cb10-441" aria-hidden="true" tabindex="-1"></a>    <span class="co">"""El propio LLM decide la ruta: 'factual' o 'analitica'."""</span></span>
+<span id="cb10-442"><a href="#cb10-442" aria-hidden="true" tabindex="-1"></a>    resp <span class="op">=</span> llm.invoke(</span>
+<span id="cb10-443"><a href="#cb10-443" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"Clasifica la pregunta como 'factual' (pide datos concretos) "</span></span>
+<span id="cb10-444"><a href="#cb10-444" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f"o 'analitica' (pide interpretación). Pregunta: </span><span class="sc">{</span>pregunta<span class="sc">}</span><span class="ch">\n</span><span class="ss">"</span></span>
+<span id="cb10-445"><a href="#cb10-445" aria-hidden="true" tabindex="-1"></a>        <span class="st">"Responde solo con una palabra: factual o analitica"</span></span>
+<span id="cb10-446"><a href="#cb10-446" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb10-447"><a href="#cb10-447" aria-hidden="true" tabindex="-1"></a>    ruta <span class="op">=</span> resp.content.strip().lower()</span>
+<span id="cb10-448"><a href="#cb10-448" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">"factual"</span> <span class="cf">if</span> ruta.startswith(<span class="st">"fact"</span>) <span class="cf">else</span> <span class="st">"analitica"</span></span>
+<span id="cb10-449"><a href="#cb10-449" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-450"><a href="#cb10-450" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> router(pregunta: <span class="bu">str</span>) <span class="op">-&gt;</span> <span class="bu">str</span>:</span>
+<span id="cb10-451"><a href="#cb10-451" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> clasificar(pregunta) <span class="op">==</span> <span class="st">"factual"</span>:</span>
+<span id="cb10-452"><a href="#cb10-452" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> prompt_facto.invoke({<span class="st">"pregunta"</span>: pregunta})</span>
+<span id="cb10-453"><a href="#cb10-453" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> prompt_analisis.invoke({<span class="st">"pregunta"</span>: pregunta})</span>
+<span id="cb10-454"><a href="#cb10-454" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-455"><a href="#cb10-455" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">not</span> LLM_KEY:</span>
+<span id="cb10-456"><a href="#cb10-456" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">"⚠️  Configura LLM_API_KEY en .env para ejecutar el ejemplo."</span>)</span>
+<span id="cb10-457"><a href="#cb10-457" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb10-458"><a href="#cb10-458" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> p <span class="kw">in</span> [<span class="st">"¿Cuál es la población de Sevilla?"</span>, <span class="st">"¿Por qué crees que bajaron las ventas?"</span>]:</span>
+<span id="cb10-459"><a href="#cb10-459" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"</span><span class="ch">\n</span><span class="ss">PREGUNTA: </span><span class="sc">{</span>p<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-460"><a href="#cb10-460" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"→ Ruta: </span><span class="sc">{</span>clasificar(p)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-461"><a href="#cb10-461" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f"→ Respuesta: </span><span class="sc">{</span>router(p)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb10-462"><a href="#cb10-462" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb10-463"><a href="#cb10-463" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-464"><a href="#cb10-464" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lecturas recomendadas</span></span>
+<span id="cb10-464"><a href="#cb10-464" aria-hidden="true" tabindex="-1"></a>Fíjate en que el routing suele costar solo 1 llamada extra (la clasificación) y evita que un prompt genérico degrade las respuestas especializadas — por eso aparece como complejidad "baja" en @tbl-guia-seleccion.</span>
 <span id="cb10-465"><a href="#cb10-465" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-466"><a href="#cb10-466" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@anthropic2024buildingagents — la guía original de la que parte esta taxonomía</span>
-<span id="cb10-467"><a href="#cb10-467" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@yao2023react — el patrón ReAct (profundizado en 02e)</span>
-<span id="cb10-468"><a href="#cb10-468" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@wang2023planandsolve — Plan-and-Solve prompting</span>
-<span id="cb10-469"><a href="#cb10-469" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@shinn2023reflexion — Reflexion: aprendizaje verbal entre episodios</span>
-<span id="cb10-470"><a href="#cb10-470" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@madaan2023selfrefine — Self-Refine: iteración con auto-feedback</span>
-<span id="cb10-471"><a href="#cb10-471" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@schick2023toolformer — Toolformer: enseñar a los LLM a usar herramientas</span>
-<span id="cb10-472"><a href="#cb10-472" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@wang2022selfconsistency — self-consistency para votación paralela</span>
-<span id="cb10-473"><a href="#cb10-473" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@langchain2024langgraph — LangGraph, grafos de ejecución para agentes</span>
-<span id="cb10-474"><a href="#cb10-474" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-475"><a href="#cb10-475" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb10-466"><a href="#cb10-466" aria-hidden="true" tabindex="-1"></a><span class="fu">## Lecturas recomendadas</span></span>
+<span id="cb10-467"><a href="#cb10-467" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-468"><a href="#cb10-468" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@anthropic2024buildingagents — la guía original de la que parte esta taxonomía</span>
+<span id="cb10-469"><a href="#cb10-469" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@yao2023react — el patrón ReAct (profundizado en 02e)</span>
+<span id="cb10-470"><a href="#cb10-470" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@wang2023planandsolve — Plan-and-Solve prompting</span>
+<span id="cb10-471"><a href="#cb10-471" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@shinn2023reflexion — Reflexion: aprendizaje verbal entre episodios</span>
+<span id="cb10-472"><a href="#cb10-472" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@madaan2023selfrefine — Self-Refine: iteración con auto-feedback</span>
+<span id="cb10-473"><a href="#cb10-473" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@schick2023toolformer — Toolformer: enseñar a los LLM a usar herramientas</span>
+<span id="cb10-474"><a href="#cb10-474" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@wang2022selfconsistency — self-consistency para votación paralela</span>
+<span id="cb10-475"><a href="#cb10-475" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>@langchain2024langgraph — LangGraph, grafos de ejecución para agentes</span>
 <span id="cb10-476"><a href="#cb10-476" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-477"><a href="#cb10-477" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
-<span id="cb10-478"><a href="#cb10-478" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb10-477"><a href="#cb10-477" aria-hidden="true" tabindex="-1"></a><span class="fu"># References</span></span>
+<span id="cb10-478"><a href="#cb10-478" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-479"><a href="#cb10-479" aria-hidden="true" tabindex="-1"></a>::: {#refs}</span>
+<span id="cb10-480"><a href="#cb10-480" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code></pre></div><button title="Copy to Clipboard" class="code-copy-button" data-in-quarto-modal=""><i class="bi"></i></button></div>
 </div></div></div></div></div>
 </div> <!-- /content -->
