@@ -367,7 +367,7 @@ from langchain_openai import ChatOpenAI
 # Usamos la API unificada de la Universidad de Sevilla (Llamus)
 # No necesita GPU — solo una API key que obtendrás en la asignatura
 llm = ChatOpenAI(
-    model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+    model=os.getenv("LLM_MODEL", "gemma4:26b"),
     max_tokens=2048,
     base_url=os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1"),
     api_key=os.getenv("LLM_API_KEY", "<API_KEY>")
@@ -594,8 +594,8 @@ La Universidad de Sevilla proporciona un endpoint OpenAI-compatible para usar LL
 
 ```
 Endpoint: https://llamus.cs.us.es/api/v1
-Modelos disponibles: gemma4:26b-mlx (default del curso), gpt-oss:20b,
-                  nemotron-3.5-lightning:30b-mlx, qwen3:8b, llama3.3:70b, ...
+Modelos disponibles: gemma4:26b (default del curso), gpt-oss:20b,
+                  qwen3:8b, llama3.3:70b, ...
 Modelo de embeddings: qwen3-embedding:0.6b
 ```
 
@@ -604,7 +604,8 @@ Funciona con `ChatOpenAI` de LangChain, el cliente OpenAI de Python o cualquier 
 ::: {.callout-warning}
 ## El nombre del modelo tiene que ser exacto
 
-`gemma4:26b` no existe: el identificador real es `gemma4:26b-mlx`. Si te equivocas, la API no devuelve un modelo parecido, devuelve `404 Model not found`. Puedes comprobar qué hay en tu cuenta con `client.models.list()` o `curl -H "Authorization: Bearer $LLM_API_KEY" https://llamus.cs.us.es/api/v1/models`.
+El identificador del modelo del curso es `gemma4:26b`. Si te equivocas, la API no devuelve un modelo parecido, devuelve `404 Model not found`. Puedes comprobar qué hay en tu cuenta con `client.models.list()` o `curl -H "Authorization: Bearer $LLM_API_KEY" https://llamus.cs.us.es/api/v1/models`.
+:::
 
 ```{python}
 #| echo: true
@@ -613,7 +614,7 @@ Funciona con `ChatOpenAI` de LangChain, el cliente OpenAI de Python o cualquier 
 from langchain_openai import ChatOpenAI
 
 llm = ChatOpenAI(
-    model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),   # Modelo principal del curso
+    model=os.getenv("LLM_MODEL", "gemma4:26b"),   # Modelo principal del curso
     max_tokens=2048,
     base_url=os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1"),
     api_key=os.getenv("LLM_API_KEY")

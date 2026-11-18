@@ -433,7 +433,7 @@ from openai import OpenAI
 
 LLM_KEY = os.getenv("LLM_API_KEY")
 LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
-LLM_MODEL = os.getenv("LLM_MODEL", "gemma4:26b-mlx")
+LLM_MODEL = os.getenv("LLM_MODEL", "gemma4:26b")
 
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env con:\n    LLM_API_KEY=tu_api_key")

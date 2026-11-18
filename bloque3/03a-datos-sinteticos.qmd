@@ -243,15 +243,15 @@ Un Variational Autoencoder (VAE) aprende a comprimir cada fila de datos en un ve
 ```{mermaid}
 graph LR
     subgraph "Entrenamiento"
-        A[Dato real x] --> B["\text{Encoder<br/>comprime a } $$\mu, \sigma$$"]
-        B --> C["$$z \sim N(\mu, \sigma^2)$$"]
-        C --> D["\text{Decoder<br/>reconstruye } $$\hat{x}$$"]
+        A["Dato real <i>x</i>"] --> B["Encoder<br/>comprime a μ, σ"]
+        B --> C["<i>z</i> ~ N(μ, σ²)"]
+        C --> D["Decoder<br/>reconstruye <i>x̂</i>"]
         A --> E{Pérdida}
         D --> E
     end
 
     subgraph "Generación"
-        F["$$z ~ N(0, I)$$"] --> G["Decoder<br/>entrenado"]
+        F["<i>z</i> ~ N(0, I)"] --> G["Decoder<br/>entrenado"]
         G --> H[Dato sintético]
     end
 
@@ -301,11 +301,11 @@ Para generar datos sintéticos: partes de ruido puro y aplicas el proceso invers
 ```{mermaid}
 graph LR
     subgraph "Forward: añadir ruido (fijo)"
-        X0["$$x_0$$ \text{ (dato real)}"] --> X1["$$x_1$$ \text{ (+ ruido)}"] --> X2["$$x_2$$ \text{ (+ más ruido)}"] --> XT["$$x_T$$ \text{ (ruido puro)}"]
+        X0["<i>x</i>₀<br/>(dato real)"] --> X1["<i>x</i>₁<br/>(+ ruido)"] --> X2["<i>x</i>₂<br/>(+ más ruido)"] --> XT["<i>x</i><sub>T</sub><br/>(ruido puro)"]
     end
 
-    subgraph "Reverse: eliminar ruido (aprendido)"
-        YT["$$x_T$$ \text{ (ruido puro)}"] --> Y2["$$x_{T-1}$$"] --> Y1["$$x_1$$"] --> Y0["$$x_0$$ (dato sintético)"]
+    subgraph "Reverse: quitar ruido"
+        YT["<i>x</i><sub>T</sub><br/>(ruido puro)"] --> Y2["<i>x</i><sub>T−1</sub>"] --> Y1["<i>x</i>₁"] --> Y0["<i>x</i>₀<br/>(dato sintético)"]
     end
 
     style X0 fill:#2e7d32,color:#fff

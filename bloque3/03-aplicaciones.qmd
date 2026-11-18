@@ -90,7 +90,7 @@ graph LR
 ::: {#fig-b3-resumen}
 ```{mermaid}
 graph TD
-    subgraph "Bloque 3 — Lo que has aprendido"
+    subgraph "Bloque 3: lo aprendido"
         A[RAG Avanzado] -->|Re-ranking + RAGAS| B[Sistemas RAG evaluados]
         C[Datos Sintéticos] -->|CTGAN + validación| D[Datasets aumentados]
         E[Fine-tuning] -->|LoRA + QLoRA| F[Modelos adaptados]

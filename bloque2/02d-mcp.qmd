@@ -35,7 +35,7 @@ Para resolverlo, Anthropic impulsó el Model Context Protocol (MCP), un protocol
 ::: {#fig-mcp-vs-sin-mcp}
 ```{mermaid}
 graph TB
-    subgraph "Sin MCP — M×N integraciones ad hoc (9 conexiones)"
+    subgraph "Sin MCP: 9 conexiones"
         direction LR
         L1[Claude] --- D1[(BD)]
         L1 --- D2[API REST]
@@ -48,7 +48,7 @@ graph TB
         L3 --- D3
     end
 
-    subgraph "Con MCP — M+N integraciones estandarizadas (6 implementaciones)"
+    subgraph "Con MCP: 6 adaptadores"
         direction TB
         LC[Claude<br/>+ MCP Client]
         LQ[Qwen<br/>+ MCP Client]
@@ -76,6 +76,8 @@ graph TB
     style S3 fill:#e65100,color:#fff
     style PROTO fill:#FFD43B,color:#000,stroke:#000,stroke-width:2px
 ```
+
+Sin MCP hacen falta M × N integraciones ad hoc (3 × 3 = 9); con MCP bastan M + N implementaciones estandarizadas (3 + 3 = 6).
 :::
 
 ### Arquitectura de MCP {#sec-mcp-arquitectura}

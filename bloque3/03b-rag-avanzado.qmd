@@ -442,7 +442,7 @@ else:
     query_original = "¿Cuál es el margen del Monitor 4K?"
 
     respuesta_hipotetica = client.chat.completions.create(
-        model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+        model=os.getenv("LLM_MODEL", "gemma4:26b"),
         max_tokens=2048,
         messages=[{"role": "user", "content": f"Responde brevemente a esta pregunta como si fueras un informe de ventas:\n{query_original}"}],
         temperature=0.7,

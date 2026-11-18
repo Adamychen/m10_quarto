@@ -57,7 +57,7 @@ flowchart LR
     QE --> B[Buscar<br/>top-k]:::proc
     I --> B
     B --> R[Chunks<br/>recuperados]:::out
-    R --> M[Medir:<br/>hit@k, MRR]:::obs
+    R --> M["Medir:<br/>hit@k, MRR"]:::obs
 
     classDef input fill:#4B8BBE,stroke:#1e3a5f,color:#fff,stroke-width:1.5px
     classDef proc  fill:#306998,stroke:#0d1f33,color:#fff,stroke-width:1.5px

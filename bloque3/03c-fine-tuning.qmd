@@ -183,19 +183,19 @@ LoRA es la técnica PEFT más popular. En vez de reescribir todos los pesos del 
 ```{mermaid}
 graph TD
     subgraph "Modelo original (congelado)"
-        X["Entrada $$x$$"] --> W["Matriz $$W$$<br/>($$d \times d$$, congelada)"]
-        W --> WX["$$Wx$$"]
+        X["Entrada <i>x</i>"] --> W["Matriz <i>W</i><br/>(d × d, congelada)"]
+        W --> WX["<i>Wx</i>"]
     end
 
-    subgraph "Adaptadores LoRA (entrenables)"
-        X --> A["Matriz $$A$$<br/>($$d \times r$$, $$r \ll d$$)"]
-        A --> B["Matriz $$B$$<br/>($$r \times d$$)"]
-        B --> BAX["$$BAx$$"]
+    subgraph "LoRA (entrenable)"
+        X --> A["Matriz <i>A</i><br/>(r × d, r ≪ d)"]
+        A --> B["Matriz <i>B</i><br/>(d × r)"]
+        B --> BAX["<i>BAx</i>"]
     end
 
-    WX --> SUM["$$+$$"]
+    WX --> SUM["+"]
     BAX --> SUM
-    SUM --> OUT["Salida: $$Wx + BAx$$"]
+    SUM --> OUT["Salida: <i>Wx</i> + <i>BAx</i>"]
 
     style W fill:#306998,color:#fff
     style A fill:#e65100,color:#fff

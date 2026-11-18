@@ -17,7 +17,7 @@ engine: jupyter
 
 ## Materiales
 - Librerías: `langgraph`, `langgraph-prebuilt`, `langgraph-checkpoint`, `langchain-openai`, `python-dotenv`
-- LLM: API Llamus US (`https://llamus.cs.us.es/api/v1`, modelo `gemma4:26b-mlx`) o local (Ollama con `qwen3:8b`)
+- LLM: API Llamus US (`https://llamus.cs.us.es/api/v1`, modelo `gemma4:26b`) o local (Ollama con `qwen3:8b`)
 - Prerrequisito: [02e — Agentes Inteligentes](02e-agentes.qmd) y [02f — Patrones de Diseño de Agentes](02f-patrones-agentes.qmd)
 
 ## Pipeline
@@ -115,7 +115,7 @@ LLM_URL = os.getenv("LLM_URL", "https://llamus.cs.us.es/api/v1")
 if not LLM_KEY:
     print("⚠️  Crea un archivo .env en la raíz con:\n    LLM_API_KEY=tu_api_key\n    Las celdas con LLM mostrarán este aviso.")
 else:
-    llm = ChatOpenAI(model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"), base_url=LLM_URL, api_key=LLM_KEY, temperature=0, max_tokens=2048)
+    llm = ChatOpenAI(model=os.getenv("LLM_MODEL", "gemma4:26b"), base_url=LLM_URL, api_key=LLM_KEY, temperature=0, max_tokens=2048)
     print("✅ LLM configurado.")
 ```
 
@@ -791,13 +791,13 @@ Añade a cualquier grafo de las Partes 1-3 un campo `pasos` en el estado y una a
 ::: {#fig-hpd3-arquitectura}
 ```{mermaid}
 graph TD
-    subgraph "Parte 1 — Workflows (StateGraph)"
-        R[Routing<br/>clasificador + manejadores]
+    subgraph "Parte 1 — Workflows"
+        R[Routing con StateGraph<br/>clasificador + manejadores]
         E[Evaluator-optimizer<br/>generador + evaluador + ciclo]
         P[Parallelization<br/>Send + fan-out + consolidar]
     end
-    subgraph "Parte 2 — Human-in-the-loop"
-        I[interrupt + checkpoint]
+    subgraph "Parte 2 — HITL"
+        I[Human-in-the-loop<br/>interrupt + checkpoint]
     end
     subgraph "Parte 3 — Multi-agente"
         S[Supervisor] --> A[Analista]
@@ -805,7 +805,7 @@ graph TD
         A --> S
         C --> S
     end
-    subgraph "Parte 4 — Problema aplicado"
+    subgraph "Parte 4 — Caso aplicado"
         P4[Problema financiero<br/>patrón justificado + grafo]
     end
     R --> E --> P --> I --> S --> P4

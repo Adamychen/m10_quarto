@@ -131,7 +131,7 @@ span.end(output={"chunks": 3, "top_distance": 0.12})
 # Registrar la generación
 gen = trace.generation(
     name="generate",
-    model=os.getenv("LLM_MODEL", "gemma4:26b-mlx"),
+    model=os.getenv("LLM_MODEL", "gemma4:26b"),
     input={"messages": [...]},
     output={"text": "..."},
     usage={"prompt_tokens": 120, "completion_tokens": 50},
