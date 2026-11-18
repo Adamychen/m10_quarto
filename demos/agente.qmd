@@ -1,0 +1,426 @@
+---
+title: "Demo — Dentro de un agente: cómo elige y usa sus herramientas"
+description: "Recorre paso a paso la traza de un agente con tool calling y comprueba qué pasa cuando la descripción de una herramienta es vaga o se solapa con otra."
+engine: markdown
+---
+
+> Demo que acompaña a [Diseño de agentes inteligentes](../bloque2/02e-agentes.qmd#sec-tool-calling) y sirve de base para el [HPD 2](../bloque2/hpd2-agente-tool-calling.qmd). Se ejecuta en el navegador con Shinylive y no necesita clave de API.
+
+::: {.callout-note}
+## El modelo de esta demo es simulado
+
+Aquí no hay ningún LLM: el «modelo» elige herramienta contando cuántas palabras de lo que necesita coinciden con la **descripción** de cada herramienta. Un LLM real es mucho más listo, pero falla por la misma razón: **solo sabe lo que dicen el nombre y la descripción de la herramienta**.
+:::
+
+Un agente con herramientas funciona en bucle: el modelo recibe la pregunta junto con la lista de herramientas, decide si necesita una, **pide** que se ejecute (el modelo no ejecuta nada: solo escribe un JSON), tu código la ejecuta y le devuelve el resultado, y el modelo decide si necesita otra vuelta o ya puede responder.
+
+Elige una pregunta y pulsa **Siguiente paso** para recorrer la traza. A la derecha, el diagrama marca en qué parte del bucle estás.
+
+```{shinylive-python}
+#| standalone: true
+#| viewerHeight: 1250
+
+import json
+import math
+import re
+import unicodedata
+
+# ── Datos de la empresa (lo que devuelven las herramientas) ──────────────────
+VENTAS = {
+    ("norte", "enero"): 120000, ("norte", "febrero"): 135000, ("norte", "marzo"): 142500,
+    ("sur", "enero"): 98000, ("sur", "febrero"): 107800, ("sur", "marzo"): 101300,
+    ("este", "enero"): 76000, ("este", "febrero"): 81500, ("este", "marzo"): 90200,
+}
+GLOSARIO = {
+    "ticket medio": "Importe medio por pedido: ventas totales divididas entre el número de pedidos.",
+    "churn": "Porcentaje de clientes que dejan de comprar en un periodo.",
+}
+
+TOOLS = ["consultar_ventas", "calcular", "buscar_glosario"]
+SIGNATURES = {
+    "consultar_ventas": "region: str, mes: str",
+    "calcular": "expresion: str",
+    "buscar_glosario": "termino: str",
+}
+DEFAULT_DESC = {
+    "consultar_ventas": "Devuelve las ventas en euros de una región (Norte, Sur o Este) en un mes concreto.",
+    "calcular": "Evalúa una operación aritmética y devuelve el resultado. Úsala para porcentajes, sumas o divisiones.",
+    "buscar_glosario": "Busca la definición de una métrica o término de negocio en el glosario de la empresa.",
+}
+PRESETS = {
+    "ok": ("Descripciones buenas", DEFAULT_DESC),
+    "vaga": ("Descripción vaga", {**DEFAULT_DESC, "consultar_ventas": "Herramienta útil para datos."}),
+    "solape": ("Dos herramientas se pisan", {
+        **DEFAULT_DESC,
+        "buscar_glosario": "Glosario de ventas por región y mes.",
+    }),
+}
+
+# ── Preguntas: lo que el modelo necesita en cada paso (su «intención») ──────
+# need: cómo formula el modelo lo que necesita; tool/args: la llamada correcta.
+QUESTIONS = [
+    {
+        "q": "¿Cuánto vendimos en el Norte en marzo?",
+        "steps": [
+            {"need": "Necesito las ventas de la región Norte en el mes de marzo.",
+             "tool": "consultar_ventas", "args": {"region": "Norte", "mes": "marzo"}, "short": "ventas Norte marzo"},
+        ],
+        "answer": "En marzo, la región Norte vendió **142.500 €**.",
+        "invented": "En marzo, la región Norte vendió unos **150.000 €**, una cifra en línea con meses anteriores.",
+    },
+    {
+        "q": "¿Cuánto crecieron las ventas del Sur de enero a febrero, en porcentaje?",
+        "steps": [
+            {"need": "Necesito las ventas de la región Sur en el mes de enero.",
+             "tool": "consultar_ventas", "args": {"region": "Sur", "mes": "enero"}, "short": "ventas Sur enero"},
+            {"need": "Necesito las ventas de la región Sur en el mes de febrero.",
+             "tool": "consultar_ventas", "args": {"region": "Sur", "mes": "febrero"}, "short": "ventas Sur febrero"},
+            {"need": "Ya tengo las dos cifras. Necesito calcular el porcentaje de crecimiento con una operación.",
+             "tool": "calcular", "args": {"expresion": "(107800 - 98000) / 98000 * 100"}, "short": "crecimiento porcentual"},
+        ],
+        "answer": "Las ventas del Sur crecieron un **10 %**: de 98.000 € en enero a 107.800 € en febrero.",
+        "invented": "Las ventas del Sur crecieron aproximadamente un **15 %** de enero a febrero.",
+    },
+    {
+        "q": "¿Qué significa «ticket medio»?",
+        "steps": [
+            {"need": "Necesito la definición del término de negocio «ticket medio».",
+             "tool": "buscar_glosario", "args": {"termino": "ticket medio"}, "short": "ticket medio"},
+        ],
+        "answer": "El **ticket medio** es el importe medio por pedido: las ventas totales divididas entre el número de pedidos.",
+        "invented": "El ticket medio es el precio medio de los productos del catálogo.",
+    },
+    {
+        "q": "Escribe una frase de bienvenida para el informe mensual.",
+        "steps": [],
+        "answer": "«Bienvenidos al informe mensual: estas son las cifras clave y lo que nos dicen.»",
+        "invented": "",
+    },
+]
+
+STOP = {"de", "la", "el", "en", "los", "las", "del", "un", "una", "y", "o", "a", "que", "con", "por",
+        "para", "su", "sus", "al", "es", "se", "lo", "ya", "mes", "necesito", "tengo", "dos", "cualquier"}
+THRESHOLD = 0.35
+
+
+def _norm(w):
+    return "".join(c for c in unicodedata.normalize("NFD", w.lower()) if unicodedata.category(c) != "Mn")
+
+
+def stems(text):
+    """Raíces de 5 letras de las palabras con contenido (simulación muy simple de «entender»)."""
+    return {_norm(w)[:5] for w in re.findall(r"\w+", text) if len(w) > 2 and _norm(w) not in STOP}
+
+
+def scores(need, descs):
+    """Puntuación de cada herramienta: coincidencias entre la necesidad y nombre + descripción."""
+    n = stems(need)
+    out = {}
+    for t in TOOLS:
+        d = stems(descs[t])
+        common = sorted(n & d)
+        out[t] = (len(common) / math.sqrt(len(d) or 1), common)
+    return out
+
+
+def run_tool(tool, args):
+    if tool == "consultar_ventas":
+        r, m = str(args.get("region", "")).lower(), str(args.get("mes", "")).lower()
+        if (r, m) in VENTAS:
+            return {"region": args["region"], "mes": args["mes"], "ventas_eur": VENTAS[(r, m)]}
+        return {"error": "Faltan o no son válidos 'region' y 'mes'."}
+    if tool == "calcular":
+        expr = str(args.get("expresion", ""))
+        if re.fullmatch(r"[\d\s+\-*/().]+", expr):
+            return {"resultado": round(eval(expr), 2)}
+        return {"error": f"«{expr}» no es una operación aritmética."}
+    if tool == "buscar_glosario":
+        term = str(args.get("termino", "")).lower()
+        if term in GLOSARIO:
+            return {"termino": term, "definicion": GLOSARIO[term]}
+        return {"error": f"«{args.get('termino')}» no está en el glosario."}
+    return {"error": "Herramienta desconocida"}
+
+
+def wrong_args(tool, short):
+    """Argumentos con los que el modelo llamaría a una herramienta que no encaja."""
+    if tool == "consultar_ventas":
+        return {"region": "?", "mes": "?"}
+    key = {"calcular": "expresion", "buscar_glosario": "termino"}[tool]
+    return {key: short}
+
+
+def build_trace(qi, descs):
+    """Lista de pasos: dicts con role in {user, think, call, result, answer} y su contenido."""
+    Q = QUESTIONS[qi]
+    trace = [{"role": "user", "text": Q["q"]}]
+    if not Q["steps"]:
+        trace.append({"role": "think", "text": "Puedo responder con lo que sé: no necesito ninguna herramienta.",
+                      "scores": None})
+        trace.append({"role": "answer", "text": Q["answer"], "status": "ok"})
+        return trace
+    for st in Q["steps"]:
+        sc = scores(st["need"], descs)
+        best = max(TOOLS, key=lambda t: sc[t][0])
+        if sc[best][0] < THRESHOLD:
+            trace.append({"role": "think", "text": st["need"] + " Ninguna herramienta parece servir, así que respondo con lo que creo saber.",
+                          "scores": sc, "chosen": None})
+            trace.append({"role": "answer", "text": Q["invented"], "status": "invented"})
+            return trace
+        trace.append({"role": "think", "text": st["need"], "scores": sc, "chosen": best})
+        args = st["args"] if best == st["tool"] else wrong_args(best, st["short"])
+        trace.append({"role": "call", "tool": best, "args": args, "right": best == st["tool"]})
+        res = run_tool(best, args)
+        trace.append({"role": "result", "tool": best, "result": res})
+        if "error" in res:
+            trace.append({"role": "answer", "status": "fail",
+                          "text": "No he podido obtener el dato: la herramienta que elegí no era la adecuada."})
+            return trace
+    trace.append({"role": "answer", "text": Q["answer"], "status": "ok"})
+    return trace
+
+
+# ── Interfaz ─────────────────────────────────────────────────────────────────
+from shiny import reactive
+from shiny.express import input, ui, render
+
+BLUE, DARK, YELLOW, ORANGE, GREEN, RED, GRAY = (
+    "#4B8BBE", "#306998", "#FFD43B", "#e65100", "#2e7d32", "#c62828", "#9ca3af")
+
+ui.tags.style("""
+body{font-family:system-ui,-apple-system,'Segoe UI',sans-serif}
+.card{border:1px solid #e5e7eb;border-radius:10px;padding:10px 14px;margin:10px 0;background:#fff}
+.muted{color:#6b7280;font-size:.85em}
+.chip{display:inline-block;border:1px solid #306998;color:#306998;background:#fff;border-radius:999px;
+  padding:2px 12px;margin:2px 6px 2px 0;font-size:.85em;cursor:pointer;user-select:none}
+.chip:hover{background:#e8f0f8}.chip.on{background:#306998;color:#fff}
+.step{border-radius:10px;padding:8px 12px;margin:8px 0;font-size:.92em}
+.step .who{font-size:.75em;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px}
+.user{background:#4B8BBE;color:#fff;margin-left:22%}
+.think{background:#f3f4f6;font-style:italic}
+.call{background:#fff3e0;border:1.5px solid #e65100}
+.call.bad{border:2px solid #c62828;background:#ffebee}
+.result{background:#fffbe6;border:1.5px solid #e0b400}
+.answer{border:2px solid #2e7d32;background:#e8f5e9}
+.answer.fail{border-color:#e65100;background:#fff3e0}
+.answer.invented{border-color:#c62828;background:#ffebee}
+pre.js{margin:4px 0 0;font-size:.82em;background:none;border:none;padding:0;white-space:pre-wrap}
+.sc{display:grid;grid-template-columns:130px 1fr 34px;gap:2px 8px;align-items:center;font-style:normal;font-size:.85em;margin-top:6px}
+.track{height:10px;background:#e5e7eb;border-radius:3px;overflow:hidden}
+.fill{display:block;height:100%;border-radius:3px}
+.kw{display:inline-block;background:#FFD43B;border-radius:3px;padding:0 4px;margin:0 2px;font-size:.85em;font-style:normal}
+@keyframes pop{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+.new{animation:pop .35s ease-out both}
+textarea{font-size:.88em!important}
+""")
+
+pos = reactive.value(0)
+
+
+def descs():
+    return {t: input[f"d_{t}"]() for t in TOOLS}
+
+
+@reactive.calc
+def trace():
+    return build_trace(int(input.q()), descs())
+
+
+@reactive.effect
+@reactive.event(input.q, *[input[f"d_{t}"] for t in TOOLS])
+def _reset():
+    pos.set(0)
+
+
+@reactive.effect
+@reactive.event(input.next)
+def _next():
+    pos.set(min(pos() + 1, len(trace()) - 1))
+
+
+@reactive.effect
+@reactive.event(input.prev)
+def _prev():
+    pos.set(max(pos() - 1, 0))
+
+
+@reactive.effect
+@reactive.event(input.all)
+def _all():
+    pos.set(len(trace()) - 1)
+
+
+@reactive.effect
+@reactive.event(input.preset)
+def _preset():
+    for t, d in PRESETS[input.preset()][1].items():
+        ui.update_text_area(f"d_{t}", value=d)
+
+
+def md(text):
+    return re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text)
+
+
+def js(obj):
+    return json.dumps(obj, ensure_ascii=False, indent=1)
+
+
+def render_step(s, new):
+    cls = " new" if new else ""
+    r = s["role"]
+    if r == "user":
+        return f"<div class='step user{cls}'><div class='who'>Usuario</div>{s['text']}</div>"
+    if r == "think":
+        body = s["text"]
+        if s.get("scores"):
+            best = max(v[0] for v in s["scores"].values()) or 1
+            rows = []
+            for t, (v, common) in s["scores"].items():
+                col = GREEN if t == s.get("chosen") else GRAY
+                rows.append(
+                    f"<code>{t}</code><span class='track'><span class='fill' "
+                    f"style='width:{100 * v / best:.0f}%;background:{col}'></span></span><span>{v:.2f}</span>"
+                )
+            chosen = s.get("chosen")
+            common = s["scores"][chosen][1] if chosen else []
+            kws = "".join(f"<span class='kw'>{c}…</span>" for c in common)
+            verdict = (
+                f"<div style='font-style:normal;margin-top:4px'>Elige <code>{chosen}</code>, porque su descripción "
+                f"coincide en: {kws}</div>" if chosen else
+                f"<div style='font-style:normal;margin-top:4px;color:{RED}'>Ninguna supera el umbral "
+                f"({THRESHOLD}): no llama a ninguna herramienta.</div>"
+            )
+            body += f"<div class='sc'>{''.join(rows)}</div>{verdict}"
+        return f"<div class='step think{cls}'><div class='who'>💭 El modelo decide</div>{body}</div>"
+    if r == "call":
+        bad = "" if s["right"] else " bad"
+        warn = "" if s["right"] else f"<div style='color:{RED};font-weight:600'>✘ Herramienta equivocada</div>"
+        payload = {"tool_call": {"name": s["tool"], "arguments": s["args"]}}
+        return (f"<div class='step call{bad}{cls}'><div class='who'>🛠 El modelo pide una herramienta</div>"
+                f"{warn}<pre class='js'>{js(payload)}</pre></div>")
+    if r == "result":
+        return (f"<div class='step result{cls}'><div class='who'>📦 Tu código ejecuta <code>{s['tool']}</code> "
+                f"y devuelve</div><pre class='js'>{js(s['result'])}</pre></div>")
+    status = s["status"]
+    extra = {
+        "ok": "",
+        "fail": "",
+        "invented": f"<div style='color:{RED};font-weight:600;margin-top:4px'>⚠ Cifra inventada: "
+                    f"no viene de ninguna herramienta. Suena convincente, pero es una alucinación.</div>",
+    }[status]
+    head = {"ok": "✔ Respuesta final", "fail": "✘ Respuesta final", "invented": "⚠ Respuesta final"}[status]
+    return f"<div class='step answer {status}{cls}'><div class='who'>{head}</div>{md(s['text'])}{extra}</div>"
+
+
+def loop_svg(role, n_calls):
+    """Diagrama del bucle con la fase actual resaltada."""
+    nodes = {"user": (60, 60, "Usuario"), "llm": (200, 60, "LLM"),
+             "tools": (340, 60, "Herramientas"), "out": (200, 160, "Respuesta")}
+    active_node = {"user": "user", "think": "llm", "call": "tools", "result": "llm", "answer": "out"}[role]
+    active_edge = {"user": "u-l", "think": None, "call": "l-t", "result": "t-l", "answer": "l-o"}[role]
+    edges = {
+        "u-l": "M100,60 L156,60", "l-t": "M244,52 L296,52", "t-l": "M296,70 L244,70", "l-o": "M200,82 L200,136",
+    }
+    parts = ["<defs>" + "".join(
+        f"<marker id='a{c}' viewBox='0 0 10 10' refX='9' refY='5' markerWidth='6' markerHeight='6' orient='auto'>"
+        f"<path d='M0,0 L10,5 L0,10 z' fill='{c2}'/></marker>" for c, c2 in (("n", GRAY), ("h", ORANGE))) + "</defs>"]
+    for k, d in edges.items():
+        on = k == active_edge
+        parts.append(f"<path d='{d}' stroke='{ORANGE if on else GRAY}' stroke-width='{3.5 if on else 1.8}' "
+                     f"fill='none' marker-end='url(#a{'h' if on else 'n'})'/>")
+    for k, (x, y, label) in nodes.items():
+        on = k == active_node
+        fill = {"user": BLUE, "llm": DARK, "tools": ORANGE, "out": GREEN}[k]
+        parts.append(
+            f"<rect x='{x - 46}' y='{y - 20}' width='92' height='40' rx='10' fill='{fill}' "
+            f"fill-opacity='{1 if on else 0.25}' stroke='{'#111' if on else 'none'}' stroke-width='2'/>"
+            f"<text x='{x}' y='{y + 5}' text-anchor='middle' font-size='13' font-weight='600' "
+            f"fill='{'#fff' if on else '#374151'}'>{label}</text>"
+        )
+    parts.append(f"<text x='340' y='100' text-anchor='middle' font-size='11' fill='#6b7280'>vueltas: {n_calls}</text>")
+    return (f"<svg viewBox='0 0 400 190' width='100%' style='max-width:360px;display:block;margin:auto' "
+            f"font-family='system-ui,sans-serif'>{''.join(parts)}</svg>")
+
+
+ui.input_select("q", "Pregunta al agente", {str(i): Q["q"] for i, Q in enumerate(QUESTIONS)},
+                selected="0", width="100%")
+
+with ui.div(style="display:flex;gap:8px;flex-wrap:wrap;margin:2px 0 6px"):
+    ui.input_action_button("prev", "◀", class_="btn-outline-primary btn-sm")
+    ui.input_action_button("next", "Siguiente paso ▶", class_="btn-primary btn-sm")
+    ui.input_action_button("all", "Ver todo", class_="btn-outline-secondary btn-sm")
+
+with ui.layout_columns(col_widths=(7, 5)):
+    @render.ui
+    def timeline():
+        tr, p = trace(), pos()
+        steps = "".join(render_step(s, i == p and p > 0) for i, s in enumerate(tr[: p + 1]))
+        more = (f"<p class='muted' style='text-align:center'>Paso {p + 1} de {len(tr)} · pulsa «Siguiente paso»</p>"
+                if p < len(tr) - 1 else "")
+        return ui.HTML(steps + more)
+
+    @render.ui
+    def side():
+        tr, p = trace(), pos()
+        seen = tr[: p + 1]
+        n_calls = sum(s["role"] == "call" for s in seen)
+        n_msgs = sum(s["role"] != "think" for s in seen)
+        explain = {
+            "user": "El usuario pregunta. El modelo recibe la pregunta <b>y la lista de herramientas</b> con sus descripciones.",
+            "think": "El modelo lee las descripciones y decide si necesita una herramienta y cuál.",
+            "call": "El modelo <b>no ejecuta nada</b>: solo devuelve un JSON con el nombre y los argumentos.",
+            "result": "Tu código ejecuta la función y devuelve el resultado al modelo como un mensaje más. Vuelta al bucle.",
+            "answer": "Cuando ya no necesita más herramientas, el modelo responde y el bucle termina.",
+        }[seen[-1]["role"]]
+        return ui.HTML(
+            f"<div class='card' style='position:sticky;top:6px'>{loop_svg(seen[-1]['role'], n_calls)}"
+            f"<p style='font-size:.88em;margin:6px 0'>{explain}</p>"
+            f"<p class='muted' style='margin:0'>Mensajes en la conversación: <b>{n_msgs}</b>. "
+            f"Cada vuelta añade dos (petición y resultado), y el contexto crece.</p></div>"
+        )
+
+
+ui.hr()
+ui.markdown("**Las herramientas que ve el modelo.** Edita una descripción, o prueba un preajuste, y vuelve a recorrer la traza.")
+
+
+@render.ui
+def presets():
+    cur = descs()
+    chips = "".join(
+        f"<span class='chip{' on' if all(cur[t] == d[t] for t in TOOLS) else ''}' "
+        f"onclick=\"Shiny.setInputValue('preset', '{k}', {{priority: 'event'}})\">{name}</span>"
+        for k, (name, d) in PRESETS.items()
+    )
+    return ui.HTML(f"<div style='margin-bottom:6px'>{chips}</div>")
+
+
+for _t in TOOLS:
+    ui.input_text_area(f"d_{_t}", ui.HTML(f"<code>{_t}({SIGNATURES[_t]})</code>"),
+                       DEFAULT_DESC[_t], rows=2, width="100%")
+```
+
+## Qué observar
+
+1. Con la primera pregunta, recorre la traza: una sola vuelta. Fíjate en que la petición de herramienta es **solo un JSON** con el nombre y los argumentos; quien ejecuta la función es tu código.
+2. Cambia a la pregunta del **crecimiento del Sur**: hacen falta tres vueltas (dos consultas y un cálculo). Mira cómo crece el contador de mensajes: cada vuelta alarga el contexto, y por eso los agentes largos son lentos y caros.
+3. Prueba la **frase de bienvenida**: el modelo no necesita ninguna herramienta y responde directamente. Decidir *no* usar herramientas también es parte del trabajo.
+4. Pulsa **Descripción vaga** y repite la primera pregunta. `consultar_ventas` ya no dice para qué sirve, ninguna herramienta encaja y el modelo **se inventa la cifra**. La respuesta suena igual de segura que la buena.
+5. Pulsa **Dos herramientas se pisan**. Ahora el glosario dice tener «ventas por región» y el modelo lo elige para pedir las ventas: herramienta equivocada y error. Y la pregunta del *ticket medio* se queda sin herramienta, porque el glosario ya no dice que define términos.
+6. Escribe tus propias descripciones. Intenta que `calcular` «robe» la pregunta de las ventas.
+
+## Qué has visto
+
+- El modelo **no ejecuta** las herramientas: propone una llamada en JSON, y tu código decide si la ejecuta.
+- Un agente es un **bucle**: pregunta → decisión → llamada → resultado → decisión… hasta que el modelo responde. Cada vuelta añade mensajes al contexto.
+- El modelo elige leyendo **descripciones**. Una descripción vaga hace que no la use (y que invente); dos descripciones solapadas hacen que use la equivocada. Por eso la descripción de una herramienta es parte del prompt y merece el mismo cuidado.
+
+::: {.callout-warning}
+## Qué es real y qué está simplificado
+
+- La selección por coincidencia de palabras es una caricatura de lo que hace un LLM. Un modelo real entiende sinónimos y contexto, y no tiene un umbral fijo, pero sí comete estos dos errores con descripciones vagas o solapadas.
+- El formato del JSON está simplificado. Cada proveedor (OpenAI, Anthropic, Ollama…) usa su propio esquema, aunque la idea es la misma: nombre de la herramienta y argumentos.
+- En un agente real el modelo no siempre se detiene ante un error: puede reintentar, probar otra herramienta o pedir aclaración. Aquí se para para que el fallo se vea.
+:::
+
+Para escribir las herramientas en código, vuelve a [Cómo definir una buena herramienta](../bloque2/02e-agentes.qmd#sec-buena-herramienta).

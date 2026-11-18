@@ -337,6 +337,7 @@ A partir de ahí, cada `quarto publish gh-pages` actualiza la rama `gh-pages` y 
 
 - Los `.qmd` usan `engine: jupyter` y contienen celdas Python ejecutables.
 - Las celdas con `#| eval: true` se ejecutan durante `quarto render`.
+- `execute: freeze: auto` en `_quarto.yml`: Quarto guarda en `_freeze/` (local, no versionado) el resultado de cada página y solo re-ejecuta las que cambian. Para forzar la re-ejecución de todo (p. ej. tras cambiar librerías o modelos): `quarto render --cache-refresh`.
 - Las celdas con `#| eval: false` (típicamente las que llaman al LLM) NO se ejecutan en render; los notebooks Colab son el vehículo de ejecución real.
 - La lógica de carga de `LLM_API_KEY` está centralizada en `includes/setup_keys.py` y se inyecta vía el marcador `"""
 Setup compartido para la API key de Llamus en todos los notebooks.

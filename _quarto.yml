@@ -120,6 +120,8 @@ website:
             text: "Troceado para RAG"
           - href: demos/temperatura.qmd
             text: "Temperatura y muestreo"
+          - href: demos/agente.qmd
+            text: "Dentro de un agente"
       - section: "Evaluación"
         contents:
           - href: 05-evaluacion.qmd
@@ -137,7 +139,7 @@ filters:
   - shinylive
 
 execute:
-  freeze: false
+  freeze: auto
 
 format:
   html:

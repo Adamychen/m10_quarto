@@ -150,6 +150,8 @@ graph TD
 
 ### Tool Calling (Function Calling nativo) {#sec-tool-calling}
 
+> **Demo interactiva:** [dentro de un agente](../demos/agente.qmd). Recorre paso a paso cómo el modelo elige una herramienta, la pide en JSON y recibe el resultado, sin escribir código.
+
 LangChain abstrae el bucle ReAct con `create_agent`:
 
 ```{python}
@@ -225,6 +227,8 @@ else:
 ### Cómo definir una buena herramienta {#sec-buena-herramienta}
 
 El secreto de un agente que funciona está en cómo describes las herramientas:
+
+> En la [demo del agente](../demos/agente.qmd) puedes estropear una descripción y ver cómo el modelo elige la herramienta equivocada o se inventa la respuesta.
 
 ```{python}
 #| echo: true
